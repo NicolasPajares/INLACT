@@ -7,13 +7,13 @@ const lugares = [
     nombre: "Depósito Villa María",
     lat: -32.3830,      // <-- poné tu lat real
     lng: -63.2229,      // <-- poné tu lng real
-    radio: 300          // metros (para prueba)
+    radio: 500         // metros (para prueba)
   },
   {
     nombre: "Deposito Las Varillas",
     lat: -31.8743,
     lng: -62.7257,
-    radio: 200
+    radio: 500
   }
 ];
 
