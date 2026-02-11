@@ -54,38 +54,53 @@ function buscarLugaresCercanos() {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const latActual = pos.coords.latitude;
-      const lngActual = pos.coords.longitude;
+navigator.geolocation.getCurrentPosition(
+  (pos) => {
+    const latActual = pos.coords.latitude;
+    const lngActual = pos.coords.longitude;
 
-      contenedor.innerHTML = "";
-      let hayCercanos = false;
+    console.log("Mi ubicación:", latActual, lngActual);
 
-      lugares.forEach(lugar => {
-        const distancia = distanciaMetros(
-          latActual,
-          lngActual,
-          lugar.lat,
-          lugar.lng
-        );
+    let encontrado = false;
 
-        if (distancia <= lugar.radio) {
-          hayCercanos = true;
+    lugares.forEach(lugar => {
+      const distancia = distanciaMetros(
+        latActual,
+        lngActual,
+        lugar.lat,
+        lugar.lng
+      );
 
-          const info = document.createElement("p");
-          info.textContent =
-            Estás a ${Math.round(distancia)} m de ${lugar.nombre};
+      console.log(
+        Distancia a ${lugar.nombre}: ${Math.round(distancia)} m
+      );
 
-          const boton = document.createElement("button");
-          boton.textContent = "Registrar visita – " + lugar.nombre;
+      if (distancia <= lugar.radio) {
+        encontrado = true;
 
-          boton.onclick = () => registrarVisita(lugar.nombre, distancia);
+        document.getElementById("resultado").innerHTML = `
+          <h3>Estás en ${lugar.nombre}</h3>
+          <button onclick="registrarVisita('${lugar.nombre}')">
+            Registrar visita
+          </button>
+        `;
+      }
+    });
 
-          contenedor.appendChild(info);
-          contenedor.appendChild(boton);
-          contenedor.appendChild(document.createElement("hr"));
-        }
+    if (!encontrado) {
+      document.getElementById("resultado").innerHTML =
+        "No hay fábricas cercanas";
+    }
+  },
+  (error) => {
+    alert("Error al obtener ubicación: " + error.message);
+  },
+  {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  }
+);
       });
 
       if (!hayCercanos) {
