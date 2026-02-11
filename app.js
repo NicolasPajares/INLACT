@@ -1,17 +1,17 @@
-console.log("✅ app.js cargado");
+console.log("app.js cargado");
 
 // ============================
-// LISTA DE CLIENTES / DEPÓSITOS
+// LUGARES
 // ============================
 const lugares = [
   {
-    nombre: "Depósito Villa María",
+    nombre: "Deposito Villa Maria",
     lat: -32.3830,
     lng: -63.2229,
     radio: 500
   },
   {
-    nombre: "Depósito Las Varillas",
+    nombre: "Deposito Las Varillas",
     lat: -31.8743,
     lng: -62.7257,
     radio: 500
@@ -19,7 +19,7 @@ const lugares = [
 ];
 
 // ============================
-// FUNCIÓN DISTANCIA (Haversine)
+// DISTANCIA (Haversine)
 // ============================
 function distanciaMetros(lat1, lng1, lat2, lng2) {
   const R = 6371000;
@@ -29,10 +29,10 @@ function distanciaMetros(lat1, lng1, lat2, lng2) {
   const dLng = toRad(lng2 - lng1);
 
   const a =
-    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRad(lat1)) *
     Math.cos(toRad(lat2)) *
-    Math.sin(dLng / 2) ** 2;
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -41,25 +41,25 @@ function distanciaMetros(lat1, lng1, lat2, lng2) {
 // ============================
 // INICIO
 // ============================
-window.onload = () => {
+window.onload = function () {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
 
   if (!navigator.geolocation) {
-    estado.textContent = "❌ Geolocalización no soportada";
+    estado.textContent = "Geolocalizacion no soportada";
     return;
   }
 
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
+    function (pos) {
       const latUser = pos.coords.latitude;
       const lngUser = pos.coords.longitude;
 
-      console.log("📍 Tu ubicación:", latUser, lngUser);
+      console.log("Ubicacion:", latUser, lngUser);
 
       let encontrado = false;
 
-      lugares.forEach(lugar => {
+      lugares.forEach(function (lugar) {
         const distancia = distanciaMetros(
           latUser,
           lngUser,
@@ -67,18 +67,17 @@ window.onload = () => {
           lugar.lng
         );
 
-        console.log(📏 Distancia a ${lugar.nombre}:, Math.round(distancia), "m");
+        console.log("Distancia a", lugar.nombre, Math.round(distancia), "m");
 
         if (distancia <= lugar.radio) {
           encontrado = true;
-
-          estado.textContent = 📍 Estás cerca de ${lugar.nombre};
+          estado.textContent = "Estas cerca de " + lugar.nombre;
 
           const btn = document.createElement("button");
-          btn.textContent = Registrar visita – ${lugar.nombre};
+          btn.textContent = "Registrar visita - " + lugar.nombre;
 
-          btn.onclick = () => {
-            alert(✅ Visita registrada en ${lugar.nombre});
+          btn.onclick = function () {
+            alert("Visita registrada en " + lugar.nombre);
           };
 
           acciones.appendChild(btn);
@@ -86,15 +85,12 @@ window.onload = () => {
       });
 
       if (!encontrado) {
-        estado.textContent = "❌ No hay fábricas dentro del radio";
+        estado.textContent = "No hay fabricas dentro del radio";
       }
     },
-    (error) => {
-      console.error("❌ Error ubicación:", error);
-      estado.textContent = "❌ No se pudo obtener la ubicación";
+    function () {
+      estado.textContent = "No se pudo obtener la ubicacion";
     },
-    {
-      enableHighAccuracy: true
-    }
+    { enableHighAccuracy: true }
   );
 };
