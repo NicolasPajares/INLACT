@@ -29,13 +29,10 @@ function verificarUbicacion() {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
+  const lat = pos.coords.latitude;
+const lng = pos.coords.longitude;
 
-      acciones.innerHTML = "";
-      let encontrada = false;
+console.log("MI UBICACIÓN REAL:", lat, lng);
 
       fabricas.forEach((f) => {
         const d = distanciaMetros(lat, lng, f.lat, f.lng);
@@ -58,5 +55,6 @@ function verificarUbicacion() {
     }
   );
 }
+
 
 verificarUbicacion();
