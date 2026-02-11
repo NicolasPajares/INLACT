@@ -10,8 +10,8 @@ const fabricas = [
     nombre: "Depósito Las Varillas",
     lat: -31.8743,
     lng: -62.7258,
-    radio: 150
-  }
+    radio: 150 
+}
 ];
 
 const estado = document.getElementById("estado");
