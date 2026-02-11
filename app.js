@@ -3,7 +3,7 @@ const fabricas = [
     nombre: "Depósito Casa",
     lat: -31.4201,
     lng: -64.1888,
-    radio: 50000
+    radio: 5000000
   }
 ];
 
@@ -58,3 +58,4 @@ console.log("MI UBICACIÓN REAL:", lat, lng);
 
 
 verificarUbicacion();
+
