@@ -1,4 +1,3 @@
-
 const fabricas = [
   {
     nombre: "Depósito Casa",
@@ -44,7 +43,6 @@ function verificarUbicacion() {
 
       fabricas.forEach((f) => {
         const d = distanciaMetros(lat, lng, f.lat, f.lng);
-
         console.log(`Distancia a ${f.nombre}:`, d);
 
         if (d <= f.radio) {
