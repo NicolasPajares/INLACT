@@ -3,13 +3,13 @@ const fabricas = [
     nombre: "Depósito Villa María",
     lat: -32.3830,
     lng: -63.229,
-    radio: 30000
+    radio: 10000
 },
 {
     nombre: "Depósito Las Varillas",
     lat: -31.8743,
     lng: -62.7258,
-    radio: 30000
+    radio: 10000
 }
 ];
 
