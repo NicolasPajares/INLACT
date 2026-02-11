@@ -1,3 +1,4 @@
+
 const fabricas = [
   {
     nombre: "Depósito Casa",
@@ -46,4 +47,25 @@ function verificarUbicacion() {
 
         console.log(`Distancia a ${f.nombre}:`, d);
 
-        if (d <= f
+        if (d <= f.radio) {
+          encontrada = true;
+          estado.textContent = "Estás cerca de una fábrica";
+
+          const btn = document.createElement("button");
+          btn.textContent = `Registrar visita: ${f.nombre}`;
+          btn.onclick = () => alert(`Visita registrada en ${f.nombre}`);
+          acciones.appendChild(btn);
+        }
+      });
+
+      if (!encontrada) {
+        estado.textContent = "No hay fábricas cercanas";
+      }
+    },
+    () => {
+      estado.textContent = "No se pudo obtener ubicación";
+    }
+  );
+}
+
+verificarUbicacion();
