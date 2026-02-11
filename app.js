@@ -1,7 +1,7 @@
 /*************
  * 1️⃣ LISTA DE CLIENTES / DEPÓSITOS
  *************/
-
+alert("js cargador")
 const lugares = [
   {
     nombre: "Depósito Villa María",
