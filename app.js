@@ -43,7 +43,7 @@ function verificarUbicacion() {
 
       fabricas.forEach((f) => {
         const d = distanciaMetros(lat, lng, f.lat, f.lng);
-        console.log(`Distancia a ${f.nombre}:`, d);
+        console.log("Distancia a", f.nombre, ":", d);
 
         if (d <= f.radio) {
           encontrada = true;
@@ -51,7 +51,9 @@ function verificarUbicacion() {
 
           const btn = document.createElement("button");
           btn.textContent = `Registrar visita: ${f.nombre}`;
-          btn.onclick = () => alert(`Visita registrada en ${f.nombre}`);
+          btn.onclick = () =>
+            alert(`Visita registrada en ${f.nombre}`);
+
           acciones.appendChild(btn);
         }
       });
