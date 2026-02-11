@@ -1,9 +1,9 @@
 const fabricas = [
   {
     nombre: "Depósito Casa",
-    lat: -31.4201,
-    lng: -64.1888,
-    radio: 5000000
+    lat: -32.3830,
+    lng: -63.229,
+    radio: 150
   }
 ];
 
