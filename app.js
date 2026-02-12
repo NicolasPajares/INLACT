@@ -88,3 +88,19 @@ function verificarUbicacion() {
 }
 
 verificarUbicacion();
+
+function mostrarVisitas() {
+  const lista = document.getElementById("listaVisitas");
+  if (!lista) return;
+
+  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+  lista.innerHTML = "";
+
+  visitas.forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+    lista.appendChild(li);
+  });
+}
+
+mostrarVisitas();
