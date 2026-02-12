@@ -3,13 +3,13 @@ const fabricas = [
     nombre: "Depósito Villa María",
     lat: -32.3830,
     lng: -63.229,
-    radio: 10000
+    radio: 800
 },
 {
     nombre: "Depósito Las Varillas",
     lat: -31.8743,
     lng: -62.7258,
-    radio: 10000
+    radio: 800
 }
 ];
 
@@ -57,8 +57,21 @@ function verificarUbicacion() {
 
           const btn = document.createElement("button");
           btn.textContent = `Registrar visita: ${f.nombre}`;
-          btn.onclick = () =>
-            alert(`Visita registrada en ${f.nombre}`);
+          btn.onclick = () => {
+  const visita = {
+    cliente: f.nombre,
+    fecha: new Date().toLocaleDateString(),
+    hora: new Date().toLocaleTimeString(),
+    lat: lat,
+    lng: lng
+  };
+
+  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+  visitas.push(visita);
+  localStorage.setItem("visitas", JSON.stringify(visitas));
+
+  alert(`Visita registrada en ${f.nombre}`);
+};
 
           acciones.appendChild(btn);
         }
