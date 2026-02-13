@@ -76,7 +76,16 @@ function verificarUbicacion() {
 
   lista.innerHTML = "";
 
+  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
 
+  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
+
+  ultimas.reverse().forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+    lista.appendChild(li);
+  });
+}
 
   alert(`Visita registrada en ${f.nombre}`);
 };
