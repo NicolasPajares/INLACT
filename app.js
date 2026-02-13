@@ -90,6 +90,7 @@ function verificarUbicacion() {
           btn.textContent = `Registrar visita: ${f.nombre}`;
 
           btn.onclick = () => {
+            console.log("BOTÓN PRESIONADO");
             const visita = {
               cliente: f.nombre,
               fecha: new Date().toLocaleDateString(),
