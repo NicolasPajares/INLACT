@@ -74,13 +74,13 @@ function verificarUbicacion() {
   const lista = document.getElementById("listaVisitas");
   if (!lista) return;
 
-  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
   lista.innerHTML = "";
 
-  // Mostrar solo las últimas 5
-  const ultimas = visitas.slice(-5).reverse();
+  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
 
-  ultimas.forEach(v => {
+  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
+
+  ultimas.reverse().forEach(v => {
     const li = document.createElement("li");
     li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
     lista.appendChild(li);
@@ -107,21 +107,4 @@ function verificarUbicacion() {
 
 verificarUbicacion();
 
-function mostrarVisitas() {
-  const lista = document.getElementById("listaVisitas");
-  if (!lista) return;
 
-  lista.innerHTML = "";
-
-  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
-
-  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
-
-  ultimas.reverse().forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
-    lista.appendChild(li);
-  });
-}
-
-mostrarVisitas();
