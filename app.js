@@ -70,7 +70,23 @@ function verificarUbicacion() {
   visitas.push(visita);
   localStorage.setItem("visitas", JSON.stringify(visitas));
 
-  mostrarVisitas();
+  function mostrarVisitas() {
+  const lista = document.getElementById("listaVisitas");
+  if (!lista) return;
+
+  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+  lista.innerHTML = "";
+
+  // Mostrar solo las últimas 5
+  const ultimas = visitas.slice(-5).reverse();
+
+  ultimas.forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+    lista.appendChild(li);
+  });
+}
+
 
   alert(`Visita registrada en ${f.nombre}`);
 };
