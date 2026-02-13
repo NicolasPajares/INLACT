@@ -66,15 +66,6 @@ function verificarUbicacion() {
     lng: lng
   };
 
-  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
-  visitas.push(visita);
-  localStorage.setItem("visitas", JSON.stringify(visitas));
-
-  function mostrarVisitas() {
-  const lista = document.getElementById("listaVisitas");
-  if (!lista) return;
-
-  lista.innerHTML = "";
 
   let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
 
