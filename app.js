@@ -66,17 +66,16 @@ function verificarUbicacion() {
     lng: lng
   };
 
-
   let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+  visitas.push(visita);
+  localStorage.setItem("visitas", JSON.stringify(visitas));
 
-  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
+  function mostrarVisitas() {
+  const lista = document.getElementById("listaVisitas");
+  if (!lista) return;
 
-  ultimas.reverse().forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
-    lista.appendChild(li);
-  });
-}
+  lista.innerHTML = "";
+
 
 
   alert(`Visita registrada en ${f.nombre}`);
