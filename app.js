@@ -111,10 +111,13 @@ function mostrarVisitas() {
   const lista = document.getElementById("listaVisitas");
   if (!lista) return;
 
-  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
   lista.innerHTML = "";
 
-  visitas.forEach(v => {
+  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+
+  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
+
+  ultimas.reverse().forEach(v => {
     const li = document.createElement("li");
     li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
     lista.appendChild(li);
