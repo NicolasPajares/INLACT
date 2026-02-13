@@ -70,6 +70,8 @@ function verificarUbicacion() {
   visitas.push(visita);
   localStorage.setItem("visitas", JSON.stringify(visitas));
 
+  mostrarVisitas();
+
   alert(`Visita registrada en ${f.nombre}`);
 };
 
