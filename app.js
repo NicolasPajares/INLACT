@@ -1,3 +1,6 @@
+// ===============================
+// CONFIGURACIÓN DE FÁBRICAS
+// ===============================
 const fabricas = [
 {
     nombre: "Depósito Villa María",
@@ -13,9 +16,15 @@ const fabricas = [
 }
 ];
 
+// ===============================
+// ELEMENTOS HTML
+// ===============================
 const estado = document.getElementById("estado");
 const acciones = document.getElementById("acciones");
 
+// ===============================
+// FUNCIÓN DISTANCIA (Haversine)
+// ===============================
 function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -31,46 +40,10 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-function verificarUbicacion() {
-  if (!navigator.geolocation) {
-    estado.textContent = "Geolocalización no disponible";
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      console.log("MI UBICACIÓN REAL:", lat, lng);
-
-      acciones.innerHTML = "";
-      let encontrada = false;
-
-      fabricas.forEach((f) => {
-        const d = distanciaMetros(lat, lng, f.lat, f.lng);
-        console.log("Distancia a", f.nombre, ":", d);
-
-        if (d <= f.radio) {
-          encontrada = true;
-          estado.textContent = "Estás cerca de una fábrica";
-
-          const btn = document.createElement("button");
-          btn.textContent = `Registrar visita: ${f.nombre}`;
-          btn.onclick = () => {
-  const visita = {
-    cliente: f.nombre,
-    fecha: new Date().toLocaleDateString(),
-    hora: new Date().toLocaleTimeString(),
-    lat: lat,
-    lng: lng
-  };
-
-  let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
-  visitas.push(visita);
-  localStorage.setItem("visitas", JSON.stringify(visitas));
-
-  function mostrarVisitas() {
+// ===============================
+// MOSTRAR VISITAS (ÚLTIMAS 5)
+// ===============================
+function mostrarVisitas() {
   const lista = document.getElementById("listaVisitas");
   if (!lista) return;
 
@@ -87,8 +60,52 @@ function verificarUbicacion() {
   });
 }
 
-  alert(`Visita registrada en ${f.nombre}`);
-};
+// ===============================
+// VERIFICAR UBICACIÓN
+// ===============================
+function verificarUbicacion() {
+  if (!navigator.geolocation) {
+    estado.textContent = "Geolocalización no disponible";
+    return;
+  }
+
+  estado.textContent = "Buscando fábricas...";
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      acciones.innerHTML = "";
+      let encontrada = false;
+
+      fabricas.forEach((f) => {
+        const d = distanciaMetros(lat, lng, f.lat, f.lng);
+
+        if (d <= f.radio) {
+          encontrada = true;
+          estado.textContent = "Estás cerca de una fábrica";
+
+          const btn = document.createElement("button");
+          btn.textContent = `Registrar visita: ${f.nombre}`;
+
+          btn.onclick = () => {
+            const visita = {
+              cliente: f.nombre,
+              fecha: new Date().toLocaleDateString(),
+              hora: new Date().toLocaleTimeString(),
+              lat: lat,
+              lng: lng
+            };
+
+            let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+            visitas.push(visita);
+            localStorage.setItem("visitas", JSON.stringify(visitas));
+
+            mostrarVisitas();
+
+            alert(`Visita registrada en ${f.nombre}`);
+          };
 
           acciones.appendChild(btn);
         }
@@ -104,6 +121,8 @@ function verificarUbicacion() {
   );
 }
 
+// ===============================
+// INICIO
+// ===============================
+mostrarVisitas();
 verificarUbicacion();
-
-
