@@ -13,8 +13,8 @@ const fabricas = [
   {
     id: "fabrica_001",
     nombre: "Depósito Casa",
-    lat: -31.4201,
-    lng: -64.1888,
+    lat: -32.3833,
+    lng: -63.2243,
     radio: 10000
   }
 ];
