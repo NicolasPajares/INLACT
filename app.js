@@ -149,7 +149,7 @@ function verificarUbicacion() {
           };
 
           acciones.appendChild(btn);
-          mostrarUltimasVisitas(f.id);
+         // mostrarUltimasVisitas(f.id);
         }
       });
 
