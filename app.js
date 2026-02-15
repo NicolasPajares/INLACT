@@ -1,82 +1,103 @@
-// ===============================
-// CONFIGURACIÓN DE FÁBRICAS
-// ===============================
+/*************************
+ * 1️⃣ DATOS (MODELO)
+ *************************/
+
+// Usuario simulado (más adelante será login real)
+const USUARIO_ACTUAL = {
+  id: "user_001",
+  nombre: "Nicolás"
+};
+
+// Fábricas / clientes
 const fabricas = [
-{
-    nombre: "Depósito Villa María",
-    lat: -32.3830,
-    lng: -63.229,
-    radio: 800
-},
-{
-    nombre: "Depósito Las Varillas",
-    lat: -31.8743,
-    lng: -62.7258,
-    radio: 800
-}
+  {
+    id: "fabrica_001",
+    nombre: "Depósito Casa",
+    lat: -31.4201,
+    lng: -64.1888,
+    radio: 10000
+  }
 ];
 
-// ===============================
-// ELEMENTOS HTML
-// ===============================
-const estado = document.getElementById("estado");
-const acciones = document.getElementById("acciones");
 
-// ===============================
-// FUNCIÓN DISTANCIA (Haversine)
-// ===============================
+/*************************
+ * 2️⃣ STORAGE (localStorage)
+ *************************/
+
+function obtenerVisitas() {
+  return JSON.parse(localStorage.getItem("visitas")) || [];
+}
+
+function guardarVisita(visita) {
+  const visitas = obtenerVisitas();
+  visitas.push(visita);
+  localStorage.setItem("visitas", JSON.stringify(visitas));
+}
+
+
+/*************************
+ * 3️⃣ UTILIDADES
+ *************************/
+
 function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
 
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos(lat1 * Math.PI / 180) *
     Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.sin(dLon / 2) ** 2;
 
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// ===============================
-// MOSTRAR VISITAS (ÚLTIMAS 5)
-// ===============================
-function mostrarVisitas() {
+
+/*************************
+ * 4️⃣ VISUALIZACIÓN
+ *************************/
+
+function mostrarUltimasVisitas(clienteId) {
   const lista = document.getElementById("listaVisitas");
   if (!lista) return;
 
   lista.innerHTML = "";
 
-  const visitas = JSON.parse(localStorage.getItem("visitas")) || [];
+  const visitas = obtenerVisitas()
+    .filter(v => v.clienteId === clienteId)
+    .slice(-5)
+    .reverse();
 
-  const ultimas = visitas.slice(visitas.length - 5, visitas.length);
-
-  ultimas.reverse().forEach(v => {
+  visitas.forEach(v => {
     const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+    li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
     lista.appendChild(li);
   });
 }
 
-// ===============================
-// VERIFICAR UBICACIÓN
-// ===============================
+
+/*************************
+ * 5️⃣ GEOLOCALIZACIÓN
+ *************************/
+
 function verificarUbicacion() {
+  const estado = document.getElementById("estado");
+  const acciones = document.getElementById("acciones");
+  acciones.innerHTML = "";
+
   if (!navigator.geolocation) {
     estado.textContent = "Geolocalización no disponible";
     return;
   }
-
-  estado.textContent = "Buscando fábricas...";
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
 
-      acciones.innerHTML = "";
+      console.log("MI UBICACIÓN:", lat, lng);
+
       let encontrada = false;
 
       fabricas.forEach((f) => {
@@ -84,31 +105,34 @@ function verificarUbicacion() {
 
         if (d <= f.radio) {
           encontrada = true;
-          estado.textContent = "Estás cerca de una fábrica";
+          estado.textContent = `Estás cerca de ${f.nombre}`;
 
           const btn = document.createElement("button");
-          btn.textContent = `Registrar visita: ${f.nombre}`;
+          btn.textContent = `Registrar visita`;
 
           btn.onclick = () => {
-            console.log("BOTÓN PRESIONADO");
             const visita = {
-              cliente: f.nombre,
+              id: Date.now(),
+              clienteId: f.id,
+              clienteNombre: f.nombre,
+
+              usuarioId: USUARIO_ACTUAL.id,
+              usuarioNombre: USUARIO_ACTUAL.nombre,
+
               fecha: new Date().toLocaleDateString(),
               hora: new Date().toLocaleTimeString(),
-              lat: lat,
-              lng: lng
+              lat,
+              lng
             };
 
-            let visitas = JSON.parse(localStorage.getItem("visitas")) || [];
-            visitas.push(visita);
-            localStorage.setItem("visitas", JSON.stringify(visitas));
-
-            mostrarVisitas();
+            guardarVisita(visita);
+            mostrarUltimasVisitas(f.id);
 
             alert(`Visita registrada en ${f.nombre}`);
           };
 
           acciones.appendChild(btn);
+          mostrarUltimasVisitas(f.id);
         }
       });
 
@@ -122,8 +146,9 @@ function verificarUbicacion() {
   );
 }
 
-// ===============================
-// INICIO
-// ===============================
-mostrarVisitas();
+
+/*************************
+ * 6️⃣ INICIO
+ *************************/
+
 verificarUbicacion();
