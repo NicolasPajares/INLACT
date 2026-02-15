@@ -152,3 +152,22 @@ function verificarUbicacion() {
  *************************/
 
 verificarUbicacion();
+
+// ================================
+// HISTORIAL DE VISITAS (MOSTRAR)
+// ================================
+function mostrarVisitas() {
+  const lista = document.getElementById("listaVisitas");
+  if (!lista) return;
+
+  lista.innerHTML = "";
+
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
+
+  visitas.slice().reverse().forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+    lista.appendChild(li);
+  });
+}
+
