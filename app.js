@@ -39,7 +39,7 @@ function guardarVisita(visita) {
  * 3️⃣ UTILIDADES
  *************************/
 
-function distanciaEnMetros(lat1, lon1, lat2, lon2) {
+function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
