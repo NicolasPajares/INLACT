@@ -1,59 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <title>INLACT</title>
-    <meta name="description" content="INLACT.VM">
+    <meta name="description" content="Sistema de registro de visitas - INLACT">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="index.css">
 
     <!-- Leaflet CSS -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
     />
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-
-        header img {
-            max-width: 160px;
-        }
-
-        nav a {
-            margin-right: 10px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        #map {
-            height: 400px;
-            width: 100%;
-            margin: 15px 0;
-            border-radius: 8px;
-        }
-
-        #estado {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        button {
-            padding: 10px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-    </style>
-    <link rel="stylesheet" href="index.css"
 </head>
 
 <body>
@@ -66,37 +28,58 @@
     <h2>NICOLÁS PAJARES</h2>
 
     <nav>
-        <a href="clientes.html">CLIENTES</a>
-        <a href="ensayos.html">ENSAYOS</a>
-        <a href="precios.html">PRECIOS</a>
-        <a href="stock.html">STOCK</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="ensayos.html">Ensayos</a>
+        <a href="precios.html">Precios</a>
+        <a href="stock.html">Stock</a>
     </nav>
 </header>
 
-<main style="padding: 15px;">
+<main>
 
-    <h2>Mapa</h2>
-    <div id="map"></div>
+    <!-- MAPA -->
+    <section class="card">
+        <h3>Mapa</h3>
+        <div id="map"></div>
+    </section>
 
-    <h2>Visitas cercanas</h2>
-    <p id="estado">Buscando fábricas...</p>
-    <div id="acciones"></div>
+    <!-- VISITAS CERCANAS -->
+    <section class="card">
+        <h3>Visitas cercanas</h3>
+        <p id="estado">Buscando fábricas cercanas...</p>
 
-    <h3>Historial de visitas</h3>
-    <ul id="listaVisitas"></ul>
+        <div id="acciones">
+            <button>Registrar visita</button>
+        </div>
+    </section>
 
-    <a href="historial.html" target="_blank">
-        Ver historial completo →
-    </a>
+    <!-- HISTORIAL -->
+    <section class="card">
+        <h3>Historial de visitas</h3>
+
+        <ul id="listaVisitas">
+            <li>Cliente Lácteos VM – 14/02/2026</li>
+            <li>Planta Quesera Centro – 12/02/2026</li>
+            <li>Distribuidora Norte – 10/02/2026</li>
+        </ul>
+
+        <a href="historial.html" target="_blank">
+            Ver historial completo →
+        </a>
+    </section>
 
 </main>
 
-<footer style="padding: 10px; border-top: 1px solid #ccc;">
-    <p>© INLACT - <a href="aviso-legal.html">Aviso Legal</a></p>
+<footer>
+    © INLACT – <a href="aviso-legal.html">Aviso Legal</a>
 </footer>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j7kP4zZr+u9pNQmX0dVZp1wQYJpAo0p+0kG6pKw="
+    crossorigin=""
+></script>
 
 <!-- App principal -->
 <script src="app.js"></script>
