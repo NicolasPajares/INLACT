@@ -1,14 +1,12 @@
 /********************************
- * 1️⃣ DATOS (MODELO)
+ * 1️⃣ MODELO DE DATOS
  ********************************/
 
-// Usuario simulado
 const USUARIO_ACTUAL = {
   id: "user_001",
   nombre: "Nicolás"
 };
 
-// Clientes / fábricas
 const fabricas = [
   {
     id: "fabrica_001",
@@ -44,27 +42,21 @@ let map;
 let markerUsuario = null;
 
 document.addEventListener("DOMContentLoaded", () => {
+  map = L.map("map").setView([-32.4075, -63.2403], 13);
 
-  // Crear mapa
-  map = L.map("map").setView([-32.4075, -63.2403], 13); // Villa María
-
-  // Capa OpenStreetMap
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  // Cargar clientes
   cargarFabricasEnMapa();
-
-  // Iniciar geolocalización
   iniciarGeolocalizacion();
 
-  console.log("Mapa cargado correctamente");
+  console.log("✅ Mapa cargado correctamente");
 });
 
 
 /********************************
- * 4️⃣ CARGAR FABRICAS EN MAPA
+ * 4️⃣ CLIENTES EN MAPA
  ********************************/
 
 function cargarFabricasEnMapa() {
@@ -74,7 +66,6 @@ function cargarFabricasEnMapa() {
       .bindPopup(`🏭 ${f.nombre}`);
   });
 
-  // Click para agregar nuevo cliente
   map.on("click", (e) => {
     const nombre = prompt("Nombre del cliente/fábrica:");
     if (!nombre) return;
@@ -115,9 +106,7 @@ function iniciarGeolocalizacion() {
       actualizarMarkerUsuario(lat, lng);
       verificarProximidad(lat, lng);
     },
-    (err) => {
-      console.error("Error geolocalización", err);
-    },
+    (err) => console.error("Error geolocalización", err),
     {
       enableHighAccuracy: true,
       maximumAge: 10000,
@@ -149,6 +138,8 @@ function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
 
+  if (!estado || !acciones) return;
+
   acciones.innerHTML = "";
   let encontrada = false;
 
@@ -161,7 +152,6 @@ function verificarProximidad(lat, lng) {
 
       const btn = document.createElement("button");
       btn.textContent = "Registrar visita";
-
       btn.onclick = () => registrarVisita(f, lat, lng);
 
       acciones.appendChild(btn);
@@ -183,10 +173,8 @@ function registrarVisita(fabrica, lat, lng) {
     id: Date.now(),
     clienteId: fabrica.id,
     cliente: fabrica.nombre,
-
     usuarioId: USUARIO_ACTUAL.id,
     usuarioNombre: USUARIO_ACTUAL.nombre,
-
     fecha: new Date().toLocaleDateString(),
     hora: new Date().toLocaleTimeString(),
     lat,
@@ -210,13 +198,14 @@ function mostrarVisitas() {
 
   lista.innerHTML = "";
 
-  const visitas = obtenerVisitas().slice().reverse();
-
-  visitas.forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
-    lista.appendChild(li);
-  });
+  obtenerVisitas()
+    .slice()
+    .reverse()
+    .forEach(v => {
+      const li = document.createElement("li");
+      li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+      lista.appendChild(li);
+    });
 }
 
 
