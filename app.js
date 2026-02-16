@@ -16,6 +16,7 @@ const fabricas = [
     lat: -32.3833,
     lng: -63.2243,
     radio: 10000
+    tipo: "cliente"
   }
 ];
 
@@ -33,6 +34,58 @@ function guardarVisita(visita) {
   visitas.push(visita);
   localStorage.setItem("visitas_global", JSON.stringify(visitas));
 }
+
+/*************************
+ * 2️⃣ INICIALIZAR MAPA
+ *************************/
+
+let map;
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById("map"), {
+    center: { lat: -32.3833, lng: -63.2243 },
+    zoom: 8
+  });
+
+  cargarFabricasEnMapa();
+}
+
+/*************************
+ * CARGAR FABRICA Y AGREGAR PIN
+ *************************/
+
+function cargarFabricasEnMapa() {
+  fabricas.forEach(f => {
+    new google.maps.Marker({
+      position: { lat: f.lat, lng: f.lng },
+      map,
+      title: f.nombre
+    });
+  });
+
+  // TOCAR MAPA PARA AGREGAR NUEVO CLIENTE
+  map.addListener("click", (e) => {
+    const nombre = prompt("Nombre del cliente/fábrica:");
+    if (!nombre) return;
+
+    const nueva = {
+      id: "fabrica_" + Date.now(),
+      nombre,
+      lat: e.latLng.lat(),
+      lng: e.latLng.lng(),
+      radio: 1000
+    };
+
+    fabricas.push(nueva);
+
+    new google.maps.Marker({
+      position: { lat: nueva.lat, lng: nueva.lng },
+      map,
+      title: nueva.nombre
+    });
+  });
+}
+
 
 
 /*************************
@@ -170,4 +223,63 @@ function verificarUbicacion() {
 
 verificarUbicacion();
 
+
+/*************************
+ * GEOLOCALIZACIÓN EN TIEMPO REAL DEL USUARIO
+ *************************/
+
+let posicionActual = null;
+
+function iniciarGeolocalizacion() {
+  if (!navigator.geolocation) {
+    alert("Geolocalización no soportada");
+    return;
+  }
+
+  navigator.geolocation.watchPosition(
+  (pos) => {
+    posicionActual = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+    };
+
+    actualizarMarkerUsuario(
+      pos.coords.latitude,
+      pos.coords.longitude
+    );
+
+    verificarProximidad();
+  },
+  (err) => {
+    console.error("Error geolocalización", err);
+  },
+  {
+    enableHighAccuracy: true,
+    maximumAge: 10000,
+    timeout: 5000
+  }
+);
+
+
+/*************************
+ * MOSTRAR UBICACION DEL USUARIO EN MAPA
+ *************************/
+
+let markerUsuario = null;
+
+function actualizarMarkerUsuario(lat, lng) {
+  if (!markerUsuario) {
+    markerUsuario = L.marker([lat, lng], {
+      icon: L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+      })
+    }).addTo(map)
+      .bindPopup("📍 Vos");
+
+  } else {
+    markerUsuario.setLatLng([lat, lng]);
+  }
+}
 
