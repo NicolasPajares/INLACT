@@ -15,7 +15,7 @@ const fabricas = [
     nombre: "Depósito Casa",
     lat: -32.3833,
     lng: -63.2243,
-    radio: 10000
+    radio: 10000,
     tipo: "cliente"
   }
 ];
@@ -38,7 +38,7 @@ function guardarVisita(visita) {
 /*************************
  * 2️⃣ INICIALIZAR MAPA
  *************************/
-
+/*
 let map;
 
 function initMap() {
@@ -49,7 +49,7 @@ function initMap() {
 
   cargarFabricasEnMapa();
 }
-
+*/
 /*************************
  * CARGAR FABRICA Y AGREGAR PIN
  *************************/
