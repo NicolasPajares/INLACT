@@ -1,0 +1,13 @@
+.visita {
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.visita strong {
+  font-size: 15px;
+}
+
+.fecha {
+  color: #666;
+  font-size: 12px;
+}
