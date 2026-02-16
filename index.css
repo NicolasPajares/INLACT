@@ -1,0 +1,165 @@
+/* ===============================
+   RESET BÁSICO
+================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===============================
+   ESTILOS GENERALES
+================================ */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f7fb;
+    color: #2c3e50;
+}
+
+/* ===============================
+   HEADER
+================================ */
+header {
+    background: #ffffff;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+header figure img {
+    height: 55px;
+}
+
+header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f4e8c;
+}
+
+/* ===============================
+   NAV
+================================ */
+nav a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: #1f4e8c;
+    font-weight: 600;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   MAIN
+================================ */
+main {
+    padding: 25px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* ===============================
+   TARJETAS GENERALES
+================================ */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    margin-bottom: 25px;
+}
+
+/* ===============================
+   MAPA
+================================ */
+#map {
+    height: 420px;
+    width: 100%;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+/* ===============================
+   VISITA CERCANA
+================================ */
+#estado {
+    margin-top: 10px;
+    font-weight: 600;
+    color: #2e7d32;
+}
+
+#acciones button {
+    margin-top: 15px;
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#acciones button:hover {
+    opacity: 0.9;
+}
+
+/* ===============================
+   HISTORIAL
+================================ */
+#listaVisitas {
+    list-style: none;
+    margin-top: 10px;
+}
+
+#listaVisitas li {
+    padding: 10px 0;
+    border-bottom: 1px solid #e6e6e6;
+    font-size: 14px;
+}
+
+/* ===============================
+   LINK HISTORIAL
+================================ */
+a {
+    color: #1f4e8c;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+footer {
+    background: #ffffff;
+    padding: 15px;
+    text-align: center;
+    border-top: 1px solid #e0e0e0;
+    font-size: 14px;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    nav {
+        width: 100%;
+    }
+
+    nav a {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+}
