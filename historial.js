@@ -22,4 +22,10 @@ if (visitas.length === 0) {
 
       contenedor.appendChild(div);
     });
+
+    document.getElementById("cerrar-historial").addEventListener("click", () => {
+  window.close();
+});
+
 }
+
