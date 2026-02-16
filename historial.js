@@ -34,15 +34,20 @@ if (visitas.length === 0) {
 
 const buscador = document.getElementById("buscador");
 
-if (buscador) {
-  buscador.addEventListener("input", () => {
-    const texto = buscador.value.toLowerCase();
+buscador.addEventListener("input", () => {
+  const texto = buscador.value.toLowerCase();
 
-    document.querySelectorAll(".visita").forEach(div => {
-      div.style.display = div.textContent.toLowerCase().includes(texto)
-        ? "block"
-        : "none";
-    });
+  const visitasDOM = document.querySelectorAll(".visita");
+
+  visitasDOM.forEach(visita => {
+    const contenido = visita.textContent.toLowerCase();
+
+    if (contenido.includes(texto)) {
+      visita.style.display = "block";
+    } else {
+      visita.style.display = "none";
+    }
   });
-}
+});
+
 
