@@ -28,4 +28,21 @@ if (visitas.length === 0) {
 });
 
 }
+// ===============================
+// BUSCADOR DE VISITAS
+// ===============================
+
+const buscador = document.getElementById("buscador");
+
+if (buscador) {
+  buscador.addEventListener("input", () => {
+    const texto = buscador.value.toLowerCase();
+
+    document.querySelectorAll(".visita").forEach(div => {
+      div.style.display = div.textContent.toLowerCase().includes(texto)
+        ? "block"
+        : "none";
+    });
+  });
+}
 

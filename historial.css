@@ -20,3 +20,14 @@
   border: none;
   border-radius: 6px;
 }
+
+.buscador {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+
