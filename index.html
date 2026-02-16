@@ -5,6 +5,24 @@
     <meta charset="UTF-8">
     <title>INLACT</title>
     <meta name="description" content="INLACT.VM">
+    <link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+  }
+  #map {
+    height: 400px; /* después lo ajustamos */
+    margin: 10px;
+  }
+</style>
+
 
 </head>
 
@@ -19,6 +37,9 @@
     <P><A href="stock.html">STOCK</A></P> 
     </header>
     
+<h2>Mapa</h2>
+<div id="map"></div>
+
 <h2>Visitas cercanas</h2>
 
 <p id="estado">Buscando fábricas...</p>
