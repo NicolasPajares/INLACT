@@ -258,8 +258,6 @@ function iniciarGeolocalizacion() {
     maximumAge: 10000,
     timeout: 5000
   }
-);
-
 
 /*************************
  * MOSTRAR UBICACION DEL USUARIO EN MAPA
@@ -283,3 +281,12 @@ function actualizarMarkerUsuario(lat, lng) {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const map = L.map("map").setView([-32.4075, -63.2403], 13); // Villa María
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap"
+  }).addTo(map);
+
+  console.log("Mapa cargado correctamente");
+});
