@@ -1,7 +1,3 @@
-// ===============================
-// CLIENTE - INLACT
-// ===============================
-
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
 
@@ -12,35 +8,37 @@ if (!cliente) {
   window.location.href = "clientes.html";
 }
 
-// Datos básicos
-document.getElementById("clienteNombre").textContent = cliente.nombre;
-document.getElementById("clienteLocalidad").textContent = cliente.localidad;
-document.getElementById("clienteProvincia").textContent = cliente.provincia;
+/* ===============================
+   FICHA CLIENTE
+=============================== */
+const ficha = document.getElementById("fichaCliente");
 
-// Contactos
-const contactosEl = document.getElementById("listaContactos");
-contactosEl.innerHTML = "";
+ficha.innerHTML = `
+  <h2>${cliente.nombre}</h2>
+  <p><strong>Localidad:</strong> ${cliente.localidad}</p>
+  <p><strong>Provincia:</strong> ${cliente.provincia}</p>
 
-cliente.contactos.forEach(c => {
-  const li = document.createElement("li");
-  li.innerHTML = `
-    <strong>${c.nombre}</strong><br>
-    📱 ${c.telefono}<br>
-    ✉️ ${c.email}
-  `;
-  contactosEl.appendChild(li);
-});
+  <h3>Contactos</h3>
+  <ul>
+    ${cliente.contactos.map(c => `
+      <li>
+        <strong>${c.nombre}</strong><br>
+        📱 ${c.telefono}<br>
+        ✉️ ${c.email}
+      </li>
+    `).join("")}
+  </ul>
+`;
 
-// Visitas
-const visitasEl = document.getElementById("listaVisitasCliente");
-visitasEl.innerHTML = "";
+/* ===============================
+   VISITAS
+=============================== */
+const visitasEl = document.getElementById("listaVisitas");
 
-cliente.visitas.forEach(v => {
-  const li = document.createElement("li");
-  li.innerHTML = `
+visitasEl.innerHTML = cliente.visitas.map(v => `
+  <li>
     <strong>${v.fecha}</strong><br>
     ${v.accion}<br>
     ${v.detalle}
-  `;
-  visitasEl.appendChild(li);
-});
+  </li>
+`).join("");
