@@ -1,15 +1,12 @@
 console.log("cliente.js cargado");
 
 // ===============================
-// OBTENER ID DEL CLIENTE
+// OBTENER CLIENTE
 // ===============================
 const params = new URLSearchParams(window.location.search);
-const id = Number(params.get("id"));
+const idCliente = Number(params.get("id"));
 
-// ===============================
-// BUSCAR CLIENTE
-// ===============================
-const cliente = clientes.find(c => c.id === id);
+const cliente = clientes.find(c => c.id === idCliente);
 
 if (!cliente) {
   alert("Cliente no encontrado");
@@ -17,7 +14,7 @@ if (!cliente) {
 }
 
 // ===============================
-// FICHA DEL CLIENTE
+// FICHA CLIENTE
 // ===============================
 const ficha = document.getElementById("fichaCliente");
 
@@ -40,26 +37,34 @@ ficha.innerHTML = `
 `;
 
 // ===============================
-// VISITAS DEL CLIENTE (GLOBAL)
+// VISITAS DESDE LOCALSTORAGE
 // ===============================
-const visitasGlobales = JSON.parse(localStorage.getItem("visitas_global")) || [];
+function obtenerVisitas() {
+  return JSON.parse(localStorage.getItem("visitas_global")) || [];
+}
 
-const visitasCliente = visitasGlobales.filter(v => v.clienteId === cliente.id);
+const visitas = obtenerVisitas();
 
+// Filtrar solo las visitas de ESTE cliente
+const visitasCliente = visitas.filter(v => v.clienteId === idCliente);
+
+// ===============================
+// MOSTRAR VISITAS
+// ===============================
 const visitasEl = document.getElementById("listaVisitas");
 visitasEl.innerHTML = "";
 
 if (visitasCliente.length === 0) {
-  visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+  visitasEl.innerHTML = "<li>No hay visitas registradas para este cliente.</li>";
 } else {
   visitasCliente
-    .sort((a, b) => b.id - a.id)
+    .sort((a, b) => new Date(b.fecha + " " + b.hora) - new Date(a.fecha + " " + a.hora))
     .forEach(v => {
       const li = document.createElement("li");
       li.innerHTML = `
         <strong>${v.fecha} ${v.hora}</strong><br>
         ${v.accion}<br>
-        ${v.detalle}
+        ${v.detalle || ""}
       `;
       visitasEl.appendChild(li);
     });
