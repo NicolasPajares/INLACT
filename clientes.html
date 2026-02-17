@@ -2,53 +2,90 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>INLACT</title>
+    <title>INLACT · Clientes</title>
 
     <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Registro de visitas y clientes">
+    <meta name="description" content="INLACT - Gestión de Clientes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS principal -->
     <link rel="stylesheet" href="index.css">
 
-    <!-- Leaflet CSS -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    <!-- Iconos -->
+    <link rel="icon" href="img/icon-inlact.svg">
+    <link rel="apple-touch-icon" href="img/icon-inlact.svg">
 </head>
 
 <body>
 
+<!-- ===============================
+     HEADER
+================================ -->
 <header>
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
     </figure>
 
     <h2>NICOLÁS PAJARES</h2>
-
-    <nav>
-        <a href="clientes.html">CLIENTES</a>
-        <a href="ensayos.html">ENSAYOS</a>
-        <a href="precios.html">PRECIOS</a>
-        <a href="stock.html">STOCK</a>
-    </nav>
 </header>
 
+<!-- ===============================
+     BOTONES SUPERIORES
+================================ -->
+<section class="quick-actions">
+    <a href="clientes.html" class="qa active">
+        🏭
+        <span>Clientes</span>
+    </a>
+    <a href="ensayos.html" class="qa">
+        🧪
+        <span>Ensayos</span>
+    </a>
+    <a href="stock.html" class="qa">
+        📦
+        <span>Stock</span>
+    </a>
+    <a href="precios.html" class="qa">
+        💲
+        <span>Precios</span>
+    </a>
+</section>
+
+<!-- ===============================
+     CONTENIDO PRINCIPAL
+================================ -->
 <main>
 
+    <section class="card">
+        <h2>Clientes</h2>
+
+        <!-- Buscador -->
+        <input
+            type="text"
+            id="buscadorClientes"
+            class="input-busqueda"
+            placeholder="Buscar cliente..."
+        >
+
+        <!-- Lista de clientes -->
+        <ul id="listaClientes" class="lista-clientes">
+            <!-- Se carga desde clientes.js -->
+        </ul>
+    </section>
 
 </main>
 
+<!-- ===============================
+     FOOTER
+================================ -->
 <footer>
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- App principal -->
-<script src="app.js"></script>
+<!-- ===============================
+     JS CLIENTES
+================================ -->
+<script src="clientes.js"></script>
 
 </body>
 </html>
