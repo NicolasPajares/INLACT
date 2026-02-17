@@ -1,4 +1,5 @@
 console.log("cliente.js cargado");
+
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
 
@@ -9,17 +10,16 @@ if (!cliente) {
   window.location.href = "clientes.html";
 }
 
-/* ===============================
-   FICHA CLIENTE
-=============================== */
+// ===== FICHA CLIENTE =====
 const ficha = document.getElementById("fichaCliente");
 
 ficha.innerHTML = `
-  <h2>${cliente.nombre}</h2>
+  <h3>${cliente.nombre}</h3>
+  <p><strong>Zona:</strong> ${cliente.zona}</p>
   <p><strong>Localidad:</strong> ${cliente.localidad}</p>
   <p><strong>Provincia:</strong> ${cliente.provincia}</p>
 
-  <h3>Contactos</h3>
+  <h4>Contactos</h4>
   <ul>
     ${cliente.contactos.map(c => `
       <li>
@@ -31,15 +31,16 @@ ficha.innerHTML = `
   </ul>
 `;
 
-/* ===============================
-   VISITAS
-=============================== */
+// ===== VISITAS =====
 const visitasEl = document.getElementById("listaVisitas");
+visitasEl.innerHTML = "";
 
-visitasEl.innerHTML = cliente.visitas.map(v => `
-  <li>
+cliente.visitas.forEach(v => {
+  const li = document.createElement("li");
+  li.innerHTML = `
     <strong>${v.fecha}</strong><br>
     ${v.accion}<br>
     ${v.detalle}
-  </li>
-`).join("");
+  `;
+  visitasEl.appendChild(li);
+});
