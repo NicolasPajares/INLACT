@@ -1,134 +1,101 @@
 // ===============================
-// CLIENTE - INLACT
+// CLIENTE - FICHA COMPLETA
+// INLACT
 // ===============================
 
-/*
-Este archivo:
-- Lee el ID del cliente desde la URL
-- Muestra la ficha del cliente
-- Filtra y muestra el historial de visitas
-*/
-
 // ===============================
-// DATOS (provisorios)
-// Luego los vamos a unificar
+// DATOS DEL CLIENTE (ejemplo real)
 // ===============================
+const cliente = {
+    id: 1,
+    nombre: "Lácteos La Manchita",
+    localidad: "Oliva",
+    provincia: "Córdoba",
 
-const clientes = [
-    {
-        id: "fabrica_001",
-        nombre: "Depósito Casa",
-        localidad: "Villa María",
-        provincia: "Córdoba",
-        observaciones: "Cliente base, visitas frecuentes",
-        contactos: [
-            {
-                nombre: "Juan Pérez",
-                telefono: "351 1234567",
-                email: "juan@depositocasa.com"
-            }
-        ]
-    }
-];
+    ubicacion: {
+        lat: -32.0416,
+        lng: -63.5674
+    },
 
-// ===============================
-// UTILIDADES STORAGE
-// ===============================
+    observaciones: "Cliente activo. Buen volumen en quesos y suero. Buen trato comercial.",
 
-function obtenerVisitas() {
-    return JSON.parse(localStorage.getItem("visitas_global")) || [];
-}
+    contactos: [
+        {
+            nombre: "Antonio Marzioni",
+            telefono: "+5493532490577",
+            email: "antoniomarzioni@gmail.com"
+        },
+        {
+            nombre: "Elizabeth Cassi",
+            telefono: "+5493532416560",
+            email: "Elizabethscassi@gmail.com",
+            email2: "lamanchitalacteos.ar@gmail.com"
+        }
+    ],
 
-// ===============================
-// LEER ID CLIENTE
-// ===============================
-
-const params = new URLSearchParams(window.location.search);
-const clienteId = params.get("id");
-
-if (!clienteId) {
-    alert("Cliente no especificado");
-}
-
-// ===============================
-// BUSCAR CLIENTE
-// ===============================
-
-const cliente = clientes.find(c => c.id === clienteId);
-
-if (!cliente) {
-    alert("Cliente no encontrado");
-}
+    visitas: [
+        {
+            fecha: "2026-02-10",
+            vendedor: "Nicolás Pajares",
+            accion: "Visita comercial",
+            detalle: "Se conversó sobre precios de WPC 35."
+        },
+        {
+            fecha: "2026-01-22",
+            vendedor: "Nicolás Pajares",
+            accion: "Entrega",
+            detalle: "Entrega de muestra de proteína."
+        }
+    ]
+};
 
 // ===============================
 // ELEMENTOS DOM
 // ===============================
-
-const elNombre = document.getElementById("clienteNombre");
-const elLocalidad = document.getElementById("clienteLocalidad");
-const elProvincia = document.getElementById("clienteProvincia");
-const elObservaciones = document.getElementById("clienteObservaciones");
-const elContactos = document.getElementById("listaContactos");
-const elVisitas = document.getElementById("listaVisitasCliente");
+const nombreEl = document.getElementById("clienteNombre");
+const localidadEl = document.getElementById("clienteLocalidad");
+const provinciaEl = document.getElementById("clienteProvincia");
+const observacionesEl = document.getElementById("clienteObservaciones");
+const listaContactosEl = document.getElementById("listaContactos");
+const listaVisitasEl = document.getElementById("listaVisitasCliente");
 
 // ===============================
-// RENDER FICHA CLIENTE
+// CARGAR DATOS CLIENTE
 // ===============================
+function cargarCliente() {
 
-function renderCliente() {
-    elNombre.textContent = cliente.nombre;
-    elLocalidad.textContent = cliente.localidad;
-    elProvincia.textContent = cliente.provincia;
-    elObservaciones.textContent = cliente.observaciones || "—";
+    nombreEl.textContent = cliente.nombre;
+    localidadEl.textContent = cliente.localidad;
+    provinciaEl.textContent = cliente.provincia;
+    observacionesEl.textContent = cliente.observaciones;
 
-    elContactos.innerHTML = "";
-
-    if (!cliente.contactos || cliente.contactos.length === 0) {
-        elContactos.innerHTML = "<li>No hay contactos cargados</li>";
-        return;
-    }
-
+    // Contactos
+    listaContactosEl.innerHTML = "";
     cliente.contactos.forEach(c => {
         const li = document.createElement("li");
         li.innerHTML = `
             <strong>${c.nombre}</strong><br>
-            📞 ${c.telefono}<br>
-            ✉️ ${c.email}
+            📱 <a href="https://wa.me/${c.telefono.replace(/\D/g, "")}" target="_blank">${c.telefono}</a><br>
+            ✉️ <a href="mailto:${c.email}">${c.email}</a>
+            ${c.email2 ? `<br>✉️ <a href="mailto:${c.email2}">${c.email2}</a>` : ""}
         `;
-        elContactos.appendChild(li);
+        listaContactosEl.appendChild(li);
     });
-}
 
-// ===============================
-// RENDER HISTORIAL VISITAS
-// ===============================
-
-function renderVisitas() {
-    const visitas = obtenerVisitas()
-        .filter(v => v.clienteId === cliente.id)
-        .reverse();
-
-    elVisitas.innerHTML = "";
-
-    if (visitas.length === 0) {
-        elVisitas.innerHTML = "<li>No hay visitas registradas</li>";
-        return;
-    }
-
-    visitas.forEach(v => {
+    // Visitas
+    listaVisitasEl.innerHTML = "";
+    cliente.visitas.forEach(v => {
         const li = document.createElement("li");
         li.innerHTML = `
-            <strong>${v.fecha} ${v.hora}</strong><br>
-            👤 ${v.usuarioNombre}<br>
-            📝 ${v.accion || "Visita registrada"}
+            <strong>${v.fecha}</strong> – ${v.vendedor}<br>
+            <em>${v.accion}</em><br>
+            ${v.detalle}
         `;
-        elVisitas.appendChild(li);
+        listaVisitasEl.appendChild(li);
     });
 }
 
 // ===============================
 // INICIALIZAR
 // ===============================
-
-renderCliente();
-renderVisitas();
+cargarCliente();

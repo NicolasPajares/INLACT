@@ -4,16 +4,14 @@
     <meta charset="UTF-8">
     <title>INLACT · Cliente</title>
 
-    <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Ficha de Cliente">
+    <!-- Mobile -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS principal -->
+    <!-- CSS -->
     <link rel="stylesheet" href="index.css">
 
     <!-- Iconos -->
     <link rel="icon" href="img/icon-inlact.svg">
-    <link rel="apple-touch-icon" href="img/icon-inlact.svg">
 </head>
 
 <body>
@@ -25,32 +23,31 @@
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
     </figure>
-
     <h2>NICOLÁS PAJARES</h2>
 </header>
 
 <!-- ===============================
-     ACCESOS RÁPIDOS
+     BOTONES SUPERIORES
 ================================ -->
 <section class="quick-actions">
 
     <a href="clientes.html" class="action-card">
-        <img src="img/icon-clientes.svg" alt="Clientes">
+        <img src="img/icon-clientes.svg" alt="">
         <span>Clientes</span>
     </a>
 
     <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg" alt="Stock">
+        <img src="img/icon-stock.svg" alt="">
         <span>Stock</span>
     </a>
 
     <a href="ensayos.html" class="action-card">
-        <img src="img/icon-ensayos.svg" alt="Ensayos">
+        <img src="img/icon-ensayos.svg" alt="">
         <span>Ensayos</span>
     </a>
 
     <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg" alt="Precios">
+        <img src="img/icon-precios.svg" alt="">
         <span>Precios</span>
     </a>
 
@@ -63,26 +60,14 @@
 
     <!-- FICHA CLIENTE -->
     <section class="card" id="fichaCliente">
-        <h2 id="clienteNombre">Cliente</h2>
-
-        <p><strong>Localidad:</strong> <span id="clienteLocalidad"></span></p>
-        <p><strong>Provincia:</strong> <span id="clienteProvincia"></span></p>
-
-        <h3>Contactos</h3>
-        <ul id="listaContactos">
-            <!-- contactos -->
-        </ul>
-
-        <h3>Observaciones</h3>
-        <p id="clienteObservaciones"></p>
+        <!-- Se completa desde cliente.js -->
     </section>
 
-    <!-- HISTORIAL DE VISITAS -->
+    <!-- HISTORIAL VISITAS -->
     <section class="card">
-        <h2>Historial de visitas</h2>
-
-        <ul id="listaVisitasCliente">
-            <!-- visitas filtradas -->
+        <h3>Historial de visitas</h3>
+        <ul id="listaVisitas" class="lista-visitas">
+            <!-- Se carga desde cliente.js -->
         </ul>
     </section>
 
@@ -91,19 +76,10 @@
 <!-- ===============================
      BOTÓN VOLVER
 ================================ -->
-<a href="clientes.html" class="btn-home" title="Volver a clientes">
-    ←
-</a>
+<a href="clientes.html" class="btn-volver">← Volver a clientes</a>
 
 <!-- ===============================
-     FOOTER
-================================ -->
-<footer>
-    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
-
-<!-- ===============================
-     JS CLIENTE
+     JS
 ================================ -->
 <script src="cliente.js"></script>
 
