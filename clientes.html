@@ -1,24 +1,76 @@
 <!DOCTYPE html>
-<html lang="es"></html>
-
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>INLACT</title>
-    <meta name="description" content="INLACT.VM">
+
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Registro de visitas y clientes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
 </head>
 
 <body>
-    <header>
-    <h1><figure><img src="img/logo.jpg" alt="">
-    </figure></h1>
+
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
     <h2>NICOLÁS PAJARES</h2>
-<p></p>
-    <h3>CLIENTES</h3>
-<P></P>
-<p><a href="lamanchita.html">LACTEOS LA MANCHITA</a>
-<p><a href="windy.html">WINDY</a></p>
-<p><a href="depositovm.html">DEPOSITO VILLA MARIA</a>
-<p><a href="depositolv.html">DEPOSITO LAS VARILLAS</a>
 
+    <nav>
+        <a href="clientes.html">CLIENTES</a>
+        <a href="ensayos.html">ENSAYOS</a>
+        <a href="precios.html">PRECIOS</a>
+        <a href="stock.html">STOCK</a>
+    </nav>
+</header>
 
-  <a href="index.html">Volver</a>
+<main>
+
+    <!-- MAPA -->
+    <section class="card">
+        <h2>Mapa de clientes</h2>
+        <div id="map"></div>
+    </section>
+
+    <!-- VISITAS CERCANAS -->
+    <section class="card">
+        <h2>Visitas cercanas</h2>
+        <p id="estado">Buscando fábricas...</p>
+        <div id="acciones"></div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section class="card">
+        <h3>Últimas visitas</h3>
+        <ul id="listaVisitas"></ul>
+
+        <a href="historial.html" target="_blank">
+            Ver historial completo →
+        </a>
+    </section>
+
+</main>
+
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- App principal -->
+<script src="app.js"></script>
+
+</body>
+</html>
