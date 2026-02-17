@@ -197,3 +197,36 @@ footer {
     font-weight: 600;
     font-size: 15px;
 }
+
+/* ===============================
+   BOTÓN FLOTANTE INICIO
+================================ */
+.fab-inicio {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    width: 56px;
+    height: 56px;
+
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    color: #ffffff;
+
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 24px;
+    text-decoration: none;
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    z-index: 999;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab-inicio:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+}
