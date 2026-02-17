@@ -2,37 +2,32 @@
 // CLIENTES - INLACT
 // ===============================
 
-// Lista de clientes (placeholder)
-let clientes = [
+// Base de clientes (resumen)
+const clientes = [
     {
-        id: "fabrica_001",
+        id: 1,
         nombre: "Depósito Casa",
         zona: "Villa María"
     },
     {
-        id: "fabrica_002",
-        nombre: "Lácteos del Centro",
-        zona: "Córdoba"
-    },
-    {
-        id: "fabrica_003",
-        nombre: "Quesería San José",
-        zona: "Río Cuarto"
+        id: 2,
+        nombre: "Lácteos La Manchita",
+        zona: "Oliva, Córdoba"
     }
 ];
 
-// Elementos del DOM
+// Elementos DOM
 const listaEl = document.getElementById("listaClientes");
 const buscadorEl = document.getElementById("buscadorClientes");
 
 // ===============================
-// Renderizar lista de clientes
+// Renderizar lista
 // ===============================
 function renderClientes(lista) {
     listaEl.innerHTML = "";
 
     if (lista.length === 0) {
-        listaEl.innerHTML = "<li class='vacio'>No hay clientes cargados</li>";
+        listaEl.innerHTML = "<li class='vacio'>No hay clientes</li>";
         return;
     }
 
@@ -46,9 +41,8 @@ function renderClientes(lista) {
         `;
 
         li.addEventListener("click", () => {
-    window.location.href = `cliente.html?id=${cliente.id}`;
-});
-
+            window.location.href = `cliente.html?id=${cliente.id}`;
+        });
 
         listaEl.appendChild(li);
     });
@@ -68,14 +62,6 @@ buscadorEl.addEventListener("input", () => {
 });
 
 // ===============================
-// Abrir ficha de cliente
-// ===============================
-function abrirCliente(clienteId) {
-    window.location.href = `cliente.html?id=${clienteId}`;
-}
-
-// ===============================
-// Inicializar
+// Init
 // ===============================
 renderClientes(clientes);
-

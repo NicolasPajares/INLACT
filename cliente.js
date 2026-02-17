@@ -4,19 +4,23 @@
 // ===============================
 
 // ===============================
-// BASE DE CLIENTES (PRUEBA)
+// BASE DE CLIENTES (DETALLADA)
 // ===============================
 const clientes = [
 
-    // ===============================
     // CLIENTE 1 - DEPÓSITO CASA
-    // ===============================
     {
         id: 1,
         nombre: "Depósito Casa",
         localidad: "Villa María",
         provincia: "Córdoba",
-        observaciones: "Cliente de prueba para testear funciones.",
+
+        ubicacion: {
+            lat: -32.4075,
+            lng: -63.2406
+        },
+
+        observaciones: "Cliente de prueba para desarrollo del sistema.",
 
         contactos: [
             {
@@ -30,20 +34,24 @@ const clientes = [
             {
                 fecha: "2026-02-15",
                 accion: "Prueba sistema",
-                detalle: "Test desde casa"
+                detalle: "Test general desde casa"
             }
         ]
     },
 
-    // ===============================
     // CLIENTE 2 - LÁCTEOS LA MANCHITA
-    // ===============================
     {
         id: 2,
         nombre: "Lácteos La Manchita",
         localidad: "Oliva",
         provincia: "Córdoba",
-        observaciones: "Cliente activo. Buen volumen en quesos.",
+
+        ubicacion: {
+            lat: -32.0416,
+            lng: -63.5674
+        },
+
+        observaciones: "Cliente activo. Buen volumen en quesos y suero.",
 
         contactos: [
             {
@@ -62,12 +70,12 @@ const clientes = [
             {
                 fecha: "2026-02-10",
                 accion: "Visita comercial",
-                detalle: "Revisión de precios"
+                detalle: "Se conversó sobre precios de WPC 35"
             },
             {
                 fecha: "2026-01-22",
                 accion: "Entrega",
-                detalle: "Entrega de muestra"
+                detalle: "Entrega de muestra de proteína"
             }
         ]
     }
@@ -82,7 +90,7 @@ const id = parseInt(params.get("id"));
 // Buscar cliente
 const cliente = clientes.find(c => c.id === id);
 
-// Seguridad mínima
+// Seguridad
 if (!cliente) {
     alert("Cliente no encontrado");
     window.location.href = "clientes.html";
@@ -106,8 +114,8 @@ cliente.contactos.forEach(c => {
     const li = document.createElement("li");
     li.innerHTML = `
         <strong>${c.nombre}</strong><br>
-        📱 ${c.telefono}<br>
-        ✉️ ${c.email}
+        📱 <a href="https://wa.me/${c.telefono.replace(/\D/g, "")}" target="_blank">${c.telefono}</a><br>
+        ✉️ <a href="mailto:${c.email}">${c.email}</a>
     `;
     contactosEl.appendChild(li);
 });
@@ -127,4 +135,3 @@ cliente.visitas.forEach(v => {
     `;
     visitasEl.appendChild(li);
 });
-
