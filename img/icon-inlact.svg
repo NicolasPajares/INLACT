@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512"
+    width="512"
+    height="512"
+>
+
+    <!-- Fondo transparente -->
+    <rect width="512" height="512" fill="transparent"/>
+
+    <!-- Gota -->
+    <path
+        d="M256 40
+           C256 40 180 140 180 200
+           C180 260 215 300 256 300
+           C297 300 332 260 332 200
+           C332 140 256 40 256 40 Z"
+        fill="#1f4e8c"
+    />
+
+    <!-- Texto INLACT -->
+    <text
+        x="256"
+        y="420"
+        text-anchor="middle"
+        font-size="110"
+        font-family="Arial, Helvetica, sans-serif"
+        letter-spacing="8"
+        fill="#1f4e8c"
+    >
+        INLACT
+    </text>
+
+</svg>
