@@ -85,8 +85,8 @@ const clientes = [
 // LEER ID DESDE URL
 // ===============================
 const params = new URLSearchParams(window.location.search);
-const id = parseInt(params.get("id"));
 
+const clienteId = Number(params.get("id"));
 // Buscar cliente
 const cliente = clientes.find(c => c.id === id);
 
@@ -135,3 +135,4 @@ cliente.visitas.forEach(v => {
     `;
     visitasEl.appendChild(li);
 });
+
