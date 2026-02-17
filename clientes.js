@@ -5,17 +5,17 @@
 // Lista de clientes (placeholder)
 let clientes = [
     {
-        id: 1,
+        id: "fabrica_001",
         nombre: "Depósito Casa",
         zona: "Villa María"
     },
     {
-        id: 2,
+        id: "fabrica_002",
         nombre: "Lácteos del Centro",
         zona: "Córdoba"
     },
     {
-        id: 3,
+        id: "fabrica_003",
         nombre: "Quesería San José",
         zona: "Río Cuarto"
     }
@@ -46,7 +46,7 @@ function renderClientes(lista) {
         `;
 
         li.addEventListener("click", () => {
-            abrirCliente(cliente);
+            abrirCliente(cliente.id);
         });
 
         listaEl.appendChild(li);
@@ -69,15 +69,12 @@ buscadorEl.addEventListener("input", () => {
 // ===============================
 // Abrir ficha de cliente
 // ===============================
-function abrirCliente(cliente) {
-    alert(
-        `Cliente: ${cliente.nombre}\n` +
-        `Zona: ${cliente.zona}\n\n` +
-        `Próximo paso: ficha completa`
-    );
+function abrirCliente(clienteId) {
+    window.location.href = `cliente.html?id=${clienteId}`;
 }
 
 // ===============================
 // Inicializar
 // ===============================
 renderClientes(clientes);
+
