@@ -46,8 +46,9 @@ function renderClientes(lista) {
         `;
 
         li.addEventListener("click", () => {
-            abrirCliente(cliente.id);
-        });
+    window.location.href = `cliente.html?id=${cliente.id}`;
+});
+
 
         listaEl.appendChild(li);
     });

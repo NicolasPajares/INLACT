@@ -4,98 +4,127 @@
 // ===============================
 
 // ===============================
-// DATOS DEL CLIENTE (ejemplo real)
+// BASE DE CLIENTES (PRUEBA)
 // ===============================
-const cliente = {
-    id: 1,
-    nombre: "Lácteos La Manchita",
-    localidad: "Oliva",
-    provincia: "Córdoba",
+const clientes = [
 
-    ubicacion: {
-        lat: -32.0416,
-        lng: -63.5674
+    // ===============================
+    // CLIENTE 1 - DEPÓSITO CASA
+    // ===============================
+    {
+        id: 1,
+        nombre: "Depósito Casa",
+        localidad: "Villa María",
+        provincia: "Córdoba",
+        observaciones: "Cliente de prueba para testear funciones.",
+
+        contactos: [
+            {
+                nombre: "Nicolás Pajares",
+                telefono: "+549000000000",
+                email: "test@inlact.com"
+            }
+        ],
+
+        visitas: [
+            {
+                fecha: "2026-02-15",
+                accion: "Prueba sistema",
+                detalle: "Test desde casa"
+            }
+        ]
     },
 
-    observaciones: "Cliente activo. Buen volumen en quesos y suero. Buen trato comercial.",
+    // ===============================
+    // CLIENTE 2 - LÁCTEOS LA MANCHITA
+    // ===============================
+    {
+        id: 2,
+        nombre: "Lácteos La Manchita",
+        localidad: "Oliva",
+        provincia: "Córdoba",
+        observaciones: "Cliente activo. Buen volumen en quesos.",
 
-    contactos: [
-        {
-            nombre: "Antonio Marzioni",
-            telefono: "+5493532490577",
-            email: "antoniomarzioni@gmail.com"
-        },
-        {
-            nombre: "Elizabeth Cassi",
-            telefono: "+5493532416560",
-            email: "Elizabethscassi@gmail.com",
-            email2: "lamanchitalacteos.ar@gmail.com"
-        }
-    ],
+        contactos: [
+            {
+                nombre: "Antonio Marzioni",
+                telefono: "+5493532490577",
+                email: "antoniomarzioni@gmail.com"
+            },
+            {
+                nombre: "Elizabeth Cassi",
+                telefono: "+5493532416560",
+                email: "lamanchitalacteos.ar@gmail.com"
+            }
+        ],
 
-    visitas: [
-        {
-            fecha: "2026-02-10",
-            vendedor: "Nicolás Pajares",
-            accion: "Visita comercial",
-            detalle: "Se conversó sobre precios de WPC 35."
-        },
-        {
-            fecha: "2026-01-22",
-            vendedor: "Nicolás Pajares",
-            accion: "Entrega",
-            detalle: "Entrega de muestra de proteína."
-        }
-    ]
-};
+        visitas: [
+            {
+                fecha: "2026-02-10",
+                accion: "Visita comercial",
+                detalle: "Revisión de precios"
+            },
+            {
+                fecha: "2026-01-22",
+                accion: "Entrega",
+                detalle: "Entrega de muestra"
+            }
+        ]
+    }
+];
+
+// ===============================
+// LEER ID DESDE URL
+// ===============================
+const params = new URLSearchParams(window.location.search);
+const id = parseInt(params.get("id"));
+
+// Buscar cliente
+const cliente = clientes.find(c => c.id === id);
+
+// Seguridad mínima
+if (!cliente) {
+    alert("Cliente no encontrado");
+    window.location.href = "clientes.html";
+}
 
 // ===============================
 // ELEMENTOS DOM
 // ===============================
-const nombreEl = document.getElementById("clienteNombre");
-const localidadEl = document.getElementById("clienteLocalidad");
-const provinciaEl = document.getElementById("clienteProvincia");
-const observacionesEl = document.getElementById("clienteObservaciones");
-const listaContactosEl = document.getElementById("listaContactos");
-const listaVisitasEl = document.getElementById("listaVisitasCliente");
+document.getElementById("clienteNombre").textContent = cliente.nombre;
+document.getElementById("clienteLocalidad").textContent = cliente.localidad;
+document.getElementById("clienteProvincia").textContent = cliente.provincia;
+document.getElementById("clienteObservaciones").textContent = cliente.observaciones;
 
 // ===============================
-// CARGAR DATOS CLIENTE
+// CONTACTOS
 // ===============================
-function cargarCliente() {
+const contactosEl = document.getElementById("listaContactos");
+contactosEl.innerHTML = "";
 
-    nombreEl.textContent = cliente.nombre;
-    localidadEl.textContent = cliente.localidad;
-    provinciaEl.textContent = cliente.provincia;
-    observacionesEl.textContent = cliente.observaciones;
-
-    // Contactos
-    listaContactosEl.innerHTML = "";
-    cliente.contactos.forEach(c => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${c.nombre}</strong><br>
-            📱 <a href="https://wa.me/${c.telefono.replace(/\D/g, "")}" target="_blank">${c.telefono}</a><br>
-            ✉️ <a href="mailto:${c.email}">${c.email}</a>
-            ${c.email2 ? `<br>✉️ <a href="mailto:${c.email2}">${c.email2}</a>` : ""}
-        `;
-        listaContactosEl.appendChild(li);
-    });
-
-    // Visitas
-    listaVisitasEl.innerHTML = "";
-    cliente.visitas.forEach(v => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <strong>${v.fecha}</strong> – ${v.vendedor}<br>
-            <em>${v.accion}</em><br>
-            ${v.detalle}
-        `;
-        listaVisitasEl.appendChild(li);
-    });
-}
+cliente.contactos.forEach(c => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+        <strong>${c.nombre}</strong><br>
+        📱 ${c.telefono}<br>
+        ✉️ ${c.email}
+    `;
+    contactosEl.appendChild(li);
+});
 
 // ===============================
-// INICIALIZAR
+// VISITAS
 // ===============================
-cargarCliente();
+const visitasEl = document.getElementById("listaVisitasCliente");
+visitasEl.innerHTML = "";
+
+cliente.visitas.forEach(v => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+        <strong>${v.fecha}</strong><br>
+        ${v.accion}<br>
+        ${v.detalle}
+    `;
+    visitasEl.appendChild(li);
+});
+
