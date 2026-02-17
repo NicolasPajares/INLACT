@@ -1,11 +1,14 @@
 console.log("cliente.js cargado");
 
-// =========================
-// OBTENER CLIENTE
-// =========================
+// ===============================
+// OBTENER ID DEL CLIENTE
+// ===============================
 const params = new URLSearchParams(window.location.search);
 const id = Number(params.get("id"));
 
+// ===============================
+// BUSCAR CLIENTE
+// ===============================
 const cliente = clientes.find(c => c.id === id);
 
 if (!cliente) {
@@ -13,9 +16,9 @@ if (!cliente) {
   window.location.href = "clientes.html";
 }
 
-// =========================
-// FICHA CLIENTE
-// =========================
+// ===============================
+// FICHA DEL CLIENTE
+// ===============================
 const ficha = document.getElementById("fichaCliente");
 
 ficha.innerHTML = `
@@ -29,35 +32,35 @@ ficha.innerHTML = `
     ${cliente.contactos.map(c => `
       <li>
         <strong>${c.nombre}</strong><br>
-        📱 ${c.telefono || "-"}<br>
-        ✉️ ${c.email || "-"}
+        📱 ${c.telefono}<br>
+        ✉️ ${c.email}
       </li>
     `).join("")}
   </ul>
 `;
 
-// =========================
-// VISITAS (DESDE HISTORIAL GLOBAL)
-// =========================
+// ===============================
+// VISITAS DEL CLIENTE (GLOBAL)
+// ===============================
+const visitasGlobales = JSON.parse(localStorage.getItem("visitas_global")) || [];
+
+const visitasCliente = visitasGlobales.filter(v => v.clienteId === cliente.id);
+
 const visitasEl = document.getElementById("listaVisitas");
 visitasEl.innerHTML = "";
 
-const visitasGlobales = JSON.parse(localStorage.getItem("visitas_global")) || [];
-
-const visitasCliente = visitasGlobales
-  .filter(v => v.clienteId === cliente.id)
-  .sort((a, b) => new Date(b.fecha) - new Date(a.fecha)); // más nuevas primero
-
 if (visitasCliente.length === 0) {
-  visitasEl.innerHTML = "<li>No hay visitas registradas.</li>";
+  visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
 } else {
-  visitasCliente.forEach(v => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${v.fecha} ${v.hora || ""}</strong><br>
-      ${v.accion}<br>
-      ${v.detalle || ""}
-    `;
-    visitasEl.appendChild(li);
-  });
+  visitasCliente
+    .sort((a, b) => b.id - a.id)
+    .forEach(v => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${v.fecha} ${v.hora}</strong><br>
+        ${v.accion}<br>
+        ${v.detalle}
+      `;
+      visitasEl.appendChild(li);
+    });
 }
