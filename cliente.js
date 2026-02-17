@@ -16,8 +16,6 @@ if (!cliente) {
 document.getElementById("clienteNombre").textContent = cliente.nombre;
 document.getElementById("clienteLocalidad").textContent = cliente.localidad;
 document.getElementById("clienteProvincia").textContent = cliente.provincia;
-document.getElementById("clienteObservaciones").textContent =
-  cliente.observaciones || "";
 
 // Contactos
 const contactosEl = document.getElementById("listaContactos");
