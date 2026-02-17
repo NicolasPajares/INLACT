@@ -2,16 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>INLACT</title>
-
-    <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Registro de visitas y clientes">
+    <title>INLACT | Gestión Comercial</title>
+    <meta name="description" content="INLACT - Gestión Comercial de Lácteos">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS principal -->
-    <link rel="stylesheet" href="index.css">
+    <!-- CSS PRINCIPAL -->
+    <link rel="stylesheet" href="./index.css">
 
-    <!-- Leaflet CSS -->
+    <!-- LEAFLET -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -20,57 +18,118 @@
 
 <body>
 
-<header>
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
+<!-- ================= HEADER ================= -->
+<header class="top-bar">
+    <div class="logo">
+        <img src="./img/logo.jpg" alt="INLACT">
+        <div class="logo-text">
+            <strong>INLACT</strong>
+            <span>Gestión Comercial de Lácteos</span>
+        </div>
+    </div>
 
-    <h2>NICOLÁS PAJARES</h2>
-
-    <nav>
-        <a href="clientes.html">CLIENTES</a>
-        <a href="ensayos.html">ENSAYOS</a>
-        <a href="precios.html">PRECIOS</a>
-        <a href="stock.html">STOCK</a>
-    </nav>
+    <div class="user">
+        Nicolás Pajares
+    </div>
 </header>
 
-<main>
+<!-- ================= MAIN ================= -->
+<main class="dashboard">
 
-    <!-- MAPA -->
-    <section class="card">
-        <h2>Mapa de clientes</h2>
-        <div id="map"></div>
-    </section>
+    <!-- ===== ACCESOS RÁPIDOS ===== -->
+    <section class="quick-access">
 
-    <!-- VISITAS CERCANAS -->
-    <section class="card">
-        <h2>Visitas cercanas</h2>
-        <p id="estado">Buscando fábricas...</p>
-        <div id="acciones"></div>
-    </section>
-
-    <!-- HISTORIAL -->
-    <section class="card">
-        <h3>Últimas visitas</h3>
-        <ul id="listaVisitas"></ul>
-
-        <a href="historial.html" target="_blank">
-            Ver historial completo →
+        <a href="./clientes.html" class="card-access">
+            <img src="./img/icon-clientes.png" alt="">
+            <span>Clientes</span>
         </a>
+
+        <a href="./stock.html" class="card-access">
+            <img src="./img/icon-stock.png" alt="">
+            <span>Stock</span>
+        </a>
+
+        <a href="./ensayos.html" class="card-access">
+            <img src="./img/icon-ensayos.png" alt="">
+            <span>Ensayos</span>
+        </a>
+
+        <a href="./precios.html" class="card-access">
+            <img src="./img/icon-precios.png" alt="">
+            <span>Precios</span>
+        </a>
+
+    </section>
+
+    <!-- ===== GRID PRINCIPAL ===== -->
+    <section class="main-grid">
+
+        <!-- VISITA CERCANA -->
+        <div class="card visita">
+            <h3>Visita cercana</h3>
+
+            <p class="estado-ok">
+                Estás cerca de:
+            </p>
+
+            <p class="cliente-cercano">
+                📍 Depósito Villa María
+            </p>
+
+            <p class="ultima-visita">
+                Última visita: hace 2 días
+            </p>
+
+            <button class="btn-primary">
+                Registrar visita
+            </button>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div class="card historial">
+            <h3>Historial reciente</h3>
+
+            <ul>
+                <li>
+                    <strong>Depósito Villa María</strong>
+                    <span>Entrega – 23/04/2024 17:45</span>
+                </li>
+                <li>
+                    <strong>Depósito Villa María</strong>
+                    <span>Ensayo – 23/04/2024 09:30</span>
+                </li>
+                <li>
+                    <strong>Depósito Villa María</strong>
+                    <span>Alerta por clausula – 21/04/2024</span>
+                </li>
+            </ul>
+
+            <a href="./historial.html" class="ver-mas">
+                Ver historial completo →
+            </a>
+        </div>
+
+    </section>
+
+    <!-- ===== MAPA ===== -->
+    <section class="card mapa">
+        <h3>Mapa</h3>
+        <div id="map"></div>
     </section>
 
 </main>
 
+<!-- ================= FOOTER ================= -->
 <footer>
-    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+    © INLACT — <a href="./aviso-legal.html">Aviso Legal</a>
 </footer>
 
-<!-- Leaflet JS -->
+<!-- LEAFLET JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- App principal -->
-<script src="app.js"></script>
+<!-- APP -->
+<script src="./app.js"></script>
 
 </body>
 </html>
+
