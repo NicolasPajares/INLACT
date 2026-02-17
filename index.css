@@ -163,3 +163,37 @@ footer {
         margin-right: 15px;
     }
 }
+
+/* ACCESOS RAPIDOS */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.action-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #1e3a5f;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: transform .15s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+}
+
+.action-card img {
+    width: 42px;
+    margin-bottom: 10px;
+}
+
+.action-card span {
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+}
