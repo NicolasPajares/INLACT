@@ -4,9 +4,9 @@ console.log("cliente.js cargado");
 // OBTENER CLIENTE
 // ===============================
 const params = new URLSearchParams(window.location.search);
-const idCliente = Number(params.get("id"));
+const clienteId = Number(params.get("id"));
 
-const cliente = clientes.find(c => c.id === idCliente);
+const cliente = clientes.find(c => c.id === clienteId);
 
 if (!cliente) {
   alert("Cliente no encontrado");
@@ -37,20 +37,19 @@ ficha.innerHTML = `
 `;
 
 // ===============================
-// VISITAS DESDE LOCALSTORAGE
+// VISITAS (DESDE LOCALSTORAGE)
 // ===============================
 function obtenerVisitas() {
   return JSON.parse(localStorage.getItem("visitas_global")) || [];
 }
 
-const visitas = obtenerVisitas();
+const todasLasVisitas = obtenerVisitas();
 
-// Filtrar solo las visitas de ESTE cliente
-const visitasCliente = visitas.filter(v => v.clienteId === idCliente);
+// filtramos SOLO las del cliente
+const visitasCliente = todasLasVisitas.filter(
+  v => Number(v.clienteId) === clienteId
+);
 
-// ===============================
-// MOSTRAR VISITAS
-// ===============================
 const visitasEl = document.getElementById("listaVisitas");
 visitasEl.innerHTML = "";
 
@@ -58,13 +57,12 @@ if (visitasCliente.length === 0) {
   visitasEl.innerHTML = "<li>No hay visitas registradas para este cliente.</li>";
 } else {
   visitasCliente
-    .sort((a, b) => new Date(b.fecha + " " + b.hora) - new Date(a.fecha + " " + a.hora))
+    .sort((a, b) => b.id - a.id)
     .forEach(v => {
       const li = document.createElement("li");
       li.innerHTML = `
         <strong>${v.fecha} ${v.hora}</strong><br>
-        ${v.accion}<br>
-        ${v.detalle || ""}
+        ${v.usuarioNombre}
       `;
       visitasEl.appendChild(li);
     });
