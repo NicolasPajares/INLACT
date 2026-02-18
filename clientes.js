@@ -1,15 +1,6 @@
-// ===============================
-// CLIENTES - INLACT
-// ===============================
-
 document.addEventListener("DOMContentLoaded", () => {
   const listaEl = document.getElementById("listaClientes");
   const buscadorEl = document.getElementById("buscadorClientes");
-
-  if (!listaEl) {
-    console.error("❌ No existe #listaClientes");
-    return;
-  }
 
   if (typeof clientes === "undefined") {
     listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
@@ -33,24 +24,23 @@ document.addEventListener("DOMContentLoaded", () => {
         <span>${c.localidad}, ${c.provincia}</span>
       `;
 
-      li.addEventListener("click", () => {
+      li.onclick = () => {
         window.location.href = `cliente.html?id=${c.id}`;
-      });
+      };
 
       listaEl.appendChild(li);
     });
   }
 
-  if (buscadorEl) {
-    buscadorEl.addEventListener("input", () => {
-      const texto = buscadorEl.value.toLowerCase();
-      renderClientes(
-        clientes.filter(c =>
-          c.nombre.toLowerCase().includes(texto)
-        )
-      );
-    });
-  }
+  buscadorEl.addEventListener("input", () => {
+    const texto = buscadorEl.value.toLowerCase();
+    renderClientes(
+      clientes.filter(c =>
+        c.nombre.toLowerCase().includes(texto) ||
+        c.localidad.toLowerCase().includes(texto)
+      )
+    );
+  });
 
   renderClientes(clientes);
 });
