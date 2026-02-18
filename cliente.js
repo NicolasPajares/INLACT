@@ -1,55 +1,64 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const listaEl = document.getElementById("listaClientes");
-  const buscadorEl = document.getElementById("buscadorClientes");
+  const params = new URLSearchParams(window.location.search);
+  const clienteId = params.get("id");
 
-  if (!listaEl || !buscadorEl) {
-    console.error("❌ Elementos HTML no encontrados");
+  const nombreEl = document.getElementById("clienteNombre");
+  const datosEl = document.getElementById("clienteDatos");
+  const visitasEl = document.getElementById("listaVisitasCliente");
+
+  if (!clienteId) {
+    nombreEl.textContent = "Cliente no especificado";
     return;
   }
 
   if (typeof clientes === "undefined") {
-    listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
+    nombreEl.textContent = "Error: clientes no cargados";
     return;
   }
 
-  function renderClientes(lista) {
-    listaEl.innerHTML = "";
+  const cliente = clientes.find(c => c.id === clienteId);
 
-    if (lista.length === 0) {
-      listaEl.innerHTML = "<li>No hay clientes</li>";
-      return;
-    }
-
-    lista.forEach(c => {
-      const li = document.createElement("li");
-      li.className = "cliente-item";
-      li.style.cursor = "pointer";
-
-      li.innerHTML = `
-        <strong>${c.nombre}</strong><br>
-        <small>${c.localidad}, ${c.provincia}</small>
-      `;
-
-      li.addEventListener("click", () => {
-        const url = `cliente.html?id=${c.id}`;
-        console.log("➡️ Navegando a:", url);
-        window.location.href = url;
-      });
-
-      listaEl.appendChild(li);
-    });
+  if (!cliente) {
+    nombreEl.textContent = "Cliente no encontrado";
+    return;
   }
 
-  buscadorEl.addEventListener("input", () => {
-    const texto = buscadorEl.value.toLowerCase();
+  // ===============================
+  // DATOS DEL CLIENTE
+  // ===============================
 
-    renderClientes(
-      clientes.filter(c =>
-        c.nombre.toLowerCase().includes(texto) ||
-        c.localidad.toLowerCase().includes(texto)
-      )
-    );
+  nombreEl.textContent = cliente.nombre;
+
+  datosEl.innerHTML = `
+    <p><strong>Localidad:</strong> ${cliente.localidad}</p>
+    <p><strong>Provincia:</strong> ${cliente.provincia}</p>
+    <p><strong>ID:</strong> ${cliente.id}</p>
+  `;
+
+  // ===============================
+  // VISITAS DEL CLIENTE
+  // ===============================
+
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
+
+  const visitasCliente = visitas
+    .filter(v => v.clienteId === cliente.id)
+    .sort((a, b) => b.id - a.id);
+
+  if (visitasCliente.length === 0) {
+    visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+    return;
+  }
+
+  visitasCliente.forEach(v => {
+    const li = document.createElement("li");
+    li.className = "visita-item";
+
+    li.innerHTML = `
+      <strong>${v.fecha} ${v.hora}</strong><br>
+      <small>Usuario: ${v.usuarioNombre}</small>
+    `;
+
+    visitasEl.appendChild(li);
   });
-
-  renderClientes(clientes);
 });
