@@ -44,9 +44,29 @@ function obtenerVisitas() {
 // 5️⃣ FILTRAR VISITAS DEL CLIENTE
 // ===============================
 
+// ===== VISITAS DEL CLIENTE =====
+const visitasEl = document.getElementById("listaVisitas");
+visitasEl.innerHTML = "";
+
 const visitasCliente = obtenerVisitas().filter(v =>
-  v.cliente && v.cliente.toLowerCase() === cliente.nombre.toLowerCase()
+  v.clienteId === cliente.id
 );
+
+if (visitasCliente.length === 0) {
+  visitasEl.innerHTML = "<li>No hay visitas registradas.</li>";
+} else {
+  visitasCliente
+    .slice()
+    .reverse()
+    .forEach(v => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${v.fecha} ${v.hora}</strong><br>
+        ${v.usuarioNombre}
+      `;
+      visitasEl.appendChild(li);
+    });
+}
 // ===============================
 // 6️⃣ MOSTRAR VISITAS
 // ===============================
@@ -68,4 +88,5 @@ if (visitasCliente.length === 0) {
       lista.appendChild(li);
     });
 }
+
 
