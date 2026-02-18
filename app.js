@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cargarFabricasEnMapa();
   iniciarGeolocalizacion();
+  mostrarVisitas();
 
   console.log("✅ Mapa cargado correctamente");
 });
@@ -172,7 +173,7 @@ function registrarVisita(fabrica, lat, lng) {
   const visita = {
     id: Date.now(),
     clienteId: fabrica.id,
-    cliente: fabrica.nombre,
+    clienteNombre: fabrica.nombre,
     usuarioId: USUARIO_ACTUAL.id,
     usuarioNombre: USUARIO_ACTUAL.nombre,
     fecha: new Date().toLocaleDateString(),
@@ -189,7 +190,7 @@ function registrarVisita(fabrica, lat, lng) {
 
 
 /********************************
- * 8️⃣ HISTORIAL VISITAS
+ * 8️⃣ HISTORIAL VISITAS (INDEX)
  ********************************/
 
 function mostrarVisitas() {
@@ -203,7 +204,7 @@ function mostrarVisitas() {
     .reverse()
     .forEach(v => {
       const li = document.createElement("li");
-      li.textContent = `${v.fecha} ${v.hora} – ${v.cliente}`;
+      li.textContent = `${v.fecha} ${v.hora} – ${v.clienteNombre}`;
       lista.appendChild(li);
     });
 }
