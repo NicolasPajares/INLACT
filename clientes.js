@@ -1,33 +1,55 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  const listaEl = document.getElementById("listaClientes");
+  const buscadorEl = document.getElementById("buscadorClientes");
 
-  const cliente = clientes.find(c => c.id === id);
-
-  const nombreEl = document.getElementById("nombreCliente");
-  const datosEl = document.getElementById("datosCliente");
-  const historialEl = document.getElementById("historialVisitas");
-
-  if (!cliente) {
-    nombreEl.textContent = "Cliente no encontrado";
+  if (!listaEl || !buscadorEl) {
+    console.error("❌ Elementos HTML no encontrados");
     return;
   }
 
-  nombreEl.textContent = cliente.nombre;
-  datosEl.textContent = `${cliente.localidad}, ${cliente.provincia}`;
-
-  const visitas = obtenerVisitas()
-    .filter(v => v.clienteId === cliente.id)
-    .reverse();
-
-  if (visitas.length === 0) {
-    historialEl.innerHTML = "<li>Sin visitas registradas</li>";
+  if (typeof clientes === "undefined") {
+    listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
     return;
   }
 
-  visitas.forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
-    historialEl.appendChild(li);
+  function renderClientes(lista) {
+    listaEl.innerHTML = "";
+
+    if (lista.length === 0) {
+      listaEl.innerHTML = "<li>No hay clientes</li>";
+      return;
+    }
+
+    lista.forEach(c => {
+      const li = document.createElement("li");
+      li.className = "cliente-item";
+      li.style.cursor = "pointer";
+
+      li.innerHTML = `
+        <strong>${c.nombre}</strong><br>
+        <small>${c.localidad}, ${c.provincia}</small>
+      `;
+
+      li.addEventListener("click", () => {
+        const url = `cliente.html?id=${c.id}`;
+        console.log("➡️ Navegando a:", url);
+        window.location.href = url;
+      });
+
+      listaEl.appendChild(li);
+    });
+  }
+
+  buscadorEl.addEventListener("input", () => {
+    const texto = buscadorEl.value.toLowerCase();
+
+    renderClientes(
+      clientes.filter(c =>
+        c.nombre.toLowerCase().includes(texto) ||
+        c.localidad.toLowerCase().includes(texto)
+      )
+    );
   });
+
+  renderClientes(clientes);
 });
