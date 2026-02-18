@@ -43,11 +43,10 @@ function obtenerVisitas() {
 // ===============================
 // 5️⃣ FILTRAR VISITAS DEL CLIENTE
 // ===============================
-const visitasCliente = obtenerVisitas().filter(v =>
-  String(v.clienteId) === String(cliente.id) ||
-  v.cliente === cliente.nombre
-);
 
+const visitasCliente = obtenerVisitas().filter(v =>
+  v.cliente && v.cliente.toLowerCase() === cliente.nombre.toLowerCase()
+);
 // ===============================
 // 6️⃣ MOSTRAR VISITAS
 // ===============================
@@ -69,3 +68,4 @@ if (visitasCliente.length === 0) {
       lista.appendChild(li);
     });
 }
+
