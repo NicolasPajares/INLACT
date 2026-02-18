@@ -50,11 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  cargarFabricasEnMapa();
+  cargarClientesEnMapa();
   iniciarGeolocalizacion();
   mostrarVisitas();
 
-  console.log("✅ Mapa cargado correctamente");
+  console.log("✅ App cargada correctamente");
 });
 
 
@@ -62,18 +62,19 @@ document.addEventListener("DOMContentLoaded", () => {
  * 4️⃣ CLIENTES EN MAPA
  ********************************/
 
-function cargarFabricasEnMapa() {
-  fabricas.forEach(f => {
-    L.marker([f.lat, f.lng])
+function cargarClientesEnMapa() {
+  clientes.forEach(c => {
+    L.marker([c.lat, c.lng])
       .addTo(map)
-      .bindPopup(`🏭 ${f.nombre}`);
+      .bindPopup(`🏭 ${c.nombre}`);
   });
 
+  // Alta manual desde el mapa (opcional)
   map.on("click", (e) => {
-    const nombre = prompt("Nombre del cliente/fábrica:");
+    const nombre = prompt("Nombre del cliente:");
     if (!nombre) return;
 
-    const nueva = {
+    const nuevo = {
       id: "fabrica_" + Date.now(),
       nombre,
       lat: e.latlng.lat,
@@ -82,11 +83,11 @@ function cargarFabricasEnMapa() {
       tipo: "cliente"
     };
 
-    fabricas.push(nueva);
+    clientes.push(nuevo);
 
-    L.marker([nueva.lat, nueva.lng])
+    L.marker([nuevo.lat, nuevo.lng])
       .addTo(map)
-      .bindPopup(`🏭 ${nueva.nombre}`);
+      .bindPopup(`🏭 ${nuevo.nombre}`);
   });
 }
 
@@ -109,7 +110,7 @@ function iniciarGeolocalizacion() {
       actualizarMarkerUsuario(lat, lng);
       verificarProximidad(lat, lng);
     },
-    (err) => console.error("Error geolocalización", err),
+    (err) => console.error("❌ Error geolocalización", err),
     {
       enableHighAccuracy: true,
       maximumAge: 10000,
@@ -144,25 +145,25 @@ function verificarProximidad(lat, lng) {
   if (!estado || !acciones) return;
 
   acciones.innerHTML = "";
-  let encontrada = false;
+  let encontrado = false;
 
-  fabricas.forEach(f => {
-    const d = distanciaMetros(lat, lng, f.lat, f.lng);
+  clientes.forEach(c => {
+    const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
-    if (d <= f.radio) {
-      encontrada = true;
-      estado.textContent = `Estás cerca de ${f.nombre}`;
+    if (d <= c.radio) {
+      encontrado = true;
+      estado.textContent = `Estás cerca de ${c.nombre}`;
 
       const btn = document.createElement("button");
       btn.textContent = "Registrar visita";
-      btn.onclick = () => registrarVisita(f, lat, lng);
+      btn.onclick = () => registrarVisita(c, lat, lng);
 
       acciones.appendChild(btn);
     }
   });
 
-  if (!encontrada) {
-    estado.textContent = "No hay fábricas cercanas";
+  if (!encontrado) {
+    estado.textContent = "No hay clientes cercanos";
   }
 }
 
@@ -171,11 +172,11 @@ function verificarProximidad(lat, lng) {
  * 7️⃣ REGISTRAR VISITA
  ********************************/
 
-function registrarVisita(fabrica, lat, lng) {
+function registrarVisita(cliente, lat, lng) {
   const visita = {
     id: Date.now(),
-    clienteId: fabrica.id,
-    clienteNombre: fabrica.nombre,
+    clienteId: cliente.id,
+    clienteNombre: cliente.nombre,
     usuarioId: USUARIO_ACTUAL.id,
     usuarioNombre: USUARIO_ACTUAL.nombre,
     fecha: new Date().toLocaleDateString(),
@@ -187,7 +188,7 @@ function registrarVisita(fabrica, lat, lng) {
   guardarVisita(visita);
   mostrarVisitas();
 
-  alert(`Visita registrada en ${fabrica.nombre}`);
+  alert(`✅ Visita registrada en ${cliente.nombre}`);
 }
 
 
@@ -229,5 +230,3 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-
-
