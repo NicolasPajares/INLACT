@@ -5,11 +5,16 @@
 const clientes = [
   {
     id: "fabrica_001",
-    nombre: "Depósito",
-    zona: "Villa María",
+    nombre: "Depósito Villa María",
     localidad: "Villa María",
     provincia: "Córdoba",
-
+    lat: -32.3833,
+    lng: -63.2243,
+    radio: 10000,
+    tipo: "cliente"
+      
+  }
+];
     contactos: [
       {
         nombre: "Nicolás Pajares",
@@ -60,6 +65,7 @@ const clientes = [
     ]
   }
 ];
+
 
 
 
