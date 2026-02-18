@@ -1,4 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ===============================
+  // OBTENER ID DESDE LA URL
+  // ===============================
   const params = new URLSearchParams(window.location.search);
   const clienteId = params.get("id");
 
@@ -11,8 +15,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  if (typeof clientes === "undefined") {
-    nombreEl.textContent = "Error: clientes no cargados";
+  // ===============================
+  // CARGAR CLIENTES DESDE LOCALSTORAGE
+  // ===============================
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+  if (clientes.length === 0) {
+    nombreEl.textContent = "No hay clientes cargados";
     return;
   }
 
@@ -26,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   // DATOS DEL CLIENTE
   // ===============================
-
   nombreEl.textContent = cliente.nombre;
 
   datosEl.innerHTML = `
@@ -38,7 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ===============================
   // VISITAS DEL CLIENTE
   // ===============================
-
   const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
   const visitasCliente = visitas
@@ -61,4 +68,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     visitasEl.appendChild(li);
   });
+
 });
