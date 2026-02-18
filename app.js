@@ -11,6 +11,8 @@ const fabricas = [
   {
     id: "fabrica_001",
     nombre: "Depósito Villa María",
+    localidad: "Villa María",
+    provincia: "Córdoba",
     lat: -32.3833,
     lng: -63.2243,
     radio: 10000,
@@ -227,3 +229,4 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
