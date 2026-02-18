@@ -1,60 +1,45 @@
-/********************************
- * 1️⃣ OBTENER ID DESDE LA URL
- ********************************/
-const params = new URLSearchParams(window.location.search);
-const clienteId = params.get("id");
+document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-if (!clienteId) {
-  alert("Cliente no especificado");
-  throw new Error("Falta clienteId en la URL");
-}
+  if (!id) {
+    document.body.innerHTML = "❌ ID de cliente no recibido";
+    return;
+  }
 
+  if (typeof clientes === "undefined") {
+    document.body.innerHTML = "❌ Clientes no cargados";
+    return;
+  }
 
-/********************************
- * 2️⃣ DATOS (desde data-clientes.js)
- ********************************/
-// Se asume que existe el array `clientes`
-const cliente = clientes.find(c => c.id === clienteId);
+  const cliente = clientes.find(c => c.id === id);
 
-if (!cliente) {
-  document.getElementById("fichaCliente").innerHTML =
-    "<p>Cliente no encontrado</p>";
-  throw new Error("Cliente no encontrado");
-}
+  if (!cliente) {
+    document.body.innerHTML = "❌ Cliente no encontrado";
+    return;
+  }
 
+  document.getElementById("nombreCliente").textContent = cliente.nombre;
+  document.getElementById("ubicacion").textContent =
+    `${cliente.localidad}, ${cliente.provincia}`;
 
-/********************************
- * 3️⃣ MOSTRAR FICHA CLIENTE
- ********************************/
-const ficha = document.getElementById("fichaCliente");
+  cargarVisitas(cliente.id);
+});
 
-ficha.innerHTML = `
-  <h2>${cliente.nombre}</h2>
-  <p><strong>Localidad:</strong> ${cliente.localidad}</p>
-  <p><strong>Provincia:</strong> ${cliente.provincia}</p>
-`;
+function cargarVisitas(clienteId) {
+  const lista = document.getElementById("listaVisitas");
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
+  const filtradas = visitas.filter(v => v.clienteId === clienteId);
 
-/********************************
- * 4️⃣ HISTORIAL DE VISITAS (FILTRADO)
- ********************************/
-function obtenerVisitas() {
-  return JSON.parse(localStorage.getItem("visitas_global")) || [];
-}
+  if (filtradas.length === 0) {
+    lista.innerHTML = "<li>No hay visitas registradas</li>";
+    return;
+  }
 
-const lista = document.getElementById("listaVisitas");
-const visitas = obtenerVisitas().filter(v => v.clienteId === clienteId);
-
-lista.innerHTML = "";
-
-if (visitas.length === 0) {
-  lista.innerHTML = "<li>No hay visitas registradas</li>";
-} else {
-  visitas
-    .sort((a, b) => b.id - a.id)
-    .forEach(v => {
-      const li = document.createElement("li");
-      li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
-      lista.appendChild(li);
-    });
+  filtradas.reverse().forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
+    lista.appendChild(li);
+  });
 }
