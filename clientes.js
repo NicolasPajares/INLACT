@@ -1,46 +1,40 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const listaEl = document.getElementById("listaClientes");
-  const buscadorEl = document.getElementById("buscadorClientes");
+  const lista = document.getElementById("listaClientes");
+  const buscador = document.getElementById("buscadorClientes");
 
-  if (typeof clientes === "undefined") {
-    listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
-    return;
-  }
+  function render(listaClientes) {
+    lista.innerHTML = "";
 
-  function renderClientes(lista) {
-    listaEl.innerHTML = "";
-
-    if (lista.length === 0) {
-      listaEl.innerHTML = "<li>No hay clientes</li>";
+    if (listaClientes.length === 0) {
+      lista.innerHTML = "<li>No hay clientes</li>";
       return;
     }
 
-    lista.forEach(c => {
+    listaClientes.forEach(c => {
       const li = document.createElement("li");
-      li.className = "cliente-item";
-
       li.innerHTML = `
         <strong>${c.nombre}</strong><br>
-        <span>${c.localidad}, ${c.provincia}</span>
+        <small>${c.localidad}, ${c.provincia}</small>
       `;
 
       li.onclick = () => {
         window.location.href = `cliente.html?id=${c.id}`;
       };
 
-      listaEl.appendChild(li);
+      lista.appendChild(li);
     });
   }
 
-  buscadorEl.addEventListener("input", () => {
-    const texto = buscadorEl.value.toLowerCase();
-    renderClientes(
+  buscador.addEventListener("input", () => {
+    const txt = buscador.value.toLowerCase();
+
+    render(
       clientes.filter(c =>
-        c.nombre.toLowerCase().includes(texto) ||
-        c.localidad.toLowerCase().includes(texto)
+        c.nombre.toLowerCase().includes(txt) ||
+        c.localidad.toLowerCase().includes(txt)
       )
     );
   });
 
-  renderClientes(clientes);
+  render(clientes);
 });
