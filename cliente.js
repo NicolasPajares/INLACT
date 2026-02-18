@@ -11,12 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // ===============================
-  // DATOS DESDE STORAGE (igual app.js)
-  // ===============================
-
-  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
+  if (typeof clientes === "undefined") {
+    nombreEl.textContent = "Error: clientes no cargados";
+    return;
+  }
 
   const cliente = clientes.find(c => c.id === clienteId);
 
@@ -25,10 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // ===============================
-  // MOSTRAR DATOS DEL CLIENTE
-  // ===============================
-
+  // DATOS DEL CLIENTE
   nombreEl.textContent = cliente.nombre;
 
   datosEl.innerHTML = `
@@ -37,13 +32,14 @@ document.addEventListener("DOMContentLoaded", () => {
     <p><strong>ID:</strong> ${cliente.id}</p>
   `;
 
-  // ===============================
-  // HISTORIAL DE VISITAS DEL CLIENTE
-  // ===============================
+  // HISTORIAL
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
-  const visitasCliente = visitas.filter(
-    v => v.clienteId === cliente.id
-  );
+  const visitasCliente = visitas
+    .filter(v => v.clienteId === cliente.id)
+    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+  visitasEl.innerHTML = "";
 
   if (visitasCliente.length === 0) {
     visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
@@ -52,13 +48,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   visitasCliente.forEach(v => {
     const li = document.createElement("li");
-    li.className = "visita-item";
-
     li.innerHTML = `
       <strong>${v.fecha} ${v.hora}</strong><br>
       <small>${v.usuarioNombre}</small>
     `;
-
     visitasEl.appendChild(li);
   });
 });
