@@ -10,7 +10,7 @@ const USUARIO_ACTUAL = {
 const fabricas = [
   {
     id: "fabrica_001",
-    nombre: "Depósito Casa",
+    nombre: "Depósito Villa María",
     lat: -32.3833,
     lng: -63.2243,
     radio: 10000,
