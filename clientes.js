@@ -1,40 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const lista = document.getElementById("listaClientes");
-  const buscador = document.getElementById("buscadorClientes");
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-  function render(listaClientes) {
-    lista.innerHTML = "";
+  const cliente = clientes.find(c => c.id === id);
 
-    if (listaClientes.length === 0) {
-      lista.innerHTML = "<li>No hay clientes</li>";
-      return;
-    }
+  const nombreEl = document.getElementById("nombreCliente");
+  const datosEl = document.getElementById("datosCliente");
+  const historialEl = document.getElementById("historialVisitas");
 
-    listaClientes.forEach(c => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <strong>${c.nombre}</strong><br>
-        <small>${c.localidad}, ${c.provincia}</small>
-      `;
-
-      li.onclick = () => {
-        window.location.href = `cliente.html?id=${c.id}`;
-      };
-
-      lista.appendChild(li);
-    });
+  if (!cliente) {
+    nombreEl.textContent = "Cliente no encontrado";
+    return;
   }
 
-  buscador.addEventListener("input", () => {
-    const txt = buscador.value.toLowerCase();
+  nombreEl.textContent = cliente.nombre;
+  datosEl.textContent = `${cliente.localidad}, ${cliente.provincia}`;
 
-    render(
-      clientes.filter(c =>
-        c.nombre.toLowerCase().includes(txt) ||
-        c.localidad.toLowerCase().includes(txt)
-      )
-    );
+  const visitas = obtenerVisitas()
+    .filter(v => v.clienteId === cliente.id)
+    .reverse();
+
+  if (visitas.length === 0) {
+    historialEl.innerHTML = "<li>Sin visitas registradas</li>";
+    return;
+  }
+
+  visitas.forEach(v => {
+    const li = document.createElement("li");
+    li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
+    historialEl.appendChild(li);
   });
-
-  render(clientes);
 });
