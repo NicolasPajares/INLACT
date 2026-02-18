@@ -7,8 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  if (typeof clientes === "undefined") {
-    listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
+  // ===============================
+  // CARGAR CLIENTES DESDE LOCALSTORAGE
+  // ===============================
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+  if (clientes.length === 0) {
+    listaEl.innerHTML = "<li>No hay clientes cargados</li>";
     return;
   }
 
