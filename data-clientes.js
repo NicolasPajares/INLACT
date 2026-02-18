@@ -4,7 +4,7 @@
 
 const clientes = [
   {
-    id: fabrica_001,
+    id: "fabrica_001",
     nombre: "Depósito",
     zona: "Villa María",
     localidad: "Villa María",
@@ -60,5 +60,6 @@ const clientes = [
     ]
   }
 ];
+
 
 
