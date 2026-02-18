@@ -1,8 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-  // ===============================
-  // OBTENER ID DESDE LA URL
-  // ===============================
   const params = new URLSearchParams(window.location.search);
   const clienteId = params.get("id");
 
@@ -16,14 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // CARGAR CLIENTES DESDE LOCALSTORAGE
+  // DATOS DESDE STORAGE (igual app.js)
   // ===============================
-  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
 
-  if (clientes.length === 0) {
-    nombreEl.textContent = "No hay clientes cargados";
-    return;
-  }
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
   const cliente = clientes.find(c => c.id === clienteId);
 
@@ -33,8 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===============================
-  // DATOS DEL CLIENTE
+  // MOSTRAR DATOS DEL CLIENTE
   // ===============================
+
   nombreEl.textContent = cliente.nombre;
 
   datosEl.innerHTML = `
@@ -44,13 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
   `;
 
   // ===============================
-  // VISITAS DEL CLIENTE
+  // HISTORIAL DE VISITAS DEL CLIENTE
   // ===============================
-  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
-  const visitasCliente = visitas
-    .filter(v => v.clienteId === cliente.id)
-    .sort((a, b) => b.id - a.id);
+  const visitasCliente = visitas.filter(
+    v => v.clienteId === cliente.id
+  );
 
   if (visitasCliente.length === 0) {
     visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
@@ -63,10 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     li.innerHTML = `
       <strong>${v.fecha} ${v.hora}</strong><br>
-      <small>Usuario: ${v.usuarioNombre}</small>
+      <small>${v.usuarioNombre}</small>
     `;
 
     visitasEl.appendChild(li);
   });
-
 });
