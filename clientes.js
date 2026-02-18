@@ -1,3 +1,7 @@
+document.getElementById("btnNuevoCliente").addEventListener("click", () => {
+  window.location.href = "nuevo-cliente.html";
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const listaEl = document.getElementById("listaClientes");
   const buscadorEl = document.getElementById("buscadorClientes");
@@ -42,3 +46,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderClientes(clientes);
 });
+
