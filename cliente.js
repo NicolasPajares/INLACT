@@ -1,45 +1,55 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+  const listaEl = document.getElementById("listaClientes");
+  const buscadorEl = document.getElementById("buscadorClientes");
 
-  if (!id) {
-    document.body.innerHTML = "❌ ID de cliente no recibido";
+  if (!listaEl || !buscadorEl) {
+    console.error("❌ Elementos HTML no encontrados");
     return;
   }
 
   if (typeof clientes === "undefined") {
-    document.body.innerHTML = "❌ Clientes no cargados";
+    listaEl.innerHTML = "<li>Error: clientes no cargados</li>";
     return;
   }
 
-  const cliente = clientes.find(c => c.id === id);
+  function renderClientes(lista) {
+    listaEl.innerHTML = "";
 
-  if (!cliente) {
-    document.body.innerHTML = "❌ Cliente no encontrado";
-    return;
+    if (lista.length === 0) {
+      listaEl.innerHTML = "<li>No hay clientes</li>";
+      return;
+    }
+
+    lista.forEach(c => {
+      const li = document.createElement("li");
+      li.className = "cliente-item";
+      li.style.cursor = "pointer";
+
+      li.innerHTML = `
+        <strong>${c.nombre}</strong><br>
+        <small>${c.localidad}, ${c.provincia}</small>
+      `;
+
+      li.addEventListener("click", () => {
+        const url = `cliente.html?id=${c.id}`;
+        console.log("➡️ Navegando a:", url);
+        window.location.href = url;
+      });
+
+      listaEl.appendChild(li);
+    });
   }
 
-  document.getElementById("nombreCliente").textContent = cliente.nombre;
-  document.getElementById("ubicacion").textContent =
-    `${cliente.localidad}, ${cliente.provincia}`;
+  buscadorEl.addEventListener("input", () => {
+    const texto = buscadorEl.value.toLowerCase();
 
-  cargarVisitas(cliente.id);
-});
-
-function cargarVisitas(clienteId) {
-  const lista = document.getElementById("listaVisitas");
-  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
-
-  const filtradas = visitas.filter(v => v.clienteId === clienteId);
-
-  if (filtradas.length === 0) {
-    lista.innerHTML = "<li>No hay visitas registradas</li>";
-    return;
-  }
-
-  filtradas.reverse().forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.usuarioNombre}`;
-    lista.appendChild(li);
+    renderClientes(
+      clientes.filter(c =>
+        c.nombre.toLowerCase().includes(texto) ||
+        c.localidad.toLowerCase().includes(texto)
+      )
+    );
   });
-}
+
+  renderClientes(clientes);
+});
