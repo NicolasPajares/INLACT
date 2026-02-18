@@ -1,105 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>INLACT · Clientes</title>
-
-    <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Gestión de Clientes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CSS principal -->
-    <link rel="stylesheet" href="index.css">
-
-    <!-- Iconos -->
-    <link rel="icon" href="img/icon-inlact.svg">
-    <link rel="apple-touch-icon" href="img/icon-inlact.svg">
+  <meta charset="UTF-8">
+  <title>Clientes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
 
-<!-- ===============================
-     HEADER
-================================ -->
-<header>
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
+<h2>Listado de clientes</h2>
 
-    <h2>NICOLÁS PAJARES</h2>
-</header>
+<input
+  type="text"
+  id="buscadorClientes"
+  placeholder="Buscar por nombre o localidad"
+>
 
-<!-- ===============================
-     ACCESOS RÁPIDOS (BOTONES)
-================================ -->
-<section class="quick-actions">
+<ul id="listaClientes"></ul>
 
-    <a href="clientes.html" class="action-card active">
-        <img src="img/icon-clientes.svg" alt="Clientes">
-        <span>Clientes</span>
-    </a>
-
-    <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg" alt="Stock">
-        <span>Stock</span>
-    </a>
-
-    <a href="ensayos.html" class="action-card">
-        <img src="img/icon-ensayos.svg" alt="Ensayos">
-        <span>Ensayos</span>
-    </a>
-
-    <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg" alt="Precios">
-        <span>Precios</span>
-    </a>
-
-</section>
-
-<!-- ===============================
-     CONTENIDO PRINCIPAL
-================================ -->
-<main>
-
-    <section class="card">
-        <h2>Listado de clientes</h2>
-
-        <!-- Buscador -->
-        <input
-            type="text"
-            id="buscadorClientes"
-            class="input-busqueda"
-            placeholder="Buscar cliente por nombre o localidad..."
-        >
-
-        <!-- Lista -->
-        <ul id="listaClientes" class="lista-clientes">
-            <!-- Se genera desde clientes.js -->
-        </ul>
-    </section>
-
-</main>
-
-<!-- ===============================
-     BOTÓN VOLVER A INICIO
-================================ -->
-<a href="index.html" class="btn-home" title="Volver al inicio">
-    🏠
-</a>
-
-<!-- ===============================
-     FOOTER
-================================ -->
-<footer>
-    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
-
-<!-- ===============================
-     JS CLIENTES
-================================ -->
 <script src="data-clientes.js"></script>
-
 <script src="clientes.js"></script>
-
 </body>
 </html>
