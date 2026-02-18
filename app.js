@@ -7,7 +7,7 @@ const USUARIO_ACTUAL = {
   nombre: "Nicolás"
 };
 
-const fabricas = [
+const clientes = [
   {
     id: "fabrica_001",
     nombre: "Depósito Villa María",
@@ -229,4 +229,5 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
