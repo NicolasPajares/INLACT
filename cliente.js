@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const cliente = clientes.find(c => c.id === clienteId);
+  // 🔑 CLAVE: comparación segura
+  const cliente = clientes.find(c => String(c.id) === String(clienteId));
 
   if (!cliente) {
     nombreEl.textContent = "Cliente no encontrado";
@@ -25,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // DATOS DEL CLIENTE
   nombreEl.textContent = cliente.nombre;
-
   datosEl.innerHTML = `
     <p><strong>Localidad:</strong> ${cliente.localidad}</p>
     <p><strong>Provincia:</strong> ${cliente.provincia}</p>
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
 
   const visitasCliente = visitas
-    .filter(v => v.clienteId === cliente.id)
+    .filter(v => String(v.clienteId) === String(cliente.id))
     .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
   visitasEl.innerHTML = "";
