@@ -1,89 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>INLACT · Cliente</title>
-
-    <!-- Mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="index.css">
-
-    <!-- Iconos -->
-    <link rel="icon" href="img/icon-inlact.svg">
+  <meta charset="UTF-8">
+  <title>Cliente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <body>
 
-<!-- ===============================
-     HEADER
-================================ -->
-<header>
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
-    <h2>NICOLÁS PAJARES</h2>
-</header>
+<h2 id="nombreCliente"></h2>
+<p id="datosCliente"></p>
 
-<!-- ===============================
-     BOTONES SUPERIORES
-================================ -->
-<section class="quick-actions">
+<h3>Historial de visitas</h3>
+<ul id="historialVisitas"></ul>
 
-    <a href="clientes.html" class="action-card">
-        <img src="img/icon-clientes.svg" alt="">
-        <span>Clientes</span>
-    </a>
+<a href="clientes.html">← Volver a clientes</a>
 
-    <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg" alt="">
-        <span>Stock</span>
-    </a>
-
-    <a href="ensayos.html" class="action-card">
-        <img src="img/icon-ensayos.svg" alt="">
-        <span>Ensayos</span>
-    </a>
-
-    <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg" alt="">
-        <span>Precios</span>
-    </a>
-
-</section>
-
-<!-- ===============================
-     CONTENIDO PRINCIPAL
-================================ -->
-<main>
-
-    <!-- FICHA CLIENTE -->
-    <section class="card" id="fichaCliente">
-        <!-- Se completa desde cliente.js -->
-    </section>
-
-    <!-- HISTORIAL VISITAS -->
-    <section class="card">
-        <h3>Historial de visitas</h3>
-        <ul id="listaVisitas" class="lista-visitas">
-            <!-- Se carga desde cliente.js -->
-        </ul>
-    </section>
-
-</main>
-
-<!-- ===============================
-     BOTÓN VOLVER
-================================ -->
-<a href="clientes.html" class="btn-volver">← Volver a clientes</a>
-
-<!-- ===============================
-     JS
-================================ -->
 <script src="data-clientes.js"></script>
-
 <script src="cliente.js"></script>
-
 </body>
 </html>
