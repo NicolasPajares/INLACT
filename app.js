@@ -147,7 +147,11 @@ async function verificarProximidad(lat, lng) {
   let hayCercanos = false;
 
   clientes.forEach(c => {
-    if (!c.lat || !c.lng || !c.radio) return;
+    const latC = Number(c.lat);
+const lngC = Number(c.lng);
+const radio = Number(c.radio);
+
+if (isNaN(latC) || isNaN(lngC) || isNaN(radio)) return;
 
     const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
@@ -231,6 +235,7 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
 
 
