@@ -138,7 +138,10 @@ async function verificarProximidad(lat, lng) {
       btn.style.border = "none";
       btn.style.borderRadius = "6px";
 
-      btn.onclick = () => registrarVisita(c, lat, lng);
+      btn.onclick = () => {
+  alert("CLICK OK: " + c.nombre);
+  registrarVisita(c, lat, lng);
+};
 
       card.appendChild(nombre);
       card.appendChild(btn);
@@ -195,3 +198,4 @@ navigator.geolocation.watchPosition(
  * INICIO
  **********************/
 dibujarClientes();
+
