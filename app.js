@@ -1,3 +1,11 @@
+window.onerror = function (msg, url, line, col, error) {
+  alert(
+    "ERROR:\n" +
+    msg +
+    "\nLinea: " + line +
+    "\nCol: " + col
+  );
+};
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -27,3 +35,4 @@ getDocs(collection(db, "clientes"))
   .catch(err => {
     console.error("❌ Firestore error:", err);
   });
+
