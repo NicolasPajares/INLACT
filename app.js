@@ -41,6 +41,7 @@ console.log("🔥 Firebase inicializado");
  **********************/
 let map;
 let markerUsuario;
+let markersClientes = [];
 
 map = L.map("map").setView([-32.4075, -63.2408], 13);
 
@@ -58,6 +59,27 @@ async function obtenerClientes() {
     clientes.push({ id: doc.id, ...doc.data() });
   });
   return clientes;
+}
+
+/**********************
+ * DIBUJAR CLIENTES EN MAPA
+ **********************/
+async function dibujarClientes() {
+  const clientes = await obtenerClientes();
+
+  // borrar marcadores anteriores
+  markersClientes.forEach(m => map.removeLayer(m));
+  markersClientes = [];
+
+  clientes.forEach(c => {
+    if (!c.lat || !c.lng) return;
+
+    const marker = L.marker([c.lat, c.lng])
+      .addTo(map)
+      .bindPopup(`<strong>${c.nombre}</strong>`);
+
+    markersClientes.push(marker);
+  });
 }
 
 /**********************
@@ -168,3 +190,8 @@ navigator.geolocation.watchPosition(
     enableHighAccuracy: true
   }
 );
+
+/**********************
+ * INICIO
+ **********************/
+dibujarClientes();
