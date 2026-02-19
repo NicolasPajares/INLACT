@@ -23,76 +23,72 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /**********************
- * ESPERAR HTML
+ * ELEMENTOS DOM
  **********************/
-document.addEventListener("DOMContentLoaded", () => {
-  const contenedor = document.getElementById("lista-visitas");
-  const buscador = document.getElementById("buscador");
-  const btnVolver = document.getElementById("cerrar-historial");
+const contenedor = document.getElementById("lista-visitas");
+const buscador = document.getElementById("buscador");
+const btnVolver = document.getElementById("cerrar-historial");
 
-  /**********************
-   * CARGAR VISITAS
-   **********************/
-  async function cargarVisitas() {
-    contenedor.innerHTML = "Cargando visitas...";
+/**********************
+ * CARGAR VISITAS
+ **********************/
+async function cargarVisitas() {
+  contenedor.innerHTML = "Cargando visitas...";
 
-    const q = query(
-      collection(db, "visitas"),
-      orderBy("fecha", "desc")
-    );
+  const q = query(
+    collection(db, "visitas"),
+    orderBy("fecha", "desc") // más recientes primero
+  );
 
-    const snap = await getDocs(q);
+  const snap = await getDocs(q);
 
-    contenedor.innerHTML = "";
+  contenedor.innerHTML = "";
 
-    if (snap.empty) {
-      contenedor.innerHTML = "<p>No hay visitas registradas.</p>";
-      return;
-    }
-
-    snap.forEach(doc => {
-      const v = doc.data();
-
-      const fecha = v.fecha?.toDate
-        ? v.fecha.toDate().toLocaleString("es-AR")
-        : "Sin fecha";
-
-      const div = document.createElement("div");
-      div.className = "visita";
-
-      div.innerHTML = `
-        <strong>${v.cliente}</strong><br>
-        <span class="fecha">${fecha}</span>
-      `;
-
-      contenedor.appendChild(div);
-    });
+  if (snap.empty) {
+    contenedor.innerHTML = "<p>No hay visitas registradas.</p>";
+    return;
   }
 
-  /**********************
-   * BUSCADOR
-   **********************/
-  buscador.addEventListener("input", () => {
-    const texto = buscador.value.toLowerCase();
-    const visitasDOM = document.querySelectorAll(".visita");
+  snap.forEach(doc => {
+    const v = doc.data();
 
-    visitasDOM.forEach(visita => {
-      const contenido = visita.textContent.toLowerCase();
-      visita.style.display = contenido.includes(texto)
-        ? "block"
-        : "none";
-    });
+    const fecha = v.fecha?.toDate
+      ? v.fecha.toDate().toLocaleString("es-AR")
+      : "Sin fecha";
+
+    const div = document.createElement("div");
+    div.className = "visita";
+
+    div.innerHTML = `
+      <strong>${v.cliente}</strong><br>
+      <span class="fecha">${fecha}</span>
+    `;
+
+    contenedor.appendChild(div);
   });
+}
 
-  /**********************
-   * BOTÓN VOLVER ✅
-   **********************/
-  btnVolver.addEventListener("click", () => {
-    history.back();
+/**********************
+ * BUSCADOR
+ **********************/
+buscador.addEventListener("input", () => {
+  const texto = buscador.value.toLowerCase();
+  const visitasDOM = document.querySelectorAll(".visita");
+
+  visitasDOM.forEach(visita => {
+    const contenido = visita.textContent.toLowerCase();
+    visita.style.display = contenido.includes(texto) ? "block" : "none";
   });
-
-  /**********************
-   * INICIAR
-   **********************/
-  cargarVisitas();
 });
+
+/**********************
+ * BOTÓN VOLVER (FIX)
+ **********************/
+btnVolver.addEventListener("click", () => {
+  window.location.href = "index.html";
+});
+
+/**********************
+ * INICIAR
+ **********************/
+cargarVisitas();
