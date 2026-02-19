@@ -8,8 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!listaEl || !buscadorEl) return;
 
-  // ⬇️ USAMOS data-clientes.js
-  if (typeof clientes === "undefined" || clientes.length === 0) {
+  // ✅ LEEMOS DESDE LOCALSTORAGE
+  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+
+  if (clientes.length === 0) {
     listaEl.innerHTML = "<li>No hay clientes cargados</li>";
     return;
   }
@@ -23,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       li.innerHTML = `
         <strong>${c.nombre}</strong><br>
-        <small>${c.localidad}, ${c.provincia}</small>
+        <small>${c.localidad || ""} ${c.provincia || ""}</small>
       `;
 
       li.onclick = () => {
@@ -39,11 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
     renderClientes(
       clientes.filter(c =>
         c.nombre.toLowerCase().includes(t) ||
-        c.localidad.toLowerCase().includes(t)
+        (c.localidad || "").toLowerCase().includes(t)
       )
     );
   });
 
   renderClientes(clientes);
 });
-
