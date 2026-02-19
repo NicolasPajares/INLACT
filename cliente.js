@@ -1,3 +1,14 @@
+function obtenerClientes() {
+  let clientes = JSON.parse(localStorage.getItem("clientes"));
+
+  if (!clientes || clientes.length === 0) {
+    clientes = CLIENTES_INICIALES;
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+  }
+
+  return clientes;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const clienteId = params.get("id");
@@ -55,3 +66,4 @@ document.addEventListener("DOMContentLoaded", () => {
     visitasEl.appendChild(li);
   });
 });
+
