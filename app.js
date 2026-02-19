@@ -158,15 +158,22 @@ async function verificarProximidad(lat, lng) {
  * REGISTRAR VISITA
  **********************/
 async function registrarVisita(cliente, lat, lng) {
-  await addDoc(collection(db, "visitas"), {
-    clienteId: cliente.id,
-    cliente: cliente.nombre,
-    lat,
-    lng,
-    fecha: serverTimestamp()
-  });
+  try {
+    console.log("Guardando visita...", cliente.nombre);
 
-  alert("✅ Visita registrada en " + cliente.nombre);
+    await addDoc(collection(db, "visitas"), {
+      clienteId: cliente.id,
+      cliente: cliente.nombre,
+      lat,
+      lng,
+      fecha: serverTimestamp()
+    });
+
+    alert("✅ Visita registrada en " + cliente.nombre);
+  } catch (error) {
+    console.error("ERROR FIRESTORE:", error);
+    alert("❌ Error al guardar visita:\n" + error.message);
+  }
 }
 
 /**********************
@@ -198,4 +205,5 @@ navigator.geolocation.watchPosition(
  * INICIO
  **********************/
 dibujarClientes();
+
 
