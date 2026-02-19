@@ -80,14 +80,16 @@ document.addEventListener("DOMContentLoaded", () => {
 async function cargarClientesEnMapaFirestore() {
   const clientes = await obtenerClientesFirestore();
 
-  clientes.forEach(c => {
-    if (typeof c.lat !== "number" || typeof c.lng !== "number") return;
+clientes.forEach(c => {
+  const lat = Number(c.lat);
+  const lng = Number(c.lng);
 
-    L.marker([c.lat, c.lng])
-      .addTo(map)
-      .bindPopup(`🏭 ${c.nombre}`);
-  });
-}
+  if (isNaN(lat) || isNaN(lng)) return;
+
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(`🏭 ${c.nombre}`);
+});
 /********************************
  * 5️⃣ CLIENTES EN MAPA
  ********************************/
@@ -229,6 +231,7 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
 
 
