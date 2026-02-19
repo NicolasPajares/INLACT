@@ -7,19 +7,18 @@ const USUARIO_ACTUAL = {
   nombre: "Nicolás"
 };
 
-const clientes = [
-  {
-    id: "clientes_001",
-    nombre: "Depósito Villa María",
-    localidad: "Villa María",
-    provincia: "Córdoba",
-    lat: -32.3833,
-    lng: -63.2243,
-    radio: 10000,
-    tipo: "cliente"
-  }
-];
 
+function obtenerClientes() {
+  const guardados = JSON.parse(localStorage.getItem("clientes"));
+
+  // Si no hay nada guardado, inicializamos desde data-clientes.js
+  if (!guardados || guardados.length === 0) {
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    return clientes;
+  }
+
+  return guardados;
+}
 
 /********************************
  * 2️⃣ STORAGE (localStorage)
@@ -230,4 +229,5 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
