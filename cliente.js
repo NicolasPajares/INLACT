@@ -27,8 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // 🔑 CLAVE: comparación segura
-  const cliente = clientes.find(c => String(c.id) === String(clienteId));
 
   if (!cliente) {
     nombreEl.textContent = "Cliente no encontrado";
@@ -66,4 +64,5 @@ document.addEventListener("DOMContentLoaded", () => {
     visitasEl.appendChild(li);
   });
 });
+
 
