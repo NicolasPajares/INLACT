@@ -128,6 +128,10 @@
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+// 👉 la base de datos ya está lista
+console.log("Firestore conectado", db);
 </script>
 </body>
 </html>
