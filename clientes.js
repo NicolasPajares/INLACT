@@ -1,3 +1,14 @@
+function obtenerClientes() {
+  let clientes = JSON.parse(localStorage.getItem("clientes"));
+
+  if (!clientes || clientes.length === 0) {
+    clientes = CLIENTES_INICIALES;
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+  }
+
+  return clientes;
+}
+
 document.getElementById("btnNuevoCliente").addEventListener("click", () => {
   window.location.href = "nuevo-cliente.html";
 });
@@ -48,3 +59,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderClientes(clientes);
 });
+
