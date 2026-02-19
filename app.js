@@ -16,6 +16,23 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+/********************************
+ * 0️⃣ CLIENTES DESDE FIRESTORE
+ ********************************/
+async function obtenerClientesFirestore() {
+  const snapshot = await getDocs(collection(db, "clientes"));
+  const clientes = [];
+
+  snapshot.forEach(doc => {
+    clientes.push({
+      id: doc.id,
+      ...doc.data()
+    });
+  });
+
+  return clientes;
+}
 /********************************
  * 1️⃣ USUARIO
  ********************************/
@@ -211,5 +228,6 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
 
