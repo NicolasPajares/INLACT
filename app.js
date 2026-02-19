@@ -81,7 +81,7 @@ async function cargarClientesEnMapaFirestore() {
   const clientes = await obtenerClientesFirestore();
 
   clientes.forEach(c => {
-    if (!c.lat || !c.lng) return;
+    if (typeof c.lat !== "number" || typeof c.lng !== "number") return;
 
     L.marker([c.lat, c.lng])
       .addTo(map)
@@ -229,6 +229,7 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
 
 
