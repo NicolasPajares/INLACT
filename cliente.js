@@ -1,57 +1,64 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const listaEl = document.getElementById("listaClientes");
-  const buscadorEl = document.getElementById("buscadorClientes");
-  const btnNuevo = document.getElementById("btnNuevoCliente");
+  const params = new URLSearchParams(window.location.search);
+  const clienteId = params.get("id");
 
-  if (!listaEl || !buscadorEl) {
-    console.error("❌ Elementos HTML no encontrados");
+  const nombreEl = document.getElementById("clienteNombre");
+  const datosEl = document.getElementById("clienteDatos");
+  const visitasEl = document.getElementById("listaVisitasCliente");
+
+  if (!nombreEl || !datosEl || !visitasEl) {
+    console.error("❌ Elementos HTML no encontrados en cliente.html");
     return;
   }
 
-  if (btnNuevo) {
-    btnNuevo.onclick = () => {
-      window.location.href = "nuevo-cliente.html";
-    };
+  if (!clienteId) {
+    nombreEl.textContent = "Cliente no especificado";
+    return;
   }
 
-  // 🔑 SIEMPRE desde localStorage
-  let clientes = obtenerClientes();
+  // 🔑 CLAVE ABSOLUTA: leer desde localStorage
+  const clientes = obtenerClientes();
 
-  function renderClientes(lista) {
-    listaEl.innerHTML = "";
+  const cliente = clientes.find(c => String(c.id) === String(clienteId));
 
-    if (lista.length === 0) {
-      listaEl.innerHTML = "<li>No hay clientes cargados</li>";
-      return;
-    }
-
-    lista.forEach(c => {
-      const li = document.createElement("li");
-      li.style.cursor = "pointer";
-
-      li.innerHTML = `
-        <strong>${c.nombre}</strong><br>
-        <small>${c.localidad || ""} ${c.provincia || ""}</small>
-      `;
-
-      li.onclick = () => {
-        window.location.href = `cliente.html?id=${c.id}`;
-      };
-
-      listaEl.appendChild(li);
-    });
+  if (!cliente) {
+    nombreEl.textContent = "Cliente no encontrado";
+    return;
   }
 
-  buscadorEl.addEventListener("input", () => {
-    const texto = buscadorEl.value.toLowerCase();
+  // ===============================
+  // DATOS DEL CLIENTE
+  // ===============================
+  nombreEl.textContent = cliente.nombre;
 
-    renderClientes(
-      clientes.filter(c =>
-        c.nombre.toLowerCase().includes(texto) ||
-        (c.localidad || "").toLowerCase().includes(texto)
-      )
-    );
+  datosEl.innerHTML = `
+    <p><strong>Localidad:</strong> ${cliente.localidad || "-"}</p>
+    <p><strong>Provincia:</strong> ${cliente.provincia || "-"}</p>
+    <p><strong>ID:</strong> ${cliente.id}</p>
+  `;
+
+  // ===============================
+  // VISITAS DEL CLIENTE
+  // ===============================
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
+
+  const visitasCliente = visitas
+    .filter(v => String(v.clienteId) === String(cliente.id))
+    .sort((a, b) => b.id - a.id);
+
+  visitasEl.innerHTML = "";
+
+  if (visitasCliente.length === 0) {
+    visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+    return;
+  }
+
+  visitasCliente.forEach(v => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${v.fecha} ${v.hora}</strong><br>
+      <small>${v.usuarioNombre}</small>
+    `;
+    visitasEl.appendChild(li);
   });
-
-  renderClientes(clientes);
 });
