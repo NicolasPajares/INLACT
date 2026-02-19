@@ -133,9 +133,9 @@ function actualizarMarkerUsuario(lat, lng) {
 
 
 /********************************
- * 7️⃣ PROXIMIDAD
+ * 7️⃣ PROXIMIDAD (FIRESTORE)
  ********************************/
-function verificarProximidad(lat, lng) {
+async function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
 
@@ -144,10 +144,13 @@ function verificarProximidad(lat, lng) {
   estado.textContent = "";
   acciones.innerHTML = "";
 
-  const clientes = obtenerClientes();
+  // 🔥 clientes desde Firestore
+  const clientes = await obtenerClientesFirestore();
   let hayCercanos = false;
 
   clientes.forEach(c => {
+    if (!c.lat || !c.lng || !c.radio) return;
+
     const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
     if (d <= c.radio) {
@@ -230,6 +233,7 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
 
 
 
