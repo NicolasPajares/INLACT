@@ -1,7 +1,6 @@
 /********************************
  * 🔥 FIREBASE
  ********************************/
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -18,96 +17,86 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /********************************
- * 0️⃣ CLIENTES DESDE FIRESTORE
- ********************************/
-async function obtenerClientesFirestore() {
-  const snapshot = await getDocs(collection(db, "clientes"));
-  const clientes = [];
-
-  snapshot.forEach(doc => {
-    clientes.push({
-      id: doc.id,
-      ...doc.data()
-    });
-  });
-
-  return clientes;
-}
-/********************************
- * 1️⃣ USUARIO
+ * 👤 USUARIO
  ********************************/
 const USUARIO_ACTUAL = {
   id: "user_001",
   nombre: "Nicolás"
 };
 
-
-
 /********************************
- * 3️⃣ VISITAS
+ * 📦 CLIENTES DESDE FIRESTORE
  ********************************/
-function obtenerVisitas() {
-  return JSON.parse(localStorage.getItem("visitas_global")) || [];
-}
+async function obtenerClientes() {
+  const snapshot = await getDocs(collection(db, "clientes"));
+  const clientes = [];
 
-function guardarVisita(visita) {
-  const visitas = obtenerVisitas();
-  visitas.push(visita);
-  localStorage.setItem("visitas_global", JSON.stringify(visitas));
-}
+  snapshot.forEach(doc => {
+    const data = doc.data();
 
+    clientes.push({
+      id: doc.id,
+      nombre: data.nombre || "Sin nombre",
+      lat: Number(data.lat),
+      lng: Number(data.lng),
+      radio: Number(data.radio) || 100
+    });
+  });
+
+  return clientes;
+}
 
 /********************************
- * 4️⃣ MAPA
+ * 🗺️ MAPA
  ********************************/
 let map;
 let markerUsuario = null;
+let marcadoresClientes = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   map = L.map("map").setView([-32.4075, -63.2403], 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  cargarClientesEnMapaFirestore();
+  const clientes = await obtenerClientes();
+  dibujarClientes(clientes);
   iniciarGeolocalizacion();
-  mostrarVisitas();
 
   console.log("✅ App cargada correctamente");
 });
 
-async function cargarClientesEnMapaFirestore() {
-  const clientes = await obtenerClientesFirestore();
-
-clientes.forEach(c => {
-  const lat = Number(c.lat);
-  const lng = Number(c.lng);
-
-  if (isNaN(lat) || isNaN(lng)) return;
-
-  L.marker([lat, lng])
-    .addTo(map)
-    .bindPopup(`🏭 ${c.nombre}`);
-});
 /********************************
- * 5️⃣ CLIENTES EN MAPA
+ * 🏭 CLIENTES EN MAPA
  ********************************/
-async function cargarClientesEnMapa() {
-  const clientes = await obtenerClientesFirestore();
+function dibujarClientes(clientes) {
+  // limpiar marcadores anteriores
+  marcadoresClientes.forEach(m => map.removeLayer(m));
+  marcadoresClientes = [];
 
   clientes.forEach(c => {
     if (!c.lat || !c.lng) return;
 
-    L.marker([c.lat, c.lng])
+    const marker = L.marker([c.lat, c.lng])
       .addTo(map)
       .bindPopup(`🏭 ${c.nombre}`);
+
+    marcadoresClientes.push(marker);
+
+    const circle = L.circle([c.lat, c.lng], {
+      radius: c.radio,
+      color: "#2563eb",
+      fillColor: "#3b82f6",
+      fillOpacity: 0.2
+    }).addTo(map);
+
+    marcadoresClientes.push(circle);
   });
 }
 
-
 /********************************
- * 6️⃣ GEOLOCALIZACIÓN
+ * 📍 GEOLOCALIZACIÓN
  ********************************/
 function iniciarGeolocalizacion() {
   if (!navigator.geolocation) return;
@@ -123,15 +112,16 @@ function iniciarGeolocalizacion() {
 
 function actualizarMarkerUsuario(lat, lng) {
   if (!markerUsuario) {
-    markerUsuario = L.marker([lat, lng]).addTo(map).bindPopup("📍 Vos");
+    markerUsuario = L.marker([lat, lng])
+      .addTo(map)
+      .bindPopup("📍 Vos");
   } else {
     markerUsuario.setLatLng([lat, lng]);
   }
 }
 
-
 /********************************
- * 7️⃣ PROXIMIDAD (FIRESTORE)
+ * 📡 PROXIMIDAD
  ********************************/
 async function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
@@ -142,17 +132,10 @@ async function verificarProximidad(lat, lng) {
   estado.textContent = "";
   acciones.innerHTML = "";
 
-  // 🔥 clientes desde Firestore
-  const clientes = await obtenerClientesFirestore();
+  const clientes = await obtenerClientes();
   let hayCercanos = false;
 
   clientes.forEach(c => {
-    const latC = Number(c.lat);
-const lngC = Number(c.lng);
-const radio = Number(c.radio);
-
-if (isNaN(latC) || isNaN(lngC) || isNaN(radio)) return;
-
     const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
     if (d <= c.radio) {
@@ -183,10 +166,12 @@ if (isNaN(latC) || isNaN(lngC) || isNaN(radio)) return;
 }
 
 /********************************
- * 8️⃣ REGISTRAR VISITA
+ * 📝 REGISTRAR VISITA
  ********************************/
 function registrarVisita(cliente, lat, lng) {
-  guardarVisita({
+  const visitas = JSON.parse(localStorage.getItem("visitas_global")) || [];
+
+  visitas.push({
     id: Date.now(),
     clienteId: cliente.id,
     clienteNombre: cliente.nombre,
@@ -198,29 +183,12 @@ function registrarVisita(cliente, lat, lng) {
     lng
   });
 
-  mostrarVisitas();
+  localStorage.setItem("visitas_global", JSON.stringify(visitas));
   alert(`✅ Visita registrada en ${cliente.nombre}`);
 }
 
-
 /********************************
- * 9️⃣ HISTORIAL
- ********************************/
-function mostrarVisitas() {
-  const lista = document.getElementById("listaVisitas");
-  if (!lista) return;
-
-  lista.innerHTML = "";
-  obtenerVisitas().slice().reverse().forEach(v => {
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha} ${v.hora} – ${v.clienteNombre}`;
-    lista.appendChild(li);
-  });
-}
-
-
-/********************************
- * 🔟 DISTANCIA
+ * 📏 DISTANCIA
  ********************************/
 function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -235,13 +203,3 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-
-
-
-
-
-
-
-
-
-
