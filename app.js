@@ -1,11 +1,6 @@
-window.onerror = function (msg, url, line, col, error) {
-  alert(
-    "ERROR:\n" +
-    msg +
-    "\nLinea: " + line +
-    "\nCol: " + col
-  );
-};
+/********************************
+ * 🔥 FIREBASE (IMPORTS PRIMERO)
+ ********************************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -13,6 +8,9 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/********************************
+ * ⚙️ CONFIG FIREBASE
+ ********************************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -25,14 +23,31 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-console.log("🔥 Firebase inicializado");
+console.log("🔥 Firebase inicializado correctamente");
 
+/********************************
+ * 🧪 TEST FIRESTORE
+ ********************************/
 getDocs(collection(db, "clientes"))
-  .then(snap => {
-    console.log("✅ Firestore OK");
-    snap.forEach(d => console.log(d.id, d.data()));
+  .then(snapshot => {
+    console.log("✅ Firestore conectado. Clientes:");
+    snapshot.forEach(doc => {
+      console.log(doc.id, doc.data());
+    });
   })
   .catch(err => {
-    console.error("❌ Firestore error:", err);
+    console.error("❌ Error Firestore:", err);
+    alert("Error Firestore: " + err.message);
   });
 
+/********************************
+ * 🚨 CAPTURA DE ERRORES (AL FINAL)
+ ********************************/
+window.onerror = function (msg, url, line, col) {
+  alert(
+    "ERROR:\n" +
+    msg +
+    "\nLinea: " + line +
+    "\nColumna: " + col
+  );
+};
