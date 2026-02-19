@@ -1,4 +1,6 @@
-document.getElementById("guardarCliente").addEventListener("click", () => {
+document.getElementById("formNuevoCliente").addEventListener("submit", e => {
+  e.preventDefault();
+
   const nombre = nombreCliente.value.trim();
   const localidad = localidadCliente.value.trim();
   const provincia = provinciaCliente.value.trim();
@@ -21,7 +23,11 @@ document.getElementById("guardarCliente").addEventListener("click", () => {
     lat,
     lng,
     radio,
-    tipo: "cliente"
+    tipo: "cliente",
+    contacto: "",
+    puesto: "",
+    telefono: "",
+    email: ""
   });
 
   localStorage.setItem("clientes", JSON.stringify(clientes));
