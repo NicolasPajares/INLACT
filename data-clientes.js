@@ -7,7 +7,7 @@ const USUARIO_ACTUAL = {
   nombre: "Nicolás"
 };
 
-const clientes = [
+const CLIENTES_INICIALES = [
   {
     id: "clientes_001",
     nombre: "Depósito Villa María",
@@ -38,3 +38,4 @@ function guardarVisita(visita) {
 if (!localStorage.getItem("clientes")) {
   localStorage.setItem("clientes", JSON.stringify(clientes));
 }
+
