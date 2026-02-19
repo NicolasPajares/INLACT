@@ -1,13 +1,8 @@
 /********************************
- * MODELO DE DATOS GLOBAL
+ * DATOS INICIALES (SOLO PRIMER USO)
  ********************************/
 
-const USUARIO_ACTUAL = {
-  id: "user_001",
-  nombre: "Nicolás"
-};
-
-const CLIENTES_INICIALES = [
+const clientes = [
   {
     id: "clientes_001",
     nombre: "Depósito Villa María",
@@ -21,21 +16,16 @@ const CLIENTES_INICIALES = [
 ];
 
 /********************************
- * STORAGE
+ * FUNCIÓN ÚNICA PARA OBTENER CLIENTES
  ********************************/
 
-function obtenerVisitas() {
-  return JSON.parse(localStorage.getItem("visitas_global")) || [];
-}
+function obtenerClientes() {
+  let clientesLS = JSON.parse(localStorage.getItem("clientes"));
 
-function guardarVisita(visita) {
-  const visitas = obtenerVisitas();
-  visitas.push(visita);
-  localStorage.setItem("visitas_global", JSON.stringify(visitas));
-}
+  if (!clientesLS || clientesLS.length === 0) {
+    localStorage.setItem("clientes", JSON.stringify(clientes));
+    clientesLS = clientes;
+  }
 
-// Inicializar clientes en localStorage solo si no existen
-if (!localStorage.getItem("clientes")) {
-  localStorage.setItem("clientes", JSON.stringify(clientes));
+  return clientesLS;
 }
-
