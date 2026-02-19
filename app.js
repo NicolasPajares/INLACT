@@ -101,29 +101,44 @@ function actualizarMarkerUsuario(lat, lng) {
 function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
+
   if (!estado || !acciones) return;
 
+  estado.textContent = "";
   acciones.innerHTML = "";
-  let hay = false;
 
-  obtenerClientes().forEach(c => {
+  const clientes = obtenerClientes();
+  let hayCercanos = false;
+
+  clientes.forEach(c => {
     const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
     if (d <= c.radio) {
-      hay = true;
-      estado.textContent = `Estás cerca de ${c.nombre}`;
+      hayCercanos = true;
+
+      const card = document.createElement("div");
+      card.style.border = "1px solid #ddd";
+      card.style.padding = "10px";
+      card.style.marginBottom = "10px";
+      card.style.borderRadius = "6px";
+
+      const texto = document.createElement("p");
+      texto.textContent = `Estás cerca de ${c.nombre}`;
 
       const btn = document.createElement("button");
       btn.textContent = "Registrar visita";
       btn.onclick = () => registrarVisita(c, lat, lng);
 
-      acciones.appendChild(btn);
+      card.appendChild(texto);
+      card.appendChild(btn);
+      acciones.appendChild(card);
     }
   });
 
-  if (!hay) estado.textContent = "No hay clientes cercanos";
+  if (!hayCercanos) {
+    estado.textContent = "No hay clientes cercanos";
+  }
 }
-
 
 /********************************
  * 8️⃣ REGISTRAR VISITA
@@ -178,3 +193,4 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
