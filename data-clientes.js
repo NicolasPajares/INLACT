@@ -33,3 +33,8 @@ function guardarVisita(visita) {
   visitas.push(visita);
   localStorage.setItem("visitas_global", JSON.stringify(visitas));
 }
+
+// Inicializar clientes en localStorage solo si no existen
+if (!localStorage.getItem("clientes")) {
+  localStorage.setItem("clientes", JSON.stringify(clientes));
+}
