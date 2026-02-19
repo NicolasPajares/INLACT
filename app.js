@@ -13,8 +13,8 @@ const firebaseConfig = {
   appId: "XXXX"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 
 /********************************
  * 👤 USUARIO
@@ -34,6 +34,9 @@ async function obtenerClientes() {
   snapshot.forEach(doc => {
     const data = doc.data();
 
+    // ⛔ filtro defensivo
+    if (data.lat == null || data.lng == null) return;
+
     clientes.push({
       id: doc.id,
       nombre: data.nombre || "Sin nombre",
@@ -52,6 +55,7 @@ async function obtenerClientes() {
 let map;
 let markerUsuario = null;
 let marcadoresClientes = [];
+let clientesCache = []; // 🔑 cache para no pedir firestore todo el tiempo
 
 document.addEventListener("DOMContentLoaded", async () => {
   map = L.map("map").setView([-32.4075, -63.2403], 13);
@@ -60,8 +64,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     attribution: "© OpenStreetMap"
   }).addTo(map);
 
-  const clientes = await obtenerClientes();
-  dibujarClientes(clientes);
+  clientesCache = await obtenerClientes();
+  dibujarClientes(clientesCache);
   iniciarGeolocalizacion();
 
   console.log("✅ App cargada correctamente");
@@ -71,18 +75,13 @@ document.addEventListener("DOMContentLoaded", async () => {
  * 🏭 CLIENTES EN MAPA
  ********************************/
 function dibujarClientes(clientes) {
-  // limpiar marcadores anteriores
   marcadoresClientes.forEach(m => map.removeLayer(m));
   marcadoresClientes = [];
 
   clientes.forEach(c => {
-    if (!c.lat || !c.lng) return;
-
     const marker = L.marker([c.lat, c.lng])
       .addTo(map)
       .bindPopup(`🏭 ${c.nombre}`);
-
-    marcadoresClientes.push(marker);
 
     const circle = L.circle([c.lat, c.lng], {
       radius: c.radio,
@@ -91,7 +90,7 @@ function dibujarClientes(clientes) {
       fillOpacity: 0.2
     }).addTo(map);
 
-    marcadoresClientes.push(circle);
+    marcadoresClientes.push(marker, circle);
   });
 }
 
@@ -99,15 +98,28 @@ function dibujarClientes(clientes) {
  * 📍 GEOLOCALIZACIÓN
  ********************************/
 function iniciarGeolocalizacion() {
-  if (!navigator.geolocation) return;
+  if (!navigator.geolocation) {
+    alert("Geolocalización no soportada");
+    return;
+  }
 
-  navigator.geolocation.watchPosition(pos => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+  navigator.geolocation.watchPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
 
-    actualizarMarkerUsuario(lat, lng);
-    verificarProximidad(lat, lng);
-  });
+      actualizarMarkerUsuario(lat, lng);
+      verificarProximidad(lat, lng);
+    },
+    err => {
+      console.error("Error GPS:", err);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    }
+  );
 }
 
 function actualizarMarkerUsuario(lat, lng) {
@@ -123,7 +135,7 @@ function actualizarMarkerUsuario(lat, lng) {
 /********************************
  * 📡 PROXIMIDAD
  ********************************/
-async function verificarProximidad(lat, lng) {
+function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
 
@@ -132,10 +144,9 @@ async function verificarProximidad(lat, lng) {
   estado.textContent = "";
   acciones.innerHTML = "";
 
-  const clientes = await obtenerClientes();
   let hayCercanos = false;
 
-  clientes.forEach(c => {
+  clientesCache.forEach(c => {
     const d = distanciaMetros(lat, lng, c.lat, c.lng);
 
     if (d <= c.radio) {
@@ -188,7 +199,7 @@ function registrarVisita(cliente, lat, lng) {
 }
 
 /********************************
- * 📏 DISTANCIA
+ * 📏 DISTANCIA (HAVERSINE)
  ********************************/
 function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -203,10 +214,3 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-
-// =====================
-// TEST FIRESTORE
-// =====================
-obtenerClientes().then(clientes => {
-  console.log("Clientes desde Firestore:", clientes);
-});
