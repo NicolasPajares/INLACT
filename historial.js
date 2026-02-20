@@ -37,11 +37,10 @@ async function cargarVisitas() {
 
   const q = query(
     collection(db, "visitas"),
-    orderBy("fecha", "desc") // más recientes primero
+    orderBy("fecha", "desc")
   );
 
   const snap = await getDocs(q);
-
   contenedor.innerHTML = "";
 
   if (snap.empty) {
@@ -56,12 +55,30 @@ async function cargarVisitas() {
       ? v.fecha.toDate().toLocaleString("es-AR")
       : "Sin fecha";
 
+    const tipo = v.tipoVisita || "Sin tipo";
+
+    let claseTipo = "";
+    if (tipo === "Visita comercial") claseTipo = "comercial";
+    if (tipo === "Ensayo") claseTipo = "ensayo";
+    if (tipo === "Entrega de productos") claseTipo = "entrega";
+
+    let productoHTML = "";
+    if (tipo === "Entrega de productos" && v.producto) {
+      productoHTML = `
+        <div class="producto">
+          📦 ${v.producto} ${v.cantidad ? `(${v.cantidad})` : ""}
+        </div>
+      `;
+    }
+
     const div = document.createElement("div");
     div.className = "visita";
 
     div.innerHTML = `
-      <strong>${v.cliente}</strong><br>
-      <span class="fecha">${fecha}</span>
+      <strong>${v.cliente || "Cliente sin nombre"}</strong><br>
+      <span class="fecha">${fecha}</span><br>
+      <span class="badge ${claseTipo}">${tipo}</span>
+      ${productoHTML}
     `;
 
     contenedor.appendChild(div);
@@ -82,7 +99,7 @@ buscador.addEventListener("input", () => {
 });
 
 /**********************
- * BOTÓN VOLVER (FIX)
+ * BOTÓN VOLVER
  **********************/
 btnVolver.addEventListener("click", () => {
   window.location.href = "index.html";
