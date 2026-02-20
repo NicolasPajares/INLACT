@@ -1,102 +1,73 @@
-// cliente.js
-import { db } from "./firebase.js";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<head>
+  <meta charset="UTF-8" />
+  <title>Cliente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-// ============================
-// Obtener clienteId desde URL
-// ============================
-const params = new URLSearchParams(window.location.search);
-const clienteId = params.get("id");
-
-console.log("Cliente ID:", clienteId);
-
-// ============================
-// Referencias HTML
-// ============================
-const nombreEl = document.getElementById("nombre");
-const direccionEl = document.getElementById("direccion");
-const zonaEl = document.getElementById("zona");
-const historialEl = document.getElementById("historial");
-
-// ============================
-// Cargar datos del cliente
-// ============================
-async function cargarCliente() {
-  try {
-    const ref = doc(db, "clientes", clienteId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      nombreEl.textContent = "Cliente no encontrado";
-      return;
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 16px;
     }
 
-    const data = snap.data();
-
-    nombreEl.textContent = data.nombre || "-";
-    direccionEl.textContent = data.direccion || "-";
-    zonaEl.textContent = data.zona || "-";
-
-  } catch (error) {
-    console.error("❌ Error cargando cliente:", error);
-  }
-}
-
-// ============================
-// Cargar historial de visitas
-// ============================
-async function cargarVisitas() {
-  try {
-    historialEl.innerHTML = "<li>Cargando visitas...</li>";
-
-    const q = query(
-      collection(db, "visitas"),
-      where("clienteId", "==", clienteId),
-      orderBy("fecha", "desc") // 🔑 CLAVE: fecha en minúscula
-    );
-
-    const snap = await getDocs(q);
-
-    historialEl.innerHTML = "";
-
-    if (snap.empty) {
-      historialEl.innerHTML = "<li>No hay visitas registradas</li>";
-      return;
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
     }
 
-    snap.forEach(docu => {
-      const v = docu.data();
-      console.log("VISITA:", v);
+    h2 {
+      margin: 0 0 8px 0;
+    }
 
-      const fecha = v.fecha?.toDate
-        ? v.fecha.toDate().toLocaleString()
-        : "-";
+    .dato {
+      margin: 4px 0;
+      color: #333;
+    }
 
-      const li = document.createElement("li");
-      li.textContent = `📅 ${fecha} | 📍 ${v.lat}, ${v.lng}`;
-      historialEl.appendChild(li);
-    });
+    .visita {
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+      font-size: 14px;
+    }
 
-  } catch (error) {
-    console.error("❌ Error cargando visitas:", error);
-    historialEl.innerHTML = "<li>Error cargando visitas</li>";
-  }
-}
+    .visita:last-child {
+      border-bottom: none;
+    }
 
-// ============================
-// Inicializar
-// ============================
-if (!clienteId) {
-  alert("Falta el ID del cliente en la URL");
-} else {
-  cargarCliente();
-  cargarVisitas();
-}
+    .muted {
+      color: #777;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- DATOS DEL CLIENTE -->
+  <div class="card">
+    <h2 id="nombre">Cargando cliente...</h2>
+    <div class="dato"><strong>Dirección:</strong> <span id="direccion"></span></div>
+    <div class="dato"><strong>Zona:</strong> <span id="zona"></span></div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div class="card">
+    <h3>Historial de visitas</h3>
+    <div id="historial" class="muted">Cargando visitas...</div>
+  </div>
+<h2 id="nombre">Cliente</h2>
+<p><b>Dirección:</b> <span id="direccion"></span></p>
+<p><b>Zona:</b> <span id="zona"></span></p>
+
+  <!-- JS -->
+  <script type="module" src="./firebase.js"></script>
+  <script type="module" src="./cliente.js"></script>
+<h3>Historial de visitas</h3>
+<ul id="historial"></ul>
+
+<script type="module" src="./cliente.js"></script>
+</body>
+</html>
