@@ -5,57 +5,88 @@ import {
   collection,
   query,
   where,
-  getDocs
+  getDocs,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Obtener ID desde la URL
-const params = new URLSearchParams(window.location.search);
-const clienteId = params.get("id");
+document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const clienteId = params.get("id");
 
-if (!clienteId) {
-  document.getElementById("titulo").textContent = "Cliente no encontrado";
-  throw new Error("Falta ID de cliente");
-}
+  const nombreEl = document.getElementById("clienteNombre");
+  const datosEl = document.getElementById("clienteDatos");
+  const visitasEl = document.getElementById("listaVisitasCliente");
 
-// Referencias HTML
-const titulo = document.getElementById("titulo");
-const listaVisitas = document.getElementById("visitas");
-
-async function cargarCliente() {
-  // 1. Obtener cliente
-  const refCliente = doc(db, "clientes", clienteId);
-  const snapCliente = await getDoc(refCliente);
-
-  if (!snapCliente.exists()) {
-    titulo.textContent = "Cliente no existe";
+  if (!clienteId) {
+    nombreEl.textContent = "Cliente no especificado";
     return;
   }
 
-  const cliente = snapCliente.data();
-  titulo.textContent = cliente.nombre || "Cliente";
+  /* =========================
+     CARGAR CLIENTE
+     ========================= */
+  try {
+    const ref = doc(db, "clientes", clienteId);
+    const snap = await getDoc(ref);
 
-  // 2. Obtener visitas del cliente
-  const q = query(
-    collection(db, "visitas"),
-    where("clienteId", "==", clienteId)
-  );
+    if (!snap.exists()) {
+      nombreEl.textContent = "Cliente no encontrado";
+      visitasEl.innerHTML = "";
+      return;
+    }
 
-  const snapVisitas = await getDocs(q);
+    const cliente = snap.data();
 
-  if (snapVisitas.empty) {
-    listaVisitas.innerHTML = "<li>Sin visitas registradas</li>";
+    nombreEl.textContent = cliente.nombre || "Sin nombre";
+
+    datosEl.innerHTML = `
+      <p><strong>Email:</strong> ${cliente.email || "-"}</p>
+      <p><strong>Localidad:</strong> ${cliente.localidad || "-"}</p>
+      <p><strong>Provincia:</strong> ${cliente.provincia || "-"}</p>
+      <p><strong>ID:</strong> ${snap.id}</p>
+    `;
+  } catch (e) {
+    console.error("❌ Error al cargar cliente:", e);
+    nombreEl.textContent = "Error al cargar cliente";
+    visitasEl.innerHTML = "";
     return;
   }
 
-  snapVisitas.forEach(docu => {
-    const v = docu.data();
-    const li = document.createElement("li");
-    li.textContent = `${v.fecha || ""} – ${v.observacion || ""}`;
-    listaVisitas.appendChild(li);
-  });
-}
+  /* =========================
+     CARGAR VISITAS DEL CLIENTE
+     ========================= */
+  try {
+    const q = query(
+      collection(db, "visitas"),
+      where("clienteId", "==", clienteId),
+      orderBy("fecha", "desc")
+    );
 
-cargarCliente().catch(err => {
-  console.error(err);
-  titulo.textContent = "Error cargando cliente";
+    const snap = await getDocs(q);
+
+    visitasEl.innerHTML = "";
+
+    if (snap.empty) {
+      visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+      return;
+    }
+
+    snap.forEach(doc => {
+      const v = doc.data();
+      const fecha = v.fecha?.toDate
+        ? v.fecha.toDate().toLocaleString("es-AR")
+        : "Sin fecha";
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${fecha}</strong><br>
+        <small>${v.usuario || ""}</small>
+      `;
+
+      visitasEl.appendChild(li);
+    });
+  } catch (e) {
+    console.error("❌ Error al cargar visitas:", e);
+    visitasEl.innerHTML = "<li>Error al cargar visitas</li>";
+  }
 });
