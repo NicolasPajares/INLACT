@@ -11,24 +11,20 @@
   <h2>Crear nuevo cliente</h2>
 
   <form id="formNuevoCliente">
+    <input id="nombre" placeholder="Nombre del cliente" required>
 
-    <input id="nombreCliente" placeholder="Nombre del cliente" required>
-    <input id="localidadCliente" placeholder="Localidad">
-    <input id="provinciaCliente" placeholder="Provincia">
+    <input id="localidad" placeholder="Localidad">
+    <input id="provincia" placeholder="Provincia">
 
-    <input id="latCliente" placeholder="Latitud" required>
-    <input id="lngCliente" placeholder="Longitud" required>
-    <input id="radioCliente" placeholder="Radio (metros)" value="10000">
+    <input id="lat" placeholder="Latitud" required>
+    <input id="lng" placeholder="Longitud" required>
+    <input id="radio" placeholder="Radio (metros)" value="1000">
 
     <button type="submit">Guardar</button>
-    <button type="button" onclick="history.back()">Cancelar</button>
-
+    <button type="button" onclick="location.href='clientes.html'">Cancelar</button>
   </form>
-
 </main>
 
-<script src="data-cliente.js"></script>
-<script src="nuevo-cliente.js"></script>
+<script type="module" src="nuevo-cliente.js"></script>
 </body>
 </html>
-
