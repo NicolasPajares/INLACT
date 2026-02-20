@@ -2,6 +2,7 @@ import { db } from "./firebase.js";
 import {
   doc,
   getDoc,
+  updateDoc,
   collection,
   query,
   where,
@@ -14,7 +15,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const clienteId = params.get("id");
 
   const nombreEl = document.getElementById("clienteNombre");
-  const datosEl = document.getElementById("clienteDatos");
+
+  const contactoInput = document.getElementById("contactoInput");
+  const posicionInput = document.getElementById("posicionInput");
+  const telefonoInput = document.getElementById("telefonoInput");
+  const emailInput = document.getElementById("emailInput");
+  const observacionesInput = document.getElementById("observacionesInput");
+
+  const wspLink = document.getElementById("wspLink");
+  const mailLink = document.getElementById("mailLink");
+
+  const guardarBtn = document.getElementById("guardarBtn");
   const visitasEl = document.getElementById("listaVisitasCliente");
 
   if (!clienteId) {
@@ -22,82 +33,110 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  await cargarCliente(clienteId);
-  await cargarVisitas(clienteId);
+  await cargarCliente();
+  await cargarVisitas();
 
   // ===============================
-  // CLIENTE
+  // CARGAR CLIENTE
   // ===============================
-  async function cargarCliente(id) {
-    try {
-      const ref = doc(db, "clientes", id);
-      const snap = await getDoc(ref);
+  async function cargarCliente() {
+    const ref = doc(db, "clientes", clienteId);
+    const snap = await getDoc(ref);
 
-      if (!snap.exists()) {
-        nombreEl.textContent = "Cliente no encontrado";
-        return;
-      }
-
-      const c = snap.data();
-
-      nombreEl.textContent = c.nombre || "Sin nombre";
-
-      datosEl.innerHTML = `
-        <p><strong>Contacto:</strong> ${c.contacto || "-"}</p>
-        <p><strong>Posición:</strong> ${c.posicion || "-"}</p>
-        <p><strong>Teléfono:</strong> ${c.telefono || "-"}</p>
-        <p><strong>Email:</strong> ${c.email || "-"}</p>
-        <p><strong>Observaciones:</strong></p>
-        <p>${c.observaciones || "-"}</p>
-      `;
-    } catch (error) {
-      console.error("❌ Error cargando cliente:", error);
-      nombreEl.textContent = "Error al cargar cliente";
+    if (!snap.exists()) {
+      nombreEl.textContent = "Cliente no encontrado";
+      return;
     }
+
+    const c = snap.data();
+
+    nombreEl.textContent = c.nombre || "Sin nombre";
+
+    contactoInput.value = c.contacto || "";
+    posicionInput.value = c.posicion || "";
+    telefonoInput.value = c.telefono || "";
+    emailInput.value = c.email || "";
+    observacionesInput.value = c.observaciones || "";
+
+    actualizarLinks();
   }
 
   // ===============================
-  // VISITAS / HISTORIAL
+  // GUARDAR CAMBIOS
   // ===============================
-  async function cargarVisitas(clienteId) {
+  guardarBtn.addEventListener("click", async () => {
     try {
-      visitasEl.innerHTML = "";
+      await updateDoc(doc(db, "clientes", clienteId), {
+        contacto: contactoInput.value,
+        posicion: posicionInput.value,
+        telefono: telefonoInput.value,
+        email: emailInput.value,
+        observaciones: observacionesInput.value
+      });
 
-      const q = query(
-        collection(db, "visitas"),
-        where("clienteId", "==", clienteId),
-        orderBy("fecha", "desc")
-      );
+      actualizarLinks();
+      alert("Cliente actualizado ✔");
+    } catch (e) {
+      console.error(e);
+      alert("Error al guardar");
+    }
+  });
 
-      const snap = await getDocs(q);
+  // ===============================
+  // LINKS DINÁMICOS
+  // ===============================
+  function actualizarLinks() {
+    const tel = telefonoInput.value.replace(/\D/g, "");
+    const mail = emailInput.value;
 
-      if (snap.empty) {
-        visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
-        return;
+    if (tel) {
+      wspLink.href = `https://wa.me/54${tel}`;
+      wspLink.textContent = "Enviar WhatsApp";
+    } else {
+      wspLink.textContent = "";
+    }
+
+    if (mail) {
+      mailLink.href = `mailto:${mail}`;
+      mailLink.textContent = "Enviar Email";
+    } else {
+      mailLink.textContent = "";
+    }
+  }
+
+  telefonoInput.addEventListener("input", actualizarLinks);
+  emailInput.addEventListener("input", actualizarLinks);
+
+  // ===============================
+  // HISTORIAL (NO TOCADO)
+  // ===============================
+  async function cargarVisitas() {
+    visitasEl.innerHTML = "";
+
+    const q = query(
+      collection(db, "visitas"),
+      where("clienteId", "==", clienteId),
+      orderBy("fecha", "desc")
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+      return;
+    }
+
+    snap.forEach(d => {
+      const v = d.data();
+      let fecha = "Fecha no válida";
+
+      if (v.fecha?.toDate) {
+        fecha = v.fecha.toDate().toLocaleString();
       }
 
-      snap.forEach(docu => {
-        const v = docu.data();
-
-        let fechaFormateada = "Fecha no válida";
-
-        if (v.fecha) {
-          if (typeof v.fecha.toDate === "function") {
-            fechaFormateada = v.fecha.toDate().toLocaleString();
-          } else if (typeof v.fecha === "number") {
-            fechaFormateada = new Date(v.fecha).toLocaleString();
-          } else if (typeof v.fecha === "string") {
-            fechaFormateada = new Date(v.fecha).toLocaleString();
-          }
-        }
-
-        const li = document.createElement("li");
-        li.textContent = fechaFormateada;
-        visitasEl.appendChild(li);
-      });
-    } catch (error) {
-      console.error("❌ Error cargando visitas:", error);
-      visitasEl.innerHTML = "<li>Error al cargar historial</li>";
-    }
+      const li = document.createElement("li");
+      li.textContent = fecha;
+      visitasEl.appendChild(li);
+    });
   }
 });
