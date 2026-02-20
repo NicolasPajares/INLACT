@@ -1,3 +1,4 @@
+console.log("🔥 Project ID:", db._databaseId.projectId);
 import { db } from "./firebase.js";
 import {
   doc,
@@ -90,3 +91,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     visitasEl.innerHTML = "<li>Error al cargar visitas</li>";
   }
 });
+
