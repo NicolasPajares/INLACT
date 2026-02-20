@@ -2,23 +2,50 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cliente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+    }
+
+    h2, h3 {
+      margin-top: 20px;
+    }
+
+    .dato {
+      margin-bottom: 8px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
 
-  <h2 id="clienteNombre">Cargando cliente...</h2>
+  <h2>Detalle del cliente</h2>
 
-  <div id="clienteDatos"></div>
+  <div class="dato"><strong>Nombre:</strong> <span id="nombre"></span></div>
+  <div class="dato"><strong>Dirección:</strong> <span id="direccion"></span></div>
+  <div class="dato"><strong>Teléfono:</strong> <span id="telefono"></span></div>
+  <div class="dato"><strong>Observaciones:</strong> <span id="observaciones"></span></div>
+
+  <hr>
 
   <h3>Historial de visitas</h3>
-  <ul id="listaVisitasCliente"></ul>
+  <ul id="listaVisitas">
+    <li>Cargando visitas...</li>
+  </ul>
 
-  <a href="clientes.html">← Volver</a>
-
-  <!-- IMPORTANTE: firebase primero -->
-  <script type="module" src="./firebase.js"></script>
-  <script type="module" src="./cliente.js"></script>
-
+  <script type="module" src="cliente.js"></script>
 </body>
 </html>
