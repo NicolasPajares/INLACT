@@ -3,13 +3,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT.firebaseapp.com",
-  projectId: "TU_PROJECT",
-  storageBucket: "TU_PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.firebasestorage.app",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+
