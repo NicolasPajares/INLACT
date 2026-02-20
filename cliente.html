@@ -1,76 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      padding: 16px;
-    }
-
-    h1, h2 {
-      margin-top: 0;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    li {
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-    }
-
-    li:last-child {
-      border-bottom: none;
-    }
-
-    .muted {
-      color: #666;
-      font-size: 13px;
-    }
-
-    a {
-      color: #1976d2;
-      text-decoration: none;
-    }
+    body { font-family: Arial, sans-serif; padding: 15px; }
+    .campo { margin-bottom: 8px; }
+    .label { font-weight: bold; }
+    textarea { width: 100%; min-height: 80px; }
+    button { padding: 8px 12px; margin-top: 8px; }
   </style>
 </head>
-
 <body>
 
-  <div class="card">
-    <h1 id="nombre">Cliente</h1>
-    <p><strong>Dirección:</strong> <span id="direccion">—</span></p>
-    <p><strong>Zona:</strong> <span id="zona">—</span></p>
+  <h2 id="clienteNombre">Cargando cliente...</h2>
+
+  <div id="clienteDatos">
+    <div class="campo"><span class="label">Contacto:</span> <span id="contacto"></span></div>
+    <div class="campo"><span class="label">Posición:</span> <span id="posicion"></span></div>
+    <div class="campo"><span class="label">Teléfono:</span> <span id="telefono"></span></div>
+    <div class="campo"><span class="label">Email:</span> <span id="email"></span></div>
+    <div class="campo"><span class="label">Dirección:</span> <span id="direccion"></span></div>
+    <div class="campo"><span class="label">Zona:</span> <span id="zona"></span></div>
   </div>
 
-  <div class="card">
-    <h2>Historial de visitas</h2>
-    <ul id="historial">
-      <li class="muted">Cargando visitas...</li>
-    </ul>
-  </div>
+  <h3>Observaciones</h3>
+  <textarea id="observaciones"></textarea>
+  <br>
+  <button id="guardarObs">Guardar observaciones</button>
 
-  <!-- Firebase -->
-  <script type="module" src="./firebase.js"></script>
-  <script type="module" src="./cliente.js"></script>
+  <h3>Historial de visitas</h3>
+  <ul id="listaVisitasCliente"></ul>
 
+  <br>
+  <a href="clientes.html">← Volver</a>
+
+  <script type="module" src="cliente.js"></script>
 </body>
 </html>
