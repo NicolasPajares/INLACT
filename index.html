@@ -26,15 +26,12 @@
     </figure>
 
     <h2>NICOLÁS PAJARES</h2>
-
-
 </header>
 
 <main>
 
-  <!-- ACCESOS RÁPIDOS -->
+<!-- ACCESOS RÁPIDOS -->
 <section class="quick-actions">
-
     <a href="clientes.html" class="action-card">
         <img src="img/icon-clientes.svg" alt="">
         <span>Clientes</span>
@@ -54,32 +51,31 @@
         <img src="img/icon-precios.svg" alt="">
         <span>Precios</span>
     </a>
-
 </section>
 
+<!-- MAPA -->
+<section class="card">
+    <h2>Mapa de clientes</h2>
+    <div id="map"></div>
+</section>
 
-    <!-- MAPA -->
-    <section class="card">
-        <h2>Mapa de clientes</h2>
-        <div id="map"></div>
-    </section>
+<!-- VISITAS CERCANAS -->
+<section class="card">
+    <h2>Visitas cercanas</h2>
+    <p id="estado">Buscando fábricas...</p>
+    <div id="acciones"></div>
+</section>
 
-    <!-- VISITAS CERCANAS -->
-    <section class="card">
-        <h2>Visitas cercanas</h2>
-        <p id="estado">Buscando fábricas...</p>
-        <div id="acciones"></div>
-    </section>
+<!-- HISTORIAL RESUMIDO -->
+<section class="card">
+    <h3>Últimas visitas</h3>
 
-    <!-- HISTORIAL -->
-    <section class="card">
-        <h3>Últimas visitas</h3>
-        <ul id="listaVisitas"></ul>
+    <ul id="listaVisitas"></ul>
 
-        <a href="historial.html" target="_blank">
-            Ver historial completo →
-        </a>
-    </section>
+    <a href="#" id="abrir-historial">
+        Ver historial completo →
+    </a>
+</section>
 
 </main>
 
@@ -90,7 +86,76 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- App principal (como módulo) -->
+<!-- App principal -->
 <script type="module" src="app.js"></script>
+
+<!-- 🔥 CARGAR ÚLTIMAS 5 VISITAS + ABRIR HISTORIAL -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    query,
+    orderBy,
+    limit
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+    authDomain: "inlact.firebaseapp.com",
+    projectId: "inlact",
+    storageBucket: "inlact.appspot.com",
+    messagingSenderId: "143868382036",
+    appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const lista = document.getElementById("listaVisitas");
+
+  async function cargarUltimasVisitas() {
+    lista.innerHTML = "<li>Cargando...</li>";
+
+    const q = query(
+      collection(db, "visitas"),
+      orderBy("fecha", "desc"),
+      limit(5)
+    );
+
+    const snap = await getDocs(q);
+    lista.innerHTML = "";
+
+    if (snap.empty) {
+      lista.innerHTML = "<li>No hay visitas</li>";
+      return;
+    }
+
+    snap.forEach(doc => {
+      const v = doc.data();
+      const fecha = v.fecha?.toDate
+        ? v.fecha.toDate().toLocaleString("es-AR")
+        : "";
+
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${v.cliente}</strong><br><small>${fecha}</small>`;
+      lista.appendChild(li);
+    });
+  }
+
+  cargarUltimasVisitas();
+
+  // Abrir historial en ventana chica
+  document.getElementById("abrir-historial").addEventListener("click", (e) => {
+    e.preventDefault();
+    window.open(
+      "historial.html",
+      "historial",
+      "width=420,height=700"
+    );
+  });
+</script>
+
 </body>
 </html>
