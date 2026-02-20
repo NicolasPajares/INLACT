@@ -67,7 +67,6 @@ async function obtenerClientes() {
 async function dibujarClientes() {
   const clientes = await obtenerClientes();
 
-  // borrar marcadores anteriores
   markersClientes.forEach(m => map.removeLayer(m));
   markersClientes = [];
 
@@ -90,10 +89,10 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos(lat1 * Math.PI / 180) *
     Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -130,18 +129,9 @@ async function verificarProximidad(lat, lng) {
 
       const btn = document.createElement("button");
       btn.textContent = "Registrar visita";
-      btn.style.display = "block";
       btn.style.marginTop = "8px";
-      btn.style.padding = "8px 12px";
-      btn.style.background = "#2563eb";
-      btn.style.color = "#fff";
-      btn.style.border = "none";
-      btn.style.borderRadius = "6px";
 
-      btn.onclick = () => {
-  alert("CLICK OK: " + c.nombre);
-  registrarVisita(c, lat, lng);
-};
+      btn.onclick = () => registrarVisita(c, lat, lng);
 
       card.appendChild(nombre);
       card.appendChild(btn);
@@ -155,24 +145,44 @@ async function verificarProximidad(lat, lng) {
 }
 
 /**********************
- * REGISTRAR VISITA
+ * REGISTRAR VISITA (MEJORADO)
  **********************/
 async function registrarVisita(cliente, lat, lng) {
   try {
-    console.log("Guardando visita...", cliente.nombre);
+    const tipo = prompt(
+      "Tipo de visita:\n1 - Visita comercial\n2 - Ensayo\n3 - Entrega de productos"
+    );
+
+    let tipoVisita = "";
+    let producto = "";
+    let cantidad = "";
+
+    if (tipo === "1") tipoVisita = "Visita comercial";
+    else if (tipo === "2") tipoVisita = "Ensayo";
+    else if (tipo === "3") {
+      tipoVisita = "Entrega de productos";
+      producto = prompt("Producto entregado:");
+      cantidad = prompt("Cantidad:");
+    } else {
+      alert("❌ Tipo inválido");
+      return;
+    }
 
     await addDoc(collection(db, "visitas"), {
       clienteId: cliente.id,
       cliente: cliente.nombre,
+      tipoVisita,
+      producto,
+      cantidad,
       lat,
       lng,
       fecha: serverTimestamp()
     });
 
-    alert("✅ Visita registrada en " + cliente.nombre);
+    alert("✅ Visita registrada: " + tipoVisita);
   } catch (error) {
-    console.error("ERROR FIRESTORE:", error);
-    alert("❌ Error al guardar visita:\n" + error.message);
+    console.error(error);
+    alert("❌ Error al guardar visita");
   }
 }
 
@@ -193,17 +203,11 @@ navigator.geolocation.watchPosition(
 
     verificarProximidad(lat, lng);
   },
-  err => {
-    alert("Error de geolocalización");
-  },
-  {
-    enableHighAccuracy: true
-  }
+  () => alert("Error de geolocalización"),
+  { enableHighAccuracy: true }
 );
 
 /**********************
  * INICIO
  **********************/
 dibujarClientes();
-
-
