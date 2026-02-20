@@ -1,6 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { db } from "./firebase.js";
 import {
-  getFirestore,
   doc,
   getDoc,
   collection,
@@ -9,100 +8,73 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* =========================
-   CONFIGURACIÓN FIREBASE
-========================= */
-
-const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* =========================
-   OBTENER ID DE LA URL
-========================= */
-
 const params = new URLSearchParams(window.location.search);
 const clienteId = params.get("id");
 
 if (!clienteId) {
-  alert("Cliente no especificado");
+  alert("ID de cliente no encontrado");
+  throw new Error("ID faltante");
 }
 
-/* =========================
-   CARGAR CLIENTE
-========================= */
+// Documento cliente
+const clienteRef = doc(db, "clientes", clienteId);
 
-async function cargarCliente(id) {
+async function cargarCliente() {
   try {
-    const ref = doc(db, "clientes", id);
-    const snap = await getDoc(ref);
+    const snap = await getDoc(clienteRef);
 
     if (!snap.exists()) {
       alert("Cliente no encontrado");
       return;
     }
 
-    const c = snap.data();
+    const data = snap.data();
+    document.getElementById("nombre").textContent = data.nombre || "Sin nombre";
+    document.getElementById("direccion").textContent =
+      "📍 " + (data.dirección || "");
+    document.getElementById("zona").textContent =
+      "Zona: " + (data.zona || "");
 
-    document.getElementById("nombre").textContent = c.nombre || "";
-    document.getElementById("direccion").textContent = c.direccion || "";
-    document.getElementById("telefono").textContent = c.telefono || "";
-    document.getElementById("observaciones").textContent = c.observaciones || "";
-
-  } catch (error) {
-    console.error("Error cargando cliente:", error);
+    cargarVisitas();
+  } catch (e) {
+    console.error("Error cliente:", e);
+    alert("Error cargando cliente");
   }
 }
 
-/* =========================
-   CARGAR VISITAS (NUEVO)
-========================= */
-
-async function cargarVisitas(id) {
-  const lista = document.getElementById("listaVisitas");
+async function cargarVisitas() {
+  const contenedor = document.getElementById("listaHistorial");
+  contenedor.innerHTML = "";
 
   try {
-    const visitasRef = collection(db, "clientes", id, "visitas");
+    // 👇 ACÁ ESTÁ EL CAMBIO CLAVE
+    const visitasRef = collection(db, "clientes", clienteId, "visitas");
     const q = query(visitasRef, orderBy("fecha", "desc"));
-    const snapshot = await getDocs(q);
+    const snap = await getDocs(q);
 
-    lista.innerHTML = "";
-
-    if (snapshot.empty) {
-      lista.innerHTML = "<li>Sin visitas registradas</li>";
+    if (snap.empty) {
+      contenedor.textContent = "Sin visitas registradas";
       return;
     }
 
-    snapshot.forEach(doc => {
-      const v = doc.data();
-
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <strong>${v.tipo || "Visita"}</strong><br>
-        Fecha: ${v.fecha || ""}<br>
-        ${v.observaciones || ""}
+    snap.forEach(d => {
+      const v = d.data();
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div><strong>${v.actividad || v.accion || "Visita"}</strong></div>
+        <div>${v.observacion || ""}</div>
+        <div class="fecha">
+          ${v.fecha?.toDate?.().toLocaleString() || ""}
+        </div>
       `;
-
-      lista.appendChild(li);
+      contenedor.appendChild(div);
     });
 
-  } catch (error) {
-    console.error("Error cargando visitas:", error);
-    lista.innerHTML = "<li>Error al cargar visitas</li>";
+  } catch (e) {
+    console.error("Error visitas:", e);
+    contenedor.textContent = "Error cargando visitas";
   }
 }
 
-/* =========================
-   INICIO
-========================= */
-
-cargarCliente(clienteId);
-cargarVisitas(clienteId);
+cargarCliente();
