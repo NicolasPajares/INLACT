@@ -1,62 +1,104 @@
-function obtenerClientes() {
-  let clientes = JSON.parse(localStorage.getItem("clientes"));
+/**********************
+ * FIREBASE
+ **********************/
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  if (!clientes || clientes.length === 0) {
-    clientes = CLIENTES_INICIALES;
-    localStorage.setItem("clientes", JSON.stringify(clientes));
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.appspot.com",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+};
 
-  return clientes;
-}
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-document.getElementById("btnNuevoCliente").addEventListener("click", () => {
+/**********************
+ * ELEMENTOS
+ **********************/
+const listaEl = document.getElementById("listaClientes");
+const buscadorEl = document.getElementById("buscadorClientes");
+const btnNuevo = document.getElementById("btnNuevoCliente");
+
+let clientes = [];
+
+/**********************
+ * BOTÓN NUEVO CLIENTE
+ **********************/
+btnNuevo.addEventListener("click", () => {
   window.location.href = "nuevo-cliente.html";
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const listaEl = document.getElementById("listaClientes");
-  const buscadorEl = document.getElementById("buscadorClientes");
+/**********************
+ * CARGAR CLIENTES
+ **********************/
+async function cargarClientes() {
+  listaEl.innerHTML = "<li>Cargando clientes...</li>";
 
-  if (!listaEl || !buscadorEl) return;
+  const snap = await getDocs(collection(db, "clientes"));
 
-  // ✅ LEEMOS DESDE LOCALSTORAGE
-  const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+  clientes = [];
+
+  snap.forEach(doc => {
+    clientes.push({
+      id: doc.id,
+      ...doc.data()
+    });
+  });
 
   if (clientes.length === 0) {
     listaEl.innerHTML = "<li>No hay clientes cargados</li>";
     return;
   }
 
-  function renderClientes(lista) {
-    listaEl.innerHTML = "";
-
-    lista.forEach(c => {
-      const li = document.createElement("li");
-      li.style.cursor = "pointer";
-
-      li.innerHTML = `
-        <strong>${c.nombre}</strong><br>
-        <small>${c.localidad || ""} ${c.provincia || ""}</small>
-      `;
-
-      li.onclick = () => {
-        window.location.href = `cliente.html?id=${c.id}`;
-      };
-
-      listaEl.appendChild(li);
-    });
-  }
-
-  buscadorEl.addEventListener("input", () => {
-    const t = buscadorEl.value.toLowerCase();
-    renderClientes(
-      clientes.filter(c =>
-        c.nombre.toLowerCase().includes(t) ||
-        (c.localidad || "").toLowerCase().includes(t)
-      )
-    );
-  });
-
   renderClientes(clientes);
+}
+
+/**********************
+ * RENDER
+ **********************/
+function renderClientes(lista) {
+  listaEl.innerHTML = "";
+
+  lista.forEach(c => {
+    const li = document.createElement("li");
+    li.style.cursor = "pointer";
+
+    li.innerHTML = `
+      <strong>${c.nombre || "Sin nombre"}</strong><br>
+      <small>${c.localidad || ""} ${c.provincia || ""}</small>
+    `;
+
+    li.onclick = () => {
+      window.location.href = `cliente.html?id=${c.id}`;
+    };
+
+    listaEl.appendChild(li);
+  });
+}
+
+/**********************
+ * BUSCADOR
+ **********************/
+buscadorEl.addEventListener("input", () => {
+  const texto = buscadorEl.value.toLowerCase();
+
+  renderClientes(
+    clientes.filter(c =>
+      (c.nombre || "").toLowerCase().includes(texto) ||
+      (c.localidad || "").toLowerCase().includes(texto)
+    )
+  );
 });
 
+/**********************
+ * INIT
+ **********************/
+cargarClientes();
