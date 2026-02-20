@@ -4,31 +4,43 @@
   <meta charset="UTF-8">
   <title>Cliente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { font-family: Arial, sans-serif; padding: 15px; }
-    .campo { margin-bottom: 8px; }
-    .label { font-weight: bold; }
-    textarea { width: 100%; min-height: 80px; }
-    button { padding: 8px 12px; margin-top: 8px; }
-  </style>
 </head>
 <body>
 
   <h2 id="clienteNombre">Cargando cliente...</h2>
 
   <div id="clienteDatos">
-    <div class="campo"><span class="label">Contacto:</span> <span id="contacto"></span></div>
-    <div class="campo"><span class="label">Posición:</span> <span id="posicion"></span></div>
-    <div class="campo"><span class="label">Teléfono:</span> <span id="telefono"></span></div>
-    <div class="campo"><span class="label">Email:</span> <span id="email"></span></div>
-    <div class="campo"><span class="label">Dirección:</span> <span id="direccion"></span></div>
-    <div class="campo"><span class="label">Zona:</span> <span id="zona"></span></div>
-  </div>
+    <label>
+      Contacto:<br>
+      <input type="text" id="contactoInput">
+    </label><br><br>
 
-  <h3>Observaciones</h3>
-  <textarea id="observaciones"></textarea>
-  <br>
-  <button id="guardarObs">Guardar observaciones</button>
+    <label>
+      Posición:<br>
+      <input type="text" id="posicionInput">
+    </label><br><br>
+
+    <label>
+      Teléfono:<br>
+      <input type="text" id="telefonoInput">
+      <br>
+      <a id="wspLink" target="_blank"></a>
+    </label><br><br>
+
+    <label>
+      Email:<br>
+      <input type="email" id="emailInput">
+      <br>
+      <a id="mailLink" target="_blank"></a>
+    </label><br><br>
+
+    <label>
+      Observaciones:<br>
+      <textarea id="observacionesInput" rows="4"></textarea>
+    </label><br><br>
+
+    <button id="guardarBtn">Guardar cambios</button>
+  </div>
 
   <h3>Historial de visitas</h3>
   <ul id="listaVisitasCliente"></ul>
