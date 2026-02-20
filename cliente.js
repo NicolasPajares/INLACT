@@ -1,98 +1,99 @@
 // cliente.js
 import { db } from "./firebase.js";
-
 import {
   doc,
   getDoc,
   collection,
   query,
   where,
-  getDocs,
-  orderBy
+  orderBy,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* =========================
-   OBTENER ID DE LA URL
-========================= */
+// Obtener ID del cliente desde la URL
 const params = new URLSearchParams(window.location.search);
 const clienteId = params.get("id");
 
+// Elementos HTML
+const nombreEl = document.getElementById("nombre");
+const direccionEl = document.getElementById("direccion");
+const zonaEl = document.getElementById("zona");
+const historialEl = document.getElementById("historial");
+
 if (!clienteId) {
-  alert("No se recibió el ID del cliente");
-  throw new Error("clienteId no definido");
+  nombreEl.textContent = "Cliente no encontrado";
+  historialEl.textContent = "";
+  throw new Error("No se pasó clienteId por URL");
 }
 
-/* =========================
-   CARGAR DATOS DEL CLIENTE
-========================= */
+// =======================
+// CARGAR CLIENTE
+// =======================
 async function cargarCliente() {
   try {
     const ref = doc(db, "clientes", clienteId);
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      console.error("Cliente no encontrado");
+      nombreEl.textContent = "Cliente inexistente";
       return;
     }
 
-    const c = snap.data();
+    const data = snap.data();
 
-    // Ajustá los IDs según tu HTML
-    document.getElementById("nombre").innerText = c.nombre ?? "Sin nombre";
-    document.getElementById("direccion").innerText = c.direccion ?? "";
-    document.getElementById("zona").innerText = c.zona ?? "";
+    nombreEl.textContent = data.nombre || "Sin nombre";
+    direccionEl.textContent = data.direccion || "-";
+    zonaEl.textContent = data.zona || "-";
 
   } catch (error) {
-    console.error("Error cargando cliente:", error);
+    console.error("❌ Error cargando cliente:", error);
+    nombreEl.textContent = "Error al cargar cliente";
   }
 }
 
-/* =========================
-   CARGAR HISTORIAL DE VISITAS
-========================= */
-async function cargarVisitas(clienteId) {
+// =======================
+// CARGAR VISITAS
+// =======================
+async function cargarVisitas() {
   try {
-    const visitasRef = collection(db, "visitas");
-
     const q = query(
-      visitasRef,
+      collection(db, "visitas"),
       where("clienteId", "==", clienteId),
       orderBy("Fecha", "desc")
     );
 
-    const snap = await getDocs(q);
-    const contenedor = document.getElementById("historial");
+    const snapshot = await getDocs(q);
 
-    contenedor.innerHTML = "";
-
-    if (snap.empty) {
-      contenedor.innerHTML = "<p>Sin visitas registradas</p>";
+    if (snapshot.empty) {
+      historialEl.textContent = "No hay visitas registradas";
       return;
     }
 
-    snap.forEach(d => {
-      const v = d.data();
+    historialEl.innerHTML = "";
 
-      const fecha = v.Fecha?.seconds
-        ? new Date(v.Fecha.seconds * 1000).toLocaleDateString()
-        : "Fecha inválida";
+    snapshot.forEach(docSnap => {
+      const v = docSnap.data();
 
-      contenedor.innerHTML += `
-        <div class="visita">
-          <strong>${fecha}</strong><br>
-          Lat: ${v.Lat}<br>
-          Lng: ${v.Lng}
-        </div>
+      const fecha = v.Fecha?.toDate
+        ? v.Fecha.toDate().toLocaleString()
+        : "Sin fecha";
+
+      const div = document.createElement("div");
+      div.className = "visita";
+      div.innerHTML = `
+        <div><strong>Fecha:</strong> ${fecha}</div>
+        <div class="muted">Lat: ${v.Lat ?? "-"} | Lng: ${v.Lng ?? "-"}</div>
       `;
+
+      historialEl.appendChild(div);
     });
 
   } catch (error) {
-    console.error("Error cargando visitas:", error);
+    console.error("❌ Error cargando visitas:", error);
+    historialEl.textContent = "Error al cargar historial";
   }
 }
 
-/* =========================
-   INICIAR
-========================= */
+// =======================
 cargarCliente();
-cargarVisitas(clienteId); y 
+cargarVisitas();
