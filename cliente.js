@@ -1,3 +1,4 @@
+console.log("Firestore DB:", db);
 // cliente.js
 import { db } from "./firebase.js";
 import {
@@ -97,3 +98,4 @@ async function cargarVisitas() {
 // =======================
 cargarCliente();
 cargarVisitas();
+
