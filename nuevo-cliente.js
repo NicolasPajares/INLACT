@@ -1,46 +1,41 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formNuevoCliente");
+import { db } from "./firebase.js";
+import { collection, addDoc } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  if (!form) {
-    console.error("❌ No se encontró el formulario formNuevoCliente");
-    return;
-  }
-
-  form.addEventListener("submit", e => {
+document
+  .getElementById("formNuevoCliente")
+  .addEventListener("submit", async e => {
     e.preventDefault();
 
-    const nombre = nombreCliente.value.trim();
-    const localidad = localidadCliente.value.trim();
-    const provincia = provinciaCliente.value.trim();
-    const lat = parseFloat(latCliente.value);
-    const lng = parseFloat(lngCliente.value);
-    const radio = parseInt(radioCliente.value) || 1000;
+    const cliente = {
+      nombre: nombre.value.trim(),
+      localidad: localidad.value.trim(),
+      provincia: provincia.value.trim(),
+      lat: parseFloat(lat.value),
+      lng: parseFloat(lng.value),
+      radio: parseInt(radio.value) || 1000,
 
-    if (!nombre || isNaN(lat) || isNaN(lng)) {
-      alert("❌ Completá nombre y coordenadas");
-      return;
-    }
-
-    const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-
-    clientes.push({
-      id: "clientes_" + Date.now(),
-      nombre,
-      localidad,
-      provincia,
-      lat,
-      lng,
-      radio,
-      tipo: "cliente",
+      // campos futuros
       contacto: "",
       puesto: "",
       telefono: "",
-      email: ""
-    });
+      email: "",
+      observaciones: "",
 
-    localStorage.setItem("clientes", JSON.stringify(clientes));
+      tipo: "cliente"
+    };
 
-    alert("✅ Cliente creado");
-    window.location.href = "clientes.html";
+    if (!cliente.nombre || isNaN(cliente.lat) || isNaN(cliente.lng)) {
+      alert("❌ Completá nombre, latitud y longitud");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "clientes"), cliente);
+      alert("✅ Cliente creado correctamente");
+      location.href = "clientes.html";
+    } catch (error) {
+      console.error("Error guardando cliente:", error);
+      alert("❌ Error al crear cliente");
+    }
   });
-});
