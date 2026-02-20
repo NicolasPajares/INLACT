@@ -8,44 +8,62 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 15px;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 16px;
     }
 
-    h2, h3 {
-      margin-top: 20px;
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    }
+
+    h2 {
+      margin: 0 0 8px 0;
     }
 
     .dato {
-      margin-bottom: 8px;
+      margin: 4px 0;
+      color: #333;
     }
 
-    ul {
-      padding-left: 20px;
+    .visita {
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+      font-size: 14px;
     }
 
-    li {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 8px;
+    .visita:last-child {
+      border-bottom: none;
+    }
+
+    .muted {
+      color: #777;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Detalle del cliente</h2>
+  <!-- DATOS DEL CLIENTE -->
+  <div class="card">
+    <h2 id="nombre">Cargando cliente...</h2>
+    <div class="dato"><strong>Dirección:</strong> <span id="direccion"></span></div>
+    <div class="dato"><strong>Zona:</strong> <span id="zona"></span></div>
+  </div>
 
-  <div class="dato"><strong>Nombre:</strong> <span id="nombre"></span></div>
-  <div class="dato"><strong>Dirección:</strong> <span id="direccion"></span></div>
-  <div class="dato"><strong>Teléfono:</strong> <span id="telefono"></span></div>
-  <div class="dato"><strong>Observaciones:</strong> <span id="observaciones"></span></div>
+  <!-- HISTORIAL -->
+  <div class="card">
+    <h3>Historial de visitas</h3>
+    <div id="historial" class="muted">Cargando visitas...</div>
+  </div>
 
-  <hr>
+  <!-- JS -->
+  <script type="module" src="./firebase.js"></script>
+  <script type="module" src="./cliente.js"></script>
 
-  <h3>Historial de visitas</h3>
-  <ul id="listaVisitas">
-    <li>Cargando visitas...</li>
-  </ul>
-
-  <script type="module" src="cliente.js"></script>
 </body>
 </html>
