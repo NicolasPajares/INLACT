@@ -1,8 +1,8 @@
-// cliente.js
 import { db } from "./firebase.js";
 import {
   doc,
   getDoc,
+  updateDoc,
   collection,
   query,
   where,
@@ -10,93 +10,92 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ============================
-// Obtener clienteId desde URL
-// ============================
 const params = new URLSearchParams(window.location.search);
 const clienteId = params.get("id");
 
-console.log("Cliente ID:", clienteId);
+if (!clienteId) {
+  alert("Cliente no encontrado");
+  throw new Error("Sin clienteId");
+}
 
-// ============================
-// Referencias HTML
-// ============================
-const nombreEl = document.getElementById("nombre");
-const direccionEl = document.getElementById("direccion");
-const zonaEl = document.getElementById("zona");
-const historialEl = document.getElementById("historial");
+const clienteRef = doc(db, "clientes", clienteId);
 
-// ============================
-// Cargar datos del cliente
-// ============================
+// =====================
+// CARGAR CLIENTE
+// =====================
 async function cargarCliente() {
   try {
-    const ref = doc(db, "clientes", clienteId);
-    const snap = await getDoc(ref);
+    const snap = await getDoc(clienteRef);
 
     if (!snap.exists()) {
-      nombreEl.textContent = "Cliente no encontrado";
+      alert("Cliente no existe");
       return;
     }
 
-    const data = snap.data();
+    const c = snap.data();
 
-    nombreEl.textContent = data.nombre || "-";
-    direccionEl.textContent = data.direccion || "-";
-    zonaEl.textContent = data.zona || "-";
+    document.getElementById("clienteNombre").textContent = c.nombre || "(Sin nombre)";
+    document.getElementById("contacto").textContent = c.contacto || "";
+    document.getElementById("posicion").textContent = c.posicion || "";
+    document.getElementById("telefono").textContent = c.telefono || "";
+    document.getElementById("email").textContent = c.email || "";
+    document.getElementById("direccion").textContent = c.direccion || "";
+    document.getElementById("zona").textContent = c.zona || "";
+    document.getElementById("observaciones").value = c.observaciones || "";
 
-  } catch (error) {
-    console.error("❌ Error cargando cliente:", error);
+  } catch (e) {
+    console.error("❌ Error cargando cliente:", e);
   }
 }
 
-// ============================
-// Cargar historial de visitas
-// ============================
-async function cargarVisitas() {
+// =====================
+// GUARDAR OBSERVACIONES
+// =====================
+document.getElementById("guardarObs").addEventListener("click", async () => {
   try {
-    historialEl.innerHTML = "<li>Cargando visitas...</li>";
+    const obs = document.getElementById("observaciones").value;
+    await updateDoc(clienteRef, { observaciones: obs });
+    alert("Observaciones guardadas");
+  } catch (e) {
+    console.error("❌ Error guardando observaciones:", e);
+    alert("Error al guardar");
+  }
+});
 
+// =====================
+// CARGAR VISITAS
+// =====================
+async function cargarVisitas() {
+  const ul = document.getElementById("listaVisitasCliente");
+  ul.innerHTML = "";
+
+  try {
     const q = query(
       collection(db, "visitas"),
       where("clienteId", "==", clienteId),
-      orderBy("fecha", "desc") // 🔑 CLAVE: fecha en minúscula
+      orderBy("fecha", "desc")
     );
 
     const snap = await getDocs(q);
 
-    historialEl.innerHTML = "";
-
     if (snap.empty) {
-      historialEl.innerHTML = "<li>No hay visitas registradas</li>";
+      ul.innerHTML = "<li>No hay visitas registradas</li>";
       return;
     }
 
     snap.forEach(docu => {
       const v = docu.data();
-      console.log("VISITA:", v);
-
-      const fecha = v.fecha?.toDate
-        ? v.fecha.toDate().toLocaleString()
-        : "-";
-
       const li = document.createElement("li");
-      li.textContent = `📅 ${fecha} | 📍 ${v.lat}, ${v.lng}`;
-      historialEl.appendChild(li);
+      li.textContent = new Date(v.fecha).toLocaleString();
+      ul.appendChild(li);
     });
 
-  } catch (error) {
-    console.error("❌ Error cargando visitas:", error);
-    historialEl.innerHTML = "<li>Error cargando visitas</li>";
+  } catch (e) {
+    console.error("❌ Error cargando visitas:", e);
+    ul.innerHTML = "<li>Error al cargar visitas</li>";
   }
 }
 
-// ============================
-// Inicializar
-// ============================
-if (!clienteId) {
-  alert("Falta el ID del cliente en la URL");
-} else {
-  cargarCliente();
-  cargarVisitas();
-}
+// =====================
+cargarCliente();
+cargarVisitas();
