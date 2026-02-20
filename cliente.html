@@ -2,52 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial del Cliente</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 10px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .visita {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .fecha {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 12px;
+      margin-top: 4px;
+    }
+
+    .comercial { background: #2196f3; color: #fff; }
+    .ensayo { background: #9c27b0; color: #fff; }
+    .entrega { background: #4caf50; color: #fff; }
+
+    .producto {
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    #volver {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 16px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2 id="clienteNombre">Cargando cliente...</h2>
+  <h2 id="titulo-cliente">Historial</h2>
 
-<div id="clienteDatos">
+  <div id="lista-visitas"></div>
 
-  <p><strong>Contacto:</strong> <span id="contactoTxt"></span></p>
-  <input type="text" id="contactoInput" hidden>
+  <button id="volver">Volver al cliente</button>
 
-  <p><strong>Posición:</strong> <span id="posicionTxt"></span></p>
-  <input type="text" id="posicionInput" hidden>
-
-  <p><strong>Teléfono:</strong>
-    <span id="telefonoTxt"></span>
-    <a id="wspLink" target="_blank"></a>
-  </p>
-  <input type="text" id="telefonoInput" hidden>
-
-  <p><strong>Email:</strong>
-    <span id="emailTxt"></span>
-    <a id="mailLink" target="_blank"></a>
-  </p>
-  <input type="email" id="emailInput" hidden>
-
-  <p><strong>Observaciones:</strong></p>
-  <p id="observacionesTxt"></p>
-  <textarea id="observacionesInput" rows="4" hidden></textarea>
-
-  <button id="editarBtn">✏️ Editar contacto</button>
-  <button id="guardarBtn" hidden>💾 Guardar cambios</button>
-
-</div>
-
-<h3>Historial de visitas</h3>
-<ul id="listaVisitasCliente"></ul>
-<hr>
-
-<div style="margin-top:20px; text-align:center;">
-  <button onclick="window.location.href='clientes.html'">
-    ⬅ Volver a clientes
-  </button>
-</div>
-<script type="module" src="cliente.js"></script>
+  <script type="module" src="cliente-historial.js"></script>
 </body>
 </html>
-
