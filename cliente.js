@@ -111,8 +111,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // ======================
+  // HISTORIAL DE VISITAS (MISMA VISTA QUE HISTORIAL GENERAL)
   async function cargarVisitas() {
-    visitasEl.innerHTML = "";
+    visitasEl.innerHTML = "Cargando visitas...";
+
     const q = query(
       collection(db, "visitas"),
       where("clienteId", "==", clienteId),
@@ -120,15 +122,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     const snap = await getDocs(q);
+    visitasEl.innerHTML = "";
+
     if (snap.empty) {
-      visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
+      visitasEl.innerHTML = "<p>No hay visitas registradas.</p>";
       return;
     }
 
-    snap.forEach(d => {
-      const li = document.createElement("li");
-      li.textContent = d.data().fecha?.toDate().toLocaleString() || "-";
-      visitasEl.appendChild(li);
+    snap.forEach(doc => {
+      const v = doc.data();
+
+      const fecha = v.fecha?.toDate
+        ? v.fecha.toDate().toLocaleString("es-AR")
+        : "Sin fecha";
+
+      const div = document.createElement("div");
+      div.className = "visita";
+
+      let detalle = `<strong>Tipo:</strong> ${v.tipo || "-"}`;
+
+      if (v.tipo === "entrega" && v.producto) {
+        detalle += `<br><strong>Entrega:</strong> ${v.producto} (${v.cantidad || 1})`;
+      }
+
+      div.innerHTML = `
+        <span class="fecha">${fecha}</span><br>
+        ${detalle}
+      `;
+
+      visitasEl.appendChild(div);
     });
   }
 });
