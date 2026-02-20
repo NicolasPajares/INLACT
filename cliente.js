@@ -1,47 +1,98 @@
+// cliente.js
+import { db } from "./firebase.js";
+
 import {
+  doc,
+  getDoc,
   collection,
-  getDocs,
   query,
   where,
+  getDocs,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-async function cargarVisitas() {
-  const contenedor = document.getElementById("listaHistorial");
-  contenedor.innerHTML = "";
+/* =========================
+   OBTENER ID DE LA URL
+========================= */
+const params = new URLSearchParams(window.location.search);
+const clienteId = params.get("id");
 
+if (!clienteId) {
+  alert("No se recibió el ID del cliente");
+  throw new Error("clienteId no definido");
+}
+
+/* =========================
+   CARGAR DATOS DEL CLIENTE
+========================= */
+async function cargarCliente() {
+  try {
+    const ref = doc(db, "clientes", clienteId);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      console.error("Cliente no encontrado");
+      return;
+    }
+
+    const c = snap.data();
+
+    // Ajustá los IDs según tu HTML
+    document.getElementById("nombre").innerText = c.nombre ?? "Sin nombre";
+    document.getElementById("direccion").innerText = c.direccion ?? "";
+    document.getElementById("zona").innerText = c.zona ?? "";
+
+  } catch (error) {
+    console.error("Error cargando cliente:", error);
+  }
+}
+
+/* =========================
+   CARGAR HISTORIAL DE VISITAS
+========================= */
+async function cargarVisitas(clienteId) {
   try {
     const visitasRef = collection(db, "visitas");
 
     const q = query(
       visitasRef,
       where("clienteId", "==", clienteId),
-      orderBy("fecha", "desc")
+      orderBy("Fecha", "desc")
     );
 
     const snap = await getDocs(q);
+    const contenedor = document.getElementById("historial");
+
+    contenedor.innerHTML = "";
 
     if (snap.empty) {
-      contenedor.textContent = "Sin visitas registradas";
+      contenedor.innerHTML = "<p>Sin visitas registradas</p>";
       return;
     }
 
     snap.forEach(d => {
       const v = d.data();
-      const div = document.createElement("div");
-      div.className = "item";
-      div.innerHTML = `
-        <div><strong>${v.actividad || v.accion || "Visita"}</strong></div>
-        <div>${v.observacion || ""}</div>
-        <div class="fecha">
-          ${v.fecha?.toDate?.().toLocaleString() || ""}
+
+      const fecha = v.Fecha?.seconds
+        ? new Date(v.Fecha.seconds * 1000).toLocaleDateString()
+        : "Fecha inválida";
+
+      contenedor.innerHTML += `
+        <div class="visita">
+          <strong>${fecha}</strong><br>
+          Lat: ${v.Lat}<br>
+          Lng: ${v.Lng}
         </div>
       `;
-      contenedor.appendChild(div);
     });
 
-  } catch (e) {
-    console.error("Error cargando visitas:", e);
-    contenedor.textContent = "Error cargando visitas";
+  } catch (error) {
+    console.error("Error cargando visitas:", error);
   }
 }
+
+/* =========================
+   INICIAR
+========================= */
+cargarCliente();
+cargarVisitas(clienteId); y 
