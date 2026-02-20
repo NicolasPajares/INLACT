@@ -3,67 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>Cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 16px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.1);
-    }
-
-    h2 {
-      margin: 0 0 8px 0;
-    }
-
-    .dato {
-      margin: 4px 0;
-      color: #333;
-    }
-
-    .visita {
-      border-bottom: 1px solid #eee;
-      padding: 8px 0;
-      font-size: 14px;
-    }
-
-    .visita:last-child {
-      border-bottom: none;
-    }
-
-    .muted {
-      color: #777;
-      font-size: 13px;
-    }
-  </style>
 </head>
 <body>
 
-  <!-- DATOS DEL CLIENTE -->
-  <div class="card">
-    <h2 id="nombre">Cargando cliente...</h2>
-    <div class="dato"><strong>Dirección:</strong> <span id="direccion"></span></div>
-    <div class="dato"><strong>Zona:</strong> <span id="zona"></span></div>
-  </div>
+<h2 id="nombre">Cliente</h2>
+<p><b>Dirección:</b> <span id="direccion"></span></p>
+<p><b>Zona:</b> <span id="zona"></span></p>
 
-  <!-- HISTORIAL -->
-  <div class="card">
-    <h3>Historial de visitas</h3>
-    <div id="historial" class="muted">Cargando visitas...</div>
-  </div>
+<h3>Historial de visitas</h3>
+<ul id="historial"></ul>
 
-  <!-- JS -->
-  <script type="module" src="./firebase.js"></script>
-  <script type="module" src="./cliente.js"></script>
-
+<script type="module" src="./cliente.js"></script>
 </body>
 </html>
