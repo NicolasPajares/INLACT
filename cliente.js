@@ -11,10 +11,15 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
-  const clienteId = params.get("id");
+  const clienteId = new URLSearchParams(window.location.search).get("id");
 
   const nombreEl = document.getElementById("clienteNombre");
+
+  const contactoTxt = document.getElementById("contactoTxt");
+  const posicionTxt = document.getElementById("posicionTxt");
+  const telefonoTxt = document.getElementById("telefonoTxt");
+  const emailTxt = document.getElementById("emailTxt");
+  const observacionesTxt = document.getElementById("observacionesTxt");
 
   const contactoInput = document.getElementById("contactoInput");
   const posicionInput = document.getElementById("posicionInput");
@@ -22,35 +27,32 @@ document.addEventListener("DOMContentLoaded", async () => {
   const emailInput = document.getElementById("emailInput");
   const observacionesInput = document.getElementById("observacionesInput");
 
+  const editarBtn = document.getElementById("editarBtn");
+  const guardarBtn = document.getElementById("guardarBtn");
+
   const wspLink = document.getElementById("wspLink");
   const mailLink = document.getElementById("mailLink");
 
-  const guardarBtn = document.getElementById("guardarBtn");
   const visitasEl = document.getElementById("listaVisitasCliente");
 
-  if (!clienteId) {
-    nombreEl.textContent = "Cliente no especificado";
-    return;
-  }
+  let clienteRef;
 
   await cargarCliente();
   await cargarVisitas();
 
-  // ===============================
-  // CARGAR CLIENTE
-  // ===============================
+  // ======================
   async function cargarCliente() {
-    const ref = doc(db, "clientes", clienteId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-      nombreEl.textContent = "Cliente no encontrado";
-      return;
-    }
+    clienteRef = doc(db, "clientes", clienteId);
+    const snap = await getDoc(clienteRef);
 
     const c = snap.data();
+    nombreEl.textContent = c.nombre || "";
 
-    nombreEl.textContent = c.nombre || "Sin nombre";
+    contactoTxt.textContent = c.contacto || "-";
+    posicionTxt.textContent = c.posicion || "-";
+    telefonoTxt.textContent = c.telefono || "-";
+    emailTxt.textContent = c.email || "-";
+    observacionesTxt.textContent = c.observaciones || "-";
 
     contactoInput.value = c.contacto || "";
     posicionInput.value = c.posicion || "";
@@ -59,60 +61,58 @@ document.addEventListener("DOMContentLoaded", async () => {
     observacionesInput.value = c.observaciones || "";
 
     actualizarLinks();
+    modoLectura();
   }
 
-  // ===============================
-  // GUARDAR CAMBIOS
-  // ===============================
-  guardarBtn.addEventListener("click", async () => {
-    try {
-      await updateDoc(doc(db, "clientes", clienteId), {
-        contacto: contactoInput.value,
-        posicion: posicionInput.value,
-        telefono: telefonoInput.value,
-        email: emailInput.value,
-        observaciones: observacionesInput.value
-      });
+  // ======================
+  function modoLectura() {
+    toggleInputs(false);
+    editarBtn.hidden = false;
+    guardarBtn.hidden = true;
+  }
 
-      actualizarLinks();
-      alert("Cliente actualizado ✔");
-    } catch (e) {
-      console.error(e);
-      alert("Error al guardar");
-    }
-  });
+  function modoEdicion() {
+    toggleInputs(true);
+    editarBtn.hidden = true;
+    guardarBtn.hidden = false;
+  }
 
-  // ===============================
-  // LINKS DINÁMICOS
-  // ===============================
+  function toggleInputs(editable) {
+    const method = editable ? "removeAttribute" : "setAttribute";
+    [contactoInput, posicionInput, telefonoInput, emailInput, observacionesInput]
+      .forEach(i => i[method]("hidden", true));
+
+    [contactoTxt, posicionTxt, telefonoTxt, emailTxt, observacionesTxt]
+      .forEach(t => t.hidden = editable);
+  }
+
+  editarBtn.onclick = modoEdicion;
+
+  guardarBtn.onclick = async () => {
+    await updateDoc(clienteRef, {
+      contacto: contactoInput.value,
+      posicion: posicionInput.value,
+      telefono: telefonoInput.value,
+      email: emailInput.value,
+      observaciones: observacionesInput.value
+    });
+
+    await cargarCliente();
+    alert("Cambios guardados ✔");
+  };
+
   function actualizarLinks() {
     const tel = telefonoInput.value.replace(/\D/g, "");
-    const mail = emailInput.value;
+    wspLink.textContent = tel ? " WhatsApp" : "";
+    wspLink.href = tel ? `https://wa.me/54${tel}` : "";
 
-    if (tel) {
-      wspLink.href = `https://wa.me/54${tel}`;
-      wspLink.textContent = "Enviar WhatsApp";
-    } else {
-      wspLink.textContent = "";
-    }
-
-    if (mail) {
-      mailLink.href = `mailto:${mail}`;
-      mailLink.textContent = "Enviar Email";
-    } else {
-      mailLink.textContent = "";
-    }
+    mailLink.textContent = emailInput.value ? " Email" : "";
+    mailLink.href = emailInput.value ? `mailto:${emailInput.value}` : "";
   }
 
-  telefonoInput.addEventListener("input", actualizarLinks);
-  emailInput.addEventListener("input", actualizarLinks);
-
-  // ===============================
-  // HISTORIAL (NO TOCADO)
-  // ===============================
+  // ======================
   async function cargarVisitas() {
     visitasEl.innerHTML = "";
-
     const q = query(
       collection(db, "visitas"),
       where("clienteId", "==", clienteId),
@@ -120,22 +120,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
     const snap = await getDocs(q);
-
     if (snap.empty) {
       visitasEl.innerHTML = "<li>No hay visitas registradas</li>";
       return;
     }
 
     snap.forEach(d => {
-      const v = d.data();
-      let fecha = "Fecha no válida";
-
-      if (v.fecha?.toDate) {
-        fecha = v.fecha.toDate().toLocaleString();
-      }
-
       const li = document.createElement("li");
-      li.textContent = fecha;
+      li.textContent = d.data().fecha?.toDate().toLocaleString() || "-";
       visitasEl.appendChild(li);
     });
   }
