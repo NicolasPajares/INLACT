@@ -1,47 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Historial completo de visitas</title>
-  <link rel="stylesheet" href="historial.css">
+  <meta charset="UTF-8">
+  <title>Historial de Visitas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 16px;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 10px;
     }
-    h1 {
+
+    h2 {
+      text-align: center;
+    }
+
+    #buscador {
+      width: 100%;
+      padding: 10px;
       margin-bottom: 10px;
+      font-size: 16px;
     }
+
     .visita {
-      border-bottom: 1px solid #ccc;
-      padding: 8px 0;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
+
+    .visita strong {
+      font-size: 16px;
+    }
+
     .fecha {
-      font-size: 12px;
+      font-size: 13px;
       color: #666;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 12px;
+      margin-top: 4px;
+    }
+
+    .comercial { background: #2196f3; color: #fff; }
+    .ensayo { background: #9c27b0; color: #fff; }
+    .entrega { background: #4caf50; color: #fff; }
+
+    .producto {
+      margin-top: 4px;
+      font-size: 14px;
+    }
+
+    #cerrar-historial {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 16px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>Historial completo de visitas</h1>
+  <h2>Historial de Visitas</h2>
 
-  <input
-  type="text"
-  id="buscador"
-  placeholder="Buscar cliente o usuario..."
-  class="buscador"
-/>
-
-  <button id="cerrar-historial">Volver</button>
-
-
+  <input type="text" id="buscador" placeholder="Buscar por cliente, tipo o producto...">
 
   <div id="lista-visitas"></div>
 
-  <script src="historial.js"></script>
+  <button id="cerrar-historial">Volver</button>
+
   <script type="module" src="historial.js"></script>
 </body>
 </html>
-
