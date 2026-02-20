@@ -1,41 +1,108 @@
-// cliente.js
-import { db } from "./firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
-  const clienteId = params.get("id");
+/* =========================
+   CONFIGURACIÓN FIREBASE
+========================= */
 
-  const nombreEl = document.getElementById("clienteNombre");
-  const datosEl = document.getElementById("clienteDatos");
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_STORAGE_BUCKET",
+  messagingSenderId: "TU_MESSAGING_SENDER_ID",
+  appId: "TU_APP_ID"
+};
 
-  if (!clienteId) {
-    nombreEl.textContent = "Cliente no especificado";
-    return;
-  }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
+/* =========================
+   OBTENER ID DE LA URL
+========================= */
+
+const params = new URLSearchParams(window.location.search);
+const clienteId = params.get("id");
+
+if (!clienteId) {
+  alert("Cliente no especificado");
+}
+
+/* =========================
+   CARGAR CLIENTE
+========================= */
+
+async function cargarCliente(id) {
   try {
-    // 🔥 DOCUMENTO DIRECTO (clave del arreglo)
-    const ref = doc(db, "clientes", clienteId);
+    const ref = doc(db, "clientes", id);
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      nombreEl.textContent = "Cliente no encontrado";
+      alert("Cliente no encontrado");
       return;
     }
 
-    const cliente = snap.data();
+    const c = snap.data();
 
-    nombreEl.textContent = cliente.nombre || "Sin nombre";
-
-    datosEl.innerHTML = `
-      <p><strong>Localidad:</strong> ${cliente.localidad || "-"}</p>
-      <p><strong>Provincia:</strong> ${cliente.provincia || "-"}</p>
-      <p><strong>ID:</strong> ${snap.id}</p>
-    `;
+    document.getElementById("nombre").textContent = c.nombre || "";
+    document.getElementById("direccion").textContent = c.direccion || "";
+    document.getElementById("telefono").textContent = c.telefono || "";
+    document.getElementById("observaciones").textContent = c.observaciones || "";
 
   } catch (error) {
-    console.error("❌ Error al cargar cliente:", error);
-    nombreEl.textContent = "Error al cargar cliente";
+    console.error("Error cargando cliente:", error);
   }
-});
+}
+
+/* =========================
+   CARGAR VISITAS (NUEVO)
+========================= */
+
+async function cargarVisitas(id) {
+  const lista = document.getElementById("listaVisitas");
+
+  try {
+    const visitasRef = collection(db, "clientes", id, "visitas");
+    const q = query(visitasRef, orderBy("fecha", "desc"));
+    const snapshot = await getDocs(q);
+
+    lista.innerHTML = "";
+
+    if (snapshot.empty) {
+      lista.innerHTML = "<li>Sin visitas registradas</li>";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const v = doc.data();
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>${v.tipo || "Visita"}</strong><br>
+        Fecha: ${v.fecha || ""}<br>
+        ${v.observaciones || ""}
+      `;
+
+      lista.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("Error cargando visitas:", error);
+    lista.innerHTML = "<li>Error al cargar visitas</li>";
+  }
+}
+
+/* =========================
+   INICIO
+========================= */
+
+cargarCliente(clienteId);
+cargarVisitas(clienteId);
