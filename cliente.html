@@ -7,47 +7,40 @@
 </head>
 <body>
 
-  <h2 id="clienteNombre">Cargando cliente...</h2>
+<h2 id="clienteNombre">Cargando cliente...</h2>
 
-  <div id="clienteDatos">
-    <label>
-      Contacto:<br>
-      <input type="text" id="contactoInput">
-    </label><br><br>
+<div id="clienteDatos">
 
-    <label>
-      Posición:<br>
-      <input type="text" id="posicionInput">
-    </label><br><br>
+  <p><strong>Contacto:</strong> <span id="contactoTxt"></span></p>
+  <input type="text" id="contactoInput" hidden>
 
-    <label>
-      Teléfono:<br>
-      <input type="text" id="telefonoInput">
-      <br>
-      <a id="wspLink" target="_blank"></a>
-    </label><br><br>
+  <p><strong>Posición:</strong> <span id="posicionTxt"></span></p>
+  <input type="text" id="posicionInput" hidden>
 
-    <label>
-      Email:<br>
-      <input type="email" id="emailInput">
-      <br>
-      <a id="mailLink" target="_blank"></a>
-    </label><br><br>
+  <p><strong>Teléfono:</strong>
+    <span id="telefonoTxt"></span>
+    <a id="wspLink" target="_blank"></a>
+  </p>
+  <input type="text" id="telefonoInput" hidden>
 
-    <label>
-      Observaciones:<br>
-      <textarea id="observacionesInput" rows="4"></textarea>
-    </label><br><br>
+  <p><strong>Email:</strong>
+    <span id="emailTxt"></span>
+    <a id="mailLink" target="_blank"></a>
+  </p>
+  <input type="email" id="emailInput" hidden>
 
-    <button id="guardarBtn">Guardar cambios</button>
-  </div>
+  <p><strong>Observaciones:</strong></p>
+  <p id="observacionesTxt"></p>
+  <textarea id="observacionesInput" rows="4" hidden></textarea>
 
-  <h3>Historial de visitas</h3>
-  <ul id="listaVisitasCliente"></ul>
+  <button id="editarBtn">✏️ Editar contacto</button>
+  <button id="guardarBtn" hidden>💾 Guardar cambios</button>
 
-  <br>
-  <a href="clientes.html">← Volver</a>
+</div>
 
-  <script type="module" src="cliente.js"></script>
+<h3>Historial de visitas</h3>
+<ul id="listaVisitasCliente"></ul>
+
+<script type="module" src="cliente.js"></script>
 </body>
 </html>
