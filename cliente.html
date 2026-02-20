@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-  <h2 id="titulo">Cargando cliente…</h2>
+  <h2 id="clienteNombre">Cargando cliente...</h2>
+
+  <div id="clienteDatos"></div>
 
   <h3>Historial de visitas</h3>
-  <ul id="visitas"></ul>
+  <ul id="listaVisitasCliente">
+    <li>Cargando visitas...</li>
+  </ul>
 
-  <a href="index.html">← Volver</a>
+  <a href="clientes.html">← Volver</a>
 
+  <!-- JS como módulo -->
   <script type="module" src="cliente.js"></script>
 </body>
 </html>
