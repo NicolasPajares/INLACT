@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <title>INLACT</title>
 
-    <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Registro de visitas y clientes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS principal -->
     <link rel="stylesheet" href="index.css">
 
-    <!-- Leaflet CSS -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -24,59 +21,48 @@
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
     </figure>
-
     <h2>NICOLÁS PAJARES</h2>
 </header>
 
 <main>
 
-<!-- ACCESOS RÁPIDOS -->
 <section class="quick-actions">
     <a href="clientes.html" class="action-card">
-        <img src="img/icon-clientes.svg" alt="">
+        <img src="img/icon-clientes.svg">
         <span>Clientes</span>
     </a>
 
     <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg" alt="">
+        <img src="img/icon-stock.svg">
         <span>Stock</span>
     </a>
 
     <a href="ensayos.html" class="action-card">
-        <img src="img/icon-ensayos.svg" alt="">
+        <img src="img/icon-ensayos.svg">
         <span>Ensayos</span>
     </a>
 
     <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg" alt="">
+        <img src="img/icon-precios.svg">
         <span>Precios</span>
     </a>
 </section>
 
-<!-- MAPA -->
 <section class="card">
     <h2>Mapa de clientes</h2>
     <div id="map"></div>
 </section>
 
-<!-- VISITAS CERCANAS -->
 <section class="card">
     <h2>Visitas cercanas</h2>
     <p id="estado">Buscando fábricas...</p>
-
-    <!-- 🔧 ÚNICO CAMBIO: se agrega la clase -->
     <div id="acciones" class="lista-clientes"></div>
 </section>
 
-<!-- HISTORIAL RESUMIDO -->
 <section class="card">
     <h3>Últimas visitas</h3>
-
     <ul id="listaVisitas"></ul>
-
-    <a href="#" id="abrir-historial">
-        Ver historial completo →
-    </a>
+    <a href="#" id="abrir-historial">Ver historial completo →</a>
 </section>
 
 </main>
@@ -85,13 +71,10 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- App principal -->
 <script type="module" src="app.js"></script>
 
-<!-- 🔥 CARGAR ÚLTIMAS 5 VISITAS + ABRIR HISTORIAL -->
+<!-- 🔥 ÚLTIMAS 5 VISITAS CON DETALLE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import {
@@ -114,7 +97,6 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
   const lista = document.getElementById("listaVisitas");
 
   async function cargarUltimasVisitas() {
@@ -140,22 +122,34 @@
         ? v.fecha.toDate().toLocaleString("es-AR")
         : "";
 
+      let html = `
+        <strong>${v.cliente}</strong><br>
+        <small>${fecha}</small><br>
+        <span style="font-weight:bold">${v.tipoVisita}</span>
+      `;
+
+      if (v.tipoVisita === "Entrega de productos" && v.productos?.length) {
+        html += "<ul style='margin-top:6px'>";
+        v.productos.forEach(p => {
+          html += `<li>${p.nombre} – ${p.cantidad}</li>`;
+        });
+        html += "</ul>";
+      }
+
       const li = document.createElement("li");
-      li.innerHTML = `<strong>${v.cliente}</strong><br><small>${fecha}</small>`;
+      li.style.marginBottom = "14px";
+      li.innerHTML = html;
+
       lista.appendChild(li);
     });
   }
 
   cargarUltimasVisitas();
 
-  document.getElementById("abrir-historial").addEventListener("click", (e) => {
+  document.getElementById("abrir-historial").onclick = e => {
     e.preventDefault();
-    window.open(
-      "historial.html",
-      "historial",
-      "width=420,height=700"
-    );
-  });
+    window.open("historial.html", "historial", "width=420,height=700");
+  };
 </script>
 
 </body>
