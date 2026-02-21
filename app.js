@@ -1,113 +1,53 @@
-/**********************
- * MANEJO DE ERRORES *
- **********************/
-window.onerror = function (msg, url, line, col) {
-  alert(
-    "ERROR:\n" +
-    msg +
-    "\nLínea: " + line +
-    "\nCol: " + col
+// ===============================
+// ESTADO INTERNO
+// ===============================
+let clientesCercanosRenderizados = new Set();
+let watchId = null;
+
+// ===============================
+// INICIO APP
+// ===============================
+document.addEventListener("DOMContentLoaded", () => {
+  iniciarGeolocalizacion();
+});
+
+// ===============================
+// GEOLOCALIZACIÓN
+// ===============================
+function iniciarGeolocalizacion() {
+  if (!navigator.geolocation) {
+    alert("Geolocalización no soportada");
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    pos => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+
+      verificarProximidad(lat, lng);
+    },
+    err => {
+      console.error("Error geolocalización:", err);
+    },
+    {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 10000
+    }
   );
-};
-
-/**********************
- * FIREBASE
- **********************/
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-console.log("🔥 Firebase inicializado");
-
-/**********************
- * MAPA
- **********************/
-let map;
-let markerUsuario;
-let markersClientes = [];
-
-map = L.map("map").setView([-32.4075, -63.2408], 13);
-
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
-
-/**********************
- * OBTENER CLIENTES
- **********************/
-async function obtenerClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
-  const clientes = [];
-  snap.forEach(doc => {
-    clientes.push({ id: doc.id, ...doc.data() });
-  });
-  return clientes;
 }
 
-/**********************
- * DIBUJAR CLIENTES EN MAPA
- **********************/
-async function dibujarClientes() {
-  const clientes = await obtenerClientes();
-
-  markersClientes.forEach(m => map.removeLayer(m));
-  markersClientes = [];
-
-  clientes.forEach(c => {
-    if (!c.lat || !c.lng) return;
-
-    const marker = L.marker([c.lat, c.lng])
-      .addTo(map)
-      .bindPopup(`<strong>${c.nombre}</strong>`);
-
-    markersClientes.push(marker);
-  });
-}
-
-/**********************
- * DISTANCIA EN METROS
- **********************/
-function distanciaMetros(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-/**********************
- * VERIFICAR CERCANÍA
- **********************/
+// ===============================
+// VERIFICAR CLIENTES CERCANOS
+// ===============================
 async function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
   const acciones = document.getElementById("acciones");
 
-  estado.textContent = "";
-  acciones.innerHTML = "";
-
   const clientes = await obtenerClientes();
   let hayCercanos = false;
+  let clientesActuales = new Set();
 
   clientes.forEach(c => {
     if (!c.lat || !c.lng || !c.radio) return;
@@ -116,21 +56,26 @@ async function verificarProximidad(lat, lng) {
 
     if (d <= c.radio) {
       hayCercanos = true;
+      clientesActuales.add(c.id);
 
+      // 🛑 Ya está renderizado → no tocar
+      if (clientesCercanosRenderizados.has(c.id)) return;
+
+      clientesCercanosRenderizados.add(c.id);
+
+      // ===============================
+      // CARD CLIENTE
+      // ===============================
       const card = document.createElement("div");
-      card.style.border = "1px solid #e5e7eb";
-      card.style.padding = "12px";
-      card.style.marginBottom = "10px";
-      card.style.borderRadius = "8px";
-      card.style.background = "#fff";
+      card.className = "cliente-card";
+      card.dataset.id = c.id;
 
-      const nombre = document.createElement("strong");
+      const nombre = document.createElement("span");
+      nombre.className = "cliente-nombre";
       nombre.textContent = c.nombre;
 
       const btn = document.createElement("button");
       btn.textContent = "Registrar visita";
-      btn.style.marginTop = "8px";
-
       btn.onclick = () => registrarVisita(c, lat, lng);
 
       card.appendChild(nombre);
@@ -139,75 +84,44 @@ async function verificarProximidad(lat, lng) {
     }
   });
 
+  // ===============================
+  // LIMPIAR CLIENTES QUE YA NO ESTÁN CERCA
+  // ===============================
+  clientesCercanosRenderizados.forEach(id => {
+    if (!clientesActuales.has(id)) {
+      const card = acciones.querySelector(`[data-id="${id}"]`);
+      if (card) card.remove();
+      clientesCercanosRenderizados.delete(id);
+    }
+  });
+
+  // ===============================
+  // ESTADO TEXTO
+  // ===============================
   if (!hayCercanos) {
     estado.textContent = "No hay clientes cercanos";
+    acciones.innerHTML = "";
+    clientesCercanosRenderizados.clear();
+  } else {
+    estado.textContent = "";
   }
 }
 
-/**********************
- * REGISTRAR VISITA (MEJORADO)
- **********************/
-async function registrarVisita(cliente, lat, lng) {
-  try {
-    const tipo = prompt(
-      "Tipo de visita:\n1 - Visita comercial\n2 - Ensayo\n3 - Entrega de productos"
-    );
+// ===============================
+// DISTANCIA EN METROS (HAVERSINE)
+// ===============================
+function distanciaMetros(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-    let tipoVisita = "";
-    let producto = "";
-    let cantidad = "";
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) *
+    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
 
-    if (tipo === "1") tipoVisita = "Visita comercial";
-    else if (tipo === "2") tipoVisita = "Ensayo";
-    else if (tipo === "3") {
-      tipoVisita = "Entrega de productos";
-      producto = prompt("Producto entregado:");
-      cantidad = prompt("Cantidad:");
-    } else {
-      alert("❌ Tipo inválido");
-      return;
-    }
-
-    await addDoc(collection(db, "visitas"), {
-      clienteId: cliente.id,
-      cliente: cliente.nombre,
-      tipoVisita,
-      producto,
-      cantidad,
-      lat,
-      lng,
-      fecha: serverTimestamp()
-    });
-
-    alert("✅ Visita registrada: " + tipoVisita);
-  } catch (error) {
-    console.error(error);
-    alert("❌ Error al guardar visita");
-  }
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 }
-
-/**********************
- * GEOLOCALIZACIÓN
- **********************/
-navigator.geolocation.watchPosition(
-  pos => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
-
-    if (!markerUsuario) {
-      markerUsuario = L.marker([lat, lng]).addTo(map);
-      map.setView([lat, lng], 15);
-    } else {
-      markerUsuario.setLatLng([lat, lng]);
-    }
-
-    verificarProximidad(lat, lng);
-  },
-  () => alert("Error de geolocalización"),
-  { enableHighAccuracy: true }
-);
-
-/**********************
- * INICIO
- **********************/
-dibujarClientes();
