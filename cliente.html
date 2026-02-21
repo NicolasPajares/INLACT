@@ -2,62 +2,139 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>INLACT · Cliente</title>
+
+  <!-- SEO / Mobile -->
+  <meta name="description" content="INLACT - Detalle de cliente">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS base -->
+  <link rel="stylesheet" href="index.css">
+
+  <!-- CSS específico cliente -->
+  <link rel="stylesheet" href="cliente.css">
 </head>
+
 <body>
 
-<h2 id="clienteNombre">Cargando cliente...</h2>
+<header>
+  <figure>
+    <img src="img/logo.jpg" alt="INLACT">
+  </figure>
+  <h2>NICOLÁS PAJARES</h2>
+</header>
 
-<div id="clienteDatos">
+<main>
 
-  <p><strong>Contacto:</strong> <span id="contactoTxt"></span></p>
-  <input type="text" id="contactoInput" hidden>
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+<section class="quick-actions">
+  <a href="clientes.html" class="action-card">
+    <img src="img/icon-clientes.svg" alt="">
+    <span>Clientes</span>
+  </a>
 
-  <p><strong>Posición:</strong> <span id="posicionTxt"></span></p>
-  <input type="text" id="posicionInput" hidden>
+  <a href="stock.html" class="action-card">
+    <img src="img/icon-stock.svg" alt="">
+    <span>Stock</span>
+  </a>
 
-  <p><strong>Teléfono:</strong>
-    <span id="telefonoTxt"></span>
-    <a id="wspLink" target="_blank"></a>
-  </p>
-  <input type="text" id="telefonoInput" hidden>
+  <a href="ensayos.html" class="action-card">
+    <img src="img/icon-ensayos.svg" alt="">
+    <span>Ensayos</span>
+  </a>
 
-  <p><strong>Email:</strong>
-    <span id="emailTxt"></span>
-    <a id="mailLink" target="_blank"></a>
-  </p>
-  <input type="email" id="emailInput" hidden>
+  <a href="precios.html" class="action-card">
+    <img src="img/icon-precios.svg" alt="">
+    <span>Precios</span>
+  </a>
+</section>
 
-  <p><strong>Observaciones:</strong></p>
-  <p id="observacionesTxt"></p>
-  <textarea id="observacionesInput" rows="4" hidden></textarea>
+<!-- ===============================
+     DATOS DEL CLIENTE
+================================ -->
+<section class="card cliente-card">
 
-  <button id="editarBtn">✏️ Editar contacto</button>
-  <button id="guardarBtn" hidden>💾 Guardar cambios</button>
+  <h2 id="clienteNombre">Cargando cliente...</h2>
 
-</div>
+  <div id="clienteDatos" class="cliente-datos">
 
-<hr>
+    <div class="campo">
+      <label>Contacto</label>
+      <span id="contactoTxt"></span>
+      <input type="text" id="contactoInput" hidden>
+    </div>
 
-<h3>Historial de visitas</h3>
-<div id="listaVisitasCliente"></div>
+    <div class="campo">
+      <label>Posición</label>
+      <span id="posicionTxt"></span>
+      <input type="text" id="posicionInput" hidden>
+    </div>
 
-<!-- 🔹 NUEVO BOTÓN -->
-<div style="margin-top:10px;">
-  <button id="verHistorialCompleto">
+    <div class="campo">
+      <label>Teléfono</label>
+      <span id="telefonoTxt"></span>
+      <a id="wspLink" target="_blank"></a>
+      <input type="text" id="telefonoInput" hidden>
+    </div>
+
+    <div class="campo">
+      <label>Email</label>
+      <span id="emailTxt"></span>
+      <a id="mailLink" target="_blank"></a>
+      <input type="email" id="emailInput" hidden>
+    </div>
+
+    <div class="campo">
+      <label>Observaciones</label>
+      <p id="observacionesTxt"></p>
+      <textarea id="observacionesInput" rows="4" hidden></textarea>
+    </div>
+
+    <div class="acciones-form">
+      <button id="editarBtn" class="btn-principal">
+        ✏️ Editar contacto
+      </button>
+
+      <button id="guardarBtn" class="btn-secundario" hidden>
+        💾 Guardar cambios
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===============================
+     HISTORIAL
+================================ -->
+<section class="card historial-card">
+  <h2>Historial de visitas</h2>
+
+  <div id="listaVisitasCliente" class="lista-historial"></div>
+
+  <button id="verHistorialCompleto" class="btn-outline">
     📋 Ver historial completo
   </button>
-</div>
+</section>
 
-<hr>
-
-<div style="margin-top:20px; text-align:center;">
-  <button onclick="window.location.href='clientes.html'">
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
+  <button class="btn-volver" onclick="window.location.href='clientes.html'">
     ⬅ Volver a clientes
   </button>
-</div>
+</section>
 
+</main>
+
+<footer>
+  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<!-- JS -->
 <script type="module" src="cliente.js"></script>
+
 </body>
 </html>
