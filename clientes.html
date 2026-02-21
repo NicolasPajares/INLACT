@@ -1,46 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Clientes</title>
+    <meta charset="UTF-8">
+    <title>INLACT · Clientes</title>
 
-  <!-- Mobile -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Gestión de clientes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS base (misma estética que index) -->
-  <link rel="stylesheet" href="index.css">
+    <!-- CSS base (misma estética que index) -->
+    <link rel="stylesheet" href="index.css">
 
-  <!-- CSS exclusivo de clientes -->
-  <link rel="stylesheet" href="clientes.css">
+    <!-- CSS específico de clientes -->
+    <link rel="stylesheet" href="clientes.css">
 </head>
+
 <body>
 
-<main class="clientes-main">
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
 
-  <!-- BOTÓN PRINCIPAL -->
-  <button id="btnNuevoCliente" class="btn-crear-cliente">
-    ➕ Crear nuevo cliente
-  </button>
+    <h2>NICOLÁS PAJARES</h2>
+</header>
 
-  <h2 class="titulo-seccion">Listado de clientes</h2>
+<main>
 
-  <input
-    type="text"
-    id="buscadorClientes"
-    class="buscador-clientes"
-    placeholder="Buscar cliente..."
-  >
+<!-- ===============================
+     ACCESOS RÁPIDOS (IGUAL A INDEX)
+================================ -->
+<section class="quick-actions">
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
+    </a>
 
-  <ul id="listaClientes" class="lista-clientes"></ul>
+    <a href="stock.html" class="action-card">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
 
-  <div class="volver-inicio">
-    <button onclick="window.location.href='index.html'">
-      ⬅ Volver al inicio
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
+
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
+</section>
+
+<!-- ===============================
+     GESTIÓN DE CLIENTES
+================================ -->
+<section class="card">
+
+    <button id="btnNuevoCliente">
+        ➕ Crear nuevo cliente
     </button>
-  </div>
+
+    <h2>Listado de clientes</h2>
+
+    <input
+        type="text"
+        id="buscadorClientes"
+        placeholder="Buscar cliente por nombre o localidad..."
+    >
+
+    <ul id="listaClientes"></ul>
+
+</section>
+
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
+    <button onclick="window.location.href='index.html'">
+        ⬅ Volver al inicio
+    </button>
+</section>
 
 </main>
 
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<!-- JS -->
 <script type="module" src="clientes.js"></script>
 
 </body>
