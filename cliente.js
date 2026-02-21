@@ -40,12 +40,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   await cargarCliente();
   await cargarVisitas();
 
-  // ======================
+  /**********************
+   * DATOS DEL CLIENTE
+   **********************/
   async function cargarCliente() {
     clienteRef = doc(db, "clientes", clienteId);
     const snap = await getDoc(clienteRef);
-
     const c = snap.data();
+
     nombreEl.textContent = c.nombre || "";
 
     contactoTxt.textContent = c.contacto || "-";
@@ -64,7 +66,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     modoLectura();
   }
 
-  // ======================
   function modoLectura() {
     toggleInputs(false);
     editarBtn.hidden = false;
@@ -79,6 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function toggleInputs(editable) {
     const method = editable ? "removeAttribute" : "setAttribute";
+
     [contactoInput, posicionInput, telefonoInput, emailInput, observacionesInput]
       .forEach(i => i[method]("hidden", true));
 
@@ -110,8 +112,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     mailLink.href = emailInput.value ? `mailto:${emailInput.value}` : "";
   }
 
-  // ======================
-  // HISTORIAL DE VISITAS (MISMA VISTA QUE HISTORIAL GENERAL)
+  /**********************
+   * HISTORIAL DE VISITAS
+   * (MISMA LÓGICA QUE HISTORIAL GENERAL)
+   **********************/
   async function cargarVisitas() {
     visitasEl.innerHTML = "Cargando visitas...";
 
@@ -136,14 +140,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? v.fecha.toDate().toLocaleString("es-AR")
         : "Sin fecha";
 
-      const div = document.createElement("div");
-      div.className = "visita";
+      const tipo = v.tipoVisita || "Sin tipo";
 
-      let detalle = `<strong>Tipo:</strong> ${v.tipo || "-"}`;
+      let detalle = `<strong>Tipo:</strong> ${tipo}`;
 
-      if (v.tipo === "entrega" && v.producto) {
+      if (tipo === "Entrega de productos" && v.producto) {
         detalle += `<br><strong>Entrega:</strong> ${v.producto} (${v.cantidad || 1})`;
       }
+
+      const div = document.createElement("div");
+      div.className = "visita";
 
       div.innerHTML = `
         <span class="fecha">${fecha}</span><br>
