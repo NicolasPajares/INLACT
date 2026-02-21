@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await cargarVisitas();
 
   /**********************
-   * DATOS DEL CLIENTE
+   * DATOS CLIENTE
    **********************/
   async function cargarCliente() {
     clienteRef = doc(db, "clientes", clienteId);
@@ -79,10 +79,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function toggleInputs(editable) {
-    const method = editable ? "removeAttribute" : "setAttribute";
-
     [contactoInput, posicionInput, telefonoInput, emailInput, observacionesInput]
-      .forEach(i => i[method]("hidden", true));
+      .forEach(i => i.hidden = !editable);
 
     [contactoTxt, posicionTxt, telefonoTxt, emailTxt, observacionesTxt]
       .forEach(t => t.hidden = editable);
@@ -105,16 +103,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function actualizarLinks() {
     const tel = telefonoInput.value.replace(/\D/g, "");
-    wspLink.textContent = tel ? " WhatsApp" : "";
+    wspLink.textContent = tel ? "WhatsApp" : "";
     wspLink.href = tel ? `https://wa.me/54${tel}` : "";
 
-    mailLink.textContent = emailInput.value ? " Email" : "";
+    mailLink.textContent = emailInput.value ? "Email" : "";
     mailLink.href = emailInput.value ? `mailto:${emailInput.value}` : "";
   }
 
   /**********************
-   * HISTORIAL DE VISITAS
-   * (MISMA LÓGICA QUE HISTORIAL GENERAL)
+   * HISTORIAL CLIENTE
    **********************/
   async function cargarVisitas() {
     visitasEl.innerHTML = "Cargando visitas...";
@@ -142,18 +139,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const tipo = v.tipoVisita || "Sin tipo";
 
-      let detalle = `<strong>Tipo:</strong> ${tipo}`;
+      let clase = "";
+      if (tipo === "Visita comercial") clase = "comercial";
+      if (tipo === "Ensayo") clase = "ensayo";
+      if (tipo === "Entrega de productos") clase = "entrega";
 
-      if (tipo === "Entrega de productos" && v.producto) {
-        detalle += `<br><strong>Entrega:</strong> ${v.producto} (${v.cantidad || 1})`;
+      let productosHTML = "";
+      if (tipo === "Entrega de productos" && Array.isArray(v.productos)) {
+        productosHTML = v.productos.map(p =>
+          `<div class="producto">📦 ${p.nombre} ${p.cantidad ? `(${p.cantidad})` : ""}</div>`
+        ).join("");
       }
 
       const div = document.createElement("div");
       div.className = "visita";
 
       div.innerHTML = `
-        <span class="fecha">${fecha}</span><br>
-        ${detalle}
+        <div class="fecha">${fecha}</div>
+        <span class="badge ${clase}">${tipo}</span>
+        ${productosHTML}
       `;
 
       visitasEl.appendChild(div);
