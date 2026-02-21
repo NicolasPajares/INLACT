@@ -39,20 +39,6 @@ header h2 {
 }
 
 /* ===============================
-   NAV
-================================ */
-nav a {
-    margin-left: 15px;
-    text-decoration: none;
-    color: #1f4e8c;
-    font-weight: 600;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
-/* ===============================
    MAIN
 ================================ */
 main {
@@ -62,7 +48,7 @@ main {
 }
 
 /* ===============================
-   TARJETAS GENERALES
+   TARJETAS
 ================================ */
 .card {
     background: #ffffff;
@@ -83,7 +69,7 @@ main {
 }
 
 /* ===============================
-   VISITA CERCANA
+   VISITAS CERCANAS
 ================================ */
 #estado {
     margin-top: 10px;
@@ -91,18 +77,42 @@ main {
     color: #2e7d32;
 }
 
-#acciones button {
+/* CONTENEDOR DE CLIENTES */
+.lista-clientes {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
     margin-top: 15px;
+}
+
+/* TARJETA DE CLIENTE */
+.cliente-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* NOMBRE CLIENTE */
+.cliente-nombre {
+    flex: 1;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* BOTÓN */
+.cliente-card button {
+    min-width: 160px;
     background: linear-gradient(135deg, #1f4e8c, #3b82f6);
     color: #fff;
     border: none;
-    padding: 12px 20px;
+    padding: 12px 16px;
     border-radius: 8px;
     font-size: 15px;
     cursor: pointer;
 }
 
-#acciones button:hover {
+.cliente-card button:hover {
     opacity: 0.9;
 }
 
@@ -121,7 +131,7 @@ main {
 }
 
 /* ===============================
-   LINK HISTORIAL
+   LINKS
 ================================ */
 a {
     color: #1f4e8c;
@@ -145,26 +155,8 @@ footer {
 }
 
 /* ===============================
-   RESPONSIVE
+   ACCESOS RÁPIDOS
 ================================ */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    nav {
-        width: 100%;
-    }
-
-    nav a {
-        margin-left: 0;
-        margin-right: 15px;
-    }
-}
-
-/* ACCESOS RAPIDOS */
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -177,7 +169,6 @@ footer {
     border-radius: 14px;
     padding: 20px;
     text-align: center;
-    text-decoration: none;
     color: #1e3a5f;
     box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     transition: transform .15s ease;
@@ -199,54 +190,24 @@ footer {
 }
 
 /* ===============================
-   BOTÓN FLOTANTE INICIO
+   RESPONSIVE (CLAVE)
 ================================ */
-.fab-inicio {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+@media (max-width: 768px) {
 
-    width: 56px;
-    height: 56px;
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
 
-    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-    color: #ffffff;
+    /* 👇 FIX DEFINITIVO MOBILE */
+    .cliente-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
 
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 24px;
-    text-decoration: none;
-
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-    z-index: 999;
-
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.fab-inicio:hover {
-    transform: scale(1.1);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
-}
-
-/* ===============================
-   CLIENTES CERCANOS - ALINEACIÓN
-================================ */
-.cliente-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-}
-
-.cliente-nombre {
-    flex: 1;
-    font-weight: 600;
-}
-
-.cliente-card button {
-    width: 180px;
-    margin-top: 0 !important;
+    .cliente-card button {
+        width: 100%;
+    }
 }
