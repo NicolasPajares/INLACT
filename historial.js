@@ -24,14 +24,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /**********************
- * ELEMENTOS DOM
+ * DOM
  **********************/
 const contenedor = document.getElementById("lista-visitas");
 const buscador = document.getElementById("buscador");
 const btnVolver = document.getElementById("cerrar-historial");
 
 /**********************
- * LEER clienteId DE LA URL (NUEVO)
+ * clienteId opcional
  **********************/
 const params = new URLSearchParams(window.location.search);
 const clienteId = params.get("clienteId");
@@ -40,20 +40,16 @@ const clienteId = params.get("clienteId");
  * CARGAR VISITAS
  **********************/
 async function cargarVisitas() {
-  contenedor.innerHTML = "Cargando visitas...";
+  contenedor.innerHTML = "<p>Cargando visitas...</p>";
 
-  // 👉 Query base
   let q;
-
   if (clienteId) {
-    // 🔹 Historial filtrado por cliente
     q = query(
       collection(db, "visitas"),
       where("clienteId", "==", clienteId),
       orderBy("fecha", "desc")
     );
   } else {
-    // 🔹 Historial general (como antes)
     q = query(
       collection(db, "visitas"),
       orderBy("fecha", "desc")
@@ -73,32 +69,32 @@ async function cargarVisitas() {
 
     const fecha = v.fecha?.toDate
       ? v.fecha.toDate().toLocaleString("es-AR")
-      : "Sin fecha";
+      : "";
 
-    const tipo = v.tipoVisita || "Sin tipo";
+    let clase = "";
+    if (v.tipoVisita === "Entrega de productos") clase = "entrega";
+    if (v.tipoVisita === "Visita comercial") clase = "comercial";
+    if (v.tipoVisita === "Ensayo") clase = "ensayo";
 
-    let claseTipo = "";
-    if (tipo === "Visita comercial") claseTipo = "comercial";
-    if (tipo === "Ensayo") claseTipo = "ensayo";
-    if (tipo === "Entrega de productos") claseTipo = "entrega";
-
-    let productoHTML = "";
-    if (tipo === "Entrega de productos" && v.producto) {
-      productoHTML = `
-        <div class="producto">
-          📦 ${v.producto} ${v.cantidad ? `(${v.cantidad})` : ""}
+    let productosHTML = "";
+    if (v.tipoVisita === "Entrega de productos" && Array.isArray(v.productos)) {
+      productosHTML = `
+        <div class="productos">
+          ${v.productos.map(p =>
+            `<div class="producto">📦 ${p.nombre} ${p.cantidad ? `(${p.cantidad})` : ""}</div>`
+          ).join("")}
         </div>
       `;
     }
 
     const div = document.createElement("div");
-    div.className = "visita";
+    div.className = `visita ${clase}`;
 
     div.innerHTML = `
-      <strong>${v.cliente || "Cliente sin nombre"}</strong><br>
-      <span class="fecha">${fecha}</span><br>
-      <span class="badge ${claseTipo}">${tipo}</span>
-      ${productoHTML}
+      <strong>${v.cliente || "Cliente sin nombre"}</strong>
+      <div class="fecha">${fecha}</div>
+      <span class="badge">${v.tipoVisita}</span>
+      ${productosHTML}
     `;
 
     contenedor.appendChild(div);
@@ -110,27 +106,18 @@ async function cargarVisitas() {
  **********************/
 buscador.addEventListener("input", () => {
   const texto = buscador.value.toLowerCase();
-  const visitasDOM = document.querySelectorAll(".visita");
-
-  visitasDOM.forEach(visita => {
-    const contenido = visita.textContent.toLowerCase();
-    visita.style.display = contenido.includes(texto) ? "block" : "none";
+  document.querySelectorAll(".visita").forEach(v => {
+    v.style.display = v.textContent.toLowerCase().includes(texto)
+      ? "block"
+      : "none";
   });
 });
 
 /**********************
- * BOTÓN VOLVER
+ * VOLVER
  **********************/
 btnVolver.addEventListener("click", () => {
-  // 👉 si venís desde cliente, volvés a clientes
-  if (clienteId) {
-    window.history.back();
-  } else {
-    window.location.href = "index.html";
-  }
+  window.history.back();
 });
 
-/**********************
- * INICIAR
- **********************/
 cargarVisitas();
