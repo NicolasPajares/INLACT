@@ -101,8 +101,11 @@ h2 {
   border-radius: 14px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
+  cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -111,14 +114,51 @@ h2 {
   box-shadow: 0 10px 22px rgba(0,0,0,0.15);
 }
 
-.cliente-item strong {
+/* INFO CLIENTE */
+.cliente-info {
+  flex: 1;
+}
+
+.cliente-info strong {
   font-size: 18px;
   display: block;
 }
 
-.cliente-item small {
+.cliente-info small {
   font-size: 14px;
   color: #6b7280;
+}
+
+/* ===============================
+   BOTÓN BORRAR ❌
+================================ */
+.btn-borrar {
+  margin-left: 12px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: #fee2e2;
+  color: #b91c1c;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-borrar:hover {
+  background: #fecaca;
+  transform: scale(1.1);
 }
 
 /* ===============================
