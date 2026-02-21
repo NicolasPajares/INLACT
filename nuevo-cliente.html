@@ -1,31 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Nuevo cliente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>INLACT · Nuevo cliente</title>
+
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Crear nuevo cliente">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="nuevo-cliente.css">
 </head>
+
 <body>
 
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+</header>
+
 <main>
-  <h2>Crear nuevo cliente</h2>
 
-  <form id="formNuevoCliente">
-    <input id="nombre" placeholder="Nombre del cliente" required>
+<!-- ===============================
+     ACCESOS RÁPIDOS (IGUAL A INDEX)
+================================ -->
+<section class="quick-actions">
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
+    </a>
 
-    <input id="localidad" placeholder="Localidad">
-    <input id="provincia" placeholder="Provincia">
+    <a href="stock.html" class="action-card">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
 
-    <input id="lat" placeholder="Latitud" required>
-    <input id="lng" placeholder="Longitud" required>
-    <input id="radio" placeholder="Radio (metros)" value="10000">
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
 
-    <button type="submit">Guardar</button>
-    <button type="button" onclick="location.href='clientes.html'">Cancelar</button>
-  </form>
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
+</section>
+
+<!-- ===============================
+     NUEVO CLIENTE
+================================ -->
+<section class="card">
+
+    <h2>Crear nuevo cliente</h2>
+
+    <form id="formNuevoCliente">
+        <input id="nombre" placeholder="Nombre del cliente" required>
+
+        <input id="localidad" placeholder="Localidad">
+        <input id="provincia" placeholder="Provincia">
+
+        <input id="lat" placeholder="Latitud" required>
+        <input id="lng" placeholder="Longitud" required>
+        <input id="radio" placeholder="Radio (metros)" value="1000">
+
+        <button type="submit">Guardar</button>
+        <button type="button" onclick="location.href='clientes.html'">
+            Cancelar
+        </button>
+    </form>
+
+</section>
+
 </main>
 
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<!-- JS -->
 <script type="module" src="nuevo-cliente.js"></script>
+
 </body>
 </html>
-
