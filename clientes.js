@@ -44,14 +44,10 @@ async function cargarClientes() {
 
   const snap = await getDocs(collection(db, "clientes"));
 
-  clientes = [];
-
-  snap.forEach(doc => {
-    clientes.push({
-      id: doc.id,
-      ...doc.data()
-    });
-  });
+  clientes = snap.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
 
   if (clientes.length === 0) {
     listaEl.innerHTML = "<li>No hay clientes cargados</li>";
@@ -69,16 +65,18 @@ function renderClientes(lista) {
 
   lista.forEach(c => {
     const li = document.createElement("li");
-    li.style.cursor = "pointer";
+    li.className = "cliente-item";
 
     li.innerHTML = `
-      <strong>${c.nombre || "Sin nombre"}</strong><br>
-      <small>${c.localidad || ""} ${c.provincia || ""}</small>
+      <div>
+        <strong>${c.nombre || "Sin nombre"}</strong><br>
+        <small>${c.localidad || ""} ${c.provincia || ""}</small>
+      </div>
     `;
 
-    li.onclick = () => {
+    li.addEventListener("click", () => {
       window.location.href = `cliente.html?id=${c.id}`;
-    };
+    });
 
     listaEl.appendChild(li);
   });
@@ -90,12 +88,12 @@ function renderClientes(lista) {
 buscadorEl.addEventListener("input", () => {
   const texto = buscadorEl.value.toLowerCase();
 
-  renderClientes(
-    clientes.filter(c =>
-      (c.nombre || "").toLowerCase().includes(texto) ||
-      (c.localidad || "").toLowerCase().includes(texto)
-    )
+  const filtrados = clientes.filter(c =>
+    (c.nombre || "").toLowerCase().includes(texto) ||
+    (c.localidad || "").toLowerCase().includes(texto)
   );
+
+  renderClientes(filtrados);
 });
 
 /**********************
