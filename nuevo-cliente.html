@@ -28,51 +28,43 @@
 <main>
 
 <!-- ===============================
-     ACCESOS RÁPIDOS (IGUAL A INDEX)
+     FORMULARIO NUEVO CLIENTE
 ================================ -->
-<section class="quick-actions">
-    <a href="clientes.html" class="action-card">
-        <img src="img/icon-clientes.svg" alt="">
-        <span>Clientes</span>
-    </a>
+<section class="card card-formulario">
 
-    <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg" alt="">
-        <span>Stock</span>
-    </a>
-
-    <a href="ensayos.html" class="action-card">
-        <img src="img/icon-ensayos.svg" alt="">
-        <span>Ensayos</span>
-    </a>
-
-    <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg" alt="">
-        <span>Precios</span>
-    </a>
-</section>
-
-<!-- ===============================
-     NUEVO CLIENTE
-================================ -->
-<section class="card">
-
-    <h2>Crear nuevo cliente</h2>
+    <h1>Crear nuevo cliente</h1>
 
     <form id="formNuevoCliente">
-        <input id="nombre" placeholder="Nombre del cliente" required>
 
-        <input id="localidad" placeholder="Localidad">
-        <input id="provincia" placeholder="Provincia">
+        <label>Nombre del cliente</label>
+        <input id="nombre" placeholder="Ej: Lácteos San Martín" required>
 
-        <input id="lat" placeholder="Latitud" required>
-        <input id="lng" placeholder="Longitud" required>
-        <input id="radio" placeholder="Radio (metros)" value="1000">
+        <label>Localidad</label>
+        <input id="localidad" placeholder="Ej: Villa María">
 
-        <button type="submit">Guardar</button>
-        <button type="button" onclick="location.href='clientes.html'">
-            Cancelar
-        </button>
+        <label>Provincia</label>
+        <input id="provincia" placeholder="Ej: Córdoba">
+
+        <label>Latitud</label>
+        <input id="lat" placeholder="-32.4075" required>
+
+        <label>Longitud</label>
+        <input id="lng" placeholder="-63.2408" required>
+
+        <label>Radio de detección (metros)</label>
+        <input id="radio" placeholder="1000" value="1000">
+
+        <div class="acciones-form">
+            <button type="submit" class="btn-guardar">
+                💾 Guardar cliente
+            </button>
+
+            <button type="button" class="btn-cancelar"
+                onclick="location.href='clientes.html'">
+                ✖ Cancelar
+            </button>
+        </div>
+
     </form>
 
 </section>
@@ -83,7 +75,6 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<!-- JS -->
 <script type="module" src="nuevo-cliente.js"></script>
 
 </body>
