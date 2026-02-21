@@ -211,3 +211,29 @@ footer {
         width: 100%;
     }
 }
+
+/* TAGS DE TIPO DE VISITA */
+.tag-visita {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Colores */
+.tag-entrega {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.tag-comercial {
+    background: #4FC3F7;
+    color: #fff;
+}
+
+.tag-ensayo {
+    background: #FFD54F;
+    color: #333;
+}
