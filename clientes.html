@@ -3,34 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <title>Clientes</title>
+
+  <!-- Mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS base (misma estética que index) -->
+  <link rel="stylesheet" href="index.css">
+
+  <!-- CSS exclusivo de clientes -->
+  <link rel="stylesheet" href="clientes.css">
 </head>
 <body>
 
-<main>
-  <button id="btnNuevoCliente">➕ Crear nuevo cliente</button>
+<main class="clientes-main">
 
-  <h2>Listado de clientes</h2>
+  <!-- BOTÓN PRINCIPAL -->
+  <button id="btnNuevoCliente" class="btn-crear-cliente">
+    ➕ Crear nuevo cliente
+  </button>
+
+  <h2 class="titulo-seccion">Listado de clientes</h2>
 
   <input
     type="text"
     id="buscadorClientes"
+    class="buscador-clientes"
     placeholder="Buscar cliente..."
   >
 
-  <ul id="listaClientes"></ul>
+  <ul id="listaClientes" class="lista-clientes"></ul>
 
-  <hr>
+  <div class="volver-inicio">
+    <button onclick="window.location.href='index.html'">
+      ⬅ Volver al inicio
+    </button>
+  </div>
 
-<div style="margin-top:20px; text-align:center;">
-  <button onclick="window.location.href='index.html'">
-    ⬅ Volver al inicio
-  </button>
-</div>
 </main>
 
-<!-- JS como módulo -->
 <script type="module" src="clientes.js"></script>
 
 </body>
 </html>
-
