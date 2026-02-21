@@ -52,7 +52,7 @@ async function obtenerClientes() {
 }
 
 /**********************
-- DIBUJAR CLIENTES EN MAPA
+- DIBUJAR CLIENTES
 **********************/
 async function dibujarClientes() {
   const clientes = await obtenerClientes();
@@ -62,15 +62,14 @@ async function dibujarClientes() {
 
   clientes.forEach(c => {
     if (!c.lat || !c.lng) return;
-    const marker = L.marker([c.lat, c.lng])
+    L.marker([c.lat, c.lng])
       .addTo(map)
       .bindPopup(`<strong>${c.nombre}</strong>`);
-    markersClientes.push(marker);
   });
 }
 
 /**********************
-- DISTANCIA EN METROS
+- DISTANCIA
 **********************/
 function distanciaMetros(lat1, lon1, lat2, lon2) {
   const R = 6371000;
@@ -97,9 +96,7 @@ async function verificarProximidad(lat, lng) {
   clientes.forEach(c => {
     if (!c.lat || !c.lng || !c.radio) return;
 
-    const d = distanciaMetros(lat, lng, c.lat, c.lng);
-
-    if (d <= c.radio) {
+    if (distanciaMetros(lat, lng, c.lat, c.lng) <= c.radio) {
       hayCercanos = true;
 
       if (clientesMostrados.has(c.id)) return;
@@ -116,8 +113,7 @@ async function verificarProximidad(lat, lng) {
       btn.textContent = "Registrar visita";
       btn.onclick = () => registrarVisita(c, lat, lng);
 
-      card.appendChild(nombre);
-      card.appendChild(btn);
+      card.append(nombre, btn);
       acciones.appendChild(card);
     }
   });
@@ -128,32 +124,42 @@ async function verificarProximidad(lat, lng) {
 }
 
 /**********************
-- FORMULARIO ENTREGA
+- FORMULARIO ENTREGA (MÓVIL FRIENDLY)
 **********************/
 function mostrarFormularioEntrega(cliente, lat, lng) {
   const overlay = document.createElement("div");
-  overlay.style.position = "fixed";
-  overlay.style.inset = "0";
-  overlay.style.background = "rgba(0,0,0,0.5)";
-  overlay.style.display = "flex";
-  overlay.style.alignItems = "center";
-  overlay.style.justifyContent = "center";
-  overlay.style.zIndex = "9999";
+  overlay.style.cssText = `
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex; align-items:center; justify-content:center;
+    z-index:9999;
+  `;
 
   const box = document.createElement("div");
-  box.style.background = "#fff";
-  box.style.padding = "20px";
-  box.style.borderRadius = "12px";
-  box.style.width = "90%";
-  box.style.maxWidth = "420px";
+  box.style.cssText = `
+    background:#fff;
+    padding:24px;
+    border-radius:16px;
+    width:92%;
+    max-width:460px;
+    font-size:18px;
+  `;
 
   box.innerHTML = `
-    <h3>Entrega de productos</h3>
+    <h3 style="margin-bottom:14px;">Entrega de productos</h3>
     <div id="productos"></div>
-    <button id="agregarProducto">➕ Agregar producto</button>
-    <hr>
-    <button id="guardarEntrega">Registrar visita</button>
-    <button id="cancelarEntrega">Cancelar</button>
+
+    <button id="agregarProducto" style="width:100%;padding:14px;margin-top:10px;">
+      ➕ Agregar producto
+    </button>
+
+    <button id="guardarEntrega" style="width:100%;padding:16px;margin-top:16px;font-weight:bold;">
+      Registrar visita
+    </button>
+
+    <button id="cancelarEntrega" style="width:100%;padding:14px;margin-top:10px;">
+      Cancelar
+    </button>
   `;
 
   overlay.appendChild(box);
@@ -163,14 +169,16 @@ function mostrarFormularioEntrega(cliente, lat, lng) {
 
   function agregarFila() {
     const fila = document.createElement("div");
-    fila.style.display = "flex";
-    fila.style.gap = "6px";
-    fila.style.marginBottom = "6px";
+    fila.style.cssText = `
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+    `;
 
     fila.innerHTML = `
-      <input placeholder="Producto" style="flex:2">
-      <input placeholder="Cantidad" style="flex:1">
-      <button>✖</button>
+      <input placeholder="Producto" style="flex:2;padding:12px;font-size:16px;">
+      <input placeholder="Cantidad" style="flex:1;padding:12px;font-size:16px;">
+      <button style="padding:12px;">✖</button>
     `;
 
     fila.querySelector("button").onclick = () => fila.remove();
@@ -180,26 +188,19 @@ function mostrarFormularioEntrega(cliente, lat, lng) {
   agregarFila();
 
   box.querySelector("#agregarProducto").onclick = agregarFila;
-
   box.querySelector("#cancelarEntrega").onclick = () => overlay.remove();
 
   box.querySelector("#guardarEntrega").onclick = async () => {
     const productos = [];
 
     contenedor.querySelectorAll("div").forEach(f => {
-      const [prod, cant] = f.querySelectorAll("input");
-      if (prod.value.trim()) {
-        productos.push({
-          nombre: prod.value.trim(),
-          cantidad: cant.value.trim()
-        });
+      const [p, c] = f.querySelectorAll("input");
+      if (p.value.trim()) {
+        productos.push({ nombre: p.value.trim(), cantidad: c.value.trim() });
       }
     });
 
-    if (productos.length === 0) {
-      alert("Agregá al menos un producto");
-      return;
-    }
+    if (!productos.length) return alert("Agregá al menos un producto");
 
     await addDoc(collection(db, "visitas"), {
       clienteId: cliente.id,
@@ -246,8 +247,7 @@ async function registrarVisita(cliente, lat, lng) {
 **********************/
 navigator.geolocation.watchPosition(
   pos => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+    const { latitude: lat, longitude: lng } = pos.coords;
 
     if (!markerUsuario) {
       markerUsuario = L.marker([lat, lng]).addTo(map);
