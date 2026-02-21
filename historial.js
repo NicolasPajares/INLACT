@@ -7,7 +7,8 @@ import {
   collection,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -30,15 +31,34 @@ const buscador = document.getElementById("buscador");
 const btnVolver = document.getElementById("cerrar-historial");
 
 /**********************
+ * LEER clienteId DE LA URL (NUEVO)
+ **********************/
+const params = new URLSearchParams(window.location.search);
+const clienteId = params.get("clienteId");
+
+/**********************
  * CARGAR VISITAS
  **********************/
 async function cargarVisitas() {
   contenedor.innerHTML = "Cargando visitas...";
 
-  const q = query(
-    collection(db, "visitas"),
-    orderBy("fecha", "desc")
-  );
+  // 👉 Query base
+  let q;
+
+  if (clienteId) {
+    // 🔹 Historial filtrado por cliente
+    q = query(
+      collection(db, "visitas"),
+      where("clienteId", "==", clienteId),
+      orderBy("fecha", "desc")
+    );
+  } else {
+    // 🔹 Historial general (como antes)
+    q = query(
+      collection(db, "visitas"),
+      orderBy("fecha", "desc")
+    );
+  }
 
   const snap = await getDocs(q);
   contenedor.innerHTML = "";
@@ -102,7 +122,12 @@ buscador.addEventListener("input", () => {
  * BOTÓN VOLVER
  **********************/
 btnVolver.addEventListener("click", () => {
-  window.location.href = "index.html";
+  // 👉 si venís desde cliente, volvés a clientes
+  if (clienteId) {
+    window.history.back();
+  } else {
+    window.location.href = "index.html";
+  }
 });
 
 /**********************
