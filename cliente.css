@@ -1,4 +1,4 @@
-/* ===============================
+/ ===============================
    CONTENEDOR GENERAL
 ================================ */
 main {
@@ -199,4 +199,38 @@ main {
     width: auto;
     flex: 1;
   }
+}
+
+/* ===============================
+   BADGES HISTORIAL CLIENTE
+================================ */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.badge.comercial {
+  background: #38bdf8;
+  color: #00324d;
+}
+
+.badge.ensayo {
+  background: #fde047;
+  color: #713f12;
+}
+
+.badge.entrega {
+  background: #4ade80;
+  color: #064e3b;
+}
+
+/* Productos entregados */
+.producto {
+  margin-top: 6px;
+  font-size: 14px;
 }
