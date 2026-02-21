@@ -85,7 +85,7 @@ function distanciaMetros(lat1, lon1, lat2, lon2) {
 }
 
 /**********************
-- VERIFICAR CERCANÍA (SIN TITILAR)
+- VERIFICAR CERCANÍA
 **********************/
 async function verificarProximidad(lat, lng) {
   const estado = document.getElementById("estado");
@@ -128,44 +128,116 @@ async function verificarProximidad(lat, lng) {
 }
 
 /**********************
-- REGISTRAR VISITA
+- FORMULARIO ENTREGA
 **********************/
-async function registrarVisita(cliente, lat, lng) {
-  try {
-    const tipo = prompt(
-      "Tipo de visita:\n1 - Visita comercial\n2 - Ensayo\n3 - Entrega de productos"
-    );
+function mostrarFormularioEntrega(cliente, lat, lng) {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.background = "rgba(0,0,0,0.5)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.zIndex = "9999";
 
-    let tipoVisita = "";
-    let producto = "";
-    let cantidad = "";
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.padding = "20px";
+  box.style.borderRadius = "12px";
+  box.style.width = "90%";
+  box.style.maxWidth = "420px";
 
-    if (tipo === "1") tipoVisita = "Visita comercial";
-    else if (tipo === "2") tipoVisita = "Ensayo";
-    else if (tipo === "3") {
-      tipoVisita = "Entrega de productos";
-      producto = prompt("Producto entregado:");
-      cantidad = prompt("Cantidad:");
-    } else {
-      alert("❌ Tipo inválido");
+  box.innerHTML = `
+    <h3>Entrega de productos</h3>
+    <div id="productos"></div>
+    <button id="agregarProducto">➕ Agregar producto</button>
+    <hr>
+    <button id="guardarEntrega">Registrar visita</button>
+    <button id="cancelarEntrega">Cancelar</button>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  const contenedor = box.querySelector("#productos");
+
+  function agregarFila() {
+    const fila = document.createElement("div");
+    fila.style.display = "flex";
+    fila.style.gap = "6px";
+    fila.style.marginBottom = "6px";
+
+    fila.innerHTML = `
+      <input placeholder="Producto" style="flex:2">
+      <input placeholder="Cantidad" style="flex:1">
+      <button>✖</button>
+    `;
+
+    fila.querySelector("button").onclick = () => fila.remove();
+    contenedor.appendChild(fila);
+  }
+
+  agregarFila();
+
+  box.querySelector("#agregarProducto").onclick = agregarFila;
+
+  box.querySelector("#cancelarEntrega").onclick = () => overlay.remove();
+
+  box.querySelector("#guardarEntrega").onclick = async () => {
+    const productos = [];
+
+    contenedor.querySelectorAll("div").forEach(f => {
+      const [prod, cant] = f.querySelectorAll("input");
+      if (prod.value.trim()) {
+        productos.push({
+          nombre: prod.value.trim(),
+          cantidad: cant.value.trim()
+        });
+      }
+    });
+
+    if (productos.length === 0) {
+      alert("Agregá al menos un producto");
       return;
     }
 
     await addDoc(collection(db, "visitas"), {
       clienteId: cliente.id,
       cliente: cliente.nombre,
-      tipoVisita,
-      producto,
-      cantidad,
+      tipoVisita: "Entrega de productos",
+      productos,
       lat,
       lng,
       fecha: serverTimestamp()
     });
 
+    alert("✅ Entrega registrada");
+    overlay.remove();
+  };
+}
+
+/**********************
+- REGISTRAR VISITA
+**********************/
+async function registrarVisita(cliente, lat, lng) {
+  const tipo = prompt(
+    "Tipo de visita:\n1 - Visita comercial\n2 - Ensayo\n3 - Entrega de productos"
+  );
+
+  if (tipo === "1" || tipo === "2") {
+    await addDoc(collection(db, "visitas"), {
+      clienteId: cliente.id,
+      cliente: cliente.nombre,
+      tipoVisita: tipo === "1" ? "Visita comercial" : "Ensayo",
+      lat,
+      lng,
+      fecha: serverTimestamp()
+    });
     alert("✅ Visita registrada");
-  } catch (e) {
-    alert("❌ Error al guardar visita");
-    console.error(e);
+  }
+
+  if (tipo === "3") {
+    mostrarFormularioEntrega(cliente, lat, lng);
   }
 }
 
