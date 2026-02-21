@@ -1,0 +1,121 @@
+/* ===============================
+   CONTENEDOR GENERAL
+================================ */
+main {
+  max-width: 420px;
+  margin: auto;
+  padding: 24px 20px;
+}
+
+/* ===============================
+   TÍTULO
+================================ */
+h2 {
+  text-align: center;
+  margin-bottom: 22px;
+  color: #1f4e8c;
+  font-size: 22px;
+}
+
+/* ===============================
+   FORMULARIO (CARD)
+================================ */
+form {
+  background: #ffffff;
+  padding: 24px 20px;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.10);
+}
+
+/* ===============================
+   INPUTS
+================================ */
+form input {
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 14px;
+
+  font-size: 16px;
+
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+
+  outline: none;
+}
+
+form input::placeholder {
+  color: #9ca3af;
+}
+
+form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
+}
+
+/* ===============================
+   BOTÓN GUARDAR
+================================ */
+form button[type="submit"] {
+  width: 100%;
+  padding: 18px;
+  margin-top: 10px;
+
+  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+  color: #ffffff;
+
+  border: none;
+  border-radius: 16px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+form button[type="submit"]:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.35);
+}
+
+/* ===============================
+   BOTÓN CANCELAR
+================================ */
+form button[type="button"] {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+
+  background: #ffffff;
+  color: #1f4e8c;
+
+  border: 2px solid #1f4e8c;
+  border-radius: 14px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+form button[type="button"]:hover {
+  background: #1f4e8c;
+  color: #ffffff;
+}
+
+/* ===============================
+   RESPONSIVE DESKTOP
+================================ */
+@media (min-width: 768px) {
+  main {
+    max-width: 480px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+}
