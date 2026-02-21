@@ -230,3 +230,23 @@ footer {
     transform: scale(1.1);
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
 }
+
+/* ===============================
+   CLIENTES CERCANOS - ALINEACIÓN
+================================ */
+.cliente-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.cliente-nombre {
+    flex: 1;
+    font-weight: 600;
+}
+
+.cliente-card button {
+    width: 180px;
+    margin-top: 0 !important;
+}
