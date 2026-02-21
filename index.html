@@ -63,7 +63,9 @@
 <section class="card">
     <h2>Visitas cercanas</h2>
     <p id="estado">Buscando fábricas...</p>
-    <div id="acciones"></div>
+
+    <!-- 🔧 ÚNICO CAMBIO: se agrega la clase -->
+    <div id="acciones" class="lista-clientes"></div>
 </section>
 
 <!-- HISTORIAL RESUMIDO -->
@@ -146,7 +148,6 @@
 
   cargarUltimasVisitas();
 
-  // Abrir historial en ventana chica
   document.getElementById("abrir-historial").addEventListener("click", (e) => {
     e.preventDefault();
     window.open(
