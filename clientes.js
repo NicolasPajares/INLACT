@@ -5,7 +5,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   collection,
-  getDocs
+  getDocs,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -21,7 +23,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 /**********************
- * ELEMENTOS
+ * ELEMENTOS DOM
  **********************/
 const listaEl = document.getElementById("listaClientes");
 const buscadorEl = document.getElementById("buscadorClientes");
@@ -30,7 +32,7 @@ const btnNuevo = document.getElementById("btnNuevoCliente");
 let clientes = [];
 
 /**********************
- * BOTÓN NUEVO CLIENTE
+ * NUEVO CLIENTE
  **********************/
 btnNuevo.addEventListener("click", () => {
   window.location.href = "nuevo-cliente.html";
@@ -43,11 +45,14 @@ async function cargarClientes() {
   listaEl.innerHTML = "<li>Cargando clientes...</li>";
 
   const snap = await getDocs(collection(db, "clientes"));
+  clientes = [];
 
-  clientes = snap.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+  snap.forEach(d => {
+    clientes.push({
+      id: d.id,
+      ...d.data()
+    });
+  });
 
   if (clientes.length === 0) {
     listaEl.innerHTML = "<li>No hay clientes cargados</li>";
@@ -58,7 +63,7 @@ async function cargarClientes() {
 }
 
 /**********************
- * RENDER
+ * RENDER CLIENTES
  **********************/
 function renderClientes(lista) {
   listaEl.innerHTML = "";
@@ -67,17 +72,35 @@ function renderClientes(lista) {
     const li = document.createElement("li");
     li.className = "cliente-item";
 
-    li.innerHTML = `
-      <div>
-        <strong>${c.nombre || "Sin nombre"}</strong><br>
-        <small>${c.localidad || ""} ${c.provincia || ""}</small>
-      </div>
+    /* INFO */
+    const info = document.createElement("div");
+    info.className = "cliente-info";
+    info.innerHTML = `
+      <strong>${c.nombre || "Sin nombre"}</strong><br>
+      <small>${c.localidad || ""} ${c.provincia || ""}</small>
     `;
 
-    li.addEventListener("click", () => {
+    info.onclick = () => {
       window.location.href = `cliente.html?id=${c.id}`;
-    });
+    };
 
+    /* BOTÓN BORRAR */
+    const btnBorrar = document.createElement("button");
+    btnBorrar.className = "btn-borrar";
+    btnBorrar.textContent = "✖";
+
+    btnBorrar.onclick = async (e) => {
+      e.stopPropagation(); // evita abrir el cliente
+
+      const ok = confirm(`¿Querés borrar el cliente "${c.nombre}"?`);
+      if (!ok) return;
+
+      await deleteDoc(doc(db, "clientes", c.id));
+      cargarClientes();
+    };
+
+    li.appendChild(info);
+    li.appendChild(btnBorrar);
     listaEl.appendChild(li);
   });
 }
