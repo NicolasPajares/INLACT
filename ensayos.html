@@ -1,70 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>INLACT · Ensayos</title>
+    <meta charset="UTF-8">
+    <title>INLACT · Ensayos</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Gestión de ensayos">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS base -->
-  <link rel="stylesheet" href="index.css">
-  <!-- CSS ensayos -->
-  <link rel="stylesheet" href="ensayos.css">
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="index.css">
+    <!-- CSS ensayos -->
+    <link rel="stylesheet" href="ensayos.css">
 </head>
 
 <body>
 
 <header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>NICOLÁS PAJARES</h2>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+    <h2>NICOLÁS PAJARES</h2>
 </header>
 
 <main>
 
+<!-- ACCESOS RÁPIDOS (IGUAL AL INDEX) -->
 <section class="quick-actions">
-  <a href="clientes.html" class="action-card">
-    <span>Clientes</span>
-  </a>
-  <a href="stock.html" class="action-card">
-    <span>Stock</span>
-  </a>
-  <a href="ensayos.html" class="action-card activo">
-    <span>Ensayos</span>
-  </a>
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg">
+        <span>Clientes</span>
+    </a>
+
+    <a href="stock.html" class="action-card">
+        <img src="img/icon-stock.svg">
+        <span>Stock</span>
+    </a>
+
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg">
+        <span>Ensayos</span>
+    </a>
+
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg">
+        <span>Precios</span>
+    </a>
 </section>
 
+<!-- LISTADO DE ENSAYOS -->
 <section class="card">
+    <h2>Ensayos realizados</h2>
 
-  <button id="btnNuevoEnsayo">
-    ➕ Crear nuevo ensayo
-  </button>
-
-  <h2>Listado de ensayos</h2>
-
-  <input
-    type="text"
-    id="buscadorEnsayos"
-    placeholder="Buscar por cliente, tipo o fecha..."
-  >
-
-  <ul id="listaEnsayos"></ul>
-
+    <ul id="listaEnsayos" class="lista-ensayos">
+        <!-- JS -->
+    </ul>
 </section>
 
+<!-- VOLVER -->
 <section style="text-align:center; margin-top:20px;">
-  <button onclick="window.location.href='index.html'">
-    ⬅ Volver al inicio
-  </button>
+    <button onclick="window.location.href='index.html'">
+        ⬅ Volver al inicio
+    </button>
 </section>
 
 </main>
 
 <footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
 <script type="module" src="ensayos.js"></script>
+
 </body>
 </html>
