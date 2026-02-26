@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>INLACT · Nuevo ensayo</title>
 
-    <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Crear nuevo ensayo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -28,26 +27,35 @@
 
 <section class="card card-formulario">
 
-    <h1>Nuevo ensayo</h1>
+    <h1>Crear nuevo ensayo</h1>
 
     <form id="formNuevoEnsayo">
 
         <label>Cliente</label>
         <select id="cliente" required>
-            <option value="">Cargando clientes…</option>
+            <option value="">Seleccionar cliente</option>
         </select>
 
         <label>Nombre del ensayo</label>
         <input id="nombre" placeholder="Ej: Mozzarella cilindro" required>
 
-        <label>Fecha</label>
+        <label>Fecha del ensayo</label>
         <input id="fecha" type="date" required>
 
+        <label>Producto evaluado</label>
+        <input id="producto" placeholder="Ej: Queso mozzarella">
+
         <label>Objetivo del ensayo</label>
-        <input id="objetivo" placeholder="Ej: Evaluar textura y rendimiento">
+        <input id="objetivo" placeholder="Ej: Mejorar textura y rendimiento">
+
+        <label>Descripción del proceso</label>
+        <input id="proceso" placeholder="Breve descripción del proceso">
+
+        <label>Resultados obtenidos</label>
+        <input id="resultados" placeholder="Resultados principales">
 
         <label>Conclusión</label>
-        <input id="conclusion" placeholder="Conclusión general del ensayo">
+        <input id="conclusion" placeholder="Conclusión final del ensayo">
 
         <div class="acciones-form">
             <button type="submit" class="btn-guardar">
