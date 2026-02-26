@@ -11,8 +11,8 @@
     <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
 
-    <!-- CSS específico -->
-    <link rel="stylesheet" href="nuevo-ensayo.css">
+    <!-- CSS específico (reutiliza el de nuevo-cliente) -->
+    <link rel="stylesheet" href="nuevo-cliente.css">
 </head>
 
 <body>
@@ -27,36 +27,65 @@
 
 <main>
 
+<!-- ===============================
+     FORMULARIO NUEVO ENSAYO
+================================ -->
 <section class="card card-formulario">
 
     <h1>Crear nuevo ensayo</h1>
 
     <form id="formNuevoEnsayo">
 
+        <!-- CLIENTE -->
         <label>Cliente</label>
         <select id="cliente" required>
             <option value="">Seleccionar cliente</option>
         </select>
 
-        <label>Nombre del ensayo</label>
-        <input id="nombreEnsayo" placeholder="Ej: Ensayo fermentos abril" required>
-
-        <label>Fecha</label>
+        <!-- FECHA -->
+        <label>Fecha del ensayo</label>
         <input type="date" id="fecha" required>
 
+        <!-- RESPONSABLE -->
+        <label>Responsable</label>
+        <input id="responsable" placeholder="Ej: Ing. Agr. Juan Pérez">
+
+        <!-- PRODUCTO -->
+        <label>Producto evaluado</label>
+        <input id="producto" placeholder="Ej: Inlact X-Pro">
+
+        <!-- PROPUESTA (NUEVO) -->
         <label>Propuesta</label>
-        <textarea id="propuesta" placeholder="Describir la propuesta del ensayo"></textarea>
+        <textarea id="propuesta" rows="4"
+            placeholder="Objetivo del ensayo, hipótesis, planteo técnico..."></textarea>
 
+        <!-- DOSIS (NUEVO) -->
         <label>Dosis</label>
-        <textarea id="dosis" placeholder="Ej: 10 g / 1000 L de leche"></textarea>
+        <textarea id="dosis" rows="3"
+            placeholder="Ej: 250 ml / 1000 L de agua"></textarea>
 
-        <label>Objetivo</label>
-        <textarea id="objetivo" placeholder="Objetivo del ensayo"></textarea>
+        <!-- METODOLOGÍA -->
+        <label>Metodología</label>
+        <textarea id="metodologia" rows="4"
+            placeholder="Descripción del diseño experimental"></textarea>
 
+        <!-- RESULTADOS -->
+        <label>Resultados</label>
+        <textarea id="resultados" rows="4"
+            placeholder="Observaciones, mediciones, comportamiento"></textarea>
+
+        <!-- CONCLUSIÓN -->
         <label>Conclusión</label>
-        <textarea id="conclusion" placeholder="Conclusión preliminar o final"></textarea>
+        <textarea id="conclusion" rows="4"
+            placeholder="Conclusión técnica final"></textarea>
 
+        <!-- FOTOS -->
+        <label>Fotos del ensayo</label>
+        <input type="file" id="fotos" accept="image/*" multiple>
+
+        <!-- ACCIONES -->
         <div class="acciones-form">
+
             <button type="submit" class="btn-guardar">
                 💾 Guardar ensayo
             </button>
@@ -65,6 +94,7 @@
                 onclick="location.href='ensayos.html'">
                 ✖ Cancelar
             </button>
+
         </div>
 
     </form>
@@ -77,7 +107,8 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script src="nuevo-ensayo.js"></script>
+<!-- JS -->
+<script type="module" src="nuevo-ensayo.js"></script>
 
 </body>
 </html>
