@@ -202,3 +202,16 @@ main button:last-of-type:hover {
   }
 }
 
+
+.action-card.active {
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
+}
+
+.action-card.active span {
+    color: #ffffff;
+}
+
+.action-card.active img {
+    filter: brightness(0) invert(1);
+}
