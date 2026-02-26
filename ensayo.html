@@ -1,109 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>INLACT · Informe de Ensayo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>INLACT · Ensayos</title>
 
-  <!-- CSS base del sitio -->
-  <link rel="stylesheet" href="index.css">
+    <meta name="description" content="INLACT - Gestión de ensayos">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS del informe -->
-  <link rel="stylesheet" href="ensayo.css">
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="ensayos.css">
 </head>
 
 <body>
 
-<!-- ================= HEADER ================= -->
 <header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>INFORME DE ENSAYO</h2>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+    <h2>NICOLÁS PAJARES</h2>
 </header>
 
-<main class="ensayo-layout">
+<main>
 
-  <!-- ============ MENÚ LATERAL ============ -->
-  <aside class="ensayo-menu">
-    <a href="#resumen" class="activo">Resumen</a>
-    <a href="#propuesta">Propuesta</a>
-    <a href="#dosis">Dosis</a>
-    <a href="#fotos">Fotos</a>
-    <a href="#conclusion">Conclusión</a>
-    <a href="#economica">Propuesta económica</a>
-
-    <div class="menu-separador"></div>
-
-    <a href="index.html" class="volver">
-      ⬅ Volver al sitio
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+<section class="quick-actions">
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
     </a>
-  </aside>
 
-  <!-- ============ CONTENIDO ============ -->
-  <section class="ensayo-contenido">
+    <a href="stock.html" class="action-card">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
 
-    <!-- CABECERA DEL ENSAYO -->
-    <div class="ensayo-header">
-      <h1>Ensayo Queso Tybo – Fermentos</h1>
-      <p>
-        <strong>Cliente:</strong> Lácteos San Juan<br>
-        <strong>Fecha:</strong> 12/03/2026<br>
-        <strong>Tipo de ensayo:</strong> Fermentación láctica
-      </p>
-    </div>
+    <a href="ensayos.html" class="action-card active">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
 
-    <!-- SECCIONES -->
-    <div id="resumen" class="bloque">
-      <h2>Resumen</h2>
-      <p>
-        Descripción general del objetivo del ensayo, condiciones iniciales
-        y alcance del trabajo realizado.
-      </p>
-    </div>
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
+</section>
 
-    <div id="propuesta" class="bloque">
-      <h2>Propuesta</h2>
-      <p>
-        Propuesta técnica del ensayo, producto evaluado y criterios.
-      </p>
-    </div>
+<!-- ===============================
+     GESTIÓN DE ENSAYOS
+================================ -->
+<section class="card">
 
-    <div id="dosis" class="bloque">
-      <h2>Dosis</h2>
-      <p>
-        Detalle de dosis utilizadas, variaciones y observaciones.
-      </p>
-    </div>
+    <button id="btnNuevoEnsayo">
+        ➕ Crear nuevo ensayo
+    </button>
 
-    <div id="fotos" class="bloque">
-      <h2>Fotos</h2>
-      <p>
-        (Acá después irán imágenes del proceso o resultado)
-      </p>
-    </div>
+    <h2>Listado de ensayos</h2>
 
-    <div id="conclusion" class="bloque">
-      <h2>Conclusión</h2>
-      <p>
-        Resultados finales del ensayo y recomendaciones.
-      </p>
-    </div>
+    <input
+        type="text"
+        id="buscadorEnsayos"
+        placeholder="Buscar por cliente o tipo de ensayo..."
+    >
 
-    <div id="economica" class="bloque">
-      <h2>Propuesta económica</h2>
-      <p>
-        La propuesta económica será enviada por separado.
-      </p>
-    </div>
+    <ul id="listaEnsayos"></ul>
 
-  </section>
+</section>
+
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
+    <button onclick="window.location.href='index.html'">
+        ⬅ Volver al inicio
+    </button>
+</section>
+
 </main>
 
-<!-- ================= FOOTER ================= -->
 <footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
+
+<script type="module" src="ensayos.js"></script>
 
 </body>
 </html>
