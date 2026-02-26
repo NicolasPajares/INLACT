@@ -1,6 +1,3 @@
-/**********************
- * FIREBASE
- **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -22,15 +19,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**********************
- * ELEMENTOS
- **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const clienteSelect = document.getElementById("cliente");
 
-/**********************
- * CARGAR CLIENTES
- **********************/
+/* ===============================
+   CARGAR CLIENTES
+================================ */
 async function cargarClientes() {
   const snap = await getDocs(collection(db, "clientes"));
   clienteSelect.innerHTML = `<option value="">Seleccionar cliente</option>`;
@@ -46,24 +40,24 @@ async function cargarClientes() {
 
 cargarClientes();
 
-/**********************
- * GUARDAR ENSAYO
- **********************/
+/* ===============================
+   GUARDAR ENSAYO
+================================ */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const ensayo = {
     cliente: clienteSelect.value,
-    nombre: document.getElementById("nombre").value,
-    objetivo: document.getElementById("objetivo").value,
-    conclusion: document.getElementById("conclusion").value,
-    fecha: Timestamp.fromDate(
-      new Date(document.getElementById("fecha").value)
-    ),
+    nombre: nombre.value,
+    producto: producto.value,
+    objetivo: objetivo.value,
+    proceso: proceso.value,
+    resultados: resultados.value,
+    conclusion: conclusion.value,
+    fecha: Timestamp.fromDate(new Date(fecha.value)),
     creado: Timestamp.now()
   };
 
   await addDoc(collection(db, "ensayos"), ensayo);
-
   window.location.href = "ensayos.html";
 });
