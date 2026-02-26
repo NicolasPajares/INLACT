@@ -5,12 +5,13 @@
     <title>INLACT · Nuevo ensayo</title>
 
     <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Nuevo ensayo">
+    <meta name="description" content="INLACT - Crear nuevo ensayo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
-    <!-- CSS nuevo ensayo -->
+
+    <!-- CSS específico -->
     <link rel="stylesheet" href="nuevo-ensayo.css">
 </head>
 
@@ -25,38 +26,44 @@
 
 <main>
 
-<section class="card">
-    <h2>Nuevo ensayo</h2>
+<section class="card card-formulario">
 
-    <label>Cliente *</label>
-    <select id="cliente">
-        <option value="">Cargando clientes...</option>
-    </select>
+    <h1>Nuevo ensayo</h1>
 
-    <label>Nombre del ensayo *</label>
-    <input type="text" id="nombre" placeholder="Ej: Mozzarella cilindro">
+    <form id="formNuevoEnsayo">
 
-    <label>Fecha</label>
-    <input type="date" id="fecha">
+        <label>Cliente</label>
+        <select id="cliente" required>
+            <option value="">Cargando clientes…</option>
+        </select>
 
-    <label>Objetivo del ensayo</label>
-    <textarea id="objetivo" rows="3"></textarea>
+        <label>Nombre del ensayo</label>
+        <input id="nombre" placeholder="Ej: Mozzarella cilindro" required>
 
-    <label>Desarrollo</label>
-    <textarea id="desarrollo" rows="4"></textarea>
+        <label>Fecha</label>
+        <input id="fecha" type="date" required>
 
-    <label>Conclusión</label>
-    <textarea id="conclusion" rows="4"></textarea>
+        <label>Objetivo del ensayo</label>
+        <input id="objetivo" placeholder="Ej: Evaluar textura y rendimiento">
 
-    <button id="btnGuardar">
-        🧪 Guardar ensayo
-    </button>
-</section>
+        <label>Conclusión</label>
+        <input id="conclusion" placeholder="Conclusión general del ensayo">
 
-<section style="text-align:center; margin-top:20px;">
-    <button onclick="window.location.href='ensayos.html'">
-        ⬅ Volver
-    </button>
+        <div class="acciones-form">
+            <button type="submit" class="btn-guardar">
+                💾 Guardar ensayo
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="location.href='ensayos.html'">
+                ✖ Cancelar
+            </button>
+        </div>
+
+    </form>
+
 </section>
 
 </main>
