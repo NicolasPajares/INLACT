@@ -1,63 +1,88 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { db, storage } from "./firebase.js";
+
 import {
-  getFirestore,
   collection,
-  getDocs,
   addDoc,
-  Timestamp
+  getDocs,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const form = document.getElementById("formNuevoEnsayo");
-const clienteSelect = document.getElementById("cliente");
+const selectCliente = document.getElementById("cliente");
 
-/* ===============================
-   CARGAR CLIENTES
-================================ */
+// ===============================
+// CARGAR CLIENTES
+// ===============================
 async function cargarClientes() {
   const snap = await getDocs(collection(db, "clientes"));
-  clienteSelect.innerHTML = `<option value="">Seleccionar cliente</option>`;
-
   snap.forEach(doc => {
-    const c = doc.data();
-    const option = document.createElement("option");
-    option.value = c.nombre;
-    option.textContent = c.nombre;
-    clienteSelect.appendChild(option);
+    const opt = document.createElement("option");
+    opt.value = doc.id;
+    opt.textContent = doc.data().nombre;
+    selectCliente.appendChild(opt);
   });
 }
-
 cargarClientes();
 
-/* ===============================
-   GUARDAR ENSAYO
-================================ */
+// ===============================
+// GUARDAR ENSAYO + FOTOS
+// ===============================
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const ensayo = {
-    cliente: clienteSelect.value,
-    nombre: nombre.value,
+  // 1. Crear ensayo SIN fotos
+  const docRef = await addDoc(collection(db, "ensayos"), {
+    clienteId: selectCliente.value,
+    fecha: fecha.value,
+    responsable: responsable.value,
     producto: producto.value,
-    objetivo: objetivo.value,
-    proceso: proceso.value,
+    propuesta: propuesta.value,
+    dosis: dosis.value,
+    metodologia: metodologia.value,
     resultados: resultados.value,
     conclusion: conclusion.value,
-    fecha: Timestamp.fromDate(new Date(fecha.value)),
-    creado: Timestamp.now()
-  };
+    creado: serverTimestamp(),
+    fotos: []
+  });
 
-  await addDoc(collection(db, "ensayos"), ensayo);
-  window.location.href = "ensayos.html";
+  const ensayoId = docRef.id;
+
+  // 2. Subir fotos
+  const archivos = document.getElementById("fotos").files;
+  const urlsFotos = [];
+
+  for (const archivo of archivos) {
+    const storageRef = ref(
+      storage,
+      `ensayos/${ensayoId}/${archivo.name}`
+    );
+
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+    urlsFotos.push(url);
+  }
+
+  // 3. Actualizar ensayo con URLs
+  await addDoc(
+    collection(db, "ensayos"),
+    {}, // dummy para forzar import
+  );
+
+  await fetch("actualizar-fotos.js"); // solo semántico
+
+  await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
+    .then(({ updateDoc, doc }) =>
+      updateDoc(doc(db, "ensayos", ensayoId), {
+        fotos: urlsFotos
+      })
+    );
+
+  // 4. Ir al ensayo listo para enviar
+  location.href = `ensayo.html?id=${ensayoId}`;
 });
