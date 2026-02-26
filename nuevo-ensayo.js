@@ -1,13 +1,13 @@
-/*************************
+/**********************
  * FIREBASE
- *************************/
+ **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   collection,
   getDocs,
   addDoc,
-  serverTimestamp
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -22,63 +22,48 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/*************************
+/**********************
  * ELEMENTOS
- *************************/
-const selectCliente = document.getElementById("cliente");
-const btnGuardar = document.getElementById("btnGuardar");
+ **********************/
+const form = document.getElementById("formNuevoEnsayo");
+const clienteSelect = document.getElementById("cliente");
 
-/*************************
+/**********************
  * CARGAR CLIENTES
- *************************/
+ **********************/
 async function cargarClientes() {
-  selectCliente.innerHTML = "<option value=''>Seleccionar cliente</option>";
-
   const snap = await getDocs(collection(db, "clientes"));
+  clienteSelect.innerHTML = `<option value="">Seleccionar cliente</option>`;
 
   snap.forEach(doc => {
     const c = doc.data();
-    const opt = document.createElement("option");
-    opt.value = c.nombre;
-    opt.textContent = c.nombre;
-    selectCliente.appendChild(opt);
+    const option = document.createElement("option");
+    option.value = c.nombre;
+    option.textContent = c.nombre;
+    clienteSelect.appendChild(option);
   });
 }
 
 cargarClientes();
 
-/*************************
+/**********************
  * GUARDAR ENSAYO
- *************************/
-btnGuardar.addEventListener("click", async () => {
-  const cliente = selectCliente.value;
-  const nombre = document.getElementById("nombre").value.trim();
-  const fechaInput = document.getElementById("fecha").value;
-  const objetivo = document.getElementById("objetivo").value.trim();
-  const desarrollo = document.getElementById("desarrollo").value.trim();
-  const conclusion = document.getElementById("conclusion").value.trim();
+ **********************/
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  if (!cliente || !nombre) {
-    alert("Cliente y nombre del ensayo son obligatorios");
-    return;
-  }
+  const ensayo = {
+    cliente: clienteSelect.value,
+    nombre: document.getElementById("nombre").value,
+    objetivo: document.getElementById("objetivo").value,
+    conclusion: document.getElementById("conclusion").value,
+    fecha: Timestamp.fromDate(
+      new Date(document.getElementById("fecha").value)
+    ),
+    creado: Timestamp.now()
+  };
 
-  try {
-    await addDoc(collection(db, "ensayos"), {
-      cliente,
-      nombre,
-      objetivo,
-      desarrollo,
-      conclusion,
-      fecha: fechaInput ? new Date(fechaInput) : serverTimestamp(),
-      creada: serverTimestamp()
-    });
+  await addDoc(collection(db, "ensayos"), ensayo);
 
-    alert("Ensayo guardado correctamente");
-    window.location.href = "ensayos.html";
-
-  } catch (error) {
-    console.error(error);
-    alert("Error al guardar el ensayo");
-  }
+  window.location.href = "ensayos.html";
 });
