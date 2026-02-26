@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <title>INLACT · Ensayos</title>
 
-    <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Gestión de ensayos">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS principal -->
+    <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
-    <!-- CSS ensayos -->
+    <!-- CSS específico -->
     <link rel="stylesheet" href="ensayos.css">
 </head>
 
@@ -25,39 +24,55 @@
 
 <main>
 
-<!-- ACCESOS RÁPIDOS (IGUAL AL INDEX) -->
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
 <section class="quick-actions">
     <a href="clientes.html" class="action-card">
-        <img src="img/icon-clientes.svg">
+        <img src="img/icon-clientes.svg" alt="">
         <span>Clientes</span>
     </a>
 
     <a href="stock.html" class="action-card">
-        <img src="img/icon-stock.svg">
+        <img src="img/icon-stock.svg" alt="">
         <span>Stock</span>
     </a>
 
     <a href="ensayos.html" class="action-card active">
-        <img src="img/icon-ensayos.svg">
+        <img src="img/icon-ensayos.svg" alt="">
         <span>Ensayos</span>
     </a>
 
     <a href="precios.html" class="action-card">
-        <img src="img/icon-precios.svg">
+        <img src="img/icon-precios.svg" alt="">
         <span>Precios</span>
     </a>
 </section>
 
-<!-- LISTADO DE ENSAYOS -->
+<!-- ===============================
+     GESTIÓN DE ENSAYOS
+================================ -->
 <section class="card">
-    <h2>Ensayos realizados</h2>
 
-    <ul id="listaEnsayos" class="lista-ensayos">
-        <!-- JS -->
-    </ul>
+    <button id="btnNuevoEnsayo">
+        ➕ Crear nuevo ensayo
+    </button>
+
+    <h2>Listado de ensayos</h2>
+
+    <input
+        type="text"
+        id="buscadorEnsayos"
+        placeholder="Buscar por cliente o tipo de ensayo..."
+    >
+
+    <ul id="listaEnsayos"></ul>
+
 </section>
 
-<!-- VOLVER -->
+<!-- ===============================
+     VOLVER
+================================ -->
 <section style="text-align:center; margin-top:20px;">
     <button onclick="window.location.href='index.html'">
         ⬅ Volver al inicio
@@ -74,4 +89,3 @@
 
 </body>
 </html>
-
