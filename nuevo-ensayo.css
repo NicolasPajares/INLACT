@@ -1,15 +1,9 @@
-/* ===============================
-   CONTENEDOR FORMULARIO
-================================ */
 .card-formulario {
   max-width: 700px;
   margin: 30px auto;
   padding: 30px;
 }
 
-/* ===============================
-   TITULO
-================================ */
 .card-formulario h1 {
   font-size: 28px;
   margin-bottom: 25px;
@@ -17,32 +11,22 @@
   text-align: center;
 }
 
-/* ===============================
-   FORM
-================================ */
 #formNuevoEnsayo {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* ===============================
-   LABELS
-================================ */
 #formNuevoEnsayo label {
   font-size: 16px;
   font-weight: 600;
   color: #374151;
 }
 
-/* ===============================
-   INPUTS / SELECT
-================================ */
 #formNuevoEnsayo input,
 #formNuevoEnsayo select {
   padding: 16px 18px;
   font-size: 18px;
-
   border-radius: 12px;
   border: 1px solid #d1d5db;
   outline: none;
@@ -54,9 +38,6 @@
   box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
 }
 
-/* ===============================
-   BOTONES
-================================ */
 .acciones-form {
   display: flex;
   flex-direction: column;
@@ -68,37 +49,24 @@
   padding: 18px;
   font-size: 20px;
   font-weight: 700;
-
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
   color: #ffffff;
-
   border: none;
   border-radius: 14px;
-
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-}
-
-.btn-guardar:hover {
-  opacity: 0.95;
 }
 
 .btn-cancelar {
   padding: 16px;
   font-size: 18px;
-
   background: #ffffff;
   color: #1f4e8c;
-
   border: 2px solid #1f4e8c;
   border-radius: 14px;
-
   cursor: pointer;
 }
 
-/* ===============================
-   DESKTOP
-================================ */
 @media (min-width: 768px) {
   .acciones-form {
     flex-direction: row;
