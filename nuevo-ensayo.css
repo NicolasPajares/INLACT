@@ -27,7 +27,7 @@
 #formNuevoEnsayo select,
 #formNuevoEnsayo textarea {
   padding: 16px 18px;
-  font-size: 18px;
+  font-size: 17px;
 
   border-radius: 12px;
   border: 1px solid #d1d5db;
@@ -35,13 +35,13 @@
 }
 
 #formNuevoEnsayo textarea {
-  min-height: 110px;
+  min-height: 120px;
   resize: vertical;
 }
 
 #formNuevoEnsayo input:focus,
-#formNuevoEnsayo select:focus,
-#formNuevoEnsayo textarea:focus {
+#formNuevoEnsayo textarea:focus,
+#formNuevoEnsayo select:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
 }
@@ -59,13 +59,11 @@
   font-weight: 700;
 
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  color: #ffffff;
+  color: #fff;
 
   border: none;
   border-radius: 14px;
-
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .btn-cancelar {
