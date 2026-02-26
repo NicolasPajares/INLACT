@@ -26,7 +26,7 @@ main {
 }
 
 /* ===============================
-   BOTÓN NUEVO ENSAYO
+   BOTÓN NUEVO ENSAYO (IGUAL CLIENTES)
 ================================ */
 #btnNuevoEnsayo {
   width: 100%;
@@ -82,76 +82,14 @@ h2 {
 }
 
 /* ===============================
-   LISTA ENSAYOS
+   LISTA
 ================================ */
 #listaEnsayos {
   list-style: none;
 }
 
 /* ===============================
-   CARD ENSAYO
-================================ */
-.ensayo-item {
-  background: #ffffff;
-  padding: 16px 18px;
-  margin-bottom: 14px;
-
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.ensayo-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.15);
-}
-
-/* INFO */
-.ensayo-info strong {
-  font-size: 17px;
-  display: block;
-  color: #1f2937;
-}
-
-/* ===============================
-   BOTÓN BORRAR
-================================ */
-.btn-borrar {
-  margin-left: 12px;
-  width: 42px;
-  height: 42px;
-
-  border-radius: 50%;
-  border: none;
-
-  background: #fee2e2;
-  color: #b91c1c;
-
-  font-size: 20px;
-  font-weight: bold;
-
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: background 0.2s ease, transform 0.15s ease;
-}
-
-.btn-borrar:hover {
-  background: #fecaca;
-  transform: scale(1.1);
-}
-
-/* ===============================
-   BOTÓN VOLVER
+   VOLVER
 ================================ */
 main button:last-of-type {
   padding: 14px 20px;
@@ -166,26 +104,26 @@ main button:last-of-type {
 
   transition: background 0.2s ease, color 0.2s ease;
 }
-/* ===============================
-   ACCESO ACTIVO
-================================ */
-.action-card.active {
-    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
-}
-
-.action-card.active span {
-    color: #ffffff;
-}
-
-.action-card.active img {
-    filter: brightness(0) invert(1);
-}
-
 
 main button:last-of-type:hover {
   background: #1f4e8c;
   color: #ffffff;
+}
+
+/* ===============================
+   ACCESO ACTIVO
+================================ */
+.quick-actions .action-card.active {
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
+}
+
+.quick-actions .action-card.active span {
+    color: #ffffff;
+}
+
+.quick-actions .action-card.active img {
+    filter: brightness(0) invert(1);
 }
 
 /* ===============================
@@ -196,22 +134,4 @@ main button:last-of-type:hover {
     font-size: 22px;
     padding: 20px;
   }
-
-  .ensayo-item {
-    padding: 18px 22px;
-  }
-}
-
-
-.action-card.active {
-    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
-}
-
-.action-card.active span {
-    color: #ffffff;
-}
-
-.action-card.active img {
-    filter: brightness(0) invert(1);
 }
