@@ -2,9 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ensayos – INLACT</title>
+  <title>INLACT · Ensayos</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS base -->
   <link rel="stylesheet" href="index.css">
+  <!-- CSS ensayos -->
+  <link rel="stylesheet" href="ensayos.css">
 </head>
 
 <body>
@@ -13,26 +18,53 @@
   <figure>
     <img src="img/logo.jpg" alt="INLACT">
   </figure>
-  <h2>ENSAYOS</h2>
-  <nav>
-    <a href="index.html">Inicio</a>
-    <a href="clientes.html">Clientes</a>
-    <a href="stock.html">Stock</a>
-    <a href="precios.html">Precios</a>
-  </nav>
+  <h2>NICOLÁS PAJARES</h2>
 </header>
 
 <main>
-  <div class="card">
-    <h3>Ensayos disponibles</h3>
-    <ul>
-      <li>Grasa</li>
-      <li>Proteína</li>
-      <li>Recuento bacteriano</li>
-      <li>pH</li>
-    </ul>
-  </div>
+
+<section class="quick-actions">
+  <a href="clientes.html" class="action-card">
+    <span>Clientes</span>
+  </a>
+  <a href="stock.html" class="action-card">
+    <span>Stock</span>
+  </a>
+  <a href="ensayos.html" class="action-card activo">
+    <span>Ensayos</span>
+  </a>
+</section>
+
+<section class="card">
+
+  <button id="btnNuevoEnsayo">
+    ➕ Crear nuevo ensayo
+  </button>
+
+  <h2>Listado de ensayos</h2>
+
+  <input
+    type="text"
+    id="buscadorEnsayos"
+    placeholder="Buscar por cliente, tipo o fecha..."
+  >
+
+  <ul id="listaEnsayos"></ul>
+
+</section>
+
+<section style="text-align:center; margin-top:20px;">
+  <button onclick="window.location.href='index.html'">
+    ⬅ Volver al inicio
+  </button>
+</section>
+
 </main>
 
+<footer>
+  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="ensayos.js"></script>
 </body>
 </html>
