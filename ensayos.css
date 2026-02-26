@@ -166,6 +166,22 @@ main button:last-of-type {
 
   transition: background 0.2s ease, color 0.2s ease;
 }
+/* ===============================
+   ACCESO ACTIVO
+================================ */
+.action-card.active {
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
+}
+
+.action-card.active span {
+    color: #ffffff;
+}
+
+.action-card.active img {
+    filter: brightness(0) invert(1);
+}
+
 
 main button:last-of-type:hover {
   background: #1f4e8c;
@@ -185,3 +201,4 @@ main button:last-of-type:hover {
     padding: 18px 22px;
   }
 }
+
