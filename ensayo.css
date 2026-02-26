@@ -1,96 +1,137 @@
-/* ================= LAYOUT ================= */
-.ensayo-layout {
-  display: flex;
-  max-width: 1200px;
+/* ===============================
+   RESET BÁSICO
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   BODY
+================================ */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f3f7fb;
+  color: #2c3e50;
+}
+
+/* ===============================
+   MAIN
+================================ */
+main {
+  max-width: 900px;
   margin: auto;
   padding: 20px;
-  gap: 20px;
 }
 
-/* ================= MENÚ ================= */
-.ensayo-menu {
-  width: 220px;
-  background: #1f4e8c;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* ===============================
+   BOTÓN NUEVO ENSAYO (IGUAL CLIENTES)
+================================ */
+#btnNuevoEnsayo {
+  width: 100%;
+  padding: 18px;
+  margin-bottom: 25px;
 
-.ensayo-menu a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 15px;
-  padding: 10px 12px;
-  border-radius: 10px;
-}
+  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+  color: #ffffff;
 
-.ensayo-menu a:hover,
-.ensayo-menu a.activo {
-  background: rgba(255,255,255,0.2);
-}
+  border: none;
+  border-radius: 14px;
 
-.menu-separador {
-  height: 1px;
-  background: rgba(255,255,255,0.3);
-  margin: 10px 0;
-}
-
-.ensayo-menu .volver {
-  font-weight: 600;
-}
-
-/* ================= CONTENIDO ================= */
-.ensayo-contenido {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 30px;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
-}
-
-/* CABECERA */
-.ensayo-header h1 {
-  font-size: 26px;
-  color: #1f4e8c;
-  margin-bottom: 10px;
-}
-
-.ensayo-header p {
-  font-size: 15px;
-  color: #374151;
-}
-
-/* BLOQUES */
-.bloque {
-  margin-top: 30px;
-}
-
-.bloque h2 {
   font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#btnNuevoEnsayo:hover {
+  transform: scale(1.03);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+}
+
+/* ===============================
+   TÍTULO
+================================ */
+h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
   color: #1f4e8c;
-  margin-bottom: 8px;
 }
 
-.bloque p {
+/* ===============================
+   BUSCADOR
+================================ */
+#buscadorEnsayos {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+
   font-size: 16px;
-  line-height: 1.6;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
-  .ensayo-layout {
-    flex-direction: column;
-  }
+#buscadorEnsayos:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
 
-  .ensayo-menu {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-  }
+/* ===============================
+   LISTA
+================================ */
+#listaEnsayos {
+  list-style: none;
+}
 
-  .ensayo-menu a {
-    white-space: nowrap;
+/* ===============================
+   VOLVER
+================================ */
+main button:last-of-type {
+  padding: 14px 20px;
+  font-size: 16px;
+
+  background: #ffffff;
+  border: 2px solid #1f4e8c;
+  color: #1f4e8c;
+
+  border-radius: 12px;
+  cursor: pointer;
+
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+main button:last-of-type:hover {
+  background: #1f4e8c;
+  color: #ffffff;
+}
+
+/* ===============================
+   ACCESO ACTIVO
+================================ */
+.quick-actions .action-card.active {
+    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
+}
+
+.quick-actions .action-card.active span {
+    color: #ffffff;
+}
+
+.quick-actions .action-card.active img {
+    filter: brightness(0) invert(1);
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (min-width: 768px) {
+  #btnNuevoEnsayo {
+    font-size: 22px;
+    padding: 20px;
   }
 }
