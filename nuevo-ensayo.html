@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>INLACT · Nuevo ensayo</title>
 
+    <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Crear nuevo ensayo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -20,6 +21,7 @@
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
     </figure>
+
     <h2>NICOLÁS PAJARES</h2>
 </header>
 
@@ -37,34 +39,29 @@
         </select>
 
         <label>Nombre del ensayo</label>
-        <input id="nombre" placeholder="Ej: Mozzarella cilindro" required>
+        <input id="nombreEnsayo" placeholder="Ej: Ensayo fermentos abril" required>
 
-        <label>Fecha del ensayo</label>
-        <input id="fecha" type="date" required>
+        <label>Fecha</label>
+        <input type="date" id="fecha" required>
 
-        <label>Producto evaluado</label>
-        <input id="producto" placeholder="Ej: Queso mozzarella">
+        <label>Propuesta</label>
+        <textarea id="propuesta" placeholder="Describir la propuesta del ensayo"></textarea>
 
-        <label>Objetivo del ensayo</label>
-        <input id="objetivo" placeholder="Ej: Mejorar textura y rendimiento">
+        <label>Dosis</label>
+        <textarea id="dosis" placeholder="Ej: 10 g / 1000 L de leche"></textarea>
 
-        <label>Descripción del proceso</label>
-        <input id="proceso" placeholder="Breve descripción del proceso">
-
-        <label>Resultados obtenidos</label>
-        <input id="resultados" placeholder="Resultados principales">
+        <label>Objetivo</label>
+        <textarea id="objetivo" placeholder="Objetivo del ensayo"></textarea>
 
         <label>Conclusión</label>
-        <input id="conclusion" placeholder="Conclusión final del ensayo">
+        <textarea id="conclusion" placeholder="Conclusión preliminar o final"></textarea>
 
         <div class="acciones-form">
             <button type="submit" class="btn-guardar">
                 💾 Guardar ensayo
             </button>
 
-            <button
-                type="button"
-                class="btn-cancelar"
+            <button type="button" class="btn-cancelar"
                 onclick="location.href='ensayos.html'">
                 ✖ Cancelar
             </button>
@@ -80,7 +77,7 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module" src="nuevo-ensayo.js"></script>
+<script src="nuevo-ensayo.js"></script>
 
 </body>
 </html>
