@@ -1,15 +1,14 @@
-/**********************
+/*************************
  * FIREBASE
- **********************/
+ *************************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   collection,
   getDocs,
-  deleteDoc,
-  doc,
   query,
-  orderBy
+  orderBy,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -24,27 +23,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**********************
+/*************************
  * ELEMENTOS DOM
- **********************/
-const listaEl = document.getElementById("listaEnsayos");
-const buscadorEl = document.getElementById("buscadorEnsayos");
-const btnNuevo = document.getElementById("btnNuevoEnsayo");
+ *************************/
+const listaEnsayos = document.getElementById("listaEnsayos");
+const buscador = document.getElementById("buscadorEnsayos");
+const btnNuevoEnsayo = document.getElementById("btnNuevoEnsayo");
 
 let ensayos = [];
 
-/**********************
+/*************************
  * NUEVO ENSAYO
- **********************/
-btnNuevo.addEventListener("click", () => {
+ *************************/
+btnNuevoEnsayo.addEventListener("click", () => {
   window.location.href = "nuevo-ensayo.html";
 });
 
-/**********************
+/*************************
  * CARGAR ENSAYOS
- **********************/
+ *************************/
 async function cargarEnsayos() {
-  listaEl.innerHTML = "<li>Cargando ensayos...</li>";
+  listaEnsayos.innerHTML = "<li class='item-cargando'>Cargando ensayos...</li>";
+
+  ensayos = [];
 
   const q = query(
     collection(db, "ensayos"),
@@ -52,83 +53,58 @@ async function cargarEnsayos() {
   );
 
   const snap = await getDocs(q);
-  ensayos = [];
 
-  snap.forEach(d => {
+  snap.forEach(docu => {
     ensayos.push({
-      id: d.id,
-      ...d.data()
+      id: docu.id,
+      ...docu.data()
     });
   });
 
   if (ensayos.length === 0) {
-    listaEl.innerHTML = "<li>No hay ensayos cargados</li>";
+    listaEnsayos.innerHTML = "<li class='item-vacio'>No hay ensayos cargados</li>";
     return;
   }
 
   renderEnsayos(ensayos);
 }
 
-/**********************
+/*************************
  * RENDER ENSAYOS
- **********************/
+ *************************/
 function renderEnsayos(lista) {
-  listaEl.innerHTML = "";
+  listaEnsayos.innerHTML = "";
 
   lista.forEach(e => {
     const li = document.createElement("li");
     li.className = "ensayo-item";
 
-    // Fecha corta tipo 25/02
-    let fechaTxt = "--/--";
-    if (e.fecha?.toDate) {
-      fechaTxt = e.fecha.toDate().toLocaleDateString("es-AR", {
-        day: "2-digit",
-        month: "2-digit"
-      });
-    }
+    const fecha = e.fecha?.toDate
+      ? e.fecha.toDate().toLocaleDateString("es-AR", {
+          day: "2-digit",
+          month: "2-digit"
+        })
+      : "--/--";
 
-    /* INFO */
-    const info = document.createElement("div");
-    info.className = "ensayo-info";
-    info.innerHTML = `
-      <strong>
-        ${fechaTxt} ${e.cliente || "Cliente sin nombre"} – ${e.nombre || "Ensayo sin nombre"}
-      </strong>
+    li.innerHTML = `
+      <div class="ensayo-principal">
+        <strong>${fecha} ${e.cliente || "Cliente sin nombre"} – ${e.nombre || "Ensayo sin nombre"}</strong>
+      </div>
     `;
 
-    info.onclick = () => {
+    li.addEventListener("click", () => {
       window.location.href = `ensayo.html?id=${e.id}`;
-    };
+    });
 
-    /* BOTÓN BORRAR */
-    const btnBorrar = document.createElement("button");
-    btnBorrar.className = "btn-borrar";
-    btnBorrar.textContent = "✖";
-
-    btnBorrar.onclick = async (ev) => {
-      ev.stopPropagation();
-
-      const ok = confirm(
-        `¿Querés borrar el ensayo?\n\n${e.cliente || ""} - ${e.nombre || ""}`
-      );
-      if (!ok) return;
-
-      await deleteDoc(doc(db, "ensayos", e.id));
-      cargarEnsayos();
-    };
-
-    li.appendChild(info);
-    li.appendChild(btnBorrar);
-    listaEl.appendChild(li);
+    listaEnsayos.appendChild(li);
   });
 }
 
-/**********************
+/*************************
  * BUSCADOR
- **********************/
-buscadorEl.addEventListener("input", () => {
-  const texto = buscadorEl.value.toLowerCase();
+ *************************/
+buscador.addEventListener("input", () => {
+  const texto = buscador.value.toLowerCase();
 
   const filtrados = ensayos.filter(e =>
     (e.cliente || "").toLowerCase().includes(texto) ||
@@ -138,7 +114,7 @@ buscadorEl.addEventListener("input", () => {
   renderEnsayos(filtrados);
 });
 
-/**********************
+/*************************
  * INIT
- **********************/
+ *************************/
 cargarEnsayos();
