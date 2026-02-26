@@ -7,7 +7,9 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -44,7 +46,12 @@ btnNuevo.addEventListener("click", () => {
 async function cargarEnsayos() {
   listaEl.innerHTML = "<li>Cargando ensayos...</li>";
 
-  const snap = await getDocs(collection(db, "ensayos"));
+  const q = query(
+    collection(db, "ensayos"),
+    orderBy("fecha", "desc")
+  );
+
+  const snap = await getDocs(q);
   ensayos = [];
 
   snap.forEach(d => {
@@ -72,21 +79,23 @@ function renderEnsayos(lista) {
     const li = document.createElement("li");
     li.className = "ensayo-item";
 
-    const fecha = e.fecha?.toDate
-      ? e.fecha.toDate().toLocaleDateString("es-AR", {
-          day: "2-digit",
-          month: "2-digit"
-        })
-      : "--/--";
-
-    const texto = `
-      <strong>${fecha} ${e.cliente || "Cliente sin nombre"} – ${e.nombre || "Ensayo sin nombre"}</strong>
-    `;
+    // Fecha corta tipo 25/02
+    let fechaTxt = "--/--";
+    if (e.fecha?.toDate) {
+      fechaTxt = e.fecha.toDate().toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit"
+      });
+    }
 
     /* INFO */
     const info = document.createElement("div");
     info.className = "ensayo-info";
-    info.innerHTML = texto;
+    info.innerHTML = `
+      <strong>
+        ${fechaTxt} ${e.cliente || "Cliente sin nombre"} – ${e.nombre || "Ensayo sin nombre"}
+      </strong>
+    `;
 
     info.onclick = () => {
       window.location.href = `ensayo.html?id=${e.id}`;
@@ -100,7 +109,9 @@ function renderEnsayos(lista) {
     btnBorrar.onclick = async (ev) => {
       ev.stopPropagation();
 
-      const ok = confirm(`¿Querés borrar el ensayo:\n"${e.nombre}"?`);
+      const ok = confirm(
+        `¿Querés borrar el ensayo?\n\n${e.cliente || ""} - ${e.nombre || ""}`
+      );
       if (!ok) return;
 
       await deleteDoc(doc(db, "ensayos", e.id));
