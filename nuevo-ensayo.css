@@ -1,87 +1,73 @@
 /* ===============================
-   RESET
+   CONTENEDOR FORMULARIO
 ================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.card-formulario {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 30px;
 }
 
 /* ===============================
-   BODY
+   TITULO
 ================================ */
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f3f7fb;
-  color: #2c3e50;
-}
-
-/* ===============================
-   MAIN
-================================ */
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-/* ===============================
-   CARD
-================================ */
-.card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-
-/* ===============================
-   TÍTULO
-================================ */
-h2 {
-  font-size: 22px;
-  margin-bottom: 20px;
+.card-formulario h1 {
+  font-size: 28px;
+  margin-bottom: 25px;
   color: #1f4e8c;
+  text-align: center;
 }
 
 /* ===============================
    FORM
 ================================ */
-label {
-  display: block;
-  margin-top: 14px;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-input,
-textarea,
-select {
-  width: 100%;
-  margin-top: 6px;
-  padding: 14px 16px;
-
-  font-size: 15px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  outline: none;
-  background: #fff;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+#formNuevoEnsayo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* ===============================
-   BOTÓN GUARDAR
+   LABELS
 ================================ */
-#btnGuardar {
-  width: 100%;
-  margin-top: 25px;
+#formNuevoEnsayo label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* ===============================
+   INPUTS / SELECT
+================================ */
+#formNuevoEnsayo input,
+#formNuevoEnsayo select {
+  padding: 16px 18px;
+  font-size: 18px;
+
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+#formNuevoEnsayo input:focus,
+#formNuevoEnsayo select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+}
+
+/* ===============================
+   BOTONES
+================================ */
+.acciones-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.btn-guardar {
   padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
 
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
   color: #ffffff;
@@ -89,36 +75,37 @@ select:focus {
   border: none;
   border-radius: 14px;
 
-  font-size: 18px;
-  font-weight: 700;
-
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#btnGuardar:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+.btn-guardar:hover {
+  opacity: 0.95;
+}
+
+.btn-cancelar {
+  padding: 16px;
+  font-size: 18px;
+
+  background: #ffffff;
+  color: #1f4e8c;
+
+  border: 2px solid #1f4e8c;
+  border-radius: 14px;
+
+  cursor: pointer;
 }
 
 /* ===============================
-   BOTÓN VOLVER
+   DESKTOP
 ================================ */
-main button:last-of-type {
-  padding: 14px 20px;
-  font-size: 16px;
+@media (min-width: 768px) {
+  .acciones-form {
+    flex-direction: row;
+  }
 
-  background: #ffffff;
-  border: 2px solid #1f4e8c;
-  color: #1f4e8c;
-
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-main button:last-of-type:hover {
-  background: #1f4e8c;
-  color: #ffffff;
+  .btn-guardar,
+  .btn-cancelar {
+    flex: 1;
+  }
 }
