@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>INLACT · Nuevo ensayo</title>
+
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Nuevo ensayo">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+    <!-- CSS nuevo ensayo -->
+    <link rel="stylesheet" href="nuevo-ensayo.css">
+</head>
+
+<body>
+
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+    <h2>NICOLÁS PAJARES</h2>
+</header>
+
+<main>
+
+<section class="card">
+    <h2>Nuevo ensayo</h2>
+
+    <label>Cliente *</label>
+    <select id="cliente">
+        <option value="">Cargando clientes...</option>
+    </select>
+
+    <label>Nombre del ensayo *</label>
+    <input type="text" id="nombre" placeholder="Ej: Mozzarella cilindro">
+
+    <label>Fecha</label>
+    <input type="date" id="fecha">
+
+    <label>Objetivo del ensayo</label>
+    <textarea id="objetivo" rows="3"></textarea>
+
+    <label>Desarrollo</label>
+    <textarea id="desarrollo" rows="4"></textarea>
+
+    <label>Conclusión</label>
+    <textarea id="conclusion" rows="4"></textarea>
+
+    <button id="btnGuardar">
+        🧪 Guardar ensayo
+    </button>
+</section>
+
+<section style="text-align:center; margin-top:20px;">
+    <button onclick="window.location.href='ensayos.html'">
+        ⬅ Volver
+    </button>
+</section>
+
+</main>
+
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="nuevo-ensayo.js"></script>
+
+</body>
+</html>
