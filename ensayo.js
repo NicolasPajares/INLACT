@@ -38,7 +38,6 @@ const e = snap.data();
 /* ENCABEZADO */
 document.getElementById("empresa").textContent = e.clienteNombre || "";
 document.getElementById("nombre-ensayo").textContent = e.nombreEnsayo || "";
-
 document.getElementById("fecha").textContent =
   e.fecha?.toDate
     ? e.fecha.toDate().toLocaleDateString("es-AR")
@@ -47,37 +46,42 @@ document.getElementById("fecha").textContent =
 /* CONTENIDO */
 const contenido = document.getElementById("contenido");
 
-const secciones = {
-  propuesta: e.propuesta,
-  dosis: e.dosis,
-  elaboracion: e.elaboracion,
-  resultados: e.resultados,
-  conclusion: e.conclusion,
-  comercial: e.propuestaComercial,
-  fotos: e.fotos && e.fotos.length
-    ? `<div class="fotos">${e.fotos.map(f => `<img src="${f}">`).join("")}</div>`
-    : "No hay imágenes"
-};
-
-function mostrarSeccion(key) {
-  if (!secciones[key]) {
-    contenido.innerHTML = "<p>No hay información</p>";
-    return;
+const secciones = [
+  { id: "propuesta", titulo: "Propuesta", contenido: e.propuesta },
+  { id: "dosis", titulo: "Dosis", contenido: e.dosis },
+  { id: "elaboracion", titulo: "Elaboración", contenido: e.elaboracion },
+  { id: "resultados", titulo: "Resultados", contenido: e.resultados },
+  { id: "conclusion", titulo: "Conclusión", contenido: e.conclusion },
+  { id: "comercial", titulo: "Propuesta comercial", contenido: e.propuestaComercial },
+  {
+    id: "fotos",
+    titulo: "Imágenes",
+    contenido:
+      e.fotos && e.fotos.length
+        ? `<div class="fotos">${e.fotos.map(f => `<img src="${f}">`).join("")}</div>`
+        : "No hay imágenes"
   }
+];
 
-  contenido.innerHTML = `
-    <div class="bloque">
-      <p>${secciones[key]}</p>
+/* render todas las secciones con scroll amplio */
+contenido.innerHTML = secciones.map(sec => `
+  <section id="${sec.id}" class="bloque" style="min-height: 100vh; padding-top: 40px;">
+    <h3>${sec.titulo}</h3>
+    <div>
+      ${sec.contenido || "<p>No hay información</p>"}
     </div>
-  `;
-}
+  </section>
+`).join("");
 
-/* botones */
+/* botones → scroll suave */
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
-    mostrarSeccion(btn.dataset.seccion);
+    const destino = document.getElementById(btn.dataset.seccion);
+    if (destino) {
+      destino.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
   });
 });
-
-/* sección inicial */
-mostrarSeccion("propuesta");
