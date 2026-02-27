@@ -1,83 +1,61 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Ensayo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="ensayo.css">
-</head>
-
 <body>
 
-  <!-- HEADER (MISMO CONCEPTO QUE INDEX) -->
-  <header class="main-header">
-    <div class="header-left">
-      <img src="img/inlact-logo.png" alt="INLACT" class="logo">
+<header class="header">
+  <img src="img/logo-inlact.png">
+  <div class="autor">Nicolás Pajares</div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <a href="#propuesta" class="menu-item">Propuesta</a>
+    <a href="#dosis" class="menu-item">Dosis</a>
+    <a href="#elaboracion" class="menu-item">Elaboración</a>
+    <a href="#resultados" class="menu-item">Resultados</a>
+    <a href="#conclusion" class="menu-item">Conclusión</a>
+    <a href="#precio" class="menu-item">Propuesta comercial</a>
+  </aside>
+
+  <main class="contenido">
+
+    <div class="encabezado">
+      <h1 id="empresa"></h1>
+      <div class="fecha" id="fecha"></div>
+      <h2 id="nombreEnsayo"></h2>
     </div>
 
-    <div class="header-right">
-      <span class="user-name">Nicolás Pajares</span>
-      <a href="index.html" class="volver-link">Volver al sitio principal</a>
-    </div>
-  </header>
+    <section id="propuesta" class="seccion">
+      <h3>Propuesta</h3>
+      <p id="propuesta-texto"></p>
+    </section>
 
-  <!-- WRAPPER GENERAL (CLAVE PARA NO ROMPER NADA) -->
-  <div class="page-wrapper">
+    <section id="dosis" class="seccion">
+      <h3>Dosis</h3>
+      <p id="dosis-texto"></p>
+    </section>
 
-    <!-- SIDEBAR (NO TOCADO) -->
-    <aside class="sidebar">
-      <nav class="menu">
-        <a href="#propuesta" class="menu-item">Propuesta</a>
-        <a href="#dosis" class="menu-item">Dosis</a>
-        <a href="#elaboracion" class="menu-item">Elaboración</a>
-        <a href="#resultados" class="menu-item">Resultados</a>
-        <a href="#conclusion" class="menu-item">Conclusión</a>
-        <a href="#precio" class="menu-item">Propuesta comercial</a>
-      </nav>
-    </aside>
+    <section id="elaboracion" class="seccion">
+      <h3>Elaboración</h3>
+      <p id="elaboracion-texto"></p>
+    </section>
 
-    <!-- CONTENIDO (NO TOCADO) -->
-    <main class="contenido">
+    <section id="resultados" class="seccion">
+      <h3>Resultados</h3>
+      <p id="resultados-texto"></p>
+    </section>
 
-      <section class="encabezado-ensayo">
-        <h1 id="clienteNombre"></h1>
-        <p id="fechaEnsayo" class="fecha"></p>
-        <h2 id="nombreEnsayo"></h2>
-      </section>
+    <section id="conclusion" class="seccion">
+      <h3>Conclusión</h3>
+      <p id="conclusion-texto"></p>
+    </section>
 
-      <section id="propuesta" class="seccion">
-        <h3>Propuesta</h3>
-        <p id="textoPropuesta"></p>
-      </section>
+    <section id="precio" class="seccion">
+      <h3>Propuesta comercial</h3>
+      <p id="precio-texto"></p>
+    </section>
 
-      <section id="dosis" class="seccion">
-        <h3>Dosis</h3>
-        <p id="textoDosis"></p>
-      </section>
+  </main>
+</div>
 
-      <section id="elaboracion" class="seccion">
-        <h3>Elaboración</h3>
-        <p id="textoElaboracion"></p>
-      </section>
-
-      <section id="resultados" class="seccion">
-        <h3>Resultados</h3>
-        <p id="textoResultados"></p>
-      </section>
-
-      <section id="conclusion" class="seccion">
-        <h3>Conclusión</h3>
-        <p id="textoConclusion"></p>
-      </section>
-
-      <section id="precio" class="seccion">
-        <h3>Propuesta comercial</h3>
-        <p id="textoPrecio"></p>
-      </section>
-
-    </main>
-  </div>
-
-  <script type="module" src="ensayo.js"></script>
+<script type="module" src="ensayo.js"></script>
 </body>
-</html>
