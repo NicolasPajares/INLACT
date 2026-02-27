@@ -29,13 +29,11 @@ const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
 
 const fechaEl = document.getElementById("fecha");
-const responsableEl = document.getElementById("responsable");
-const productoEl = document.getElementById("producto");
+const nombreEnsayoEl = document.getElementById("nombreEnsayo"); // NUEVO
 const propuestaEl = document.getElementById("propuesta");
 const dosisEl = document.getElementById("dosis");
 const metodologiaEl = document.getElementById("metodologia");
 const resultadosEl = document.getElementById("resultados");
-const conclusionEl = document.getElementById("conclusion");
 
 /**********************
  * CARGAR CLIENTES
@@ -75,22 +73,25 @@ async function cargarClientes() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (!selectCliente.value || !fechaEl.value) {
-    alert("Completá al menos cliente y fecha del ensayo");
+  if (!selectCliente.value || !fechaEl.value || !nombreEnsayoEl.value) {
+    alert("Completá cliente, fecha y nombre del ensayo");
     return;
   }
 
+  const clienteNombre =
+    selectCliente.options[selectCliente.selectedIndex].text;
+
   const nuevoEnsayo = {
     clienteId: selectCliente.value,
+    clienteNombre,
+    nombreEnsayo: nombreEnsayoEl.value,
+
     fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
-    responsable: responsableEl.value || "",
-    producto: productoEl.value || "",
     propuesta: propuestaEl.value || "",
     dosis: dosisEl.value || "",
     metodologia: metodologiaEl.value || "",
     resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
 
     creadoEn: Timestamp.now()
   };
@@ -98,7 +99,7 @@ form.addEventListener("submit", async (e) => {
   try {
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // Redirige al informe del ensayo
+    // Redirigir al informe
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
