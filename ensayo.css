@@ -125,3 +125,34 @@ section p {
     font-size: 24px;
   }
 }
+
+/* ===============================
+   SEPARACIÓN VISUAL FUERTE
+================================ */
+
+.ensayo-header {
+    margin-bottom: 60px; /* mucho aire debajo del header */
+}
+
+section {
+    margin-top: 80px;   /* espacio grande antes de cada sección */
+    padding-top: 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+section h2 {
+    font-size: 22px;
+    color: #1f4e8c;
+    margin-bottom: 10px;
+}
+
+/* Para que el scroll al presionar botón no se pise con header */
+html {
+    scroll-padding-top: 120px;
+}
+
+/* Resaltar la sección activa (opcional visual) */
+section:target {
+    padding-top: 100px;
+    border-top: 3px solid #1f4e8c;
+}
