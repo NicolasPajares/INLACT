@@ -1,265 +1,77 @@
-/* ===============================
-   RESET / BASE
-================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.ensayo-wrapper {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px;
 }
 
-body {
-  background: #f3f4f6;
-  font-family: "Segoe UI", Arial, sans-serif;
-  color: #2c3e50;
-}
-
-/* ===============================
-   LAYOUT GENERAL DOS COLUMNAS
-================================ */
-.layout-ensayo {
-  display: flex;
-  min-height: calc(100vh - 140px);
-}
-
-/* ===============================
-   SIDEBAR (IZQUIERDA)
-================================ */
+/* MENÚ */
 .ensayo-menu {
-  width: 240px;
-  background: linear-gradient(180deg, #3aa0da, #2c7fb8);
-  padding: 22px 16px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .ensayo-menu button {
-  background: rgba(255,255,255,0.15);
-  border: none;
+  background: #3b82f6;
   color: white;
-  padding: 12px;
-  text-align: left;
-  font-size: 15px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.ensayo-menu button:hover {
-  background: rgba(255,255,255,0.28);
-}
-
-/* ===============================
-   CONTENIDO
-================================ */
-.ensayo-contenido {
-  flex: 1;
-  background: #ffffff;
-  padding: 36px 50px;
-}
-
-.ensayo-contenido h1 {
-  color: #2c7fb8;
-  text-align: center;
-  margin-bottom: 6px;
-}
-
-.ensayo-contenido h2 {
-  text-align: center;
-  color: #6b7280;
-  margin-bottom: 26px;
-  font-size: 15px;
-}
-
-.ensayo-contenido h3 {
-  text-align: center;
-  color: #2c7fb8;
-  margin-bottom: 34px;
-  font-size: 22px;
-}
-
-/* ===============================
-   BLOQUES
-================================ */
-.bloque {
-  margin-bottom: 36px;
-}
-
-.bloque h4 {
-  font-size: 16px;
-  color: #374151;
-  margin-bottom: 6px;
-  border-left: 4px solid #1f4e8c;
-  padding-left: 10px;
-}
-
-.bloque p {
-  font-size: 15px;
-  line-height: 1.6;
-  color: #374151;
-  white-space: pre-line;
-}
-
-/* ===============================
-   PROPUESTA COMERCIAL
-================================ */
-.propuesta-comercial {
-  background: #f0f9ff;
-  border-left: 4px solid #2563eb;
-  padding: 18px 14px;
-  border-radius: 10px;
-}
-
-/* ===============================
-   BOTÓN MEDIA
-================================ */
-.btn-media {
-  background: #1f4e8c;
-  color: #fff;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 14px;
+  border-radius: 20px;
   font-size: 14px;
-  border-radius: 8px;
+  white-space: nowrap;
   cursor: pointer;
-  margin-top: 8px;
 }
 
-.btn-media:hover {
-  background: #2569a5;
-}
-
-/* ===============================
-   FOOTER
-================================ */
-footer {
-  background: #ffffff;
-  padding: 15px;
+/* HEADER */
+.ensayo-header {
   text-align: center;
-  border-top: 1px solid #e0e0e0;
-  font-size: 14px;
-  color: #374151;
+  margin: 20px 0;
 }
 
-footer a {
+.ensayo-header h1 {
   color: #1f4e8c;
-  text-decoration: none;
+  margin-bottom: 6px;
 }
 
-footer a:hover {
-  text-decoration: underline;
+.ensayo-header h2 {
+  color: #3b82f6;
+  margin-top: 10px;
 }
 
-
-/* ===============================
-   RESPONSIVE ADAPTATIVO MEJORADO
-================================ */
-@media (max-width: 900px) {
-
-  /* Layout vertical en celular */
-  .layout-ensayo {
-    flex-direction: column;
-  }
-
-  /* Sidebar como barra horizontal */
-  .ensayo-menu {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    padding: 16px 12px;
-    overflow-x: auto;
-    background: linear-gradient(90deg, #3aa0da, #2c7fb8);
-    margin-bottom: 12px;
-  }
-
-  .ensayo-menu button {
-    flex: 0 0 auto;
-    padding: 10px 14px;
-    font-size: 14px;
-    white-space: nowrap;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-  }
-
-  .ensayo-menu button:hover {
-    background: rgba(255,255,255,0.28);
-  }
-
-  /* Contenido con más padding */
-  .ensayo-contenido {
-    padding: 24px 16px;
-  }
-
-  /* Titulares más adaptados */
-  .ensayo-contenido h1 {
-    font-size: 22px;
-  }
-
-  .ensayo-contenido h2 {
-    font-size: 14px;
-    margin-bottom: 16px;
-  }
-
-  .ensayo-contenido h3 {
-    font-size: 20px;
-    margin-bottom: 28px;
-  }
-
-  /* Bloques */
-  .bloque {
-    margin-bottom: 28px;
-  }
+.btn-media {
+  margin-top: 16px;
+  background: #1f4e8c;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
 }
 
-/* =========================
-   MOBILE
-   ========================= */
-@media (max-width: 768px) {
+/* SECCIONES */
+.ensayo-contenido {
+  margin-top: 20px;
+}
 
-  /* contenedor principal */
-  .ensayo-layout {
-    display: block;
-  }
+.ensayo-seccion {
+  display: none;
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 10px;
+}
 
-  /* columna izquierda (menú) */
-  .ensayo-menu {
-    width: 100%;
-    height: auto;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    padding: 10px;
-    overflow-x: auto;
-  }
+.ensayo-seccion.activa {
+  display: block;
+}
 
-  .ensayo-menu button {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    border-radius: 999px;
-  }
+.ensayo-seccion h3 {
+  margin-bottom: 8px;
+  color: #1f2937;
+}
 
-  /* contenido */
-  .ensayo-contenido {
-    width: 100%;
-    padding: 16px;
-  }
-
-  /* títulos */
-  .ensayo-header h1 {
-    font-size: 22px;
-    text-align: center;
-  }
-
-  .ensayo-header h2 {
-    font-size: 16px;
-    text-align: center;
-  }
-
-  /* botón imágenes */
-  .btn-media {
-    width: 100%;
-    text-align: center;
-  }
-
+.ensayo-seccion p {
+  line-height: 1.6;
 }
