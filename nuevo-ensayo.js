@@ -10,6 +10,13 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -21,6 +28,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /**********************
  * ELEMENTOS DOM
@@ -29,11 +37,12 @@ const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
 
 const fechaEl = document.getElementById("fecha");
-const nombreEnsayoEl = document.getElementById("nombreEnsayo"); // NUEVO
+const nombreEnsayoEl = document.getElementById("nombreEnsayo");
 const propuestaEl = document.getElementById("propuesta");
 const dosisEl = document.getElementById("dosis");
 const metodologiaEl = document.getElementById("metodologia");
 const resultadosEl = document.getElementById("resultados");
+const fotosEl = document.getElementById("fotos");
 
 /**********************
  * CARGAR CLIENTES
@@ -41,30 +50,38 @@ const resultadosEl = document.getElementById("resultados");
 async function cargarClientes() {
   selectCliente.innerHTML = `<option value="">Cargando clientes...</option>`;
 
-  try {
-    const snap = await getDocs(collection(db, "clientes"));
+  const snap = await getDocs(collection(db, "clientes"));
 
-    if (snap.empty) {
-      selectCliente.innerHTML = `<option value="">No hay clientes cargados</option>`;
-      return;
-    }
+  selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
 
-    selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
+  snap.forEach(docu => {
+    const c = docu.data();
+    const option = document.createElement("option");
+    option.value = docu.id;
+    option.textContent = c.nombre || "Cliente sin nombre";
+    selectCliente.appendChild(option);
+  });
+}
 
-    snap.forEach(docu => {
-      const cliente = docu.data();
+/**********************
+ * SUBIR FOTOS
+ **********************/
+async function subirFotos(ensayoId) {
+  const archivos = fotosEl.files;
+  const urls = [];
 
-      const option = document.createElement("option");
-      option.value = docu.id;
-      option.textContent = cliente.nombre || "Cliente sin nombre";
+  for (const file of archivos) {
+    const storageRef = ref(
+      storage,
+      `ensayos/${ensayoId}/${file.name}`
+    );
 
-      selectCliente.appendChild(option);
-    });
-
-  } catch (error) {
-    console.error("Error cargando clientes:", error);
-    selectCliente.innerHTML = `<option value="">Error al cargar clientes</option>`;
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    urls.push(url);
   }
+
+  return urls;
 }
 
 /**********************
@@ -79,7 +96,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   const clienteNombre =
-    selectCliente.options[selectCliente.selectedIndex].text;
+    selectCliente.selectedOptions[0].textContent;
 
   const nuevoEnsayo = {
     clienteId: selectCliente.value,
@@ -93,17 +110,35 @@ form.addEventListener("submit", async (e) => {
     metodologia: metodologiaEl.value || "",
     resultados: resultadosEl.value || "",
 
+    fotos: [],
     creadoEn: Timestamp.now()
   };
 
   try {
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+    const docRef = await addDoc(
+      collection(db, "ensayos"),
+      nuevoEnsayo
+    );
 
-    // Redirigir al informe
+    const fotosUrls = await subirFotos(docRef.id);
+
+    await addDoc; // noop para claridad
+
+    await fetch; // noop
+
+    // actualizar fotos
+    await import(
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+    ).then(({ updateDoc, doc }) =>
+      updateDoc(doc(db, "ensayos", docRef.id), {
+        fotos: fotosUrls
+      })
+    );
+
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("Error al guardar ensayo:", error);
+    console.error(error);
     alert("Error al guardar el ensayo");
   }
 });
