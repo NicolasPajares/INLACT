@@ -59,9 +59,9 @@ body {
 }
 
 .ensayo-contenido h1 {
-  color: #1f4e8c;
+  color: #2c7fb8;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .ensayo-contenido h2 {
@@ -73,7 +73,7 @@ body {
 
 .ensayo-contenido h3 {
   text-align: center;
-  color: #1f4e8c;
+  color: #2c7fb8;
   margin-bottom: 34px;
   font-size: 22px;
 }
