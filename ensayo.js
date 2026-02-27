@@ -1,16 +1,14 @@
-import { db } from "./firebase.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+/**********************
+ * FIREBASE
+ **********************/
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   doc,
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   OBTENER ID
-================================ */
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -23,150 +21,85 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* PARAMS */
-const id = new URLSearchParams(location.search).get("id");
+/**********************
+ * OBTENER ID
+ **********************/
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
 if (!id) {
   alert("Ensayo no encontrado");
-  location.href = "ensayos.html";
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("ID faltante");
+  throw new Error("Falta ID de ensayo");
 }
 
-/* ===============================
-   REFERENCIAS DOM
-================================ */
-const clienteNombre = document.getElementById("clienteNombre");
-const fechaEnsayo = document.getElementById("fechaEnsayo");
-const tituloEnsayo = document.getElementById("tituloEnsayo");
-
-/* ===============================
-   FUNCIONES
-================================ */
-function mostrarBloque(id, titulo, contenido) {
-  if (!contenido) return;
-
-  const div = document.getElementById(id);
-  div.classList.remove("oculto");
-  div.innerHTML = `
-    <h4>${titulo}</h4>
-    <p>${contenido}</p>
-  `;
+/**********************
+ * CARGAR ENSAYO
+ **********************/
 const ref = doc(db, "ensayos", id);
 const snap = await getDoc(ref);
+
 if (!snap.exists()) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("No existe");
+  alert("Ensayo inexistente");
+  throw new Error("Ensayo no existe");
 }
 
-function mostrarEvidencia(media) {
-  if (!media || !media.length) return;
 const e = snap.data();
 
-  const cont = document.getElementById("evidencia");
-  cont.classList.remove("oculto");
-/* HEADER */
-document.getElementById("cliente").textContent = e.clienteNombre || "";
-document.getElementById("nombreEnsayo").textContent = e.nombreEnsayo || "";
+/**********************
+ * FECHA FORMATEADA
+ **********************/
+const fecha = e.fecha?.toDate
+  ? e.fecha.toDate().toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    })
+  : "";
 
-  const btn = cont.querySelector(".btn-media");
-document.getElementById("fecha").textContent =
-  e.fecha?.toDate
-    ? e.fecha.toDate().toLocaleDateString("es-AR")
-    : "";
+/**********************
+ * HEADER (EMPRESA / ENSAYO / FECHA)
+ **********************/
+document.getElementById("nombreEnsayo").textContent =
+  e.nombreEnsayo || "";
 
-  btn.onclick = () => {
-    if (cont.querySelector(".galeria")) return;
-/* SECCIONES */
-function cargar(id, titulo, texto) {
-  if (!texto) return;
-  const div = document.getElementById(id);
-  div.innerHTML = `<h3>${titulo}</h3><p>${texto}</p>`;
-  div.dataset.visible = "1";
-}
+document.getElementById("clienteEnsayo").textContent =
+  e.clienteNombre || "";
 
-    const galeria = document.createElement("div");
-    galeria.className = "galeria";
-cargar("propuesta", "Propuesta", e.propuesta);
-cargar("dosis", "Dosis", e.dosis);
-cargar("metodologia", "Metodología", e.metodologia);
-cargar("resultados", "Resultados", e.resultados);
-cargar("conclusion", "Conclusión", e.conclusion);
+document.getElementById("fechaEnsayo").textContent =
+  fecha;
 
-    media.forEach(url => {
-      if (url.match(/\.(mp4|webm|ogg)$/)) {
-        const video = document.createElement("video");
-        video.src = url;
-        video.controls = true;
-        galeria.appendChild(video);
-      } else {
-        const img = document.createElement("img");
-        img.src = url;
-        galeria.appendChild(img);
-      }
-    });
-if (e.propuestaComercial) {
-  cargar("comercial", "Propuesta comercial", e.propuestaComercial);
-  document.getElementById("btnComercial").hidden = false;
-}
+/**********************
+ * CONTENIDO
+ **********************/
+setTexto("propuesta", e.propuesta);
+setTexto("dosis", e.dosis);
+setTexto("elaboracion", e.elaboracion);
+setTexto("resultados", e.resultados);
+setTexto("conclusion", e.conclusion);
 
-    cont.appendChild(galeria);
-/* IMÁGENES */
+/**********************
+ * FOTOS
+ **********************/
+const galeria = document.querySelector("#fotos .galeria");
+
 if (e.fotos && e.fotos.length) {
-  document.getElementById("btnMedia").hidden = false;
-  document.getElementById("btnMedia").onclick = () => {
-    window.open(e.fotos[0], "_blank");
-  };
+  galeria.innerHTML = e.fotos
+    .map(url => `<img src="${url}">`)
+    .join("");
+} else {
+  document.getElementById("fotos").style.display = "none";
 }
 
-/* ===============================
-   CARGAR ENSAYO
-================================ */
-async function cargarEnsayo() {
-  const ref = doc(db, "ensayos", id);
-  const snap = await getDoc(ref);
+/**********************
+ * HELPERS
+ **********************/
+function setTexto(id, valor) {
+  const bloque = document.getElementById(id);
+  const p = bloque.querySelector("p");
 
-  if (!snap.exists()) {
-    alert("Ensayo no encontrado");
-    location.href = "ensayos.html";
-    return;
+  if (valor && valor.trim() !== "") {
+    p.textContent = valor;
+  } else {
+    bloque.style.display = "none";
   }
-
-  const e = snap.data();
-
-  clienteNombre.textContent = e.cliente || "";
-  fechaEnsayo.textContent = e.fecha || "";
-  tituloEnsayo.textContent = e.nombreEnsayo || "";
-
-  mostrarBloque("propuesta", "Propuesta", e.propuesta);
-  mostrarBloque("dosis", "Dosis", e.dosis);
-  mostrarBloque("conclusion", "Conclusión", e.conclusion);
-  mostrarBloque("comercial", "Propuesta comercial", e.propuestaComercial);
-/* MENÚ */
-const botones = document.querySelectorAll(".ensayo-menu button");
-const secciones = document.querySelectorAll(".ensayo-seccion");
-
-  mostrarEvidencia(e.media || e.fotos);
-function activar(id) {
-  secciones.forEach(s => s.classList.remove("activa"));
-  document.getElementById(id)?.classList.add("activa");
 }
-
-/* ===============================
-   NAVEGACIÓN SIDEBAR
-================================ */
-document.querySelectorAll(".ensayo-menu button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.seccion;
-    const bloque = document.getElementById(id);
-    if (bloque && !bloque.classList.contains("oculto")) {
-      bloque.scrollIntoView({ behavior: "smooth" });
-    }
-  });
-botones.forEach(b => {
-  b.onclick = () => activar(b.dataset.seccion);
-});
-
-cargarEnsayo();
-/* DEFAULT */
-const primera = [...secciones].find(s => s.dataset.visible);
-if (primera) primera.classList.add("activa");
