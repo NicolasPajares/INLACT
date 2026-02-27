@@ -1,160 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ensayo INLACT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS base -->
-  <link rel="stylesheet" href="index.css">
-  <!-- CSS ensayo -->
-  <link rel="stylesheet" href="ensayo.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ensayo</title>
+    <link rel="stylesheet" href="ensayo.css">
 </head>
 
 <body>
 
-<header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>NICOLÁS PAJARES</h2>
-</header>
-
-<main>
-
-  <div class="ensayo-layout">
+<div class="ensayo-wrapper">
 
     <!-- COLUMNA IZQUIERDA -->
-    <aside class="ensayo-sidebar">
-      <h3>Ensayo</h3>
-      <p id="sidebarCliente"></p>
-      <p id="sidebarFecha"></p>
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="logo-inlact.png" alt="INLACT">
+        </div>
+
+        <nav class="menu">
+            <a href="#propuesta">📋 Propuesta</a>
+            <a href="#dosis">⚗️ Dosis</a>
+            <a href="#elaboracion">🧪 Elaboración</a>
+            <a href="#resultados">📊 Resultados</a>
+            <a href="#conclusion">💡 Conclusión</a>
+            <a href="#precio">💲 Propuesta comercial</a>
+        </nav>
+
+        <footer class="sidebar-footer">
+            © INLACT · Aviso Legal
+        </footer>
     </aside>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <section class="ensayo-contenido">
+    <!-- CONTENIDO -->
+    <main class="contenido">
 
-      <header class="ensayo-header">
-        <h1 id="tituloEnsayo">Ensayo técnico</h1>
-        <h2 id="subtituloEnsayo"></h2>
-      </header>
+        <header class="encabezado">
+            <a class="volver" href="ensayos.html">Volver al sitio principal</a>
 
-      <div id="contenido"></div>
+            <h1 class="empresa">Molino San José S.A.</h1>
+            <p class="fecha">02 de marzo de 2026</p>
+            <h2 class="titulo-ensayo">Ensayo de calidad de producto</h2>
+        </header>
 
-    </section>
+        <section id="propuesta">
+            <h3>Propuesta</h3>
+            <p>Texto de la propuesta técnica del ensayo.</p>
+        </section>
 
-  </div>
+        <section id="dosis">
+            <h3>Dosis</h3>
+            <p>Detalle de dosis aplicada.</p>
+        </section>
 
-</main>
+        <section id="elaboracion">
+            <h3>Elaboración</h3>
+            <p>Proceso de elaboración del ensayo.</p>
+        </section>
 
-<footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
+        <section id="resultados">
+            <h3>Resultados</h3>
+            <p>Resultados observados.</p>
+        </section>
 
-<script type="module">
-/**********************
- * FIREBASE
- **********************/
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <section id="conclusion">
+            <h3>Conclusión</h3>
+            <p>Conclusión técnica.</p>
+        </section>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
+        <section id="precio">
+            <h3>Propuesta comercial</h3>
+            <p>Condiciones comerciales sugeridas.</p>
+        </section>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    </main>
 
-/**********************
- * CARGA ENSAYO
- **********************/
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
-
-if (!id) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("ID faltante");
-}
-
-const ref = doc(db, "ensayos", id);
-const snap = await getDoc(ref);
-
-if (!snap.exists()) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("No existe");
-}
-
-const e = snap.data();
-
-/**********************
- * FECHA
- **********************/
-const fecha = e.fecha?.toDate
-  ? e.fecha.toDate().toLocaleDateString("es-AR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    })
-  : "--/--/----";
-
-/**********************
- * SIDEBAR
- **********************/
-document.getElementById("sidebarCliente").textContent =
-  e.clienteNombre || "";
-
-document.getElementById("sidebarFecha").textContent = fecha;
-
-/**********************
- * TITULOS
- **********************/
-document.getElementById("tituloEnsayo").textContent =
-  e.nombreEnsayo || "Ensayo técnico";
-
-document.getElementById("subtituloEnsayo").textContent =
-  e.clienteNombre || "";
-
-/**********************
- * CONTENIDO
- **********************/
-const div = document.getElementById("contenido");
-
-div.innerHTML = `
-  <div class="bloque"><h3>Propuesta</h3><p>${e.propuesta || "-"}</p></div>
-  <div class="bloque"><h3>Dosis</h3><p>${e.dosis || "-"}</p></div>
-  <div class="bloque"><h3>Elaboración</h3><p>${e.elaboracion || "-"}</p></div>
-  <div class="bloque"><h3>Resultados</h3><p>${e.resultados || "-"}</p></div>
-  <div class="bloque"><h3>Conclusión</h3><p>${e.conclusion || "-"}</p></div>
-
-  ${
-    e.propuestaComercial
-      ? `<div class="bloque"><h3>Propuesta comercial</h3><p>${e.propuestaComercial}</p></div>`
-      : ""
-  }
-
-  ${
-    e.fotos && e.fotos.length
-      ? `
-      <div class="bloque">
-        <h3>Registro fotográfico</h3>
-        <div class="fotos">
-          ${e.fotos.map(f => `<img src="${f}">`).join("")}
-        </div>
-      </div>`
-      : ""
-  }
-`;
-</script>
+</div>
 
 </body>
 </html>
