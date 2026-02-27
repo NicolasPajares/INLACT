@@ -149,27 +149,64 @@ footer a:hover {
   text-decoration: underline;
 }
 
+
 /* ===============================
-   RESPONSIVE ADAPTATIVO
+   RESPONSIVE ADAPTATIVO MEJORADO
 ================================ */
 @media (max-width: 900px) {
 
+  /* Layout vertical en celular */
   .layout-ensayo {
     flex-direction: column;
   }
 
+  /* Sidebar como barra horizontal */
   .ensayo-menu {
+    display: flex;
     flex-direction: row;
+    gap: 8px;
+    padding: 16px 12px;
     overflow-x: auto;
+    background: linear-gradient(90deg, #3aa0da, #2c7fb8);
+    margin-bottom: 12px;
   }
 
   .ensayo-menu button {
-    flex: 1;
-    white-space: nowrap;
+    flex: 0 0 auto;
+    padding: 10px 14px;
     font-size: 14px;
+    white-space: nowrap;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
   }
 
+  .ensayo-menu button:hover {
+    background: rgba(255,255,255,0.28);
+  }
+
+  /* Contenido con más padding */
   .ensayo-contenido {
-    padding: 26px 18px;
+    padding: 24px 16px;
+  }
+
+  /* Titulares más adaptados */
+  .ensayo-contenido h1 {
+    font-size: 22px;
+  }
+
+  .ensayo-contenido h2 {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .ensayo-contenido h3 {
+    font-size: 20px;
+    margin-bottom: 28px;
+  }
+
+  /* Bloques */
+  .bloque {
+    margin-bottom: 28px;
   }
 }
