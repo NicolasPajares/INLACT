@@ -5,9 +5,8 @@
   <title>Ensayo INLACT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS base -->
+  <!-- CSS principal -->
   <link rel="stylesheet" href="index.css">
-  <!-- CSS ensayo -->
   <link rel="stylesheet" href="ensayo.css">
 </head>
 
@@ -20,56 +19,34 @@
   <h2>NICOLÁS PAJARES</h2>
 </header>
 
-<main class="ensayo-layout">
+<main class="ensayo-container">
 
-  <!-- COLUMNA IZQUIERDA -->
-  <aside class="ensayo-menu">
-    <button onclick="scrollToSection('propuesta')">Propuesta</button>
-    <button onclick="scrollToSection('dosis')">Dosis</button>
-    <button onclick="scrollToSection('elaboracion')">Elaboración</button>
-    <button onclick="scrollToSection('resultados')">Resultados</button>
-    <button onclick="scrollToSection('conclusion')">Conclusión</button>
-    <button onclick="scrollToSection('fotos')">Imágenes</button>
-  </aside>
+  <!-- ===============================
+       HEADER ENSAYO
+  ================================ -->
+  <section class="ensayo-header">
+    <div id="clienteEnsayo"></div>
+    <div id="fechaEnsayo"></div>
+    <div id="nombreEnsayo"></div>
+  </section>
 
-  <!-- CONTENIDO -->
-  <section class="ensayo-contenido">
+  <!-- ===============================
+       CUERPO (NO SE TOCA)
+  ================================ -->
+  <section class="ensayo-body">
 
-    <div class="ensayo-header">
-      <h1 id="nombreEnsayo">Ensayo técnico</h1>
-      <h2 id="clienteEnsayo"></h2>
-      <p id="fechaEnsayo"></p>
-    </div>
+    <aside class="ensayo-menu">
+      <button data-target="propuesta">Propuesta</button>
+      <button data-target="dosis">Dosis</button>
+      <button data-target="elaboracion">Elaboración</button>
+      <button data-target="resultados">Resultados</button>
+      <button data-target="conclusion">Conclusión</button>
+      <button data-target="fotos">Ver imágenes</button>
+    </aside>
 
-    <div id="propuesta" class="bloque">
-      <h3>Propuesta</h3>
-      <p></p>
-    </div>
-
-    <div id="dosis" class="bloque">
-      <h3>Dosis</h3>
-      <p></p>
-    </div>
-
-    <div id="elaboracion" class="bloque">
-      <h3>Elaboración</h3>
-      <p></p>
-    </div>
-
-    <div id="resultados" class="bloque">
-      <h3>Resultados</h3>
-      <p></p>
-    </div>
-
-    <div id="conclusion" class="bloque">
-      <h3>Conclusión</h3>
-      <p></p>
-    </div>
-
-    <div id="fotos" class="bloque">
-      <h3>Registro fotográfico</h3>
-      <div class="galeria"></div>
-    </div>
+    <article class="ensayo-contenido" id="contenidoEnsayo">
+      <!-- El JS escribe acá -->
+    </article>
 
   </section>
 
@@ -80,15 +57,5 @@
 </footer>
 
 <script type="module" src="ensayo.js"></script>
-
-<script>
-function scrollToSection(id) {
-  document.getElementById(id).scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-}
-</script>
-
 </body>
 </html>
