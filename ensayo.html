@@ -9,69 +9,69 @@
 
 <body>
 
-  <!-- HEADER (igual al index) -->
+  <!-- HEADER (MISMO CONCEPTO QUE INDEX) -->
   <header class="main-header">
     <div class="header-left">
-      <img src="img/inlact-logo.png" class="logo" alt="INLACT">
+      <img src="img/inlact-logo.png" alt="INLACT" class="logo">
     </div>
+
     <div class="header-right">
       <span class="user-name">Nicolás Pajares</span>
+      <a href="index.html" class="volver-link">Volver al sitio principal</a>
     </div>
   </header>
 
-  <div class="layout">
+  <!-- WRAPPER GENERAL (CLAVE PARA NO ROMPER NADA) -->
+  <div class="page-wrapper">
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (NO TOCADO) -->
     <aside class="sidebar">
       <nav class="menu">
-        <a href="#propuesta">📄 Propuesta</a>
-        <a href="#dosis">⚗️ Dosis</a>
-        <a href="#elaboracion">🧪 Elaboración</a>
-        <a href="#resultados">📊 Resultados</a>
-        <a href="#conclusion">💡 Conclusión</a>
-        <a href="#precio">💲 Propuesta comercial</a>
+        <a href="#propuesta" class="menu-item">Propuesta</a>
+        <a href="#dosis" class="menu-item">Dosis</a>
+        <a href="#elaboracion" class="menu-item">Elaboración</a>
+        <a href="#resultados" class="menu-item">Resultados</a>
+        <a href="#conclusion" class="menu-item">Conclusión</a>
+        <a href="#precio" class="menu-item">Propuesta comercial</a>
       </nav>
-      <footer class="sidebar-footer">
-        © INLACT · Aviso Legal
-      </footer>
     </aside>
 
-    <!-- CONTENIDO -->
+    <!-- CONTENIDO (NO TOCADO) -->
     <main class="contenido">
 
-      <div class="encabezado-ensayo">
-        <h1 id="empresa"></h1>
-        <p id="fecha"></p>
+      <section class="encabezado-ensayo">
+        <h1 id="clienteNombre"></h1>
+        <p id="fechaEnsayo" class="fecha"></p>
         <h2 id="nombreEnsayo"></h2>
-      </div>
+      </section>
 
       <section id="propuesta" class="seccion">
-        <h2>Propuesta</h2>
+        <h3>Propuesta</h3>
         <p id="textoPropuesta"></p>
       </section>
 
       <section id="dosis" class="seccion">
-        <h2>Dosis</h2>
+        <h3>Dosis</h3>
         <p id="textoDosis"></p>
       </section>
 
       <section id="elaboracion" class="seccion">
-        <h2>Elaboración</h2>
+        <h3>Elaboración</h3>
         <p id="textoElaboracion"></p>
       </section>
 
       <section id="resultados" class="seccion">
-        <h2>Resultados</h2>
+        <h3>Resultados</h3>
         <p id="textoResultados"></p>
       </section>
 
       <section id="conclusion" class="seccion">
-        <h2>Conclusión</h2>
+        <h3>Conclusión</h3>
         <p id="textoConclusion"></p>
       </section>
 
-      <section id="precio" class="seccion oculto">
-        <h2>Propuesta comercial</h2>
+      <section id="precio" class="seccion">
+        <h3>Propuesta comercial</h3>
         <p id="textoPrecio"></p>
       </section>
 
