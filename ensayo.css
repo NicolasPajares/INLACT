@@ -33,11 +33,15 @@
   flex: 1;
   background: white;
   padding: 40px;
+
+  display: flex;
+  flex-direction: column;
 }
 
 /* 🔥 ENCABEZADO ENSAYO */
 .encabezado-ensayo {
-  margin-bottom: 50px;
+  margin: auto 0;
+  text-align: center;
 }
 
 .encabezado-ensayo h1 {
@@ -81,3 +85,4 @@
   width: 100%;
   border-radius: 12px;
 }
+
