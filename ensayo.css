@@ -86,3 +86,16 @@
   border-radius: 12px;
 }
 
+/* cada bloque ocupa casi una pantalla */
+.bloque {
+  min-height: 85vh;
+  padding-top: 60px;
+  padding-bottom: 60px;
+  scroll-margin-top: 120px; /* compensa header */
+}
+
+/* título bien separado del resto */
+.bloque h3 {
+  font-size: 22px;
+  margin-bottom: 24px;
+}
