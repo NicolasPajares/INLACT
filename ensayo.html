@@ -1,80 +1,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensayo</title>
-    <link rel="stylesheet" href="ensayo.css">
+  <meta charset="UTF-8">
+  <title>Ensayo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="ensayo.css">
 </head>
 
 <body>
 
-<div class="ensayo-wrapper">
+  <!-- HEADER (igual al index) -->
+  <header class="main-header">
+    <div class="header-left">
+      <img src="img/inlact-logo.png" class="logo" alt="INLACT">
+    </div>
+    <div class="header-right">
+      <span class="user-name">Nicolás Pajares</span>
+    </div>
+  </header>
 
-    <!-- COLUMNA IZQUIERDA -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="logo">
-            <img src="logo-inlact.png" alt="INLACT">
-        </div>
-
-        <nav class="menu">
-            <a href="#propuesta">📋 Propuesta</a>
-            <a href="#dosis">⚗️ Dosis</a>
-            <a href="#elaboracion">🧪 Elaboración</a>
-            <a href="#resultados">📊 Resultados</a>
-            <a href="#conclusion">💡 Conclusión</a>
-            <a href="#precio">💲 Propuesta comercial</a>
-        </nav>
-
-        <footer class="sidebar-footer">
-            © INLACT · Aviso Legal
-        </footer>
+      <nav class="menu">
+        <a href="#propuesta">📄 Propuesta</a>
+        <a href="#dosis">⚗️ Dosis</a>
+        <a href="#elaboracion">🧪 Elaboración</a>
+        <a href="#resultados">📊 Resultados</a>
+        <a href="#conclusion">💡 Conclusión</a>
+        <a href="#precio">💲 Propuesta comercial</a>
+      </nav>
+      <footer class="sidebar-footer">
+        © INLACT · Aviso Legal
+      </footer>
     </aside>
 
     <!-- CONTENIDO -->
     <main class="contenido">
 
-        <header class="encabezado">
-            <a class="volver" href="ensayos.html">Volver al sitio principal</a>
+      <div class="encabezado-ensayo">
+        <h1 id="empresa"></h1>
+        <p id="fecha"></p>
+        <h2 id="nombreEnsayo"></h2>
+      </div>
 
-            <h1 class="empresa">Molino San José S.A.</h1>
-            <p class="fecha">02 de marzo de 2026</p>
-            <h2 class="titulo-ensayo">Ensayo de calidad de producto</h2>
-        </header>
+      <section id="propuesta" class="seccion">
+        <h2>Propuesta</h2>
+        <p id="textoPropuesta"></p>
+      </section>
 
-        <section id="propuesta">
-            <h3>Propuesta</h3>
-            <p>Texto de la propuesta técnica del ensayo.</p>
-        </section>
+      <section id="dosis" class="seccion">
+        <h2>Dosis</h2>
+        <p id="textoDosis"></p>
+      </section>
 
-        <section id="dosis">
-            <h3>Dosis</h3>
-            <p>Detalle de dosis aplicada.</p>
-        </section>
+      <section id="elaboracion" class="seccion">
+        <h2>Elaboración</h2>
+        <p id="textoElaboracion"></p>
+      </section>
 
-        <section id="elaboracion">
-            <h3>Elaboración</h3>
-            <p>Proceso de elaboración del ensayo.</p>
-        </section>
+      <section id="resultados" class="seccion">
+        <h2>Resultados</h2>
+        <p id="textoResultados"></p>
+      </section>
 
-        <section id="resultados">
-            <h3>Resultados</h3>
-            <p>Resultados observados.</p>
-        </section>
+      <section id="conclusion" class="seccion">
+        <h2>Conclusión</h2>
+        <p id="textoConclusion"></p>
+      </section>
 
-        <section id="conclusion">
-            <h3>Conclusión</h3>
-            <p>Conclusión técnica.</p>
-        </section>
-
-        <section id="precio">
-            <h3>Propuesta comercial</h3>
-            <p>Condiciones comerciales sugeridas.</p>
-        </section>
+      <section id="precio" class="seccion oculto">
+        <h2>Propuesta comercial</h2>
+        <p id="textoPrecio"></p>
+      </section>
 
     </main>
+  </div>
 
-</div>
-
+  <script type="module" src="ensayo.js"></script>
 </body>
 </html>
