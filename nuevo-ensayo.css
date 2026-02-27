@@ -4,15 +4,15 @@
 .card-formulario {
   max-width: 720px;
   margin: 30px auto;
-  padding: 30px;
+  padding: 28px;
 }
 
 /* ===============================
-   TITULO
+   TÍTULO
 ================================ */
 .card-formulario h1 {
   font-size: 28px;
-  margin-bottom: 25px;
+  margin-bottom: 26px;
   color: #1f4e8c;
   text-align: center;
 }
@@ -23,7 +23,7 @@
 #formNuevoEnsayo {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 /* ===============================
@@ -42,30 +42,32 @@
 #formNuevoEnsayo select,
 #formNuevoEnsayo textarea {
   padding: 16px 18px;
-  font-size: 18px;
+  font-size: 17px;
 
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid #d1d5db;
   outline: none;
 
-  font-family: inherit;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #ffffff;
 }
 
-/* TEXTAREA */
+/* Select */
+#formNuevoEnsayo select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%236b7280' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 20px;
+}
+
+/* Textarea */
 #formNuevoEnsayo textarea {
   resize: vertical;
   min-height: 90px;
 }
 
-/* FILE INPUT */
-#formNuevoEnsayo input[type="file"] {
-  padding: 12px;
-  font-size: 16px;
-  background: #f9fafb;
-  cursor: pointer;
-}
-
-/* FOCUS */
+/* Focus */
 #formNuevoEnsayo input:focus,
 #formNuevoEnsayo select:focus,
 #formNuevoEnsayo textarea:focus {
@@ -74,32 +76,46 @@
 }
 
 /* ===============================
-   BOTONES
+   INPUT FILE
+================================ */
+#formNuevoEnsayo input[type="file"] {
+  padding: 14px;
+  font-size: 15px;
+  border-style: dashed;
+  cursor: pointer;
+}
+
+/* ===============================
+   ACCIONES
 ================================ */
 .acciones-form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: 26px;
 }
 
+/* Guardar */
 .btn-guardar {
   padding: 18px;
   font-size: 20px;
   font-weight: 700;
 
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  color: #fff;
+  color: #ffffff;
 
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .btn-guardar:hover {
   opacity: 0.95;
 }
 
+/* Cancelar */
 .btn-cancelar {
   padding: 16px;
   font-size: 18px;
@@ -108,12 +124,9 @@
   color: #1f4e8c;
 
   border: 2px solid #1f4e8c;
-  border-radius: 14px;
-  cursor: pointer;
-}
+  border-radius: 16px;
 
-.btn-cancelar:hover {
-  background: #f1f5f9;
+  cursor: pointer;
 }
 
 /* ===============================
@@ -127,5 +140,9 @@
   .btn-guardar,
   .btn-cancelar {
     flex: 1;
+  }
+
+  .card-formulario {
+    padding: 34px;
   }
 }
