@@ -2,13 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Ensayo técnico | INLACT</title>
+  <title>Ensayo INLACT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS principal -->
   <link rel="stylesheet" href="index.css">
-
-  <!-- CSS específico -->
   <link rel="stylesheet" href="ensayo.css">
 </head>
 
@@ -21,33 +18,38 @@
   <h2>NICOLÁS PAJARES</h2>
 </header>
 
-<main class="layout-ensayo">
+<main class="ensayo-wrapper">
 
-  <!-- SIDEBAR -->
-  <aside class="ensayo-menu">
+  <!-- MENÚ SECCIONES -->
+  <nav class="ensayo-menu">
     <button data-seccion="propuesta">📋 Propuesta</button>
-    <button data-seccion="dosis">⚗️ Dosis</button>
-    <button data-seccion="evidencia">📷 Evidencia</button>
+    <button data-seccion="dosis">🧪 Dosis</button>
+    <button data-seccion="metodologia">⚙️ Metodología</button>
+    <button data-seccion="resultados">📊 Resultados</button>
     <button data-seccion="conclusion">💡 Conclusión</button>
-    <button data-seccion="comercial">💲 Propuesta comercial</button>
-  </aside>
+    <button data-seccion="comercial" id="btnComercial" hidden>💲 Comercial</button>
+  </nav>
+
+  <!-- CABECERA -->
+  <section class="ensayo-header">
+    <h1 id="cliente"></h1>
+    <p id="fecha"></p>
+    <h2 id="nombreEnsayo"></h2>
+
+    <button id="btnMedia" class="btn-media" hidden>
+      📷 Ver imágenes y videos
+    </button>
+  </section>
 
   <!-- CONTENIDO -->
   <section class="ensayo-contenido">
 
-    <h1 id="clienteNombre"></h1>
-    <h2 id="fechaEnsayo"></h2>
-    <h3 id="tituloEnsayo"></h3>
-
-    <div id="propuesta" class="bloque oculto"></div>
-    <div id="dosis" class="bloque oculto"></div>
-
-    <div id="evidencia" class="bloque oculto">
-      <button class="btn-media">📷 Ver imágenes y videos</button>
-    </div>
-
-    <div id="conclusion" class="bloque oculto"></div>
-    <div id="comercial" class="bloque oculto propuesta-comercial"></div>
+    <div id="propuesta" class="ensayo-seccion"></div>
+    <div id="dosis" class="ensayo-seccion"></div>
+    <div id="metodologia" class="ensayo-seccion"></div>
+    <div id="resultados" class="ensayo-seccion"></div>
+    <div id="conclusion" class="ensayo-seccion"></div>
+    <div id="comercial" class="ensayo-seccion"></div>
 
   </section>
 
@@ -57,98 +59,7 @@
   <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module">
-import { db } from "./firebase.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
-
-if (!id) {
-  location.href = "ensayos.html";
-}
-
-async function cargarEnsayo() {
-  const ref = doc(db, "ensayos", id);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    location.href = "ensayos.html";
-    return;
-  }
-
-  const e = snap.data();
-
-  document.getElementById("clienteNombre").textContent = e.clienteNombre || "";
-  document.getElementById("fechaEnsayo").textContent =
-    e.fecha?.toDate().toLocaleDateString("es-AR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    }) || "";
-
-  document.getElementById("tituloEnsayo").textContent = e.nombreEnsayo || "";
-
-  function cargarSeccion(id, titulo, contenido) {
-    if (!contenido) return;
-    const div = document.getElementById(id);
-    div.classList.remove("oculto");
-    div.innerHTML = `<h4>${titulo}</h4><p>${contenido}</p>`;
-  }
-
-  cargarSeccion("propuesta", "Propuesta", e.propuesta);
-  cargarSeccion("dosis", "Dosis", e.dosis);
-  cargarSeccion("conclusion", "Conclusión", e.conclusion);
-
-  if (e.propuestaComercial) {
-    const com = document.getElementById("comercial");
-    com.classList.remove("oculto");
-    com.innerHTML = `
-      <h4>Propuesta comercial</h4>
-      <p>${e.propuestaComercial}</p>
-    `;
-  }
-
-  if (e.fotos && e.fotos.length > 0) {
-    const evid = document.getElementById("evidencia");
-    evid.classList.remove("oculto");
-
-    const btn = evid.querySelector(".btn-media");
-    btn.onclick = () => {
-      if (evid.querySelector(".galeria")) return;
-
-      const gal = document.createElement("div");
-      gal.className = "galeria";
-
-      e.fotos.forEach(url => {
-        if (url.match(/\.(mp4|webm|ogg)$/)) {
-          const video = document.createElement("video");
-          video.src = url;
-          video.controls = true;
-          gal.appendChild(video);
-        } else {
-          const img = document.createElement("img");
-          img.src = url;
-          gal.appendChild(img);
-        }
-      });
-
-      evid.appendChild(gal);
-    };
-  }
-}
-
-cargarEnsayo();
-
-document.querySelectorAll(".ensayo-menu button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const sec = btn.dataset.seccion;
-    const el = document.getElementById(sec);
-    if (el && !el.classList.contains("oculto")) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  });
-});
-</script>
+<script type="module" src="ensayo.js"></script>
 
 </body>
 </html>
