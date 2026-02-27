@@ -7,8 +7,7 @@ import {
   collection,
   getDocs,
   query,
-  orderBy,
-  doc
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -44,7 +43,6 @@ btnNuevoEnsayo.addEventListener("click", () => {
  *************************/
 async function cargarEnsayos() {
   listaEnsayos.innerHTML = "<li class='item-cargando'>Cargando ensayos...</li>";
-
   ensayos = [];
 
   const q = query(
@@ -62,7 +60,8 @@ async function cargarEnsayos() {
   });
 
   if (ensayos.length === 0) {
-    listaEnsayos.innerHTML = "<li class='item-vacio'>No hay ensayos cargados</li>";
+    listaEnsayos.innerHTML =
+      "<li class='item-vacio'>No hay ensayos cargados</li>";
     return;
   }
 
@@ -88,7 +87,10 @@ function renderEnsayos(lista) {
 
     li.innerHTML = `
       <div class="ensayo-principal">
-        <strong>${fecha} ${e.cliente || "Cliente sin nombre"} – ${e.nombre || "Ensayo sin nombre"}</strong>
+        <strong>
+          ${fecha} ${e.clienteNombre || "Cliente sin nombre"} – 
+          ${e.nombreEnsayo || "Ensayo sin nombre"}
+        </strong>
       </div>
     `;
 
@@ -107,8 +109,8 @@ buscador.addEventListener("input", () => {
   const texto = buscador.value.toLowerCase();
 
   const filtrados = ensayos.filter(e =>
-    (e.cliente || "").toLowerCase().includes(texto) ||
-    (e.nombre || "").toLowerCase().includes(texto)
+    (e.clienteNombre || "").toLowerCase().includes(texto) ||
+    (e.nombreEnsayo || "").toLowerCase().includes(texto)
   );
 
   renderEnsayos(filtrados);
