@@ -8,9 +8,10 @@
   <!-- CSS principal -->
   <link rel="stylesheet" href="index.css">
 
-  <!-- CSS específico de ensayo -->
+  <!-- CSS específico -->
   <link rel="stylesheet" href="ensayo.css">
 </head>
+
 <body>
 
 <header>
@@ -42,7 +43,7 @@
     <div id="dosis" class="bloque oculto"></div>
 
     <div id="evidencia" class="bloque oculto">
-      <button class="btn-media">Ver imágenes y videos</button>
+      <button class="btn-media">📷 Ver imágenes y videos</button>
     </div>
 
     <div id="conclusion" class="bloque oculto"></div>
@@ -64,49 +65,50 @@ const params = new URLSearchParams(location.search);
 const id = params.get("id");
 
 if (!id) {
-  alert("Ensayo no encontrado");
   location.href = "ensayos.html";
 }
 
 async function cargarEnsayo() {
   const ref = doc(db, "ensayos", id);
   const snap = await getDoc(ref);
-
   if (!snap.exists()) {
-    alert("Ensayo inexistente");
     location.href = "ensayos.html";
+    return;
   }
 
   const e = snap.data();
 
   document.getElementById("clienteNombre").textContent = e.clienteNombre || "";
-  document.getElementById("fechaEnsayo").textContent = e.fecha.toDate().toLocaleDateString("es-AR", {
-    day: "2-digit", month: "2-digit", year: "numeric"
-  });
+  document.getElementById("fechaEnsayo").textContent =
+    e.fecha?.toDate().toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    }) || "";
+
   document.getElementById("tituloEnsayo").textContent = e.nombreEnsayo || "";
 
-  function mostrarSeccion(id, titulo, contenido) {
+  function cargarSeccion(id, titulo, contenido) {
     if (!contenido) return;
-
     const div = document.getElementById(id);
     div.classList.remove("oculto");
     div.innerHTML = `<h4>${titulo}</h4><p>${contenido}</p>`;
   }
 
-  mostrarSeccion("propuesta", "Propuesta", e.propuesta);
-  mostrarSeccion("dosis", "Dosis", e.dosis);
-  mostrarSeccion("conclusion", "Conclusión", e.conclusion);
+  cargarSeccion("propuesta", "Propuesta", e.propuesta);
+  cargarSeccion("dosis", "Dosis", e.dosis);
+  cargarSeccion("conclusion", "Conclusión", e.conclusion);
 
   if (e.propuestaComercial) {
-    const divCom = document.getElementById("comercial");
-    divCom.classList.remove("oculto");
-    divCom.innerHTML = `
+    const com = document.getElementById("comercial");
+    com.classList.remove("oculto");
+    com.innerHTML = `
       <h4>Propuesta comercial</h4>
       <p>${e.propuestaComercial}</p>
     `;
   }
 
-  if (e.fotos && e.fotos.length) {
+  if (e.fotos && e.fotos.length > 0) {
     const evid = document.getElementById("evidencia");
     evid.classList.remove("oculto");
 
@@ -114,38 +116,35 @@ async function cargarEnsayo() {
     btn.onclick = () => {
       if (evid.querySelector(".galeria")) return;
 
-      const galeria = document.createElement("div");
-      galeria.className = "galeria";
+      const gal = document.createElement("div");
+      gal.className = "galeria";
 
       e.fotos.forEach(url => {
         if (url.match(/\.(mp4|webm|ogg)$/)) {
           const video = document.createElement("video");
           video.src = url;
           video.controls = true;
-          galeria.appendChild(video);
+          gal.appendChild(video);
         } else {
           const img = document.createElement("img");
           img.src = url;
-          galeria.appendChild(img);
+          gal.appendChild(img);
         }
       });
 
-      evid.appendChild(galeria);
+      evid.appendChild(gal);
     };
   }
 }
 
 cargarEnsayo();
 
-/* ===============================
-   NAVEGACIÓN SIDEBAR
-================================ */
 document.querySelectorAll(".ensayo-menu button").forEach(btn => {
   btn.addEventListener("click", () => {
     const sec = btn.dataset.seccion;
-    const elem = document.getElementById(sec);
-    if (elem && !elem.classList.contains("oculto")) {
-      elem.scrollIntoView({ behavior: "smooth" });
+    const el = document.getElementById(sec);
+    if (el && !el.classList.contains("oculto")) {
+      el.scrollIntoView({ behavior: "smooth" });
     }
   });
 });
