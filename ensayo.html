@@ -1,273 +1,83 @@
- <link rel="stylesheet" href="index.css">
-  <!-- CSS ensayo -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ensayo</title>
   <link rel="stylesheet" href="ensayo.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ensayo</title>
-    <link rel="stylesheet" href="ensayo.css">
 </head>
-
 <body>
-@@ -24,203 +20,75 @@
-  <h2>NICOLÁS PAJARES</h2>
-</header>
 
-<main>
-
-  <div class="ensayo-layout">
-<div class="ensayo-wrapper">
-
-    <!-- COLUMNA IZQUIERDA -->
-    <aside class="ensayo-sidebar">
-      <h3>Ensayo</h3>
-      <p id="sidebarCliente"></p>
-      <p id="sidebarFecha"></p>
-    <aside class="sidebar">
-        <div class="logo">
-            <img src="logo-inlact.png" alt="INLACT">
-        </div>
-
-        <nav class="menu">
-            <a href="#propuesta">📋 Propuesta</a>
-            <a href="#dosis">⚗️ Dosis</a>
-            <a href="#elaboracion">🧪 Elaboración</a>
-            <a href="#resultados">📊 Resultados</a>
-            <a href="#conclusion">💡 Conclusión</a>
-            <a href="#precio">💲 Propuesta comercial</a>
-        </nav>
-
-        <footer class="sidebar-footer">
-            © INLACT · Aviso Legal
-        </footer>
-    </aside>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <section class="ensayo-contenido">
-
-      <header class="ensayo-header">
-        <h1 id="tituloEnsayo">Ensayo técnico</h1>
-        <h2 id="subtituloEnsayo"></h2>
-      </header>
-
-      <div id="contenido"></div>
-
-    </section>
-
-  </div>
-<main class="ensayo-layout">
+<div class="layout">
 
   <!-- COLUMNA IZQUIERDA -->
-  <aside class="ensayo-menu">
-    <button onclick="scrollToSection('propuesta')">Propuesta</button>
-    <button onclick="scrollToSection('dosis')">Dosis</button>
-    <button onclick="scrollToSection('elaboracion')">Elaboración</button>
-    <button onclick="scrollToSection('resultados')">Resultados</button>
-    <button onclick="scrollToSection('conclusion')">Conclusión</button>
-    <button onclick="scrollToSection('fotos')">Imágenes</button>
+  <aside class="sidebar">
+    <div class="logo">INLACT</div>
+
+    <nav class="menu">
+      <a href="#propuesta">Propuesta</a>
+      <a href="#dosis">Dosis</a>
+      <a href="#elaboracion">Elaboración</a>
+      <a href="#resultados">Resultados</a>
+      <a href="#conclusion">Conclusión</a>
+      <a href="#precio" id="link-precio" style="display:none;">Propuesta comercial</a>
+      <a href="#imagenes">Ver imágenes</a>
+    </nav>
   </aside>
 
-  <!-- CONTENIDO -->
-  <section class="ensayo-contenido">
+  <!-- CONTENIDO BLANCO -->
+  <main class="contenido">
 
+    <!-- HEADER DEL ENSAYO (AHORA BIEN UBICADO) -->
     <div class="ensayo-header">
-      <h1 id="nombreEnsayo">Ensayo técnico</h1>
-      <h2 id="clienteEnsayo"></h2>
-      <p id="fechaEnsayo"></p>
+      <div id="empresa" class="empresa">—</div>
+      <div id="fecha" class="fecha">—</div>
+      <div id="nombre-ensayo" class="nombre-ensayo">—</div>
     </div>
 
-    <div id="propuesta" class="bloque">
-      <h3>Propuesta</h3>
-      <p></p>
-    </div>
+    <section id="propuesta">
+      <h2>Propuesta</h2>
+      <p id="txt-propuesta"></p>
+    </section>
 
-    <div id="dosis" class="bloque">
-      <h3>Dosis</h3>
-      <p></p>
-    </div>
+    <section id="dosis">
+      <h2>Dosis</h2>
+      <p id="txt-dosis"></p>
+    </section>
 
-    <div id="elaboracion" class="bloque">
-      <h3>Elaboración</h3>
-      <p></p>
-    </div>
+    <section id="elaboracion">
+      <h2>Elaboración</h2>
+      <p id="txt-elaboracion"></p>
+    </section>
 
-    <div id="resultados" class="bloque">
-      <h3>Resultados</h3>
-      <p></p>
-    </div>
+    <section id="resultados">
+      <h2>Resultados</h2>
+      <p id="txt-resultados"></p>
+    </section>
 
-    <div id="conclusion" class="bloque">
-      <h3>Conclusión</h3>
-      <p></p>
-    </div>
+    <section id="conclusion">
+      <h2>Conclusión</h2>
+      <p id="txt-conclusion"></p>
+    </section>
 
-    <div id="fotos" class="bloque">
-      <h3>Registro fotográfico</h3>
-      <div class="galeria"></div>
-    </div>
+    <section id="precio" style="display:none;">
+      <h2>Propuesta comercial</h2>
+      <p id="txt-precio"></p>
+    </section>
 
-  </section>
+    <section id="imagenes">
+      <h2>Imágenes</h2>
+      <div id="galeria"></div>
+    </section>
 
-</main>
+    <footer class="footer">
+      INLACT · Nicolás Pajares
+    </footer>
 
-<footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
-
-<script type="module">
-/**********************
- * FIREBASE
- **********************/
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/**********************
- * CARGA ENSAYO
- **********************/
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
-
-if (!id) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("ID faltante");
-}
-
-const ref = doc(db, "ensayos", id);
-const snap = await getDoc(ref);
-<script type="module" src="ensayo.js"></script>
-
-if (!snap.exists()) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("No existe");
-<script>
-function scrollToSection(id) {
-  document.getElementById(id).scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-}
-
-const e = snap.data();
-
-/**********************
- * FECHA
- **********************/
-const fecha = e.fecha?.toDate
-  ? e.fecha.toDate().toLocaleDateString("es-AR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    })
-  : "--/--/----";
-
-/**********************
- * SIDEBAR
- **********************/
-document.getElementById("sidebarCliente").textContent =
-  e.clienteNombre || "";
-
-document.getElementById("sidebarFecha").textContent = fecha;
-
-/**********************
- * TITULOS
- **********************/
-document.getElementById("tituloEnsayo").textContent =
-  e.nombreEnsayo || "Ensayo técnico";
-
-document.getElementById("subtituloEnsayo").textContent =
-  e.clienteNombre || "";
-
-/**********************
- * CONTENIDO
- **********************/
-const div = document.getElementById("contenido");
-
-div.innerHTML = `
-  <div class="bloque"><h3>Propuesta</h3><p>${e.propuesta || "-"}</p></div>
-  <div class="bloque"><h3>Dosis</h3><p>${e.dosis || "-"}</p></div>
-  <div class="bloque"><h3>Elaboración</h3><p>${e.elaboracion || "-"}</p></div>
-  <div class="bloque"><h3>Resultados</h3><p>${e.resultados || "-"}</p></div>
-  <div class="bloque"><h3>Conclusión</h3><p>${e.conclusion || "-"}</p></div>
-
-  ${
-    e.propuestaComercial
-      ? `<div class="bloque"><h3>Propuesta comercial</h3><p>${e.propuestaComercial}</p></div>`
-      : ""
-  }
-
-  ${
-    e.fotos && e.fotos.length
-      ? `
-      <div class="bloque">
-        <h3>Registro fotográfico</h3>
-        <div class="fotos">
-          ${e.fotos.map(f => `<img src="${f}">`).join("")}
-        </div>
-      </div>`
-      : ""
-  }
-`;
-</script>
-    <!-- CONTENIDO -->
-    <main class="contenido">
-
-        <header class="encabezado">
-            <a class="volver" href="ensayos.html">Volver al sitio principal</a>
-
-            <h1 class="empresa">Molino San José S.A.</h1>
-            <p class="fecha">02 de marzo de 2026</p>
-            <h2 class="titulo-ensayo">Ensayo de calidad de producto</h2>
-        </header>
-
-        <section id="propuesta">
-            <h3>Propuesta</h3>
-            <p>Texto de la propuesta técnica del ensayo.</p>
-        </section>
-
-        <section id="dosis">
-            <h3>Dosis</h3>
-            <p>Detalle de dosis aplicada.</p>
-        </section>
-
-        <section id="elaboracion">
-            <h3>Elaboración</h3>
-            <p>Proceso de elaboración del ensayo.</p>
-        </section>
-
-        <section id="resultados">
-            <h3>Resultados</h3>
-            <p>Resultados observados.</p>
-        </section>
-
-        <section id="conclusion">
-            <h3>Conclusión</h3>
-            <p>Conclusión técnica.</p>
-        </section>
-
-        <section id="precio">
-            <h3>Propuesta comercial</h3>
-            <p>Condiciones comerciales sugeridas.</p>
-        </section>
-
-    </main>
+  </main>
 
 </div>
 
+<script src="ensayo.js"></script>
 </body>
 </html>
