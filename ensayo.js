@@ -1,41 +1,83 @@
-const params = new URLSearchParams(window.location.search);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.appspot.com",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* PARAMS */
+const params = new URLSearchParams(location.search);
 const id = params.get("id");
 
 if (!id) {
-  alert("Ensayo no encontrado");
+  document.body.innerHTML = "Ensayo no encontrado";
+  throw new Error("ID faltante");
 }
 
-fetch(`https://firestore.googleapis.com/v1/projects/inlact/databases/(default)/documents/ensayos/${id}`)
-  .then(res => res.json())
-  .then(data => {
-    const f = data.fields;
+const snap = await getDoc(doc(db, "ensayos", id));
+if (!snap.exists()) {
+  document.body.innerHTML = "Ensayo inexistente";
+  throw new Error("No existe");
+}
 
-    document.getElementById("empresa").textContent = f.empresa?.stringValue || "";
-    document.getElementById("fecha").textContent = f.fecha?.stringValue || "";
-    document.getElementById("nombre-ensayo").textContent = f.ensayo?.stringValue || "";
+const e = snap.data();
 
-    document.getElementById("txt-propuesta").textContent = f.propuesta?.stringValue || "";
-    document.getElementById("txt-dosis").textContent = f.dosis?.stringValue || "";
-    document.getElementById("txt-elaboracion").textContent = f.elaboracion?.stringValue || "";
-    document.getElementById("txt-resultados").textContent = f.resultados?.stringValue || "";
-    document.getElementById("txt-conclusion").textContent = f.conclusion?.stringValue || "";
+/* ENCABEZADO */
+document.getElementById("empresa").textContent = e.clienteNombre || "";
+document.getElementById("nombre-ensayo").textContent = e.nombreEnsayo || "";
 
-    if (f.precio) {
-      document.getElementById("txt-precio").textContent = f.precio.stringValue;
-      document.getElementById("precio").style.display = "block";
-      document.getElementById("link-precio").style.display = "block";
-    }
+document.getElementById("fecha").textContent =
+  e.fecha?.toDate
+    ? e.fecha.toDate().toLocaleDateString("es-AR")
+    : "";
 
-    if (f.imagenes) {
-      const galeria = document.getElementById("galeria");
-      f.imagenes.arrayValue.values.forEach(item => {
-        const img = document.createElement("img");
-        img.src = item.stringValue;
-        galeria.appendChild(img);
-      });
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error cargando el ensayo");
+/* CONTENIDO */
+const contenido = document.getElementById("contenido");
+
+const secciones = {
+  propuesta: e.propuesta,
+  dosis: e.dosis,
+  elaboracion: e.elaboracion,
+  resultados: e.resultados,
+  conclusion: e.conclusion,
+  comercial: e.propuestaComercial,
+  fotos: e.fotos && e.fotos.length
+    ? `<div class="fotos">${e.fotos.map(f => `<img src="${f}">`).join("")}</div>`
+    : "No hay imágenes"
+};
+
+function mostrarSeccion(key) {
+  if (!secciones[key]) {
+    contenido.innerHTML = "<p>No hay información</p>";
+    return;
+  }
+
+  contenido.innerHTML = `
+    <div class="bloque">
+      <p>${secciones[key]}</p>
+    </div>
+  `;
+}
+
+/* botones */
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    mostrarSeccion(btn.dataset.seccion);
   });
+});
+
+/* sección inicial */
+mostrarSeccion("propuesta");
