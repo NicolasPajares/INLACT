@@ -210,3 +210,56 @@ footer a:hover {
     margin-bottom: 28px;
   }
 }
+
+/* =========================
+   MOBILE
+   ========================= */
+@media (max-width: 768px) {
+
+  /* contenedor principal */
+  .ensayo-layout {
+    display: block;
+  }
+
+  /* columna izquierda (menú) */
+  .ensayo-menu {
+    width: 100%;
+    height: auto;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  .ensayo-menu button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    border-radius: 999px;
+  }
+
+  /* contenido */
+  .ensayo-contenido {
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* títulos */
+  .ensayo-header h1 {
+    font-size: 22px;
+    text-align: center;
+  }
+
+  .ensayo-header h2 {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  /* botón imágenes */
+  .btn-media {
+    width: 100%;
+    text-align: center;
+  }
+
+}
