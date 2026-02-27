@@ -1,90 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ensayo</title>
+  <meta charset="UTF-8">
+  <title>Ensayo INLACT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS general -->
+  <link rel="stylesheet" href="index.css">
+  <!-- CSS ensayo -->
   <link rel="stylesheet" href="ensayo.css">
 </head>
+
 <body>
 
-<div class="layout">
+<!-- HEADER IGUAL AL INDEX -->
+<header>
+  <figure>
+    <img src="img/logo.jpg" alt="INLACT">
+  </figure>
+  <h2>NICOLÁS PAJARES</h2>
+</header>
 
-  <!-- COLUMNA IZQUIERDA -->
-  <aside class="sidebar">
-    <div class="logo">INLACT</div>
+<main class="contenedor-ensayo">
 
-    <nav class="menu">
-      <a href="#propuesta">Propuesta</a>
-      <a href="#dosis">Dosis</a>
-      <a href="#elaboracion">Elaboración</a>
-      <a href="#resultados">Resultados</a>
-      <a href="#conclusion">Conclusión</a>
-      <a href="#precio" id="link-precio" style="display:none;">Propuesta comercial</a>
-      <a href="#imagenes">Ver imágenes</a>
-    </nav>
+  <!-- COLUMNA IZQUIERDA (menú) -->
+  <aside class="menu-ensayo">
+    <button data-seccion="propuesta">Propuesta</button>
+    <button data-seccion="dosis">Dosis</button>
+    <button data-seccion="elaboracion">Elaboración</button>
+    <button data-seccion="resultados">Resultados</button>
+    <button data-seccion="conclusion">Conclusión</button>
+    <button data-seccion="comercial">Propuesta comercial</button>
+    <button data-seccion="fotos">Imágenes</button>
   </aside>
 
-  <!-- CONTENIDO BLANCO -->
-  <main class="contenido">
+  <!-- COLUMNA DERECHA (BLANCA) -->
+  <section class="contenido-blanco">
 
-    <!-- CABECERA ENSAYO -->
-<section class="encabezado-ensayo">
-  <h1 id="empresa"></h1>
-  <p id="fecha"></p>
-  <h2 id="nombre-ensayo"></h2>
-</section>
-    <!-- HEADER DEL ENSAYO (AHORA BIEN UBICADO) -->
-    <div class="ensayo-header">
-      <div id="empresa" class="empresa">—</div>
-      <div id="fecha" class="fecha">—</div>
-      <div id="nombre-ensayo" class="nombre-ensayo">—</div>
-    </div>
-
-    <section id="propuesta">
-      <h2>Propuesta</h2>
-      <p id="txt-propuesta"></p>
+    <!-- 🔥 ESTO ES LO QUE NO EXISTÍA -->
+    <section class="encabezado-ensayo">
+      <h1 id="empresa"></h1>
+      <p id="fecha"></p>
+      <h2 id="nombre-ensayo"></h2>
     </section>
 
-    <section id="dosis">
-      <h2>Dosis</h2>
-      <p id="txt-dosis"></p>
-    </section>
+    <!-- CONTENIDO DINÁMICO -->
+    <section id="contenido"></section>
 
-    <section id="elaboracion">
-      <h2>Elaboración</h2>
-      <p id="txt-elaboracion"></p>
-    </section>
+  </section>
 
-    <section id="resultados">
-      <h2>Resultados</h2>
-      <p id="txt-resultados"></p>
-    </section>
+</main>
 
-    <section id="conclusion">
-      <h2>Conclusión</h2>
-      <p id="txt-conclusion"></p>
-    </section>
+<footer>
+  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
 
-    <section id="precio" style="display:none;">
-      <h2>Propuesta comercial</h2>
-      <p id="txt-precio"></p>
-    </section>
+<script type="module" src="ensayo.js"></script>
 
-    <section id="imagenes">
-      <h2>Imágenes</h2>
-      <div id="galeria"></div>
-    </section>
-
-    <footer class="footer">
-      INLACT · Nicolás Pajares
-    </footer>
-
-  </main>
-
-</div>
-
-<script src="ensayo.js"></script>
 </body>
 </html>
-
