@@ -1,136 +1,143 @@
+/* RESET BÁSICO */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-body {
-    background: #f4f6f8;
-}
-
-/* Layout general */
-.ensayo-wrapper {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 260px;
-    background: #3b97d3;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+/* HEADER */
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
 }
 
 .logo {
-    padding: 25px;
-    text-align: center;
+  height: 40px;
 }
 
-.logo img {
-    max-width: 150px;
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.volver-link {
+  font-size: 14px;
+  color: #0077b6;
+  text-decoration: none;
+}
+
+/* WRAPPER GENERAL */
+.page-wrapper {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: linear-gradient(180deg, #2f8fd8, #4aa3df);
+  padding: 24px 16px;
 }
 
 .menu {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.menu a {
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    text-decoration: none;
-    padding: 12px 15px;
-    border-radius: 6px;
-    font-weight: 600;
+.menu-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
 }
 
-.menu a:hover {
-    background: rgba(255,255,255,0.25);
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-.sidebar-footer {
-    text-align: center;
-    padding: 15px;
-    font-size: 13px;
-    opacity: 0.8;
-}
-
-/* Contenido */
+/* CONTENIDO */
 .contenido {
-    flex: 1;
-    background: #fff;
-    padding: 40px 50px;
+  flex: 1;
+  padding: 32px 40px;
+  background: #f7f9fb;
 }
 
-/* Encabezado */
-.encabezado {
-    text-align: center;
-    margin-bottom: 40px;
+.encabezado-ensayo {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.volver {
-    display: block;
-    text-align: right;
-    font-size: 14px;
-    color: #666;
-    text-decoration: none;
-    margin-bottom: 10px;
+.encabezado-ensayo h1 {
+  font-size: 32px;
+  color: #2f8fd8;
 }
 
-.empresa {
-    font-size: 34px;
-    color: #3b97d3;
-    margin-bottom: 10px;
+.encabezado-ensayo h2 {
+  font-size: 22px;
+  margin-top: 10px;
+  color: #333;
 }
 
 .fecha {
-    font-size: 16px;
-    color: #777;
-    margin-bottom: 20px;
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
 }
 
-.titulo-ensayo {
-    font-size: 26px;
-    color: #3b97d3;
-    font-weight: bold;
+/* SECCIONES */
+.seccion {
+  margin-bottom: 80px; /* separación grande (efecto "pantalla nueva") */
 }
 
-/* Secciones */
-section {
-    margin-bottom: 35px;
+.seccion h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: #2f8fd8;
 }
 
-section h3 {
-    font-size: 20px;
-    color: #3b97d3;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
+.seccion p {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.6;
 }
 
-section p {
-    font-size: 15px;
-    color: #333;
-    line-height: 1.6;
-}
-
-/* Mobile: mismo diseño, solo achica paddings */
+/* MOBILE */
 @media (max-width: 768px) {
-    .contenido {
-        padding: 25px;
-    }
+  .page-wrapper {
+    flex-direction: column;
+  }
 
-    .empresa {
-        font-size: 26px;
-    }
+  .sidebar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
 
-    .titulo-ensayo {
-        font-size: 22px;
-    }
+  .menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .contenido {
+    padding: 24px;
+  }
 }
