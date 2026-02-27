@@ -99,3 +99,15 @@
   font-size: 22px;
   margin-bottom: 24px;
 }
+
+/* 🔥 ENCABEZADO COMO PANTALLA */
+.encabezado-ensayo {
+  min-height: 85vh;              /* ocupa casi una pantalla */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;       /* centra vertical */
+  align-items: center;           /* centra horizontal */
+  text-align: center;
+
+  scroll-margin-top: 120px;      /* compensa header fijo */
+}
