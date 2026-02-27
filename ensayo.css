@@ -1,299 +1,127 @@
-/* ===============================
-   RESET BÁSICO
-================================ */
-/* RESET */
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* BODY */
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
-    background: #f4f6f8;
-    color: #1f2937;
-  font-family: system-ui, Arial, sans-serif;
-  background: #f3f7fb;
-  color: #2c3e50;
+  margin: 0;
+  background: #f2f4f7;
 }
 
-/* ===============================
-   LAYOUT GENERAL
-================================ */
-/* LAYOUT GENERAL */
-.ensayo-layout {
-    display: flex;
-    min-height: calc(100vh - 120px);
-    background: #ffffff;
+/* LAYOUT */
+.layout {
   display: flex;
-  min-height: calc(100vh - 140px);
-  background: #ffffff;
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-  gap: 24px;
+  min-height: 100vh;
 }
 
-/* ===============================
-   SIDEBAR IZQUIERDA
-   COLUMNA IZQUIERDA
-================================ */
 /* SIDEBAR */
-.ensayo-sidebar {
-    width: 260px;
-    min-width: 260px;
-    background: linear-gradient(180deg, #3a9bdc, #4aa3df);
-    padding: 20px 15px;
-    color: #ffffff;
-.ensayo-menu {
-  width: 260px;
-  background: #3a9bdc;
-  color: #ffffff;
-  padding: 24px;
-}
-
-.ensayo-sidebar .menu {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-.ensayo-sidebar h3 {
-  font-size: 20px;
-  margin-bottom: 14px;
-  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  border-radius: 16px;
+.sidebar {
+  width: 240px;
+  background: #e8f2f7;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex-shrink: 0;
 }
 
-.ensayo-sidebar .menu a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    color: #ffffff;
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.12);
-    font-weight: 500;
-    transition: background 0.2s;
-.ensayo-sidebar p {
-  font-size: 14px;
-  margin-bottom: 6px;
-.ensayo-menu button {
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.ensayo-sidebar .menu a:hover {
-    background: rgba(255, 255, 255, 0.25);
-.ensayo-menu button:hover {
-  background: rgba(255,255,255,0.3);
-}
-
-/* ===============================
-   CONTENIDO PRINCIPAL
-   CONTENIDO DERECHO
-================================ */
-/* CONTENIDO */
-.ensayo-contenido {
-    flex: 1;
-    padding: 40px 60px;
-    background: #ffffff;
-  flex: 1;
-  padding: 40px;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 30px 40px;
-}
-
-/* ===============================
-   CABECERA ENSAYO
-   HEADER ENSAYO
-================================ */
-/* HEADER */
-.ensayo-header {
-    text-align: center;
-    margin-bottom: 40px;
-  text-align: center;
-  margin-bottom: 40px;
-  margin-bottom: 50px;
-}
-
-.ensayo-header h1 {
-    font-size: 36px;
-    color: #3a9bdc;
-    margin-bottom: 10px;
-  font-size: 32px;
-  color: #1f4e8c;
-}
-
-.ensayo-header .fecha {
-    font-size: 16px;
-    color: #6b7280;
-    margin-bottom: 20px;
-.ensayo-header h2 {
-  font-size: 18px;
-  font-weight: 500;
-  font-size: 20px;
-  color: #374151;
-  margin-top: 6px;
-}
-
-.ensayo-header .titulo {
-    font-size: 26px;
-    color: #3a9bdc;
-    font-weight: 700;
-    margin-top: 25px;
-.ensayo-header p {
-  font-size: 14px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
-/* ===============================
-   BLOQUES DE CONTENIDO
-   BLOQUES
-================================ */
-/* BLOQUES */
-.bloque {
-    background: #f9fbfd;
-    border-left: 6px solid #3a9bdc;
-    padding: 20px 24px;
-    margin-bottom: 30px;
-    border-radius: 12px;
-  background: #f9fbfd;
-  border-left: 5px solid #3a9bdc;
-  padding: 22px;
-  margin-bottom: 26px;
-  border-radius: 12px;
-  margin-bottom: 80px;
-}
-
-.bloque h3 {
-    font-size: 20px;
-    margin-bottom: 10px;
-    color: #1f4e8c;
+.logo {
   font-size: 22px;
+  font-weight: bold;
+  color: #4aa3c7;
+  margin-bottom: 30px;
+}
+
+.menu a {
+  display: block;
+  color: #4aa3c7;
+  text-decoration: none;
   margin-bottom: 12px;
-  color: #1f4e8c;
+  font-weight: 600;
 }
 
-.bloque p {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #374151;
-    white-space: pre-wrap;
+.menu a:hover {
+  text-decoration: underline;
 }
 
-/* ===============================
-   BOTÓN EVIDENCIA
-================================ */
-.btn-evidencia {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #1f4e8c;
-    color: #ffffff;
-    padding: 14px 22px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 600;
-    margin-bottom: 30px;
+/* CONTENIDO */
+.contenido {
+  flex: 1;
+  background: #ffffff;
+  padding: 40px;
 }
 
-.btn-evidencia:hover {
-    background: #163b6a;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #374151;
+/* HEADER ENSAYO */
+.ensayo-header {
+  margin-bottom: 40px;
 }
 
-/* ===============================
-   GALERÍA
-================================ */
-.galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-    margin-top: 15px;
+.empresa {
+  font-size: 36px;
+  font-weight: 700;
+  color: #4aa3c7;
 }
 
-.galeria img,
-.galeria video {
-    width: 100%;
-    border-radius: 12px;
-    background: #e5e7eb;
-  color: #1f4e8c;
-  margin-bottom: 8px;
+.fecha {
+  font-size: 14px;
+  color: #555;
+  margin: 6px 0;
 }
 
-/* ===============================
-   FOOTER (IGUAL AL INDEX)
-================================ */
-footer {
-    text-align: center;
-    padding: 20px;
-    background: #ffffff;
-    border-top: 1px solid #e5e7eb;
-    font-size: 14px;
-/* FOTOS */
-.fotos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+.nombre-ensayo {
+  font-size: 28px;
+  font-weight: 600;
+  color: #4aa3c7;
 }
 
-footer a {
-    color: #1f4e8c;
-    text-decoration: none;
-.fotos img {
-.galeria img {
-  width: 100%;
-  border-radius: 12px;
+/* SECCIONES */
+section {
+  margin-bottom: 35px;
 }
 
-/* ===============================
-   🔒 FORZAR VISTA ESCRITORIO
-   (CELULAR = PC)
-================================ */
-/* 🔒 FORZAR MISMA VISTA EN CELULAR */
-@media (max-width: 900px) {
+section h2 {
+  font-size: 20px;
+  color: #4aa3c7;
+  margin-bottom: 10px;
+}
 
-    body {
-        min-width: 1200px;
-        overflow-x: auto;
-    }
+section p {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
+}
 
-    .ensayo-layout {
-        flex-direction: row !important;
-    }
+/* GALERÍA */
+#galeria img,
+#galeria video {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
 
-    .ensayo-sidebar {
-        width: 260px;
-        min-width: 260px;
-    }
+/* FOOTER */
+.footer {
+  margin-top: 40px;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+  font-size: 13px;
+  color: #777;
+}
 
-    .ensayo-contenido {
-        padding: 40px 60px;
-    }
-  body {
-    min-width: 1100px;
-    overflow-x: auto;
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: row;
+  }
+
+  .sidebar {
+    width: 220px;
+  }
+
+  .contenido {
+    padding: 25px;
+  }
+
+  .empresa {
+    font-size: 30px;
+  }
+
+  .nombre-ensayo {
+    font-size: 24px;
   }
 }
