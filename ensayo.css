@@ -156,3 +156,27 @@ section:target {
     padding-top: 100px;
     border-top: 3px solid #1f4e8c;
 }
+
+.encabezado-ensayo {
+  margin-bottom: 40px;
+}
+
+.encabezado-ensayo h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1f9cd6; /* celeste */
+  margin: 0;
+}
+
+.encabezado-ensayo p {
+  font-size: 14px;
+  color: #4b5563; /* gris oscuro */
+  margin: 6px 0 10px 0;
+}
+
+.encabezado-ensayo h2 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1f9cd6; /* celeste */
+  margin: 0;
+}
