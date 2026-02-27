@@ -1,107 +1,109 @@
 /* ===============================
-   LAYOUT GENERAL
+   BASE
 ================================ */
-.ensayo-layout {
-  display: flex;
+body {
+  background: #f3f7fb;
+  color: #1f2937;
+}
+
+/* ===============================
+   CONTENEDOR
+================================ */
+.ensayo-container {
   max-width: 1200px;
   margin: auto;
   padding: 20px;
-  gap: 24px;
-}
-
-/* ===============================
-   COLUMNA IZQUIERDA
-================================ */
-.ensayo-menu {
-  width: 260px;
-  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  flex-shrink: 0;
-}
-
-.ensayo-menu button {
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.ensayo-menu button:hover {
-  background: rgba(255,255,255,0.3);
-}
-
-/* ===============================
-   CONTENIDO DERECHO
-================================ */
-.ensayo-contenido {
-  flex: 1;
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 30px 40px;
 }
 
 /* ===============================
    HEADER ENSAYO
 ================================ */
 .ensayo-header {
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 }
 
-.ensayo-header h1 {
-  font-size: 32px;
+/* EMPRESA */
+#clienteEnsayo {
+  font-size: 40px;
+  font-weight: 800;
   color: #1f4e8c;
+  line-height: 1.1;
+  margin-bottom: 6px;
 }
 
-.ensayo-header h2 {
-  font-size: 20px;
-  color: #374151;
-  margin-top: 6px;
-}
-
-.ensayo-header p {
+/* FECHA */
+#fechaEnsayo {
   font-size: 14px;
-  color: #6b7280;
-  margin-top: 4px;
+  color: #4b5563;
+  margin-bottom: 14px;
 }
 
-/* ===============================
-   BLOQUES
-================================ */
-.bloque {
-  margin-bottom: 80px;
-}
-
-.bloque h3 {
-  font-size: 22px;
-  margin-bottom: 12px;
+/* NOMBRE ENSAYO */
+#nombreEnsayo {
+  font-size: 30px;
+  font-weight: 700;
   color: #1f4e8c;
-}
-
-.bloque p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #374151;
+  line-height: 1.2;
 }
 
 /* ===============================
-   GALERÍA
+   CUERPO ENSAYO
 ================================ */
-.galeria {
+.ensayo-body {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
 }
 
-.galeria img {
-  width: 100%;
-  border-radius: 12px;
+/* ===============================
+   MENU
+================================ */
+.ensayo-menu {
+  background: #e6f0fa;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ensayo-menu button {
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f4e8c;
+  cursor: pointer;
+}
+
+.ensayo-menu button:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   CONTENIDO
+================================ */
+.ensayo-contenido {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  min-height: 300px;
+}
+
+/* ===============================
+   RESPONSIVE (MISMA VISTA)
+================================ */
+@media (max-width: 768px) {
+  .ensayo-body {
+    grid-template-columns: 260px 1fr;
+  }
+
+  #clienteEnsayo {
+    font-size: 34px;
+  }
+
+  #nombreEnsayo {
+    font-size: 26px;
+  }
 }
