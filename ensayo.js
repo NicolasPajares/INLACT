@@ -43,45 +43,39 @@ document.getElementById("fecha").textContent =
     ? e.fecha.toDate().toLocaleDateString("es-AR")
     : "";
 
-/* CONTENIDO */
-const contenido = document.getElementById("contenido");
+/* SECCIONES */
+const secciones = {
+  propuesta: e.propuesta,
+  dosis: e.dosis,
+  elaboracion: e.elaboracion,
+  resultados: e.resultados,
+  conclusion: e.conclusion,
+  comercial: e.propuestaComercial,
+  fotos: e.fotos && e.fotos.length
+    ? `<div class="fotos">${e.fotos.map(f => `<img src="${f}">`).join("")}</div>`
+    : "<p>No hay imágenes</p>"
+};
 
-const secciones = [
-  { id: "propuesta", titulo: "Propuesta", contenido: e.propuesta },
-  { id: "dosis", titulo: "Dosis", contenido: e.dosis },
-  { id: "elaboracion", titulo: "Elaboración", contenido: e.elaboracion },
-  { id: "resultados", titulo: "Resultados", contenido: e.resultados },
-  { id: "conclusion", titulo: "Conclusión", contenido: e.conclusion },
-  { id: "comercial", titulo: "Propuesta comercial", contenido: e.propuestaComercial },
-  {
-    id: "fotos",
-    titulo: "Imágenes",
-    contenido:
-      e.fotos && e.fotos.length
-        ? `<div class="fotos">${e.fotos.map(f => `<img src="${f}">`).join("")}</div>`
-        : "No hay imágenes"
-  }
-];
+/* CARGAR CONTENIDO EN CADA BLOQUE */
+Object.entries(secciones).forEach(([id, contenido]) => {
+  const bloque = document.getElementById(id);
+  if (!bloque) return;
 
-/* render todas las secciones con scroll amplio */
-contenido.innerHTML = secciones.map(sec => `
-  <section id="${sec.id}" class="bloque" style="min-height: 100vh; padding-top: 40px;">
-    <h3>${sec.titulo}</h3>
-    <div>
-      ${sec.contenido || "<p>No hay información</p>"}
-    </div>
-  </section>
-`).join("");
+  bloque.innerHTML = `
+    <h3>${id.charAt(0).toUpperCase() + id.slice(1)}</h3>
+    ${contenido ? `<p>${contenido}</p>` : "<p>No hay información</p>"}
+  `;
+});
 
-/* botones → scroll suave */
+/* BOTONES → SCROLL AMPLIO */
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
     const destino = document.getElementById(btn.dataset.seccion);
-    if (destino) {
-      destino.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
+    if (!destino) return;
+
+    destino.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
   });
 });
