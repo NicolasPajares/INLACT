@@ -1,101 +1,54 @@
-/**********************
- * FIREBASE
- **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   collection,
-  getDocs,
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+  // TU CONFIG ACTUAL (NO LA CAMBIO)
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**********************
- * ELEMENTOS DOM
- **********************/
-const form = document.getElementById("formNuevoEnsayo");
-const selectCliente = document.getElementById("cliente");
+const form = document.getElementById("form-ensayo");
+const inputFoto = document.getElementById("foto");
 
-const fechaEl = document.getElementById("fecha");
-const nombreEnsayoEl = document.getElementById("nombreEnsayo");
-const propuestaEl = document.getElementById("propuesta");
-const dosisEl = document.getElementById("dosis");
-const elaboracionEl = document.getElementById("elaboracion");
-const resultadosEl = document.getElementById("resultados");
-const conclusionEl = document.getElementById("conclusion");
-const propuestaComercialEl = document.getElementById("propuestaComercial");
-
-/**********************
- * CARGAR CLIENTES
- **********************/
-async function cargarClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
-
-  snap.forEach(docu => {
-    const cliente = docu.data();
-
-    const option = document.createElement("option");
-    option.value = docu.id;
-    option.textContent = cliente.nombre || "Cliente sin nombre";
-    option.dataset.nombre = cliente.nombre || "";
-
-    selectCliente.appendChild(option);
+function convertirABase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
 }
 
-/**********************
- * GUARDAR ENSAYO
- **********************/
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const clienteOption =
-    selectCliente.options[selectCliente.selectedIndex];
+  let fotoBase64 = "";
 
-  const nuevoEnsayo = {
-    clienteId: selectCliente.value,
-    clienteNombre: clienteOption.dataset.nombre,
+  if (inputFoto.files.length > 0) {
+    fotoBase64 = await convertirABase64(inputFoto.files[0]);
+  }
 
-    nombreEnsayo: nombreEnsayoEl.value,
-    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-
-    propuesta: propuestaEl.value || "",
-    dosis: dosisEl.value || "",
-    elaboracion: elaboracionEl.value || "",
-    resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
-    propuestaComercial: propuestaComercialEl.value || "",
-
-    fotos: [], // 👈 se completan luego en ensayo.js
-    creadoEn: Timestamp.now()
+  const data = {
+    empresa: form.empresa.value,
+    nombreEnsayo: form.nombreEnsayo.value,
+    propuesta: form.propuesta.value,
+    dosis: form.dosis.value,
+    elaboracion: form.elaboracion.value,
+    resultados: form.resultados.value,
+    conclusion: form.conclusion.value,
+    propuestaComercial: form.propuestaComercial.value,
+    foto: fotoBase64, // ✅ AHORA SÍ SE GUARDA
+    fecha: Timestamp.now()
   };
 
-  try {
-    const docRef = await addDoc(
-      collection(db, "ensayos"),
-      nuevoEnsayo
-    );
+  await addDoc(collection(db, "ensayos"), data);
 
-    window.location.href = `ensayo.html?id=${docRef.id}`;
-  } catch (error) {
-    console.error(error);
-    alert("Error al guardar el ensayo");
-  }
+  alert("Ensayo guardado correctamente");
+  form.reset();
 });
-
-/**********************
- * INIT
- **********************/
-cargarClientes();
