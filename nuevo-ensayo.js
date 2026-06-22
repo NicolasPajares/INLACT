@@ -78,7 +78,7 @@ form.addEventListener("submit", async (e) => {
     conclusion: conclusionEl.value || "",
     propuestaComercial: propuestaComercialEl.value || "",
 
-    fotos: [],
+    fotos: [], // 👈 se completan luego en ensayo.js
     creadoEn: Timestamp.now()
   };
 
