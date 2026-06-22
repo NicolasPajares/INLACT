@@ -47,17 +47,6 @@ const fotosInput = document.getElementById("fotos");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  try {
-    let fotoURL = "";
-
-    // 1️⃣ subir foto
-    if (fotosInput.files.length > 0) {
-      const file = fotosInput.files[0];
-      const fotoRef = ref(storage, `ensayos/${Date.now()}_${file.name}`);
-      await uploadBytes(fotoRef, file);
-      fotoURL = await getDownloadURL(fotoRef);
-    }
-
 /**********************
  * CARGAR CLIENTES
  **********************/
