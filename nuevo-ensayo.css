@@ -3,8 +3,11 @@
 ================================ */
 .card-formulario {
   max-width: 720px;
-  margin: 30px auto;
-  padding: 28px;
+  margin: 32px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 
 /* ===============================
@@ -12,9 +15,10 @@
 ================================ */
 .card-formulario h1 {
   font-size: 28px;
-  margin-bottom: 26px;
+  margin-bottom: 28px;
   color: #1f4e8c;
   text-align: center;
+  font-weight: 700;
 }
 
 /* ===============================
@@ -30,7 +34,7 @@
    LABELS
 ================================ */
 #formNuevoEnsayo label {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #374151;
 }
@@ -41,18 +45,22 @@
 #formNuevoEnsayo input,
 #formNuevoEnsayo select,
 #formNuevoEnsayo textarea {
-  padding: 16px 18px;
-  font-size: 17px;
+  width: 100%;
+  padding: 15px 18px;
+  font-size: 16px;
 
   border-radius: 14px;
   border: 1px solid #d1d5db;
   outline: none;
 
   font-family: "Segoe UI", Arial, sans-serif;
-  background: #ffffff;
+  background-color: #ffffff;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Select */
+/* ===============================
+   SELECT
+================================ */
 #formNuevoEnsayo select {
   appearance: none;
   background-image: url("data:image/svg+xml;utf8,<svg fill='%236b7280' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
@@ -61,13 +69,17 @@
   background-size: 20px;
 }
 
-/* Textarea */
+/* ===============================
+   TEXTAREA
+================================ */
 #formNuevoEnsayo textarea {
   resize: vertical;
-  min-height: 90px;
+  min-height: 100px;
 }
 
-/* Focus */
+/* ===============================
+   FOCUS
+================================ */
 #formNuevoEnsayo input:focus,
 #formNuevoEnsayo select:focus,
 #formNuevoEnsayo textarea:focus {
@@ -80,9 +92,11 @@
 ================================ */
 #formNuevoEnsayo input[type="file"] {
   padding: 14px;
-  font-size: 15px;
+  font-size: 14px;
   border-style: dashed;
+  border-radius: 14px;
   cursor: pointer;
+  background: #f9fafb;
 }
 
 /* ===============================
@@ -92,13 +106,15 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: 26px;
+  margin-top: 28px;
 }
 
-/* Guardar */
+/* ===============================
+   BOTÓN GUARDAR
+================================ */
 .btn-guardar {
   padding: 18px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
 
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
@@ -109,16 +125,24 @@
   cursor: pointer;
 
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
 .btn-guardar:hover {
   opacity: 0.95;
 }
 
-/* Cancelar */
+.btn-guardar:active {
+  transform: scale(0.98);
+}
+
+/* ===============================
+   BOTÓN CANCELAR
+================================ */
 .btn-cancelar {
   padding: 16px;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 600;
 
   background: #ffffff;
   color: #1f4e8c;
@@ -127,6 +151,11 @@
   border-radius: 16px;
 
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-cancelar:hover {
+  background: #f0f6ff;
 }
 
 /* ===============================
@@ -143,6 +172,6 @@
   }
 
   .card-formulario {
-    padding: 34px;
+    padding: 36px;
   }
 }
