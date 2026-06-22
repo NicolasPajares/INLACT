@@ -54,13 +54,15 @@ const titulos = {
   fotos: "Imágenes"
 };
 
-/* FOTOS (sin templates anidados) */
+/* FOTOS */
 let fotosHTML = "<p>No hay imágenes</p>";
-if (e.fotos && e.fotos.length) {
-  fotosHTML =
-    '<div class="fotos">' +
-    e.fotos.map(f => `<img src="${f}">`).join("") +
-    "</div>";
+
+if (Array.isArray(e.fotos) && e.fotos.length > 0) {
+  fotosHTML = `
+    <div class="fotos">
+      ${e.fotos.map(url => `<img src="${url}" alt="Foto del ensayo">`).join("")}
+    </div>
+  `;
 }
 
 /* SECCIONES */
@@ -78,6 +80,15 @@ const secciones = {
 Object.entries(secciones).forEach(([id, contenido]) => {
   const bloque = document.getElementById(id);
   if (!bloque) return;
+
+  // FOTOS → NO envolver en <p>
+  if (id === "fotos") {
+    bloque.innerHTML = `
+      <h3>${titulos[id]}</h3>
+      ${contenido}
+    `;
+    return;
+  }
 
   bloque.innerHTML = `
     <h3>${titulos[id] || id}</h3>
