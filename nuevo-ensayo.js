@@ -33,6 +33,7 @@ const storage = getStorage(app);
  * ELEMENTOS DOM
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
+const btnGuardar = document.getElementById("btnGuardar");
 const selectCliente = document.getElementById("cliente");
 
 const fechaEl = document.getElementById("fecha");
@@ -64,15 +65,13 @@ async function cargarClientes() {
 /**********************
  * GUARDAR ENSAYO
  **********************/
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
+async function guardarEnsayo() {
   const clienteOption =
     selectCliente.options[selectCliente.selectedIndex];
 
   const fotosURLs = [];
 
-  if (fotosInput && fotosInput.files.length > 0) {
+  if (fotosInput.files.length > 0) {
     for (const file of fotosInput.files) {
       const fotoRef = ref(
         storage,
@@ -101,7 +100,12 @@ form.addEventListener("submit", async (e) => {
 
   const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
   window.location.href = `ensayo.html?id=${docRef.id}`;
-});
+}
+
+/**********************
+ * EVENTOS
+ **********************/
+btnGuardar.addEventListener("click", guardarEnsayo);
 
 /**********************
  * INIT
