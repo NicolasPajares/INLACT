@@ -7,6 +7,8 @@ import {
   collection,
   getDocs,
   addDoc,
+  updateDoc,
+  doc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -55,8 +57,8 @@ async function cargarClientes() {
 
   snap.forEach(docu => {
     const cliente = docu.data();
-
     const option = document.createElement("option");
+
     option.value = docu.id;
     option.textContent = cliente.nombre || "Cliente sin nombre";
     option.dataset.nombre = cliente.nombre || "";
@@ -74,8 +76,10 @@ async function subirFotos(files, ensayoId) {
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
 
-    const ruta = `ensayos/${ensayoId}/foto_${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, ruta);
+    const storageRef = ref(
+      storage,
+      `ensayos/${ensayoId}/foto_${Date.now()}_${file.name}`
+    );
 
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
@@ -103,56 +107,39 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    /* 1️⃣ crear ensayo sin fotos */
-    const docRef = await addDoc(
-      collection(db, "ensayos"),
-      {
-        clienteId: selectCliente.value,
-        clienteNombre: clienteOption.dataset.nombre,
+    /* 1️⃣ Crear ensayo SIN fotos */
+    const docRef = await addDoc(collection(db, "ensayos"), {
+      clienteId: selectCliente.value,
+      clienteNombre: clienteOption.dataset.nombre,
 
-        nombreEnsayo: nombreEnsayoEl.value,
-        fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+      nombreEnsayo: nombreEnsayoEl.value,
+      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
-        propuesta: propuestaEl.value || "",
-        dosis: dosisEl.value || "",
-        elaboracion: elaboracionEl.value || "",
-        resultados: resultadosEl.value || "",
+      propuesta: propuestaEl.value || "",
+      dosis: dosisEl.value || "",
+      elaboracion: elaboracionEl.value || "",
+      resultados: resultadosEl.value || "",
+      conclusion: "",
+      propuestaComercial: "",
 
-        fotos: [],
-        creadoEn: Timestamp.now()
-      }
-    );
+      fotos: [],
+      creadoEn: Timestamp.now()
+    });
 
-    /* 2️⃣ subir fotos */
+    /* 2️⃣ Subir fotos a Storage */
     let urls = [];
     if (archivos.length > 0) {
       urls = await subirFotos(archivos, docRef.id);
     }
 
-    /* 3️⃣ guardar URLs */
-    await addDoc(
-      collection(db, "ensayos"),
-      {} // workaround para forzar index refresh
-    );
+    /* 3️⃣ Guardar URLs en Firestore */
+    if (urls.length > 0) {
+      await updateDoc(doc(db, "ensayos", docRef.id), {
+        fotos: urls
+      });
+    }
 
-    await fetch(
-      `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/ensayos/${docRef.id}`,
-      {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fields: {
-            fotos: {
-              arrayValue: {
-                values: urls.map(url => ({ stringValue: url }))
-              }
-            }
-          }
-        })
-      }
-    );
-
-    /* 4️⃣ redirigir */
+    /* 4️⃣ Redirigir */
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
