@@ -1,3 +1,6 @@
+/**********************
+ * FIREBASE
+ **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -5,7 +8,6 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -18,93 +20,112 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* PARAMS */
-const params = new URLSearchParams(location.search);
-const id = params.get("id");
+/**********************
+ * ELEMENTOS DOM
+ **********************/
+const empresaEl = document.getElementById("empresa");
+const fechaEl = document.getElementById("fecha");
+const nombreEnsayoEl = document.getElementById("nombre-ensayo");
 
-if (!id) {
-  document.body.innerHTML = "Ensayo no encontrado";
-  throw new Error("ID faltante");
+const propuestaEl = document.getElementById("propuesta");
+const dosisEl = document.getElementById("dosis");
+const elaboracionEl = document.getElementById("elaboracion");
+const resultadosEl = document.getElementById("resultados");
+const conclusionEl = document.getElementById("conclusion");
+const propuestaComercialEl = document.getElementById("propuestacomercial");
+const fotosEl = document.getElementById("fotos");
+
+/**********************
+ * UTILS
+ **********************/
+function formatearFecha(ts) {
+  if (!ts) return "";
+  const d = ts.toDate();
+  return d.toLocaleDateString("es-AR");
 }
 
-const snap = await getDoc(doc(db, "ensayos", id));
-if (!snap.exists()) {
-  document.body.innerHTML = "Ensayo inexistente";
-  throw new Error("No existe");
-}
+function renderBloque(el, titulo, contenido) {
+  if (!contenido || contenido.trim() === "") return;
 
-const e = snap.data();
-
-/* ENCABEZADO */
-document.getElementById("empresa").textContent = e.clienteNombre || "";
-document.getElementById("nombre-ensayo").textContent = e.nombreEnsayo || "";
-document.getElementById("fecha").textContent =
-  e.fecha?.toDate
-    ? e.fecha.toDate().toLocaleDateString("es-AR")
-    : "";
-
-/* TITULOS */
-const titulos = {
-  propuesta: "Propuesta",
-  dosis: "Dosis",
-  elaboracion: "Elaboración",
-  resultados: "Resultados",
-  conclusion: "Conclusión",
-  propuestacomercial: "Propuesta Comercial",
-  fotos: "Imágenes"
-};
-
-/* FOTOS */
-let fotosHTML = "<p>No hay imágenes</p>";
-
-if (Array.isArray(e.fotos) && e.fotos.length > 0) {
-  fotosHTML = `
-    <div class="fotos">
-      ${e.fotos.map(url => `<img src="${url}" alt="Foto del ensayo">`).join("")}
-    </div>
+  el.innerHTML = `
+    <h3>${titulo}</h3>
+    <p>${contenido.replace(/\n/g, "<br>")}</p>
   `;
 }
 
-/* SECCIONES */
-const secciones = {
-  propuesta: e.propuesta,
-  dosis: e.dosis,
-  elaboracion: e.elaboracion,
-  resultados: e.resultados,
-  conclusion: e.conclusion,
-  propuestacomercial: e.propuestaComercial,
-  fotos: fotosHTML
-};
+/**********************
+ * CARGAR ENSAYO
+ **********************/
+async function cargarEnsayo() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
 
-/* CARGAR CONTENIDO */
-Object.entries(secciones).forEach(([id, contenido]) => {
-  const bloque = document.getElementById(id);
-  if (!bloque) return;
-
-  // FOTOS → NO envolver en <p>
-  if (id === "fotos") {
-    bloque.innerHTML = `
-      <h3>${titulos[id]}</h3>
-      ${contenido}
-    `;
+  if (!id) {
+    alert("Ensayo no encontrado");
     return;
   }
 
-  bloque.innerHTML = `
-    <h3>${titulos[id] || id}</h3>
-    ${contenido ? `<p>${contenido}</p>` : "<p>No hay información</p>"}
-  `;
-});
+  const refEnsayo = doc(db, "ensayos", id);
+  const snap = await getDoc(refEnsayo);
 
-/* BOTONES → SCROLL */
+  if (!snap.exists()) {
+    alert("Ensayo no existe");
+    return;
+  }
+
+  const e = snap.data();
+
+  /* ENCABEZADO */
+  empresaEl.textContent = e.clienteNombre || "";
+  fechaEl.textContent = formatearFecha(e.fecha);
+  nombreEnsayoEl.textContent = e.nombreEnsayo || "";
+
+  /* BLOQUES */
+  renderBloque(propuestaEl, "Propuesta", e.propuesta);
+  renderBloque(dosisEl, "Dosis", e.dosis);
+  renderBloque(elaboracionEl, "Elaboración", e.elaboracion);
+  renderBloque(resultadosEl, "Resultados", e.resultados);
+  renderBloque(conclusionEl, "Conclusión", e.conclusion);
+  renderBloque(propuestaComercialEl, "Propuesta comercial", e.propuestaComercial);
+
+  /* FOTOS */
+  if (Array.isArray(e.fotos) && e.fotos.length > 0) {
+    fotosEl.innerHTML = `<h3>Imágenes</h3>`;
+
+    const contenedor = document.createElement("div");
+    contenedor.className = "fotos";
+
+    e.fotos.forEach(url => {
+      const img = document.createElement("img");
+      img.src = url;
+      img.loading = "lazy";
+      img.alt = "Foto del ensayo";
+
+      img.addEventListener("click", () => {
+        window.open(url, "_blank");
+      });
+
+      contenedor.appendChild(img);
+    });
+
+    fotosEl.appendChild(contenedor);
+  }
+}
+
+/**********************
+ * SCROLL MENU
+ **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
-    const destino = document.getElementById(btn.dataset.seccion);
-    if (!destino) return;
-
-    destino.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+    const id = btn.dataset.seccion;
+    const seccion = document.getElementById(id);
+    if (seccion) {
+      seccion.scrollIntoView({ behavior: "smooth" });
+    }
   });
 });
+
+/**********************
+ * INIT
+ **********************/
+cargarEnsayo();
