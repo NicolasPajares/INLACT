@@ -33,7 +33,6 @@ const storage = getStorage(app);
  * ELEMENTOS DOM
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
-const btnGuardar = document.getElementById("btnGuardar");
 const selectCliente = document.getElementById("cliente");
 
 const fechaEl = document.getElementById("fecha");
@@ -65,47 +64,51 @@ async function cargarClientes() {
 /**********************
  * GUARDAR ENSAYO
  **********************/
-async function guardarEnsayo() {
-  const clienteOption =
-    selectCliente.options[selectCliente.selectedIndex];
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  const fotosURLs = [];
+  try {
+    const clienteOption =
+      selectCliente.options[selectCliente.selectedIndex];
 
-  if (fotosInput.files.length > 0) {
-    for (const file of fotosInput.files) {
-      const fotoRef = ref(
-        storage,
-        `ensayos/${Date.now()}_${file.name}`
-      );
-      await uploadBytes(fotoRef, file);
-      const url = await getDownloadURL(fotoRef);
-      fotosURLs.push(url);
+    const fotosURLs = [];
+
+    if (fotosInput && fotosInput.files.length > 0) {
+      for (const file of fotosInput.files) {
+        const fotoRef = ref(
+          storage,
+          `ensayos/${Date.now()}_${file.name}`
+        );
+        await uploadBytes(fotoRef, file);
+        const url = await getDownloadURL(fotoRef);
+        fotosURLs.push(url);
+      }
     }
+
+    const nuevoEnsayo = {
+      clienteId: selectCliente.value,
+      clienteNombre: clienteOption.dataset.nombre,
+      nombreEnsayo: nombreEnsayoEl.value,
+      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+      propuesta: propuestaEl.value || "",
+      dosis: dosisEl.value || "",
+      elaboracion: elaboracionEl.value || "",
+      resultados: resultadosEl.value || "",
+      conclusion: conclusionEl.value || "",
+      propuestaComercial: propuestaComercialEl.value || "",
+      fotos: fotosURLs,
+      creadoEn: Timestamp.now()
+    };
+
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+
+    window.location.href = `ensayo.html?id=${docRef.id}`;
+
+  } catch (error) {
+    console.error("ERROR GUARDANDO ENSAYO:", error);
+    alert("Error al guardar el ensayo. Mirá la consola.");
   }
-
-  const nuevoEnsayo = {
-    clienteId: selectCliente.value,
-    clienteNombre: clienteOption.dataset.nombre,
-    nombreEnsayo: nombreEnsayoEl.value,
-    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-    propuesta: propuestaEl.value || "",
-    dosis: dosisEl.value || "",
-    elaboracion: elaboracionEl.value || "",
-    resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
-    propuestaComercial: propuestaComercialEl.value || "",
-    fotos: fotosURLs,
-    creadoEn: Timestamp.now()
-  };
-
-  const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
-  window.location.href = `ensayo.html?id=${docRef.id}`;
-}
-
-/**********************
- * EVENTOS
- **********************/
-btnGuardar.addEventListener("click", guardarEnsayo);
+});
 
 /**********************
  * INIT
