@@ -1,135 +1,145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nuevo Ensayo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <title>INLACT · Nuevo ensayo</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-    }
-    button {
-      margin-top: 20px;
-      background: #2c7be5;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:disabled {
-      background: #aaa;
-    }
-  </style>
+    <meta name="description" content="INLACT - Crear nuevo ensayo">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="nuevo-ensayo.css">
 </head>
 
 <body>
 
-  <h2>Nuevo Ensayo</h2>
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="Logo INLACT">
+    </figure>
+    <h2>NICOLÁS PAJARES</h2>
+</header>
 
-  <label>Nombre</label>
-  <input type="text" id="nombre">
+<main>
 
-  <label>Fecha</label>
-  <input type="date" id="fecha">
+<section class="card card-formulario">
 
-  <label>Observaciones</label>
-  <textarea id="observaciones"></textarea>
+    <h1>Crear nuevo ensayo</h1>
 
-  <label>Foto</label>
-  <input type="file" id="foto" accept="image/*">
+    <form id="formNuevoEnsayo" enctype="multipart/form-data">
+<input type="file" id="fotos" multiple accept="image/*">
+        <!-- CLIENTE -->
+        <label for="cliente">Cliente</label>
+        <select id="cliente" name="cliente" required>
+            <option value="">Seleccionar cliente</option>
+        </select>
 
-  <button id="guardar">Guardar</button>
+        <!-- FECHA -->
+        <label for="fecha">Fecha del ensayo</label>
+        <input type="date" id="fecha" name="fecha" required>
 
-  <p id="estado"></p>
+        <!-- NOMBRE ENSAYO -->
+        <label for="nombreEnsayo">Nombre del ensayo</label>
+        <input
+            type="text"
+            id="nombreEnsayo"
+            name="nombreEnsayo"
+            placeholder="Ej: Ensayo mozzarella cilindro"
+            required
+        >
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      Timestamp
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        <!-- PROPUESTA -->
+        <label for="propuesta">Propuesta</label>
+        <textarea
+            id="propuesta"
+            name="propuesta"
+            rows="4"
+            placeholder="Objetivo del ensayo, hipótesis, planteo técnico..."
+        ></textarea>
 
-    import {
-      getStorage,
-      ref,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        <!-- DOSIS -->
+        <label for="dosis">Dosis</label>
+        <textarea
+            id="dosis"
+            name="dosis"
+            rows="3"
+            placeholder="Ej: 250 ml / 1000 L de agua"
+        ></textarea>
 
-    // 🔧 CONFIG FIREBASE (no tocar)
-    const firebaseConfig = {
-      apiKey: "TU_API_KEY",
-      authDomain: "TU_AUTH_DOMAIN",
-      projectId: "TU_PROJECT_ID",
-      storageBucket: "TU_STORAGE_BUCKET",
-      messagingSenderId: "TU_SENDER_ID",
-      appId: "TU_APP_ID"
-    };
+        <!-- ELABORACIÓN -->
+        <label for="elaboracion">Elaboración</label>
+        <textarea
+            id="elaboracion"
+            name="elaboracion"
+            rows="4"
+            placeholder="Descripción del proceso de elaboración"
+        ></textarea>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+        <!-- RESULTADOS -->
+        <label for="resultados">Resultados</label>
+        <textarea
+            id="resultados"
+            name="resultados"
+            rows="4"
+            placeholder="Observaciones, mediciones, comportamiento"
+        ></textarea>
 
-    const btn = document.getElementById("guardar");
-    const estado = document.getElementById("estado");
+        <!-- CONCLUSIÓN -->
+        <label for="conclusion">Conclusión</label>
+        <textarea
+            id="conclusion"
+            name="conclusion"
+            rows="4"
+            placeholder="Conclusión técnica del ensayo"
+        ></textarea>
 
-    btn.addEventListener("click", async () => {
-      btn.disabled = true;
-      estado.textContent = "Guardando...";
+        <!-- PROPUESTA COMERCIAL -->
+        <label for="propuestaComercial">Propuesta comercial</label>
+        <textarea
+            id="propuestaComercial"
+            name="propuestaComercial"
+            rows="4"
+            placeholder="Propuesta comercial, recomendación o próximos pasos"
+        ></textarea>
 
-      try {
-        const nombre = document.getElementById("nombre").value;
-        const fecha = document.getElementById("fecha").value;
-        const observaciones = document.getElementById("observaciones").value;
-        const fileInput = document.getElementById("foto");
-        const file = fileInput.files[0];
+        <!-- FOTOS -->
+        <label for="fotos">Fotos del ensayo (máx. 10)</label>
+        <input
+            type="file"
+            id="fotos"
+            name="fotos"
+            accept="image/*"
+            multiple
+        >
 
-        let fotoURL = "";
+        <!-- ACCIONES -->
+        <div class="acciones-form">
+            <button type="submit" class="btn-guardar">
+                💾 Guardar ensayo
+            </button>
 
-        // 📸 SUBIR FOTO
-        if (file) {
-          const storageRef = ref(
-            storage,
-            `ensayos/${Date.now()}_${file.name}`
-          );
-          await uploadBytes(storageRef, file);
-          fotoURL = await getDownloadURL(storageRef);
-        }
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="location.href='ensayos.html'">
+                ✖ Cancelar
+            </button>
+        </div>
 
-        // 🧾 GUARDAR ENSAYO
-        await addDoc(collection(db, "ensayos"), {
-          nombre,
-          fecha,
-          observaciones,
-          foto: fotoURL,
-          createdAt: Timestamp.now()
-        });
+    </form>
 
-        estado.textContent = "✅ Ensayo guardado correctamente";
-        btn.disabled = false;
+</section>
 
-      } catch (error) {
-        console.error(error);
-        estado.textContent = "❌ Error al guardar";
-        btn.disabled = false;
-      }
-    });
-  </script>
+</main>
+
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="nuevo-ensayo.js"></script>
 
 </body>
 </html>
