@@ -10,6 +10,13 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -21,6 +28,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /**********************
  * ELEMENTOS DOM
@@ -36,6 +44,7 @@ const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
+const fotosEl = document.getElementById("fotos");
 
 /**********************
  * CARGAR CLIENTES
@@ -56,6 +65,29 @@ async function cargarClientes() {
 }
 
 /**********************
+ * SUBIR FOTOS
+ **********************/
+async function subirFotos(files, ensayoId) {
+  const urls = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+
+    const storageRef = ref(
+      storage,
+      `ensayos/${ensayoId}/${Date.now()}_${file.name}`
+    );
+
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+
+    urls.push(url);
+  }
+
+  return urls;
+}
+
+/**********************
  * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
@@ -64,31 +96,67 @@ form.addEventListener("submit", async (e) => {
   const clienteOption =
     selectCliente.options[selectCliente.selectedIndex];
 
-  const nuevoEnsayo = {
-    clienteId: selectCliente.value,
-    clienteNombre: clienteOption.dataset.nombre,
+  const files = fotosEl.files;
 
-    nombreEnsayo: nombreEnsayoEl.value,
-    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-
-    propuesta: propuestaEl.value || "",
-    dosis: dosisEl.value || "",
-    elaboracion: elaboracionEl.value || "",
-    resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
-    propuestaComercial: propuestaComercialEl.value || "",
-
-    fotos: [],
-    creadoEn: Timestamp.now()
-  };
+  if (files.length > 10) {
+    alert("Podés subir hasta 10 fotos como máximo");
+    return;
+  }
 
   try {
+    // 1️⃣ Crear ensayo sin fotos
     const docRef = await addDoc(
       collection(db, "ensayos"),
-      nuevoEnsayo
+      {
+        clienteId: selectCliente.value,
+        clienteNombre: clienteOption.dataset.nombre,
+
+        nombreEnsayo: nombreEnsayoEl.value,
+        fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+
+        propuesta: propuestaEl.value || "",
+        dosis: dosisEl.value || "",
+        elaboracion: elaboracionEl.value || "",
+        resultados: resultadosEl.value || "",
+        conclusion: conclusionEl.value || "",
+        propuestaComercial: propuestaComercialEl.value || "",
+
+        fotos: [],
+        creadoEn: Timestamp.now()
+      }
     );
 
+    // 2️⃣ Subir fotos (si hay)
+    let fotosUrls = [];
+    if (files.length > 0) {
+      fotosUrls = await subirFotos(files, docRef.id);
+    }
+
+    // 3️⃣ Actualizar ensayo con fotos
+    await fetch(
+      `https://firestore.googleapis.com/v1/projects/inlact/databases/(default)/documents/ensayos/${docRef.id}?updateMask.fieldPaths=fotos`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          fields: {
+            fotos: {
+              arrayValue: {
+                values: fotosUrls.map(url => ({
+                  stringValue: url
+                }))
+              }
+            }
+          }
+        })
+      }
+    );
+
+    // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
+
   } catch (error) {
     console.error(error);
     alert("Error al guardar el ensayo");
