@@ -1,6 +1,6 @@
 /**********************
  * FIREBASE
- **********************/
+ **********************/r
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -34,6 +34,8 @@ const propuestaEl = document.getElementById("propuesta");
 const dosisEl = document.getElementById("dosis");
 const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
+const conclusionEl = document.getElementById("conclusion");
+const propuestaComercialEl = document.getElementById("propuestaComercial");
 
 /**********************
  * CARGAR CLIENTES
@@ -67,13 +69,14 @@ form.addEventListener("submit", async (e) => {
     clienteNombre: clienteOption.dataset.nombre,
 
     nombreEnsayo: nombreEnsayoEl.value,
-
     fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
     propuesta: propuestaEl.value || "",
     dosis: dosisEl.value || "",
-    metodologia: elaboracionEl.value || "",
+    elaboracion: elaboracionEl.value || "",
     resultados: resultadosEl.value || "",
+    conclusion: conclusionEl.value || "",
+    propuestaComercial: propuestaComercialEl.value || "",
 
     fotos: [],
     creadoEn: Timestamp.now()
