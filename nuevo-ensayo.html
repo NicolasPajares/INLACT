@@ -10,7 +10,7 @@
     <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
 
-    <!-- CSS reutilizado de nuevo-cliente -->
+    <!-- CSS específico -->
     <link rel="stylesheet" href="nuevo-ensayo.css">
 </head>
 
@@ -18,7 +18,7 @@
 
 <header>
     <figure>
-        <img src="img/logo.jpg" alt="INLACT">
+        <img src="img/logo.jpg" alt="Logo INLACT">
     </figure>
     <h2>NICOLÁS PAJARES</h2>
 </header>
@@ -29,73 +29,91 @@
 
     <h1>Crear nuevo ensayo</h1>
 
-    <form id="formNuevoEnsayo">
+    <form id="formNuevoEnsayo" enctype="multipart/form-data">
 
         <!-- CLIENTE -->
-        <label>Cliente</label>
-        <select id="cliente" required>
+        <label for="cliente">Cliente</label>
+        <select id="cliente" name="cliente" required>
             <option value="">Seleccionar cliente</option>
         </select>
 
         <!-- FECHA -->
-        <label>Fecha del ensayo</label>
-        <input type="date" id="fecha" required>
+        <label for="fecha">Fecha del ensayo</label>
+        <input type="date" id="fecha" name="fecha" required>
 
         <!-- NOMBRE ENSAYO -->
-        <label>Nombre del ensayo</label>
-        <input id="nombreEnsayo" placeholder="Ej: Ensayo mozzarella cilindro" required>
+        <label for="nombreEnsayo">Nombre del ensayo</label>
+        <input
+            type="text"
+            id="nombreEnsayo"
+            name="nombreEnsayo"
+            placeholder="Ej: Ensayo mozzarella cilindro"
+            required
+        >
 
         <!-- PROPUESTA -->
-        <label>Propuesta</label>
+        <label for="propuesta">Propuesta</label>
         <textarea
             id="propuesta"
+            name="propuesta"
             rows="4"
-            placeholder="Objetivo del ensayo, hipótesis, planteo técnico...">
-        </textarea>
+            placeholder="Objetivo del ensayo, hipótesis, planteo técnico..."
+        ></textarea>
 
         <!-- DOSIS -->
-        <label>Dosis</label>
+        <label for="dosis">Dosis</label>
         <textarea
             id="dosis"
+            name="dosis"
             rows="3"
-            placeholder="Ej: 250 ml / 1000 L de agua">
-        </textarea>
+            placeholder="Ej: 250 ml / 1000 L de agua"
+        ></textarea>
 
         <!-- ELABORACIÓN -->
-        <label>Elaboración</label>
+        <label for="elaboracion">Elaboración</label>
         <textarea
             id="elaboracion"
+            name="elaboracion"
             rows="4"
-            placeholder="Descripción del proceso de elaboración">
-        </textarea>
+            placeholder="Descripción del proceso de elaboración"
+        ></textarea>
 
         <!-- RESULTADOS -->
-        <label>Resultados</label>
+        <label for="resultados">Resultados</label>
         <textarea
             id="resultados"
+            name="resultados"
             rows="4"
-            placeholder="Observaciones, mediciones, comportamiento">
-        </textarea>
+            placeholder="Observaciones, mediciones, comportamiento"
+        ></textarea>
 
         <!-- CONCLUSIÓN -->
-        <label>Conclusión</label>
+        <label for="conclusion">Conclusión</label>
         <textarea
             id="conclusion"
+            name="conclusion"
             rows="4"
-            placeholder="Conclusión técnica del ensayo">
-        </textarea>
+            placeholder="Conclusión técnica del ensayo"
+        ></textarea>
 
-        <!-- PROPUESTA COMERCIAL / LABORAL -->
-        <label>Propuesta comercial</label>
+        <!-- PROPUESTA COMERCIAL -->
+        <label for="propuestaComercial">Propuesta comercial</label>
         <textarea
             id="propuestaComercial"
+            name="propuestaComercial"
             rows="4"
-            placeholder="Propuesta comercial, recomendación o próximos pasos">
-        </textarea>
+            placeholder="Propuesta comercial, recomendación o próximos pasos"
+        ></textarea>
 
         <!-- FOTOS -->
-        <label>Fotos del ensayo</label>
-        <input type="file" id="fotos" accept="image/*" multiple>
+        <label for="fotos">Fotos del ensayo (máx. 10)</label>
+        <input
+            type="file"
+            id="fotos"
+            name="fotos"
+            accept="image/*"
+            multiple
+        >
 
         <!-- ACCIONES -->
         <div class="acciones-form">
