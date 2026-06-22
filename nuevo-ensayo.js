@@ -66,13 +66,16 @@ async function cargarClientes() {
 
   snap.forEach(docu => {
     const cliente = docu.data();
+
     const option = document.createElement("option");
     option.value = docu.id;
     option.textContent = cliente.nombre || "Cliente sin nombre";
     option.dataset.nombre = cliente.nombre || "";
+
     selectCliente.appendChild(option);
   });
 }
+
 
 /**********************
  * GUARDAR ENSAYO
