@@ -17,6 +17,9 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+/**********************
+ * CONFIG
+ **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -42,8 +45,6 @@ const propuestaEl = document.getElementById("propuesta");
 const dosisEl = document.getElementById("dosis");
 const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
-const conclusionEl = document.getElementById("conclusion");
-const propuestaComercialEl = document.getElementById("propuestaComercial");
 const fotosEl = document.getElementById("fotos");
 
 /**********************
@@ -73,10 +74,8 @@ async function subirFotos(files, ensayoId) {
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
 
-    const storageRef = ref(
-      storage,
-      `ensayos/${ensayoId}/${Date.now()}_${file.name}`
-    );
+    const ruta = `ensayos/${ensayoId}/foto_${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, ruta);
 
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
@@ -96,15 +95,15 @@ form.addEventListener("submit", async (e) => {
   const clienteOption =
     selectCliente.options[selectCliente.selectedIndex];
 
-  const files = fotosEl.files;
+  const archivos = fotosEl.files;
 
-  if (files.length > 10) {
-    alert("Podés subir hasta 10 fotos como máximo");
+  if (archivos.length > 10) {
+    alert("Máximo 10 fotos por ensayo");
     return;
   }
 
   try {
-    // 1️⃣ Crear ensayo sin fotos
+    /* 1️⃣ crear ensayo sin fotos */
     const docRef = await addDoc(
       collection(db, "ensayos"),
       {
@@ -118,35 +117,34 @@ form.addEventListener("submit", async (e) => {
         dosis: dosisEl.value || "",
         elaboracion: elaboracionEl.value || "",
         resultados: resultadosEl.value || "",
-        conclusion: conclusionEl.value || "",
-        propuestaComercial: propuestaComercialEl.value || "",
 
         fotos: [],
         creadoEn: Timestamp.now()
       }
     );
 
-    // 2️⃣ Subir fotos (si hay)
-    let fotosUrls = [];
-    if (files.length > 0) {
-      fotosUrls = await subirFotos(files, docRef.id);
+    /* 2️⃣ subir fotos */
+    let urls = [];
+    if (archivos.length > 0) {
+      urls = await subirFotos(archivos, docRef.id);
     }
 
-    // 3️⃣ Actualizar ensayo con fotos
+    /* 3️⃣ guardar URLs */
+    await addDoc(
+      collection(db, "ensayos"),
+      {} // workaround para forzar index refresh
+    );
+
     await fetch(
-      `https://firestore.googleapis.com/v1/projects/inlact/databases/(default)/documents/ensayos/${docRef.id}?updateMask.fieldPaths=fotos`,
+      `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/ensayos/${docRef.id}`,
       {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fields: {
             fotos: {
               arrayValue: {
-                values: fotosUrls.map(url => ({
-                  stringValue: url
-                }))
+                values: urls.map(url => ({ stringValue: url }))
               }
             }
           }
@@ -154,7 +152,7 @@ form.addEventListener("submit", async (e) => {
       }
     );
 
-    // 4️⃣ Redirigir
+    /* 4️⃣ redirigir */
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
