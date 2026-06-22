@@ -1,5 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-
 /**********************
  * FIREBASE
  **********************/
@@ -36,7 +34,6 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
 const propuestaEl = document.getElementById("propuesta");
@@ -74,9 +71,13 @@ form.addEventListener("submit", async (e) => {
 
   const fotosURLs = [];
 
-  if (fotosInput && fotosInput.files.length > 0) {
+  // SUBIR FOTOS
+  if (fotosInput.files.length > 0) {
     for (const file of fotosInput.files) {
-      const fotoRef = ref(storage, `ensayos/${Date.now()}_${file.name}`);
+      const fotoRef = ref(
+        storage,
+        `ensayos/${Date.now()}_${file.name}`
+      );
       await uploadBytes(fotoRef, file);
       const url = await getDownloadURL(fotoRef);
       fotosURLs.push(url);
@@ -99,6 +100,8 @@ form.addEventListener("submit", async (e) => {
   };
 
   const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+
+  // REDIRIGIR
   window.location.href = `ensayo.html?id=${docRef.id}`;
 });
 
@@ -106,5 +109,3 @@ form.addEventListener("submit", async (e) => {
  * INIT
  **********************/
 cargarClientes();
-
-});
