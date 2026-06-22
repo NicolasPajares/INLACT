@@ -1,111 +1,145 @@
-/**********************
- * FIREBASE
- **********************/
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  addDoc,
-  Timestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>INLACT · Nuevo ensayo</title>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
+    <meta name="description" content="INLACT - Crear nuevo ensayo">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
 
-/**********************
- * ELEMENTOS DOM
- **********************/
-const form = document.getElementById("formNuevoEnsayo");
-const selectCliente = document.getElementById("cliente");
-const fechaEl = document.getElementById("fecha");
-const nombreEnsayoEl = document.getElementById("nombreEnsayo");
-const propuestaEl = document.getElementById("propuesta");
-const dosisEl = document.getElementById("dosis");
-const elaboracionEl = document.getElementById("elaboracion");
-const resultadosEl = document.getElementById("resultados");
-const conclusionEl = document.getElementById("conclusion");
-const propuestaComercialEl = document.getElementById("propuestaComercial");
-const fotosInput = document.getElementById("fotos");
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="nuevo-ensayo.css">
+</head>
 
-/**********************
- * CARGAR CLIENTES
- **********************/
-async function cargarClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
+<body>
 
-  snap.forEach(docu => {
-    const cliente = docu.data();
-    const option = document.createElement("option");
-    option.value = docu.id;
-    option.textContent = cliente.nombre || "Cliente sin nombre";
-    option.dataset.nombre = cliente.nombre || "";
-    selectCliente.appendChild(option);
-  });
-}
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="Logo INLACT">
+    </figure>
+    <h2>NICOLÁS PAJARES</h2>
+</header>
 
-/**********************
- * GUARDAR ENSAYO
- **********************/
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+<main>
 
-  const clienteOption =
-    selectCliente.options[selectCliente.selectedIndex];
+<section class="card card-formulario">
 
-  const fotosURLs = [];
+    <h1>Crear nuevo ensayo</h1>
 
-  // SUBIR FOTOS
-  if (fotosInput.files.length > 0) {
-    for (const file of fotosInput.files) {
-      const fotoRef = ref(
-        storage,
-        `ensayos/${Date.now()}_${file.name}`
-      );
-      await uploadBytes(fotoRef, file);
-      const url = await getDownloadURL(fotoRef);
-      fotosURLs.push(url);
-    }
-  }
+    <form id="formNuevoEnsayo" enctype="multipart/form-data">
+        
+        <!-- CLIENTE -->
+        <label for="cliente">Cliente</label>
+        <select id="cliente" name="cliente" required>
+            <option value="">Seleccionar cliente</option>
+        </select>
 
-  const nuevoEnsayo = {
-    clienteId: selectCliente.value,
-    clienteNombre: clienteOption.dataset.nombre,
-    nombreEnsayo: nombreEnsayoEl.value,
-    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-    propuesta: propuestaEl.value || "",
-    dosis: dosisEl.value || "",
-    elaboracion: elaboracionEl.value || "",
-    resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
-    propuestaComercial: propuestaComercialEl.value || "",
-    fotos: fotosURLs,
-    creadoEn: Timestamp.now()
-  };
+        <!-- FECHA -->
+        <label for="fecha">Fecha del ensayo</label>
+        <input type="date" id="fecha" name="fecha" required>
 
-  const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+        <!-- NOMBRE ENSAYO -->
+        <label for="nombreEnsayo">Nombre del ensayo</label>
+        <input
+            type="text"
+            id="nombreEnsayo"
+            name="nombreEnsayo"
+            placeholder="Ej: Ensayo mozzarella cilindro"
+            required
+        >
 
-  // REDIRIGIR
-  window.location.href = `ensayo.html?id=${docRef.id}`;
-});
+        <!-- PROPUESTA -->
+        <label for="propuesta">Propuesta</label>
+        <textarea
+            id="propuesta"
+            name="propuesta"
+            rows="4"
+            placeholder="Objetivo del ensayo, hipótesis, planteo técnico..."
+        ></textarea>
 
-/**********************
- * INIT
- **********************/
-cargarClientes();
+        <!-- DOSIS -->
+        <label for="dosis">Dosis</label>
+        <textarea
+            id="dosis"
+            name="dosis"
+            rows="3"
+            placeholder="Ej: 250 ml / 1000 L de agua"
+        ></textarea>
+
+        <!-- ELABORACIÓN -->
+        <label for="elaboracion">Elaboración</label>
+        <textarea
+            id="elaboracion"
+            name="elaboracion"
+            rows="4"
+            placeholder="Descripción del proceso de elaboración"
+        ></textarea>
+
+        <!-- RESULTADOS -->
+        <label for="resultados">Resultados</label>
+        <textarea
+            id="resultados"
+            name="resultados"
+            rows="4"
+            placeholder="Observaciones, mediciones, comportamiento"
+        ></textarea>
+
+        <!-- CONCLUSIÓN -->
+        <label for="conclusion">Conclusión</label>
+        <textarea
+            id="conclusion"
+            name="conclusion"
+            rows="4"
+            placeholder="Conclusión técnica del ensayo"
+        ></textarea>
+
+        <!-- PROPUESTA COMERCIAL -->
+        <label for="propuestaComercial">Propuesta comercial</label>
+        <textarea
+            id="propuestaComercial"
+            name="propuestaComercial"
+            rows="4"
+            placeholder="Propuesta comercial, recomendación o próximos pasos"
+        ></textarea>
+
+        <!-- FOTOS -->
+        <label for="fotos">Fotos del ensayo (máx. 10)</label>
+        <input
+            type="file"
+            id="fotos"
+            name="fotos"
+            accept="image/*"
+            multiple
+        >
+
+        <!-- ACCIONES -->
+        <div class="acciones-form">
+            <button type="submit" class="btn-guardar">
+                💾 Guardar ensayo
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="location.href='ensayos.html'">
+                ✖ Cancelar
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+</main>
+
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="nuevo-ensayo.js"></script>
+
+</body>
+</html>
