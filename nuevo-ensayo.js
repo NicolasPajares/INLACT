@@ -1,54 +1,109 @@
+/**********************
+ * FIREBASE
+ **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   collection,
+  getDocs,
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
-  // TU CONFIG ACTUAL (NO LA CAMBIO)
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.appspot.com",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
-const form = document.getElementById("form-ensayo");
-const inputFoto = document.getElementById("foto");
+/**********************
+ * ELEMENTOS DOM
+ **********************/
+const form = document.getElementById("formNuevoEnsayo");
+const selectCliente = document.getElementById("cliente");
 
-function convertirABase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+const fechaEl = document.getElementById("fecha");
+const nombreEnsayoEl = document.getElementById("nombreEnsayo");
+const propuestaEl = document.getElementById("propuesta");
+const dosisEl = document.getElementById("dosis");
+const elaboracionEl = document.getElementById("elaboracion");
+const resultadosEl = document.getElementById("resultados");
+const conclusionEl = document.getElementById("conclusion");
+const propuestaComercialEl = document.getElementById("propuestaComercial");
+const fotosInput = document.getElementById("fotos");
+
+/**********************
+ * CARGAR CLIENTES
+ **********************/
+async function cargarClientes() {
+  const snap = await getDocs(collection(db, "clientes"));
+
+  snap.forEach(docu => {
+    const cliente = docu.data();
+    const option = document.createElement("option");
+    option.value = docu.id;
+    option.textContent = cliente.nombre || "Cliente sin nombre";
+    option.dataset.nombre = cliente.nombre || "";
+    selectCliente.appendChild(option);
   });
 }
 
+/**********************
+ * GUARDAR ENSAYO
+ **********************/
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  let fotoBase64 = "";
+  const clienteOption =
+    selectCliente.options[selectCliente.selectedIndex];
 
-  if (inputFoto.files.length > 0) {
-    fotoBase64 = await convertirABase64(inputFoto.files[0]);
+  const fotosURLs = [];
+
+  if (fotosInput && fotosInput.files.length > 0) {
+    for (const file of fotosInput.files) {
+      const fotoRef = ref(
+        storage,
+        `ensayos/${Date.now()}_${file.name}`
+      );
+      await uploadBytes(fotoRef, file);
+      const url = await getDownloadURL(fotoRef);
+      fotosURLs.push(url);
+    }
   }
 
-  const data = {
-    empresa: form.empresa.value,
-    nombreEnsayo: form.nombreEnsayo.value,
-    propuesta: form.propuesta.value,
-    dosis: form.dosis.value,
-    elaboracion: form.elaboracion.value,
-    resultados: form.resultados.value,
-    conclusion: form.conclusion.value,
-    propuestaComercial: form.propuestaComercial.value,
-    foto: fotoBase64, // ✅ AHORA SÍ SE GUARDA
-    fecha: Timestamp.now()
+  const nuevoEnsayo = {
+    clienteId: selectCliente.value,
+    clienteNombre: clienteOption.dataset.nombre,
+    nombreEnsayo: nombreEnsayoEl.value,
+    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+    propuesta: propuestaEl.value || "",
+    dosis: dosisEl.value || "",
+    elaboracion: elaboracionEl.value || "",
+    resultados: resultadosEl.value || "",
+    conclusion: conclusionEl.value || "",
+    propuestaComercial: propuestaComercialEl.value || "",
+    fotos: fotosURLs,
+    creadoEn: Timestamp.now()
   };
 
-  await addDoc(collection(db, "ensayos"), data);
-
-  alert("Ensayo guardado correctamente");
-  form.reset();
+  const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+  window.location.href = `ensayo.html?id=${docRef.id}`;
 });
+
+/**********************
+ * INIT
+ **********************/
+cargarClientes();
