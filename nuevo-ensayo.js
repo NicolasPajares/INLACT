@@ -30,10 +30,11 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * ELEMENTOS DOM
+ * DOM
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
+
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
 const propuestaEl = document.getElementById("propuesta");
@@ -61,48 +62,68 @@ async function cargarClientes() {
 }
 
 /**********************
+ * SUBIR FOTOS (SEGURO)
+ **********************/
+async function subirFotos(files) {
+  const urls = [];
+
+  if (!files || files.length === 0) return urls;
+
+  for (const file of files) {
+    try {
+      const nombreSeguro =
+        Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+
+      const fotoRef = ref(storage, `ensayos/${nombreSeguro}`);
+
+      await uploadBytes(fotoRef, file);
+      const url = await getDownloadURL(fotoRef);
+
+      urls.push(url);
+    } catch (error) {
+      console.error("Error subiendo foto:", error);
+      // seguimos sin romper el guardado
+    }
+  }
+
+  return urls;
+}
+
+/**********************
  * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const clienteOption =
-    selectCliente.options[selectCliente.selectedIndex];
+  try {
+    const clienteOption =
+      selectCliente.options[selectCliente.selectedIndex];
 
-  const fotosURLs = [];
+    const fotosURLs = await subirFotos(fotosInput.files);
 
-  // SUBIR FOTOS
-  if (fotosInput.files.length > 0) {
-    for (const file of fotosInput.files) {
-      const fotoRef = ref(
-        storage,
-        `ensayos/${Date.now()}_${file.name}`
-      );
-      await uploadBytes(fotoRef, file);
-      const url = await getDownloadURL(fotoRef);
-      fotosURLs.push(url);
-    }
+    const nuevoEnsayo = {
+      clienteId: selectCliente.value,
+      clienteNombre: clienteOption.dataset.nombre,
+      nombreEnsayo: nombreEnsayoEl.value,
+      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+      propuesta: propuestaEl.value || "",
+      dosis: dosisEl.value || "",
+      elaboracion: elaboracionEl.value || "",
+      resultados: resultadosEl.value || "",
+      conclusion: conclusionEl.value || "",
+      propuestaComercial: propuestaComercialEl.value || "",
+      fotos: fotosURLs,
+      creadoEn: Timestamp.now()
+    };
+
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+
+    window.location.href = `ensayo.html?id=${docRef.id}`;
+
+  } catch (error) {
+    console.error("Error guardando ensayo:", error);
+    alert("Error al guardar el ensayo");
   }
-
-  const nuevoEnsayo = {
-    clienteId: selectCliente.value,
-    clienteNombre: clienteOption.dataset.nombre,
-    nombreEnsayo: nombreEnsayoEl.value,
-    fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-    propuesta: propuestaEl.value || "",
-    dosis: dosisEl.value || "",
-    elaboracion: elaboracionEl.value || "",
-    resultados: resultadosEl.value || "",
-    conclusion: conclusionEl.value || "",
-    propuestaComercial: propuestaComercialEl.value || "",
-    fotos: fotosURLs,
-    creadoEn: Timestamp.now()
-  };
-
-  const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
-
-  // REDIRIGIR
-  window.location.href = `ensayo.html?id=${docRef.id}`;
 });
 
 /**********************
