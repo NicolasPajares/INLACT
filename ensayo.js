@@ -5,6 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   doc,
+  getDoc,
   updateDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -40,40 +41,85 @@ if (!ensayoId) {
 }
 
 /**********************
- * FORM
+ * CARGAR ENSAYO
  **********************/
-const form = document.getElementById("form-ensayo");
+const ensayoRef = doc(db, "ensayos", ensayoId);
+const snap = await getDoc(ensayoRef);
 
-form.addEventListener("submit", async (e) => {
+if (!snap.exists()) {
+  alert("Ensayo inexistente");
+  throw new Error("No existe el ensayo");
+}
+
+const ensayo = snap.data();
+
+/**********************
+ * RENDER DATOS
+ **********************/
+document.getElementById("empresa").textContent = ensayo.clienteNombre || "";
+document.getElementById("nombre-ensayo").textContent = ensayo.nombreEnsayo || "";
+
+if (ensayo.fecha) {
+  document.getElementById("fecha").textContent =
+    ensayo.fecha.toDate().toLocaleDateString("es-AR");
+}
+
+document.getElementById("propuesta").textContent = ensayo.propuesta || "";
+document.getElementById("dosis").textContent = ensayo.dosis || "";
+document.getElementById("elaboracion").textContent = ensayo.elaboracion || "";
+document.getElementById("resultados").textContent = ensayo.resultados || "";
+document.getElementById("conclusion").textContent = ensayo.conclusion || "";
+document.getElementById("propuestacomercial").textContent =
+  ensayo.propuestaComercial || "";
+
+/**********************
+ * RENDER FOTOS
+ **********************/
+const fotosSection = document.getElementById("fotos");
+
+if (ensayo.fotos && ensayo.fotos.length > 0) {
+  ensayo.fotos.forEach(url => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.style.maxWidth = "200px";
+    img.style.margin = "10px";
+    fotosSection.appendChild(img);
+  });
+}
+
+/**********************
+ * FORM SUBIR FOTOS
+ **********************/
+const uploadForm = document.createElement("form");
+uploadForm.innerHTML = `
+  <input type="file" id="nuevasFotos" multiple accept="image/*">
+  <button type="submit">Subir imágenes</button>
+`;
+fotosSection.appendChild(uploadForm);
+
+uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const fotosInput = document.getElementById("fotos");
-  const fotosURLs = [];
+  const input = document.getElementById("nuevasFotos");
+  if (input.files.length === 0) return;
 
-  try {
-    if (fotosInput.files.length > 0) {
-      for (const file of fotosInput.files) {
-        const fotoRef = ref(
-          storage,
-          `ensayos/${ensayoId}/${Date.now()}_${file.name}`
-        );
+  const nuevasURLs = [...(ensayo.fotos || [])];
 
-        await uploadBytes(fotoRef, file);
-        const url = await getDownloadURL(fotoRef);
-        fotosURLs.push(url);
-      }
+  for (const file of input.files) {
+    const fotoRef = ref(
+      storage,
+      `ensayos/${ensayoId}/${Date.now()}_${file.name}`
+    );
 
-      await updateDoc(doc(db, "ensayos", ensayoId), {
-        fotos: fotosURLs,
-        actualizadoEn: Timestamp.now()
-      });
-    }
-
-    alert("Fotos guardadas correctamente");
-    form.reset();
-
-  } catch (error) {
-    console.error(error);
-    alert("Error al guardar las fotos");
+    await uploadBytes(fotoRef, file);
+    const url = await getDownloadURL(fotoRef);
+    nuevasURLs.push(url);
   }
+
+  await updateDoc(ensayoRef, {
+    fotos: nuevasURLs,
+    actualizadoEn: Timestamp.now()
+  });
+
+  location.reload();
 });
