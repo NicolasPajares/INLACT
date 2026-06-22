@@ -49,16 +49,22 @@ const fotosInput = document.getElementById("fotos");
  * CARGAR CLIENTES
  **********************/
 async function cargarClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
+  try {
+    const snap = await getDocs(collection(db, "clientes"));
 
-  snap.forEach(docu => {
-    const cliente = docu.data();
-    const option = document.createElement("option");
-    option.value = docu.id;
-    option.textContent = cliente.nombre || "Cliente sin nombre";
-    option.dataset.nombre = cliente.nombre || "";
-    selectCliente.appendChild(option);
-  });
+    snap.forEach(docu => {
+      const cliente = docu.data();
+      const option = document.createElement("option");
+      option.value = docu.id;
+      option.textContent = cliente.nombre || "Cliente sin nombre";
+      option.dataset.nombre = cliente.nombre || "";
+      selectCliente.appendChild(option);
+    });
+
+    console.log("✅ Clientes cargados:", snap.size);
+  } catch (err) {
+    console.error("❌ Error cargando clientes", err);
+  }
 }
 
 /**********************
@@ -87,7 +93,7 @@ form.addEventListener("submit", async (e) => {
 
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre,
+      clienteNombre: clienteOption.dataset.nombre || "",
       nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
       propuesta: propuestaEl.value || "",
@@ -100,12 +106,15 @@ form.addEventListener("submit", async (e) => {
       creadoEn: Timestamp.now()
     };
 
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
-    window.location.href = `ensayo.html?id=${docRef.id}`;
+    const docRef = await addDoc(
+      collection(db, "ensayos"),
+      nuevoEnsayo
+    );
 
-  } catch (error) {
-    console.error(error);
-    alert("Error al guardar el ensayo");
+    window.location.href = `ensayo.html?id=${docRef.id}`;
+  } catch (err) {
+    console.error("❌ Error guardando ensayo", err);
+    alert("Error al guardar el ensayo. Ver consola.");
   }
 });
 
