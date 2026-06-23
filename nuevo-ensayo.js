@@ -78,8 +78,7 @@ form.addEventListener("submit", async (e) => {
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      fotos: fotosBase64,
-      creadoEn: Timestamp.now()
+      
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
