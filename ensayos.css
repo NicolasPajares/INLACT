@@ -135,7 +135,18 @@ main button:last-of-type:hover {
     padding: 20px;
   }
 }
-/* HACER QUE LA COLUMNA CELSTE OCUPÉ TODO EL ALTO */
+/* ===============================
+   FIX BARRA AZUL ENSAYO
+   (sin romper nada)
+================================ */
+
+/* el contenedor define la altura */
+.contenedor-ensayo {
+  min-height: calc(100vh - 120px); /* header + footer */
+  display: flex;
+}
+
+/* la barra azul se estira completa */
 .menu-ensayo {
-  min-height: 100vh !important;
+  align-self: stretch;
 }
