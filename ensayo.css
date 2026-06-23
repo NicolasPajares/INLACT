@@ -108,3 +108,26 @@
     flex-direction: column;
   }
 }
+/* =========================
+   AJUSTES SOLO PARA CELULAR
+   ========================= */
+@media (max-width: 768px) {
+
+  .contenedor-ensayo {
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .menu-ensayo {
+    width: 100%;              /* ocupa todo el ancho */
+    position: relative;       /* desactiva sticky solo en mobile */
+    top: auto;
+    height: auto;
+    min-height: 100vh;        /* llega hasta abajo */
+  }
+
+  .contenido-blanco {
+    padding: 24px;
+  }
+
+}
