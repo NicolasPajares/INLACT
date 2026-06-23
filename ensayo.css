@@ -43,15 +43,15 @@
   flex-direction: column;
 }
 
-/* ENCABEZADO */
 .encabezado-ensayo {
-  min-height: 85vh;
+  min-height: calc(85vh - 120px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
+
 
 .encabezado-ensayo h1,
 .encabezado-ensayo h2 {
