@@ -83,3 +83,50 @@
   width: 100%;
   border-radius: 12px;
 }
+/* ===============================
+   FIX SOLO MOBILE
+   NO TOCA DESKTOP
+================================ */
+@media (max-width: 768px) {
+
+  /* layout en columna */
+  .contenedor-ensayo {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  /* menú azul */
+  .menu-ensayo {
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .menu-ensayo button {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  /* contenido */
+  .contenido-blanco {
+    padding: 20px;
+  }
+
+  /* encabezado */
+  .encabezado-ensayo {
+    min-height: calc(100vh - 140px);
+    padding-top: 20px;
+  }
+
+  /* bloques */
+  .bloque {
+    min-height: auto;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    scroll-margin-top: 0;
+  }
+}
