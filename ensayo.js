@@ -7,13 +7,15 @@ import {
   doc,
   getDoc,
   updateDoc,
-  arrayUnion
+  arrayUnion,
+  arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
@@ -107,7 +109,7 @@ async function cargarEnsayo() {
 }
 
 /**********************
- * SUBIR FOTOS (CON PREVIEW)
+ * SUBIR FOTOS
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -118,7 +120,7 @@ async function subirFotos(e) {
   for (const archivo of archivos) {
 
     const previewUrl = URL.createObjectURL(archivo);
-    const imgPreview = agregarImagen(previewUrl);
+    const imgPreview = agregarImagen(previewUrl, true);
 
     const storageRef = ref(
       storage,
@@ -132,30 +134,72 @@ async function subirFotos(e) {
       fotos: arrayUnion(urlFinal)
     });
 
-    imgPreview.src = urlFinal;
+    imgPreview.dataset.url = urlFinal;
+    imgPreview.querySelector("img").src = urlFinal;
   }
 
   e.target.value = "";
 }
 
 /**********************
- * AGREGAR IMAGEN AL DOM
- * (ÚNICO CAMBIO REAL)
+ * AGREGAR IMAGEN + CRUZ ELIMINAR
  **********************/
-function agregarImagen(url) {
+function agregarImagen(url, esPreview = false) {
   const fotosDiv = document.getElementById("fotos");
+
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "relative";
+  wrapper.style.display = "inline-block";
+  wrapper.style.marginBottom = "16px";
 
   const img = document.createElement("img");
   img.src = url;
-
   img.style.width = "100%";
   img.style.maxWidth = "480px";
   img.style.display = "block";
-  img.style.marginBottom = "16px";
   img.style.borderRadius = "12px";
 
-  fotosDiv.appendChild(img);
-  return img;
+  const cerrar = document.createElement("button");
+  cerrar.textContent = "✕";
+  cerrar.style.position = "absolute";
+  cerrar.style.top = "6px";
+  cerrar.style.right = "6px";
+  cerrar.style.border = "none";
+  cerrar.style.cursor = "pointer";
+  cerrar.style.fontSize = "16px";
+  cerrar.style.lineHeight = "1";
+  cerrar.style.background = "rgba(0,0,0,0.6)";
+  cerrar.style.color = "#fff";
+  cerrar.style.borderRadius = "50%";
+  cerrar.style.width = "24px";
+  cerrar.style.height = "24px";
+
+  cerrar.addEventListener("click", async () => {
+    const urlImagen = wrapper.dataset.url;
+    wrapper.remove();
+
+    if (!urlImagen) return;
+
+    const refEnsayo = doc(db, "ensayos", ensayoId);
+
+    await updateDoc(refEnsayo, {
+      fotos: arrayRemove(urlImagen)
+    });
+
+    try {
+      const storageRef = ref(storage, urlImagen);
+      await deleteObject(storageRef);
+    } catch (e) {
+      // si falla borrar en storage no rompe nada
+    }
+  });
+
+  wrapper.appendChild(img);
+  wrapper.appendChild(cerrar);
+  wrapper.dataset.url = esPreview ? "" : url;
+
+  fotosDiv.appendChild(wrapper);
+  return wrapper;
 }
 
 cargarEnsayo();
