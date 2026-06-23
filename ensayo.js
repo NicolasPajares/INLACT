@@ -77,8 +77,15 @@ async function cargarEnsayo() {
     `;
   });
 
+  /**********************
+   * FOTOS + TÍTULO
+   **********************/
   const fotosDiv = document.getElementById("fotos");
-  fotosDiv.innerHTML = "";
+  fotosDiv.innerHTML = `
+    <h3 style="color:#1f4e8c; margin-bottom:16px;">
+      Imágenes
+    </h3>
+  `;
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => {
