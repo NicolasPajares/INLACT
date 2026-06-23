@@ -77,35 +77,50 @@ async function cargarEnsayo() {
       ? "propuestaComercial"
       : id;
 
-    const contenedor = document.getElementById(id);
-    contenedor.innerHTML = `
+    document.getElementById(id).innerHTML = `
       <h3 style="color:#1f4e8c; margin-bottom:16px;">${titulos[id]}</h3>
       <p>${data[campo] || ""}</p>
     `;
   });
 
   /**********************
-   * IMÁGENES + BOTÓN
+   * IMÁGENES + BOTÓN SUBIR
    **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `
     <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
-    <input 
-      type="file"
-      id="inputFotos"
-      accept="image/*"
-      multiple
-      style="margin-bottom:16px;"
-    />
+    <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
   `;
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => agregarImagen(url));
   }
 
-  document
-    .getElementById("inputFotos")
-    .addEventListener("change", subirFotos);
+  document.getElementById("inputFotos").addEventListener("change", subirFotos);
+
+  /**********************
+   * BOTÓN PUBLICAR + LINK
+   **********************/
+  const btnPublicar = document.createElement("button");
+  btnPublicar.textContent = "Guardar y generar link para cliente";
+  btnPublicar.style.marginTop = "32px";
+
+  const linkDiv = document.createElement("div");
+  linkDiv.style.marginTop = "16px";
+
+  btnPublicar.addEventListener("click", async () => {
+    await updateDoc(refEnsayo, { publico: true });
+
+    const link = `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}`;
+
+    linkDiv.innerHTML = `
+      <p><strong>Link para el cliente:</strong></p>
+      <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
+    `;
+  });
+
+  fotosDiv.appendChild(btnPublicar);
+  fotosDiv.appendChild(linkDiv);
 }
 
 /**********************
@@ -118,101 +133,51 @@ async function subirFotos(e) {
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
   for (const archivo of archivos) {
-
     const previewUrl = URL.createObjectURL(archivo);
-    const imgPreview = agregarImagen(previewUrl, true);
+    const wrapper = agregarImagen(previewUrl, true);
 
-    const storageRef = ref(
-      storage,
-      `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-    );
-
+    const storageRef = ref(storage, `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`);
     await uploadBytes(storageRef, archivo);
     const urlFinal = await getDownloadURL(storageRef);
 
-    await updateDoc(refEnsayo, {
-      fotos: arrayUnion(urlFinal)
-    });
-
-    imgPreview.dataset.url = urlFinal;
-    imgPreview.querySelector("img").src = urlFinal;
+    await updateDoc(refEnsayo, { fotos: arrayUnion(urlFinal) });
+    wrapper.dataset.url = urlFinal;
+    wrapper.querySelector("img").src = urlFinal;
   }
 
   e.target.value = "";
 }
 
 /**********************
- * AGREGAR IMAGEN + CRUZ ELIMINAR
+ * AGREGAR IMAGEN + BORRAR
  **********************/
-function agregarImagen(url, esPreview = false) {
+function agregarImagen(url, preview = false) {
   const fotosDiv = document.getElementById("fotos");
 
-  const wrapper = document.createElement("div");
-  wrapper.style.position = "relative";
-  wrapper.style.display = "inline-block";
-  wrapper.style.marginBottom = "16px";
+  const wrap = document.createElement("div");
+  wrap.style.position = "relative";
+  wrap.style.marginBottom = "16px";
 
   const img = document.createElement("img");
   img.src = url;
-  img.style.width = "100%";
   img.style.maxWidth = "480px";
-  img.style.display = "block";
+  img.style.width = "100%";
   img.style.borderRadius = "12px";
 
-  const cerrar = document.createElement("button");
-  cerrar.textContent = "✕";
-  cerrar.style.position = "absolute";
-  cerrar.style.top = "6px";
-  cerrar.style.right = "6px";
-  cerrar.style.border = "none";
-  cerrar.style.cursor = "pointer";
-  cerrar.style.fontSize = "16px";
-  cerrar.style.lineHeight = "1";
-  cerrar.style.background = "rgba(0,0,0,0.6)";
-  cerrar.style.color = "#fff";
-  cerrar.style.borderRadius = "50%";
-  cerrar.style.width = "24px";
-  cerrar.style.height = "24px";
-
-  cerrar.addEventListener("click", async () => {
-    const urlImagen = wrapper.dataset.url;
-    wrapper.remove();
-
-    if (!urlImagen) return;
-
-    const refEnsayo = doc(db, "ensayos", ensayoId);
-
-    await updateDoc(refEnsayo, {
-      fotos: arrayRemove(urlImagen)
-    });
-
-    try {
-      const storageRef = ref(storage, urlImagen);
-      await deleteObject(storageRef);
-    } catch (e) {
-      // si falla borrar en storage no rompe nada
-    }
-  });
-
-  wrapper.appendChild(img);
-  wrapper.appendChild(cerrar);
-  wrapper.dataset.url = esPreview ? "" : url;
-
-  fotosDiv.appendChild(wrapper);
-  return wrapper;
+  wrap.appendChild(img);
+  fotosDiv.appendChild(wrap);
+  return wrap;
 }
 
 cargarEnsayo();
 
 /**********************
- * SCROLL MENÚ IZQUIERDO
+ * SCROLL MENÚ
  **********************/
-document.querySelectorAll(".menu-ensayo button").forEach(boton => {
-  boton.addEventListener("click", () => {
-    const id = boton.dataset.seccion;
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.seccion;
     const destino = document.getElementById(id);
-    if (destino) {
-      destino.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    if (destino) destino.scrollIntoView({ behavior: "smooth" });
   });
 });
