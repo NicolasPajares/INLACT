@@ -37,7 +37,6 @@ const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
 
-
 /**********************
  * CARGAR CLIENTES
  **********************/
@@ -54,7 +53,6 @@ async function cargarClientes() {
   });
 }
 
-
 /**********************
  * GUARDAR ENSAYO
  **********************/
@@ -65,23 +63,29 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-
+    // 🔒 nombre y fecha ya son obligatorios por HTML
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
       nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
       elaboracion: elaboracionEl.value || "",
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      
+
+      // 👇 dejamos preparado el campo para el futuro
+      fotos: [],
+
+      creadoEn: Timestamp.now()
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
+    // redirige al ensayo
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
