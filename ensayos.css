@@ -139,14 +139,19 @@ main button:last-of-type:hover {
    FIX BARRA AZUL ENSAYO
    (sin romper nada)
 ================================ */
+/* ===============================
+   FIX BARRA AZUL ENSAYO (FINAL)
+================================ */
 
-/* el contenedor define la altura */
+/* contenedor general */
 .contenedor-ensayo {
-  min-height: calc(100vh - 120px); /* header + footer */
   display: flex;
 }
 
-/* la barra azul se estira completa */
+/* barra azul siempre completa */
 .menu-ensayo {
-  align-self: stretch;
+  position: sticky;
+  top: 120px;               /* altura del header */
+  height: calc(100vh - 120px);
+  align-self: flex-start;
 }
