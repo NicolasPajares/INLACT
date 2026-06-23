@@ -65,7 +65,6 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    const fotosBase64 = await procesarFotos(fotosInput.files);
 
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
