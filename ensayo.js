@@ -99,14 +99,19 @@ async function cargarEnsayo() {
 cargarEnsayo();
 
 /**********************
- * SCROLL MENU
+ * SCROLL MENÚ IZQUIERDO
+ * (FIX FUNCIONAL – SIN TOCAR DISEÑO)
  **********************/
-document.querySelectorAll(".menu-ensayo button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.seccion;
-    const target = document.getElementById(id);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
+document.querySelectorAll(".menu-ensayo button").forEach(boton => {
+  boton.addEventListener("click", () => {
+    const seccionId = boton.dataset.seccion;
+    const destino = document.getElementById(seccionId);
+
+    if (destino) {
+      destino.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
     }
   });
 });
