@@ -32,10 +32,11 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * OBTENER ID
+ * PARAMETROS
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
+const esPublico = params.get("publico") === "1";
 
 /**********************
  * CARGAR ENSAYO
@@ -84,47 +85,50 @@ async function cargarEnsayo() {
   });
 
   /**********************
-   * IMÁGENES + BOTÓN SUBIR
+   * IMÁGENES
    **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `
     <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
-    <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
   `;
 
-  if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => agregarImagen(url));
+  if (!esPublico) {
+    fotosDiv.innerHTML += `
+      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
+    `;
+    document.getElementById("inputFotos").addEventListener("change", subirFotos);
   }
 
-  document.getElementById("inputFotos").addEventListener("change", subirFotos);
+  if (Array.isArray(data.fotos)) {
+    data.fotos.forEach(url => agregarImagen(url, !esPublico));
+  }
 
   /**********************
-   * BOTÓN PUBLICAR + LINK
+   * BOTÓN LINK CLIENTE (SOLO EDITOR)
    **********************/
-  const btnPublicar = document.createElement("button");
-  btnPublicar.textContent = "Guardar y generar link para cliente";
-  btnPublicar.style.marginTop = "32px";
+  if (!esPublico) {
+    const btn = document.createElement("button");
+    btn.textContent = "Guardar y generar link para cliente";
+    btn.style.marginTop = "32px";
 
-  const linkDiv = document.createElement("div");
-  linkDiv.style.marginTop = "16px";
+    const linkDiv = document.createElement("div");
+    linkDiv.style.marginTop = "16px";
 
-  btnPublicar.addEventListener("click", async () => {
-    await updateDoc(refEnsayo, { publico: true });
+    btn.addEventListener("click", async () => {
+      const link = `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
+      linkDiv.innerHTML = `
+        <p><strong>Link para el cliente:</strong></p>
+        <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
+      `;
+    });
 
-    const link = `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}`;
-
-    linkDiv.innerHTML = `
-      <p><strong>Link para el cliente:</strong></p>
-      <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
-    `;
-  });
-
-  fotosDiv.appendChild(btnPublicar);
-  fotosDiv.appendChild(linkDiv);
+    fotosDiv.appendChild(btn);
+    fotosDiv.appendChild(linkDiv);
+  }
 }
 
 /**********************
- * SUBIR FOTOS
+ * SUBIR FOTOS (EDITOR)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -134,24 +138,24 @@ async function subirFotos(e) {
 
   for (const archivo of archivos) {
     const previewUrl = URL.createObjectURL(archivo);
-    const wrapper = agregarImagen(previewUrl, true);
+    const wrap = agregarImagen(previewUrl, true);
 
     const storageRef = ref(storage, `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`);
     await uploadBytes(storageRef, archivo);
     const urlFinal = await getDownloadURL(storageRef);
 
     await updateDoc(refEnsayo, { fotos: arrayUnion(urlFinal) });
-    wrapper.dataset.url = urlFinal;
-    wrapper.querySelector("img").src = urlFinal;
+    wrap.querySelector("img").src = urlFinal;
+    wrap.dataset.url = urlFinal;
   }
 
   e.target.value = "";
 }
 
 /**********************
- * AGREGAR IMAGEN + BORRAR
+ * AGREGAR IMAGEN
  **********************/
-function agregarImagen(url, preview = false) {
+function agregarImagen(url, editable) {
   const fotosDiv = document.getElementById("fotos");
 
   const wrap = document.createElement("div");
@@ -165,11 +169,10 @@ function agregarImagen(url, preview = false) {
   img.style.borderRadius = "12px";
 
   wrap.appendChild(img);
+
   fotosDiv.appendChild(wrap);
   return wrap;
 }
-
-cargarEnsayo();
 
 /**********************
  * SCROLL MENÚ
@@ -181,3 +184,5 @@ document.querySelectorAll(".menu-ensayo button").forEach(btn => {
     if (destino) destino.scrollIntoView({ behavior: "smooth" });
   });
 });
+
+cargarEnsayo();
