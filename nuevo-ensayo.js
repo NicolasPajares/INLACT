@@ -9,12 +9,6 @@ import {
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -27,7 +21,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 /**********************
  * DOM
@@ -62,31 +55,68 @@ async function cargarClientes() {
 }
 
 /**********************
- * SUBIR FOTOS (SEGURO)
+ * IMAGEN A BASE64 COMPRIMIDA
  **********************/
-async function subirFotos(files) {
-  const urls = [];
+function imagenABase64Comprimida(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
 
-  if (!files || files.length === 0) return urls;
+    reader.onload = () => {
+      const img = new Image();
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let w = img.width;
+        let h = img.height;
+
+        const MAX = 1280;
+        const QUALITY = 0.6;
+
+        if (w > h && w > MAX) {
+          h *= MAX / w;
+          w = MAX;
+        } else if (h > MAX) {
+          w *= MAX / h;
+          h = MAX;
+        }
+
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+
+        resolve(canvas.toDataURL("image/jpeg", QUALITY));
+      };
+
+      img.src = reader.result;
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/**********************
+ * PROCESAR FOTOS
+ **********************/
+async function procesarFotos(files) {
+  const imagenes = [];
+
+  if (!files || files.length === 0) return imagenes;
 
   for (const file of files) {
+    if (!file.type.startsWith("image/")) continue;
+
     try {
-      const nombreSeguro =
-        Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-
-      const fotoRef = ref(storage, `ensayos/${nombreSeguro}`);
-
-      await uploadBytes(fotoRef, file);
-      const url = await getDownloadURL(fotoRef);
-
-      urls.push(url);
-    } catch (error) {
-      console.error("Error subiendo foto:", error);
-      // seguimos sin romper el guardado
+      const base64 = await imagenABase64Comprimida(file);
+      imagenes.push(base64);
+    } catch (e) {
+      console.error("Error procesando imagen", e);
     }
   }
 
-  return urls;
+  return imagenes;
 }
 
 /**********************
@@ -99,7 +129,7 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    const fotosURLs = await subirFotos(fotosInput.files);
+    const fotosBase64 = await procesarFotos(fotosInput.files);
 
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
@@ -112,7 +142,7 @@ form.addEventListener("submit", async (e) => {
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      fotos: fotosURLs,
+      fotos: fotosBase64,
       creadoEn: Timestamp.now()
     };
 
