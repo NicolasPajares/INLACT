@@ -87,24 +87,13 @@ async function cargarEnsayo() {
    * IMÁGENES
    **********************/
   const fotosDiv = document.getElementById("fotos");
-  fotosDiv.innerHTML = `
-    <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
-  `;
+  fotosDiv.innerHTML = `<h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>`;
 
   if (!esPublico) {
     fotosDiv.innerHTML += `
-      <input
-        type="file"
-        id="inputFotos"
-        accept="image/*"
-        multiple
-        style="margin-bottom:16px;"
-      />
+      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
     `;
-
-    document
-      .getElementById("inputFotos")
-      .addEventListener("change", subirFotos);
+    document.getElementById("inputFotos").addEventListener("change", subirFotos);
   }
 
   if (Array.isArray(data.fotos)) {
@@ -117,7 +106,7 @@ async function cargarEnsayo() {
 }
 
 /**********************
- * SUBIR FOTOS
+ * SUBIR FOTOS (FIX REAL)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -125,11 +114,7 @@ async function subirFotos(e) {
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
   const snap = await getDoc(refEnsayo);
-
-  // 🔹 Garantizar que exista el array fotos
-  if (!snap.data().fotos) {
-    await updateDoc(refEnsayo, { fotos: [] });
-  }
+  const data = snap.data() || {};
 
   for (const archivo of archivos) {
     const previewUrl = URL.createObjectURL(archivo);
@@ -143,9 +128,15 @@ async function subirFotos(e) {
     await uploadBytes(storageRef, archivo);
     const urlFinal = await getDownloadURL(storageRef);
 
-    await updateDoc(refEnsayo, {
-      fotos: arrayUnion(urlFinal)
-    });
+    if (Array.isArray(data.fotos)) {
+      await updateDoc(refEnsayo, {
+        fotos: arrayUnion(urlFinal)
+      });
+    } else {
+      await setDoc(refEnsayo, {
+        fotos: [urlFinal]
+      }, { merge: true });
+    }
 
     imgPreview.src = urlFinal;
   }
