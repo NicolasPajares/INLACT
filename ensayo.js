@@ -52,12 +52,29 @@ async function cargarEnsayo() {
     "propuestacomercial"
   ];
 
+  const titulos = {
+    propuesta: "Propuesta",
+    dosis: "Dosis",
+    elaboracion: "Elaboración",
+    resultados: "Resultados",
+    conclusion: "Conclusión",
+    propuestacomercial: "Propuesta comercial"
+  };
+
   secciones.forEach(id => {
     const campo = id === "propuestacomercial"
       ? "propuestaComercial"
       : id;
 
-    document.getElementById(id).textContent = data[campo] || "";
+    const contenido = data[campo] || "";
+    const contenedor = document.getElementById(id);
+
+    contenedor.innerHTML = `
+      <h3 style="color:#1f4e8c; margin-bottom:16px;">
+        ${titulos[id]}
+      </h3>
+      <p>${contenido}</p>
+    `;
   });
 
   const fotosDiv = document.getElementById("fotos");
@@ -77,10 +94,10 @@ cargarEnsayo();
 /**********************
  * SCROLL MENU
  **********************/
-document.querySelectorAll(".menu-lateral button").forEach(btn => {
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
     const id = btn.dataset.seccion;
-    const target = document.getElementById(id) || document.getElementById(`bloque-${id}`);
+    const target = document.getElementById(id);
     if (target) {
       target.scrollIntoView({ behavior: "smooth" });
     }
