@@ -5,8 +5,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   doc,
-  getDoc
+  getDoc,
+  updateDoc,
+  arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -19,6 +27,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /**********************
  * OBTENER ID
@@ -66,52 +75,89 @@ async function cargarEnsayo() {
       ? "propuestaComercial"
       : id;
 
-    const contenido = data[campo] || "";
     const contenedor = document.getElementById(id);
-
     contenedor.innerHTML = `
       <h3 style="color:#1f4e8c; margin-bottom:16px;">
         ${titulos[id]}
       </h3>
-      <p>${contenido}</p>
+      <p>${data[campo] || ""}</p>
     `;
   });
 
   /**********************
-   * FOTOS + TÍTULO
+   * IMÁGENES + BOTÓN SUBIR
    **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `
-    <h3 style="color:#1f4e8c; margin-bottom:16px;">
-      Imágenes
-    </h3>
+    <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
+
+    <input 
+      type="file" 
+      id="inputFotos" 
+      accept="image/*" 
+      multiple
+      style="margin-bottom:16px;"
+    />
   `;
 
   if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => {
-      const img = document.createElement("img");
-      img.src = url;
-      fotosDiv.appendChild(img);
-    });
+    data.fotos.forEach(url => agregarImagen(url));
   }
+
+  document
+    .getElementById("inputFotos")
+    .addEventListener("change", subirFotos);
+}
+
+/**********************
+ * SUBIR FOTOS
+ **********************/
+async function subirFotos(e) {
+  const archivos = Array.from(e.target.files);
+  if (!archivos.length) return;
+
+  const refEnsayo = doc(db, "ensayos", ensayoId);
+
+  for (const archivo of archivos) {
+    const storageRef = ref(
+      storage,
+      `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
+    );
+
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+
+    await updateDoc(refEnsayo, {
+      fotos: arrayUnion(url)
+    });
+
+    agregarImagen(url);
+  }
+
+  e.target.value = "";
+}
+
+/**********************
+ * AGREGAR IMAGEN AL DOM
+ **********************/
+function agregarImagen(url) {
+  const fotosDiv = document.getElementById("fotos");
+  const img = document.createElement("img");
+  img.src = url;
+  fotosDiv.appendChild(img);
 }
 
 cargarEnsayo();
 
 /**********************
  * SCROLL MENÚ IZQUIERDO
- * (FIX FUNCIONAL – SIN TOCAR DISEÑO)
  **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(boton => {
   boton.addEventListener("click", () => {
-    const seccionId = boton.dataset.seccion;
-    const destino = document.getElementById(seccionId);
-
+    const id = boton.dataset.seccion;
+    const destino = document.getElementById(id);
     if (destino) {
-      destino.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
+      destino.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   });
 });
