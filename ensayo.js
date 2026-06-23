@@ -77,24 +77,21 @@ async function cargarEnsayo() {
 
     const contenedor = document.getElementById(id);
     contenedor.innerHTML = `
-      <h3 style="color:#1f4e8c; margin-bottom:16px;">
-        ${titulos[id]}
-      </h3>
+      <h3 style="color:#1f4e8c; margin-bottom:16px;">${titulos[id]}</h3>
       <p>${data[campo] || ""}</p>
     `;
   });
 
   /**********************
-   * IMÁGENES + BOTÓN SUBIR
+   * IMÁGENES + BOTÓN
    **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `
     <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
-
     <input 
-      type="file" 
-      id="inputFotos" 
-      accept="image/*" 
+      type="file"
+      id="inputFotos"
+      accept="image/*"
       multiple
       style="margin-bottom:16px;"
     />
@@ -110,7 +107,7 @@ async function cargarEnsayo() {
 }
 
 /**********************
- * SUBIR FOTOS
+ * SUBIR FOTOS (CON PREVIEW INMEDIATO)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -119,19 +116,27 @@ async function subirFotos(e) {
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
   for (const archivo of archivos) {
+
+    // 🔹 PREVIEW INMEDIATO
+    const previewUrl = URL.createObjectURL(archivo);
+    const imgPreview = agregarImagen(previewUrl);
+
+    // 🔹 SUBIDA A FIREBASE
     const storageRef = ref(
       storage,
       `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
     );
 
     await uploadBytes(storageRef, archivo);
-    const url = await getDownloadURL(storageRef);
+    const urlFinal = await getDownloadURL(storageRef);
 
+    // 🔹 GUARDAR EN FIRESTORE
     await updateDoc(refEnsayo, {
-      fotos: arrayUnion(url)
+      fotos: arrayUnion(urlFinal)
     });
 
-    agregarImagen(url);
+    // 🔹 REEMPLAZAR PREVIEW POR URL REAL
+    imgPreview.src = urlFinal;
   }
 
   e.target.value = "";
@@ -145,6 +150,7 @@ function agregarImagen(url) {
   const img = document.createElement("img");
   img.src = url;
   fotosDiv.appendChild(img);
+  return img;
 }
 
 cargarEnsayo();
