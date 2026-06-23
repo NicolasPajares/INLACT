@@ -1,10 +1,18 @@
 /* ===============================
-   CONTENEDOR ENSAYO
+   RESET (NO VISUAL)
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   CONTENEDOR PRINCIPAL
 ================================ */
 .contenedor-ensayo {
   display: flex;
-  min-height: 100vh;          /* CLAVE: ocupa toda la pantalla */
-  width: 100%;
+  min-height: calc(100vh - 120px);
 }
 
 /* ===============================
@@ -22,7 +30,8 @@
   position: sticky;
   top: 120px;
 
-  align-self: stretch;        /* CLAVE: se estira completo */
+  /* 🔧 FIX CLAVE */
+  align-self: flex-start;
 }
 
 /* BOTONES */
@@ -41,30 +50,48 @@
 }
 
 /* ===============================
-   CONTENIDO BLANCO
+   CONTENIDO DERECHO
 ================================ */
 .contenido-blanco {
   flex: 1;
   background: white;
   padding: 40px;
-  display: flex;
-  flex-direction: column;
+
+  display: block; /* 🔧 antes flex rompía el flujo */
 }
 
 /* ===============================
-   ENCABEZADO (PORTADA)
+   PORTADA / ENCABEZADO
 ================================ */
 .encabezado-ensayo {
-  min-height: calc(100vh - 120px); /* respeta header */
+  min-height: 85vh;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   text-align: center;
+
+  /* 🔧 FIX CLAVE */
+  position: relative;
 }
 
-.encabezado-ensayo h1,
+.encabezado-ensayo h1 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1f4e8c;
+}
+
+.encabezado-ensayo p {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 8px 0 12px 0;
+}
+
 .encabezado-ensayo h2 {
+  font-size: 26px;
+  font-weight: 600;
   color: #1f4e8c;
 }
 
@@ -72,9 +99,10 @@
    BLOQUES
 ================================ */
 .bloque {
-  min-height: calc(100vh - 120px);
+  min-height: 85vh;
   padding-top: 60px;
   padding-bottom: 60px;
+
   scroll-margin-top: 120px;
 }
 
@@ -96,19 +124,4 @@
 .fotos img {
   width: 100%;
   border-radius: 12px;
-}
-
-/* ===============================
-   MOBILE (SOLO VISUAL, NO ROMPE)
-================================ */
-@media (max-width: 768px) {
-  .contenedor-ensayo {
-    flex-direction: column;
-  }
-
-  .menu-ensayo {
-    width: 100%;
-    position: relative;
-    top: 0;
-  }
 }
