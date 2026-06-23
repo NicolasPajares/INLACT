@@ -36,7 +36,7 @@ const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
-const fotosInput = document.getElementById("fotos");
+
 
 /**********************
  * CARGAR CLIENTES
@@ -54,70 +54,6 @@ async function cargarClientes() {
   });
 }
 
-/**********************
- * IMAGEN A BASE64 COMPRIMIDA
- **********************/
-function imagenABase64Comprimida(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const img = new Image();
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        let w = img.width;
-        let h = img.height;
-
-        const MAX = 1280;
-        const QUALITY = 0.6;
-
-        if (w > h && w > MAX) {
-          h *= MAX / w;
-          w = MAX;
-        } else if (h > MAX) {
-          w *= MAX / h;
-          h = MAX;
-        }
-
-        canvas.width = w;
-        canvas.height = h;
-        ctx.drawImage(img, 0, 0, w, h);
-
-        resolve(canvas.toDataURL("image/jpeg", QUALITY));
-      };
-
-      img.src = reader.result;
-    };
-
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/**********************
- * PROCESAR FOTOS
- **********************/
-async function procesarFotos(files) {
-  const imagenes = [];
-
-  if (!files || files.length === 0) return imagenes;
-
-  for (const file of files) {
-    if (!file.type.startsWith("image/")) continue;
-
-    try {
-      const base64 = await imagenABase64Comprimida(file);
-      imagenes.push(base64);
-    } catch (e) {
-      console.error("Error procesando imagen", e);
-    }
-  }
-
-  return imagenes;
-}
 
 /**********************
  * GUARDAR ENSAYO
