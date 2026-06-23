@@ -149,6 +149,24 @@ main button:last-of-type:hover {
 }
 
 /* barra azul siempre completa */
+
+/* ===============================
+   FORZAR BARRA AZUL COMPLETA
+================================ */
+
+/* Que siempre esté pegada a la ventana */
+.menu-ensayo {
+  position: sticky !important;
+  top: 0 !important;
+  height: 100vh !important;
+}
+
+/* Evitar márgenes en el padre que rompan el sticky */
+.contenedor-ensayo,
+.contenedor-ensayo > .menu-ensayo {
+  margin: 0;
+  padding: 0;
+}
 .menu-ensayo {
   position: sticky;
   top: 120px;               /* altura del header */
