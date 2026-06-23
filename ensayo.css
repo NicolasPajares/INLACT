@@ -93,32 +93,32 @@
   width: 100%;
   border-radius: 12px;
 }
-
-/* ==========================================================
-   📱 SOLO CELULAR EN VERTICAL (NO TOCA DESKTOP)
-========================================================== */
+/* ===============================
+   FIX MOBILE VERTICAL SIN TOCAR DESKTOP
+=============================== */
 @media (max-width: 768px) {
 
+  /* Mantener layout en columnas */
   .contenedor-ensayo {
-    min-height: 100vh;
+    display: flex;
+    flex-direction: row;
   }
 
-  /* Barra azul ocupa 1/3 y arranca desde arriba */
+  /* Menú lateral igual que desktop */
   .menu-ensayo {
-    width: 33vw;
+    width: 33%;
     min-height: 100vh;
     position: sticky;
     top: 0;
-    padding-top: 40px;
+
+    /* elimina el espacio blanco de arriba */
+    margin-top: 0;
+    padding-top: 20px;
   }
 
   /* Contenido a la derecha */
   .contenido-blanco {
-    padding: 24px;
-  }
-
-  /* Texto un poco más legible en celular */
-  .menu-ensayo button {
-    font-size: 18px;
+    width: 67%;
+    padding: 20px;
   }
 }
