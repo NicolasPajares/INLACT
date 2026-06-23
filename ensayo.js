@@ -1,6 +1,3 @@
-/**********************
- * FIREBASE
- **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -20,20 +17,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**********************
- * OBTENER ID
- **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
 
-/**********************
- * CARGAR ENSAYO
- **********************/
-async function cargarEnsayo() {
-  if (!ensayoId) return;
+/* SCROLL MENU */
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document
+      .getElementById(btn.dataset.seccion)
+      .scrollIntoView({ behavior: "smooth" });
+  });
+});
 
-  const refEnsayo = doc(db, "ensayos", ensayoId);
-  const snap = await getDoc(refEnsayo);
+/* CARGAR ENSAYO */
+async function cargarEnsayo() {
+  const snap = await getDoc(doc(db, "ensayos", ensayoId));
   if (!snap.exists()) return;
 
   const data = snap.data();
@@ -41,29 +39,26 @@ async function cargarEnsayo() {
   document.getElementById("empresa").textContent = data.clienteNombre || "";
   document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
   document.getElementById("fecha").textContent =
-    data.fecha?.toDate().toLocaleDateString() || "";
+    data.fecha?.toDate().toLocaleDateString();
 
-  const secciones = [
-    "propuesta",
-    "dosis",
-    "elaboracion",
-    "resultados",
-    "conclusion",
-    "propuestacomercial"
-  ];
+  const map = {
+    propuesta: "propuesta",
+    dosis: "dosis",
+    elaboracion: "elaboracion",
+    resultados: "resultados",
+    conclusion: "conclusion",
+    propuestacomercial: "propuestaComercial"
+  };
 
-  secciones.forEach(id => {
-    const campo = id === "propuestacomercial"
-      ? "propuestaComercial"
-      : id;
-
-    document.getElementById(id).textContent = data[campo] || "";
+  Object.keys(map).forEach(id => {
+    document.querySelector(`#${id} .contenido`).textContent =
+      data[map[id]] || "";
   });
 
-  const fotosDiv = document.getElementById("fotos");
+  const fotosDiv = document.querySelector("#fotos .fotos");
   fotosDiv.innerHTML = "";
 
-  if (Array.isArray(data.fotos)) {
+  if (data.fotos?.length) {
     data.fotos.forEach(url => {
       const img = document.createElement("img");
       img.src = url;
@@ -73,16 +68,3 @@ async function cargarEnsayo() {
 }
 
 cargarEnsayo();
-
-/**********************
- * SCROLL MENU
- **********************/
-document.querySelectorAll(".menu-lateral button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.seccion;
-    const target = document.getElementById(id) || document.getElementById(`bloque-${id}`);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth" });
-    }
-  });
-});
