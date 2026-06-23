@@ -13,7 +13,8 @@ import {
   getStorage,
   ref,
   uploadBytes,
-  getDownloadURL
+  getDownloadURL,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
@@ -30,7 +31,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * PARSING URL
+ * PARAMETROS URL
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
@@ -48,13 +49,11 @@ async function cargarEnsayo() {
 
   const data = snap.data();
 
-  // Cabecera
   document.getElementById("empresa").textContent = data.clienteNombre || "";
   document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
   document.getElementById("fecha").textContent =
     data.fecha?.toDate().toLocaleDateString() || "";
 
-  // Secciones con títulos
   const secciones = [
     "propuesta",
     "dosis",
@@ -78,7 +77,8 @@ async function cargarEnsayo() {
       ? "propuestaComercial"
       : id;
 
-    document.getElementById(id).innerHTML = `
+    const contenedor = document.getElementById(id);
+    contenedor.innerHTML = `
       <h3 style="color:#1f4e8c; margin-bottom:16px;">${titulos[id]}</h3>
       <p>${data[campo] || ""}</p>
     `;
@@ -92,7 +92,7 @@ async function cargarEnsayo() {
     <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
   `;
 
-  // Si NO es público, mostrar input para subir
+  // Input SOLO si NO es público
   if (!esPublico) {
     fotosDiv.innerHTML += `
       <input 
@@ -103,24 +103,22 @@ async function cargarEnsayo() {
         style="margin-bottom:16px;"
       />
     `;
+  }
+
+  // 🔴 ESTO ES LO QUE FALTABA: CARGA SIEMPRE LAS IMÁGENES
+  if (Array.isArray(data.fotos)) {
+    data.fotos.forEach(url => agregarImagen(url, !esPublico));
+  }
+
+  if (!esPublico) {
     document
       .getElementById("inputFotos")
       .addEventListener("change", subirFotos);
   }
-
-  // Mostrar TODAS las imágenes
-  if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => renderImagen(url));
-  }
-
-  // Botón de link solo si no es público
-  if (!esPublico) {
-    agregarBotonLink();
-  }
 }
 
 /**********************
- * SUBIR FOTOS (EDITOR)
+ * SUBIR FOTOS
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -130,12 +128,13 @@ async function subirFotos(e) {
 
   for (const archivo of archivos) {
     const previewUrl = URL.createObjectURL(archivo);
-    const imgPreview = renderImagen(previewUrl);
+    const imgPreview = agregarImagen(previewUrl, true);
 
     const storageRef = ref(
       storage,
       `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
     );
+
     await uploadBytes(storageRef, archivo);
     const urlFinal = await getDownloadURL(storageRef);
 
@@ -150,58 +149,51 @@ async function subirFotos(e) {
 }
 
 /**********************
- * RENDER IMAGEN para público y editor
+ * AGREGAR IMAGEN
  **********************/
-function renderImagen(url) {
+function agregarImagen(url, editable) {
   const fotosDiv = document.getElementById("fotos");
+
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "relative";
+  wrapper.style.marginBottom = "16px";
 
   const img = document.createElement("img");
   img.src = url;
+  img.style.maxWidth = "100%";
 
-  img.style.width = "100%";
-  img.style.maxWidth = "480px";
-  img.style.display = "block";
-  img.style.marginBottom = "16px";
-  img.style.borderRadius = "12px";
+  wrapper.appendChild(img);
 
-  fotosDiv.appendChild(img);
+  // Cruz SOLO si es editable
+  if (editable) {
+    const cruz = document.createElement("span");
+    cruz.textContent = "✕";
+    cruz.style.position = "absolute";
+    cruz.style.top = "6px";
+    cruz.style.right = "10px";
+    cruz.style.cursor = "pointer";
+    cruz.style.fontSize = "18px";
+    cruz.style.fontWeight = "bold";
+
+    cruz.onclick = () => wrapper.remove();
+    wrapper.appendChild(cruz);
+  }
+
+  fotosDiv.appendChild(wrapper);
   return img;
 }
 
-/**********************
- * BOTÓN LINK CLIENTE
- **********************/
-function agregarBotonLink() {
-  const fotosDiv = document.getElementById("fotos");
-
-  const btn = document.createElement("button");
-  btn.textContent = "Guardar y generar link para cliente";
-  btn.style.marginTop = "32px";
-
-  const linkDiv = document.createElement("div");
-  linkDiv.style.marginTop = "16px";
-
-  btn.addEventListener("click", () => {
-    const linkCliente = `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
-    linkDiv.innerHTML = `
-      <p><strong>Link para el cliente:</strong></p>
-      <input type="text" value="${linkCliente}" readonly style="width:100%; padding:8px;" />
-    `;
-  });
-
-  fotosDiv.appendChild(btn);
-  fotosDiv.appendChild(linkDiv);
-}
+cargarEnsayo();
 
 /**********************
- * SCROLL MENÚ
+ * SCROLL MENU
  **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
     const id = btn.dataset.seccion;
     const destino = document.getElementById(id);
-    if (destino) destino.scrollIntoView({ behavior: "smooth" });
+    if (destino) {
+      destino.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 });
-
-cargarEnsayo();
