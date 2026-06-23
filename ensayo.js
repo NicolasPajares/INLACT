@@ -1,70 +1,126 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const params = new URLSearchParams(window.location.search);
-const ensayoId = params.get("id");
-
-/* SCROLL MENU */
-document.querySelectorAll(".menu-ensayo button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document
-      .getElementById(btn.dataset.seccion)
-      .scrollIntoView({ behavior: "smooth" });
-  });
-});
-
-/* CARGAR ENSAYO */
-async function cargarEnsayo() {
-  const snap = await getDoc(doc(db, "ensayos", ensayoId));
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  document.getElementById("empresa").textContent = data.clienteNombre || "";
-  document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
-  document.getElementById("fecha").textContent =
-    data.fecha?.toDate().toLocaleDateString();
-
-  const map = {
-    propuesta: "propuesta",
-    dosis: "dosis",
-    elaboracion: "elaboracion",
-    resultados: "resultados",
-    conclusion: "conclusion",
-    propuestacomercial: "propuestaComercial"
-  };
-
-  Object.keys(map).forEach(id => {
-    document.querySelector(`#${id} .contenido`).textContent =
-      data[map[id]] || "";
-  });
-
-  const fotosDiv = document.querySelector("#fotos .fotos");
-  fotosDiv.innerHTML = "";
-
-  if (data.fotos?.length) {
-    data.fotos.forEach(url => {
-      const img = document.createElement("img");
-      img.src = url;
-      fotosDiv.appendChild(img);
-    });
-  }
+/* ===============================
+   CONTENEDOR GENERAL
+================================ */
+.contenedor-ensayo {
+  display: flex;
+  min-height: calc(100vh - 120px);
+  align-items: stretch; /* clave: evita el marco */
 }
 
-cargarEnsayo();
+/* ===============================
+   MENÚ LATERAL
+================================ */
+.menu-ensayo {
+  width: 240px;
+  background: #1f4e8c;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  position: sticky;
+  top: 120px;
+
+  /* CLAVE: ocupa todo el alto visible */
+  align-self: stretch;
+}
+
+/* botones */
+.menu-ensayo button {
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.menu-ensayo button:hover {
+  text-decoration: underline;
+}
+
+/* ===============================
+   CONTENIDO
+================================ */
+.contenido-blanco {
+  flex: 1;
+  background: white;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================
+   PORTADA
+   (NO se toca visualmente)
+================================ */
+.encabezado-ensayo {
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.encabezado-ensayo h1,
+.encabezado-ensayo h2 {
+  color: #1f4e8c;
+}
+
+/* ===============================
+   BLOQUES DE CONTENIDO
+================================ */
+.bloque {
+  min-height: 85vh;
+  padding-top: 60px;
+  padding-bottom: 60px;
+  scroll-margin-top: 120px;
+}
+
+.bloque h3 {
+  font-size: 22px;
+  margin-bottom: 24px;
+  color: #1f4e8c;
+}
+
+/* ===============================
+   FOTOS
+================================ */
+.fotos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.fotos img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* ===============================
+   MOBILE – SOLO MOBILE
+================================ */
+@media (max-width: 768px) {
+
+  .contenedor-ensayo {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .menu-ensayo {
+    position: relative;   /* evita el hueco blanco */
+    top: 0;
+    width: 100%;
+    align-self: stretch;
+  }
+
+  .contenido-blanco {
+    padding: 24px;
+  }
+
+  .bloque {
+    scroll-margin-top: 0;
+  }
+}
