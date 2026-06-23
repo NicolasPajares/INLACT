@@ -135,3 +135,7 @@ main button:last-of-type:hover {
     padding: 20px;
   }
 }
+/* HACER QUE LA COLUMNA CELSTE OCUPÉ TODO EL ALTO */
+.menu-ensayo {
+  min-height: 100vh !important;
+}
