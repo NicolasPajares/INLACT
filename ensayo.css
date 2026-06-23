@@ -113,7 +113,10 @@
 }
 
 
-
+.menu-lateral {
+  position: sticky;
+  top: 0;
+}
 
 
 
