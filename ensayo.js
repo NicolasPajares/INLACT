@@ -90,7 +90,7 @@ async function cargarEnsayo() {
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => {
-      agregarImagen(url);
+      renderImagen(url);
     });
   }
 
@@ -100,7 +100,7 @@ async function cargarEnsayo() {
 cargarEnsayo();
 
 /**********************
- * AGREGAR INPUT DE FOTOS
+ * INPUT DE FOTOS
  **********************/
 function agregarInputFotos() {
   const fotosDiv = document.getElementById("fotos");
@@ -141,26 +141,31 @@ async function subirFoto(file) {
     fotos: arrayUnion(url)
   });
 
-  agregarImagen(url);
+  renderImagen(url);
 }
 
 /**********************
- * AGREGAR IMAGEN (ÚNICA CORRECCIÓN)
+ * RENDER IMAGEN (FIX REAL)
  **********************/
-function agregarImagen(url) {
+function renderImagen(url) {
   const fotosDiv = document.getElementById("fotos");
+  const input = fotosDiv.querySelector("input");
 
   const img = document.createElement("img");
   img.src = url;
 
-  /* 👇 SOLO ESTO CAMBIA */
   img.style.width = "100%";
   img.style.maxWidth = "420px";
   img.style.display = "block";
   img.style.marginBottom = "16px";
   img.style.borderRadius = "12px";
 
-  fotosDiv.appendChild(img);
+  // 🔥 CLAVE: insertar ANTES del input
+  if (input) {
+    fotosDiv.insertBefore(img, input);
+  } else {
+    fotosDiv.appendChild(img);
+  }
 }
 
 /**********************
