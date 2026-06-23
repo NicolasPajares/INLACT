@@ -83,3 +83,7 @@
   width: 100%;
   border-radius: 12px;
 }
+.encabezado-ensayo {
+  padding-top: 120px;
+  min-height: calc(85vh + 120px);
+}
