@@ -97,3 +97,14 @@
   }
 
 }
+@media (max-width: 768px) {
+  .menu-ensayo {
+    position: relative;
+    top: 0;
+    height: auto;
+  }
+
+  .contenedor-ensayo {
+    flex-direction: column;
+  }
+}
