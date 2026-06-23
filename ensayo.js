@@ -30,9 +30,10 @@ const ensayoId = params.get("id");
  * CARGAR ENSAYO
  **********************/
 async function cargarEnsayo() {
+  if (!ensayoId) return;
+
   const refEnsayo = doc(db, "ensayos", ensayoId);
   const snap = await getDoc(refEnsayo);
-
   if (!snap.exists()) return;
 
   const data = snap.data();
@@ -40,7 +41,7 @@ async function cargarEnsayo() {
   document.getElementById("empresa").textContent = data.clienteNombre || "";
   document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
   document.getElementById("fecha").textContent =
-    data.fecha?.toDate().toLocaleDateString();
+    data.fecha?.toDate().toLocaleDateString() || "";
 
   const secciones = [
     "propuesta",
@@ -62,15 +63,26 @@ async function cargarEnsayo() {
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = "";
 
-  if (data.fotos && data.fotos.length > 0) {
+  if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => {
       const img = document.createElement("img");
       img.src = url;
-      img.style.maxWidth = "100%";
-      img.style.marginBottom = "10px";
       fotosDiv.appendChild(img);
     });
   }
 }
 
 cargarEnsayo();
+
+/**********************
+ * SCROLL MENU
+ **********************/
+document.querySelectorAll(".menu-lateral button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.seccion;
+    const target = document.getElementById(id) || document.getElementById(`bloque-${id}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+});
