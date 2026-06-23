@@ -1,76 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Ensayo INLACT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS general -->
-  <link rel="stylesheet" href="index.css">
-  <!-- CSS ensayo -->
-  <link rel="stylesheet" href="ensayo.css">
+  <meta charset="UTF-8" />
+  <title>Ensayo</title>
+  <link rel="stylesheet" href="ensayo.css" />
 </head>
-
 <body>
 
-<!-- HEADER IGUAL AL INDEX -->
-<header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>NICOLÁS PAJARES</h2>
-</header>
+<div class="contenedor-ensayo">
 
-<main class="contenedor-ensayo">
+  <aside class="menu-lateral">
+    <h2 id="empresa"></h2>
+    <p id="nombre-ensayo"></p>
+    <p id="fecha"></p>
 
-  <!-- COLUMNA IZQUIERDA -->
-  <aside class="menu-ensayo">
     <button data-seccion="propuesta">Propuesta</button>
     <button data-seccion="dosis">Dosis</button>
     <button data-seccion="elaboracion">Elaboración</button>
     <button data-seccion="resultados">Resultados</button>
     <button data-seccion="conclusion">Conclusión</button>
     <button data-seccion="propuestacomercial">Propuesta comercial</button>
-    <button data-seccion="fotos">Imágenes</button>
+    <button data-seccion="fotos">Fotos</button>
   </aside>
 
-  <!-- COLUMNA BLANCA -->
-  <section class="contenido-blanco">
+  <main class="contenido">
 
-    <!-- ENCABEZADO -->
-    <section class="encabezado-ensayo">
-      <h1 id="empresa"></h1>
-      <p id="fecha"></p>
-      <h2 id="nombre-ensayo"></h2>
-    </section>
+    <div class="bloque" id="bloque-propuesta">
+      <h3>Propuesta</h3>
+      <div id="propuesta"></div>
+    </div>
 
-    <!-- SECCIONES -->
-    <section id="propuesta" class="bloque"></section>
-    <section id="dosis" class="bloque"></section>
-    <section id="elaboracion" class="bloque"></section>
-    <section id="resultados" class="bloque"></section>
-    <section id="conclusion" class="bloque"></section>
-    <section id="propuestacomercial" class="bloque"></section>
-    <section id="fotos" class="bloque"></section>
+    <div class="bloque" id="bloque-dosis">
+      <h3>Dosis</h3>
+      <div id="dosis"></div>
+    </div>
 
-  </section>
+    <div class="bloque" id="bloque-elaboracion">
+      <h3>Elaboración</h3>
+      <div id="elaboracion"></div>
+    </div>
 
-</main>
+    <div class="bloque" id="bloque-resultados">
+      <h3>Resultados</h3>
+      <div id="resultados"></div>
+    </div>
 
-<footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
+    <div class="bloque" id="bloque-conclusion">
+      <h3>Conclusión</h3>
+      <div id="conclusion"></div>
+    </div>
+
+    <div class="bloque" id="bloque-propuestacomercial">
+      <h3>Propuesta comercial</h3>
+      <div id="propuestacomercial"></div>
+    </div>
+
+    <div class="bloque">
+      <h3>Fotos</h3>
+      <div id="fotos" class="fotos"></div>
+    </div>
+
+  </main>
+
+</div>
 
 <script type="module" src="ensayo.js"></script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
