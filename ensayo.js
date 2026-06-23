@@ -1,126 +1,88 @@
-/* ===============================
-   CONTENEDOR GENERAL
-================================ */
-.contenedor-ensayo {
-  display: flex;
-  min-height: calc(100vh - 120px);
-  align-items: stretch; /* clave: evita el marco */
-}
+/**********************
+ * FIREBASE
+ **********************/
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   MENÚ LATERAL
-================================ */
-.menu-ensayo {
-  width: 240px;
-  background: #1f4e8c;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+const firebaseConfig = {
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.appspot.com",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+};
 
-  position: sticky;
-  top: 120px;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  /* CLAVE: ocupa todo el alto visible */
-  align-self: stretch;
-}
+/**********************
+ * OBTENER ID
+ **********************/
+const params = new URLSearchParams(window.location.search);
+const ensayoId = params.get("id");
 
-/* botones */
-.menu-ensayo button {
-  background: none;
-  border: none;
-  text-align: left;
-  font-size: 20px;
-  font-weight: 500;
-  cursor: pointer;
-  color: #ffffff;
-}
+/**********************
+ * CARGAR ENSAYO
+ **********************/
+async function cargarEnsayo() {
+  if (!ensayoId) return;
 
-.menu-ensayo button:hover {
-  text-decoration: underline;
-}
+  const refEnsayo = doc(db, "ensayos", ensayoId);
+  const snap = await getDoc(refEnsayo);
+  if (!snap.exists()) return;
 
-/* ===============================
-   CONTENIDO
-================================ */
-.contenido-blanco {
-  flex: 1;
-  background: white;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-}
+  const data = snap.data();
 
-/* ===============================
-   PORTADA
-   (NO se toca visualmente)
-================================ */
-.encabezado-ensayo {
-  min-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
+  document.getElementById("empresa").textContent = data.clienteNombre || "";
+  document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
+  document.getElementById("fecha").textContent =
+    data.fecha?.toDate().toLocaleDateString() || "";
 
-.encabezado-ensayo h1,
-.encabezado-ensayo h2 {
-  color: #1f4e8c;
-}
+  const secciones = [
+    "propuesta",
+    "dosis",
+    "elaboracion",
+    "resultados",
+    "conclusion",
+    "propuestacomercial"
+  ];
 
-/* ===============================
-   BLOQUES DE CONTENIDO
-================================ */
-.bloque {
-  min-height: 85vh;
-  padding-top: 60px;
-  padding-bottom: 60px;
-  scroll-margin-top: 120px;
-}
+  secciones.forEach(id => {
+    const campo = id === "propuestacomercial"
+      ? "propuestaComercial"
+      : id;
 
-.bloque h3 {
-  font-size: 22px;
-  margin-bottom: 24px;
-  color: #1f4e8c;
-}
+    document.getElementById(id).textContent = data[campo] || "";
+  });
 
-/* ===============================
-   FOTOS
-================================ */
-.fotos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
+  const fotosDiv = document.getElementById("fotos");
+  fotosDiv.innerHTML = "";
 
-.fotos img {
-  width: 100%;
-  border-radius: 12px;
-}
-
-/* ===============================
-   MOBILE – SOLO MOBILE
-================================ */
-@media (max-width: 768px) {
-
-  .contenedor-ensayo {
-    flex-direction: column;
-    min-height: auto;
-  }
-
-  .menu-ensayo {
-    position: relative;   /* evita el hueco blanco */
-    top: 0;
-    width: 100%;
-    align-self: stretch;
-  }
-
-  .contenido-blanco {
-    padding: 24px;
-  }
-
-  .bloque {
-    scroll-margin-top: 0;
+  if (Array.isArray(data.fotos)) {
+    data.fotos.forEach(url => {
+      const img = document.createElement("img");
+      img.src = url;
+      fotosDiv.appendChild(img);
+    });
   }
 }
+
+cargarEnsayo();
+
+/**********************
+ * SCROLL MENU
+ **********************/
+document.querySelectorAll(".menu-lateral button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.seccion;
+    const target = document.getElementById(id) || document.getElementById(`bloque-${id}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+});
