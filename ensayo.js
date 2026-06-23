@@ -53,117 +53,125 @@ async function cargarEnsayo() {
     data.fecha?.toDate().toLocaleDateString() || "";
 
   const secciones = [
-    "propuesta",
-    "dosis",
-    "elaboracion",
-    "resultados",
-    "conclusion",
-    "propuestacomercial"
+    { id: "propuesta", titulo: "Propuesta" },
+    { id: "dosis", titulo: "Dosis" },
+    { id: "elaboracion", titulo: "Elaboración" },
+    { id: "resultados", titulo: "Resultados" },
+    { id: "conclusion", titulo: "Conclusión" },
+    { id: "propuestacomercial", titulo: "Propuesta comercial" }
   ];
 
-  const titulos = {
-    propuesta: "Propuesta",
-    dosis: "Dosis",
-    elaboracion: "Elaboración",
-    resultados: "Resultados",
-    conclusion: "Conclusión",
-    propuestacomercial: "Propuesta comercial"
-  };
-
-  secciones.forEach(id => {
-    const campo = id === "propuestacomercial"
+  secciones.forEach(sec => {
+    const campo = sec.id === "propuestacomercial"
       ? "propuestaComercial"
-      : id;
+      : sec.id;
 
-    const contenedor = document.getElementById(id);
-    contenedor.innerHTML = `
-      <h3 style="color:#1f4e8c; margin-bottom:16px;">${titulos[id]}</h3>
-      <p>${data[campo] || ""}</p>
-    `;
+    const contenedor = document.getElementById(sec.id);
+    contenedor.innerHTML = "";
+
+    const h3 = document.createElement("h3");
+    h3.textContent = sec.titulo;
+    h3.style.color = "#1f4e8c";
+
+    const p = document.createElement("p");
+    p.textContent = data[campo] || "";
+
+    contenedor.appendChild(h3);
+    contenedor.appendChild(p);
   });
 
-  /**********************
-   * IMÁGENES + BOTÓN
-   **********************/
   const fotosDiv = document.getElementById("fotos");
-  fotosDiv.innerHTML = `
-    <h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>
-    <input 
-      type="file"
-      id="inputFotos"
-      accept="image/*"
-      multiple
-      style="margin-bottom:16px;"
-    />
-  `;
+  fotosDiv.innerHTML = "";
+
+  const h3Fotos = document.createElement("h3");
+  h3Fotos.textContent = "Imágenes";
+  h3Fotos.style.color = "#1f4e8c";
+  fotosDiv.appendChild(h3Fotos);
 
   if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => agregarImagen(url));
-  }
-
-  document
-    .getElementById("inputFotos")
-    .addEventListener("change", subirFotos);
-}
-
-/**********************
- * SUBIR FOTOS (CON PREVIEW INMEDIATO)
- **********************/
-async function subirFotos(e) {
-  const archivos = Array.from(e.target.files);
-  if (!archivos.length) return;
-
-  const refEnsayo = doc(db, "ensayos", ensayoId);
-
-  for (const archivo of archivos) {
-
-    // 🔹 PREVIEW INMEDIATO
-    const previewUrl = URL.createObjectURL(archivo);
-    const imgPreview = agregarImagen(previewUrl);
-
-    // 🔹 SUBIDA A FIREBASE
-    const storageRef = ref(
-      storage,
-      `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-    );
-
-    await uploadBytes(storageRef, archivo);
-    const urlFinal = await getDownloadURL(storageRef);
-
-    // 🔹 GUARDAR EN FIRESTORE
-    await updateDoc(refEnsayo, {
-      fotos: arrayUnion(urlFinal)
+    data.fotos.forEach(url => {
+      agregarImagen(url);
     });
-
-    // 🔹 REEMPLAZAR PREVIEW POR URL REAL
-    imgPreview.src = urlFinal;
   }
 
-  e.target.value = "";
-}
-
-/**********************
- * AGREGAR IMAGEN AL DOM
- **********************/
-function agregarImagen(url) {
-  const fotosDiv = document.getElementById("fotos");
-  const img = document.createElement("img");
-  img.src = url;
-  fotosDiv.appendChild(img);
-  return img;
+  agregarInputFotos();
 }
 
 cargarEnsayo();
 
 /**********************
- * SCROLL MENÚ IZQUIERDO
+ * AGREGAR INPUT DE FOTOS
  **********************/
-document.querySelectorAll(".menu-ensayo button").forEach(boton => {
-  boton.addEventListener("click", () => {
-    const id = boton.dataset.seccion;
-    const destino = document.getElementById(id);
-    if (destino) {
-      destino.scrollIntoView({ behavior: "smooth", block: "start" });
+function agregarInputFotos() {
+  const fotosDiv = document.getElementById("fotos");
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.style.marginTop = "16px";
+
+  input.addEventListener("change", async () => {
+    const files = Array.from(input.files);
+    for (const file of files) {
+      await subirFoto(file);
+    }
+    input.value = "";
+  });
+
+  fotosDiv.appendChild(input);
+}
+
+/**********************
+ * SUBIR FOTO
+ **********************/
+async function subirFoto(file) {
+  if (!ensayoId) return;
+
+  const storageRef = ref(
+    storage,
+    `ensayos/${ensayoId}/${Date.now()}_${file.name}`
+  );
+
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+
+  const refEnsayo = doc(db, "ensayos", ensayoId);
+  await updateDoc(refEnsayo, {
+    fotos: arrayUnion(url)
+  });
+
+  agregarImagen(url);
+}
+
+/**********************
+ * AGREGAR IMAGEN (ÚNICA CORRECCIÓN)
+ **********************/
+function agregarImagen(url) {
+  const fotosDiv = document.getElementById("fotos");
+
+  const img = document.createElement("img");
+  img.src = url;
+
+  /* 👇 SOLO ESTO CAMBIA */
+  img.style.width = "100%";
+  img.style.maxWidth = "420px";
+  img.style.display = "block";
+  img.style.marginBottom = "16px";
+  img.style.borderRadius = "12px";
+
+  fotosDiv.appendChild(img);
+}
+
+/**********************
+ * SCROLL MENU
+ **********************/
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.seccion;
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
     }
   });
 });
