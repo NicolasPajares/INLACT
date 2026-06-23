@@ -7,6 +7,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  setDoc,
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
@@ -123,6 +124,12 @@ async function subirFotos(e) {
   if (!archivos.length) return;
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
+  const snap = await getDoc(refEnsayo);
+
+  // 🔹 Garantizar que exista el array fotos
+  if (!snap.data().fotos) {
+    await updateDoc(refEnsayo, { fotos: [] });
+  }
 
   for (const archivo of archivos) {
     const previewUrl = URL.createObjectURL(archivo);
