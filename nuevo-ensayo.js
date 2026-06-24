@@ -7,20 +7,42 @@ import {
   collection,
   getDocs,
   addDoc,
-  Timestamp
+  Timestamp,
+  updateDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+/**********************
+ * CONFIG
+ **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
+  storageBucket: "inlact.firebasestorage.app",
   messagingSenderId: "143868382036",
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
+
+/**********************
+ * AUTH
+ **********************/
+await signInAnonymously(auth);
 
 /**********************
  * DOM
@@ -36,6 +58,44 @@ const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
+
+/**********************
+ * INPUT FOTOS (inyectado)
+ **********************/
+form.insertAdjacentHTML(
+  "beforeend",
+  `
+  <label>Imágenes</label>
+  <input type="file" id="fotosInput" accept="image/*" multiple />
+  <div id="previewFotos" style="margin-top:12px;"></div>
+`
+);
+
+const fotosInput = document.getElementById("fotosInput");
+const previewFotos = document.getElementById("previewFotos");
+
+let fotosSeleccionadas = [];
+
+/**********************
+ * PREVIEW
+ **********************/
+fotosInput.addEventListener("change", e => {
+  const archivos = Array.from(e.target.files);
+  if (!archivos.length) return;
+
+  archivos.forEach(file => {
+    fotosSeleccionadas.push(file);
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.style.maxWidth = "200px";
+    img.style.marginBottom = "12px";
+    img.style.borderRadius = "8px";
+    previewFotos.appendChild(img);
+  });
+
+  fotosInput.value = "";
+});
 
 /**********************
  * CARGAR CLIENTES
@@ -56,37 +116,63 @@ async function cargarClientes() {
 /**********************
  * GUARDAR ENSAYO
  **********************/
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
+
+  const btn = form.querySelector(".btn-guardar");
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
 
   try {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    const nuevoEnsayo = {
+    // 1️⃣ crear ensayo vacío de fotos
+    const docRef = await addDoc(collection(db, "ensayos"), {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
       nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
-
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
       elaboracion: elaboracionEl.value || "",
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-
       fotos: [],
       creadoEn: Timestamp.now()
-    };
+    });
 
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+    const ensayoId = docRef.id;
+    const urlsFotos = [];
 
-    window.location.href = `ensayo.html?id=${docRef.id}`;
+    // 2️⃣ subir fotos a Storage
+    for (const archivo of fotosSeleccionadas) {
+      const storageRef = ref(
+        storage,
+        `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
+      );
 
-  } catch (error) {
-    console.error("Error guardando ensayo:", error);
+      await uploadBytes(storageRef, archivo);
+      const url = await getDownloadURL(storageRef);
+      urlsFotos.push(url);
+    }
+
+    // 3️⃣ guardar URLs
+    if (urlsFotos.length) {
+      await updateDoc(doc(db, "ensayos", ensayoId), {
+        fotos: urlsFotos
+      });
+    }
+
+    // 4️⃣ ir al ensayo
+    window.location.href = `ensayo.html?id=${ensayoId}`;
+
+  } catch (err) {
+    console.error(err);
     alert("Error al guardar el ensayo");
+    btn.disabled = false;
+    btn.textContent = "💾 Guardar ensayo";
   }
 });
 
