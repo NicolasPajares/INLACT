@@ -6,6 +6,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   collection,
+  getDocs,
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -37,7 +38,31 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * FORM
+ * CARGAR CLIENTES
+ **********************/
+const selectCliente = document.getElementById("cliente");
+
+async function cargarClientes() {
+  selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
+
+  const querySnapshot = await getDocs(collection(db, "clientes"));
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    const option = document.createElement("option");
+    option.value = doc.id;
+    option.textContent = data.nombre || data.razonSocial || "Cliente sin nombre";
+
+    selectCliente.appendChild(option);
+  });
+}
+
+// ⚠️ ESTO ES CLAVE
+cargarClientes();
+
+/**********************
+ * FORM ENSAYO
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 
@@ -45,14 +70,13 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
-    // ====== CAMPOS ======
-    const cliente = document.getElementById("cliente").value;
+    const cliente = selectCliente.value;
     const observaciones = document.getElementById("observaciones").value;
     const fileInput = document.getElementById("foto");
 
     let imageUrl = "";
 
-    // ====== STORAGE (SOLO SI HAY FOTO) ======
+    // ====== STORAGE (OPCIONAL) ======
     if (fileInput && fileInput.files.length > 0) {
       const file = fileInput.files[0];
 
@@ -67,7 +91,7 @@ form.addEventListener("submit", async (e) => {
 
     // ====== FIRESTORE ======
     await addDoc(collection(db, "ensayos"), {
-      cliente: cliente,
+      clienteId: cliente,
       observaciones: observaciones,
       imagen: imageUrl,
       createdAt: Timestamp.now()
