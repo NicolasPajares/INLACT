@@ -29,4 +29,64 @@
 
     <label for="cliente">Cliente</label>
     <select id="cliente" required>
-      <option value="">Seleccionar cliente
+      <option value="">Seleccionar cliente</option>
+    </select>
+
+    <label for="fecha">Fecha del ensayo</label>
+    <input type="date" id="fecha" required>
+
+    <label for="nombreEnsayo">Nombre del ensayo</label>
+    <input type="text" id="nombreEnsayo" required>
+
+    <label for="propuesta">Propuesta</label>
+    <textarea id="propuesta"></textarea>
+
+    <label for="dosis">Dosis</label>
+    <textarea id="dosis"></textarea>
+
+    <label for="elaboracion">Elaboración</label>
+    <textarea id="elaboracion"></textarea>
+
+    <label for="resultados">Resultados</label>
+    <textarea id="resultados"></textarea>
+
+    <label for="conclusion">Conclusión</label>
+    <textarea id="conclusion"></textarea>
+
+    <label for="propuestaComercial">Propuesta comercial</label>
+    <textarea id="propuestaComercial"></textarea>
+
+    <label for="fotoEnsayo">Foto del ensayo</label>
+    <input
+      type="file"
+      id="fotoEnsayo"
+      accept="image/*"
+    >
+
+    <div class="acciones-form">
+      <button type="submit" class="btn-guardar">
+        💾 Guardar ensayo
+      </button>
+
+      <button
+        type="button"
+        class="btn-cancelar"
+        onclick="location.href='ensayos.html'">
+        ✖ Cancelar
+      </button>
+    </div>
+
+  </form>
+
+</section>
+</main>
+
+<footer>
+  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<!-- JS -->
+<script type="module" src="nuevo-ensayo.js"></script>
+
+</body>
+</html>
