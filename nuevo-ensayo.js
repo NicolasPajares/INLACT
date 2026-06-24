@@ -38,56 +38,6 @@ const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
 
 /**********************
- * BLOQUE IMÁGENES (ANTES DE BOTONES)
- **********************/
-const accionesForm = document.querySelector(".acciones-form");
-
-accionesForm.insertAdjacentHTML("beforebegin", `
-  <div id="bloqueImagenes">
-    <label>Imágenes</label>
-    <input type="file" id="inputFotos" accept="image/*" multiple />
-    <div id="previewFotos" style="margin-top:12px;"></div>
-  </div>
-`);
-
-const fotosInput = document.getElementById("inputFotos");
-const previewDiv = document.getElementById("previewFotos");
-
-/**********************
- * PREVIEW IMÁGENES
- **********************/
-let fotosBase64 = [];
-
-fotosInput.addEventListener("change", async () => {
-  fotosBase64 = [];
-  previewDiv.innerHTML = "";
-
-  const archivos = Array.from(fotosInput.files);
-  if (!archivos.length) return;
-
-  for (const archivo of archivos) {
-    const base64 = await archivoToBase64(archivo);
-    fotosBase64.push(base64);
-
-    const img = document.createElement("img");
-    img.src = base64;
-    img.style.maxWidth = "100%";
-    img.style.marginBottom = "12px";
-    img.style.borderRadius = "12px";
-    previewDiv.appendChild(img);
-  }
-});
-
-function archivoToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/**********************
  * CARGAR CLIENTES
  **********************/
 async function cargarClientes() {
@@ -102,6 +52,43 @@ async function cargarClientes() {
     selectCliente.appendChild(option);
   });
 }
+
+/**********************
+ * BLOQUE DE IMÁGENES (above submit)
+ **********************/
+const accionesForm = document.querySelector(".acciones-form");
+
+accionesForm.insertAdjacentHTML("beforebegin", `
+  <label>Imágenes</label>
+  <input type="file" id="inputFotos" accept="image/*" multiple />
+  <div id="previewFotos" style="margin-top:12px;"></div>
+`);
+
+const fotosInput = document.getElementById("inputFotos");
+const previewFotos = document.getElementById("previewFotos");
+
+// Previsualización
+let fotosSeleccionadas = [];
+
+fotosInput.addEventListener("change", () => {
+  previewFotos.innerHTML = "";
+  fotosSeleccionadas = [];
+
+  const archivos = Array.from(fotosInput.files);
+  archivos.forEach(file => {
+    fotosSeleccionadas.push(file);
+
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.style.maxWidth = "200px";
+    img.style.marginBottom = "12px";
+    img.style.borderRadius = "8px";
+
+    previewFotos.appendChild(img);
+  });
+
+  fotosInput.value = "";
+});
 
 /**********************
  * GUARDAR ENSAYO
@@ -124,14 +111,14 @@ form.addEventListener("submit", async (e) => {
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      fotos: fotosBase64,
+      fotos: fotosSeleccionadas.map(file => URL.createObjectURL(file)), // Guardá urls locales por ahora
       creadoEn: Timestamp.now()
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
     window.location.href = `ensayo.html?id=${docRef.id}`;
-
+    
   } catch (error) {
     console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
