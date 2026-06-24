@@ -132,4 +132,6 @@ form.addEventListener("submit", async (e) => {
 /**********************
  * INIT
  **********************/
-cargarClientes();
+window.addEventListener("DOMContentLoaded", () => {
+  cargarClientes();
+});
