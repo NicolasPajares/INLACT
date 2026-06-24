@@ -54,7 +54,7 @@ async function cargarClientes() {
 }
 
 /**********************
- * BLOQUE DE IMÁGENES (above submit)
+ * BLOQUE DE IMÁGENES (preview)
  **********************/
 const accionesForm = document.querySelector(".acciones-form");
 
@@ -67,17 +67,22 @@ accionesForm.insertAdjacentHTML("beforebegin", `
 const fotosInput = document.getElementById("inputFotos");
 const previewFotos = document.getElementById("previewFotos");
 
-// Previsualización
+// Estado
 let fotosSeleccionadas = [];
 
+/**********************
+ * PREVIEW DE IMÁGENES
+ **********************/
 fotosInput.addEventListener("change", () => {
   previewFotos.innerHTML = "";
   fotosSeleccionadas = [];
 
   const archivos = Array.from(fotosInput.files);
+
   archivos.forEach(file => {
     fotosSeleccionadas.push(file);
 
+    // Preview SOLO visual (blob)
     const img = document.createElement("img");
     img.src = URL.createObjectURL(file);
     img.style.maxWidth = "200px";
@@ -91,6 +96,18 @@ fotosInput.addEventListener("change", () => {
 });
 
 /**********************
+ * CONVERTIR FILE → BASE64
+ **********************/
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/**********************
  * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
@@ -99,6 +116,13 @@ form.addEventListener("submit", async (e) => {
   try {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
+
+    // ✅ Convertir imágenes a Base64 (ESTO ES LA CLAVE)
+    const fotosBase64 = [];
+    for (const file of fotosSeleccionadas) {
+      const base64 = await fileToBase64(file);
+      fotosBase64.push(base64);
+    }
 
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
@@ -111,14 +135,14 @@ form.addEventListener("submit", async (e) => {
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      fotos: fotosSeleccionadas.map(file => URL.createObjectURL(file)), // Guardá urls locales por ahora
+      fotos: fotosBase64, // ✅ ahora son imágenes reales
       creadoEn: Timestamp.now()
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
     window.location.href = `ensayo.html?id=${docRef.id}`;
-    
+
   } catch (error) {
     console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
