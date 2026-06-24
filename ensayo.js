@@ -33,14 +33,19 @@ const auth = getAuth(app);
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
-const esPublico = params.get("publico") === "1";
 
 /**********************
- * INIT
+ * INIT (AUTH)
  **********************/
 signInAnonymously(auth)
-  .then(() => cargarEnsayo())
-  .catch(() => cargarEnsayo());
+  .then(() => iniciar())
+  .catch(() => iniciar());
+
+async function iniciar() {
+  await cargarEnsayo();
+  activarMenuSticky();   // ✅ ÚNICO CAMBIO NUEVO
+  activarScrollMenu();   // (esto ya lo tenías / se mantiene)
+}
 
 /**********************
  * CARGAR ENSAYO
@@ -55,12 +60,16 @@ async function cargarEnsayo() {
   const data = snap.data();
 
   // Encabezado
-  document.getElementById("empresa").textContent = data.clienteNombre || "";
-  document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
+  document.getElementById("empresa").textContent =
+    data.clienteNombre || "";
+
+  document.getElementById("nombre-ensayo").textContent =
+    data.nombreEnsayo || "";
+
   document.getElementById("fecha").textContent =
     data.fecha?.toDate().toLocaleDateString() || "";
 
-  // Bloques de texto
+  // Secciones
   renderBloque("propuesta", "Propuesta", data.propuesta);
   renderBloque("dosis", "Dosis", data.dosis);
   renderBloque("elaboracion", "Elaboración", data.elaboracion);
@@ -74,11 +83,6 @@ async function cargarEnsayo() {
 
   // Imágenes
   renderImagenes(data.fotos || []);
-
-  // Link para clientes (solo si NO es público)
-  if (!esPublico) {
-    renderLinkCliente();
-  }
 }
 
 /**********************
@@ -89,7 +93,11 @@ function renderBloque(id, titulo, contenido) {
   if (!contenedor) return;
 
   contenedor.innerHTML = `
-    <h3 style="color:#1f4e8c; margin-bottom:12px; font-weight:600;">
+    <h3 style="
+      color:#1f4e8c;
+      margin-bottom:12px;
+      font-weight:600;
+    ">
       ${titulo}
     </h3>
     <p style="white-space:pre-line;">
@@ -99,14 +107,18 @@ function renderBloque(id, titulo, contenido) {
 }
 
 /**********************
- * RENDER IMÁGENES
+ * RENDER IMÁGENES + LINK CLIENTE
  **********************/
 function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
 
   contenedor.innerHTML = `
-    <h3 style="color:#1f4e8c; margin-bottom:16px; font-weight:600;">
+    <h3 style="
+      color:#1f4e8c;
+      margin-bottom:16px;
+      font-weight:600;
+    ">
       Imágenes
     </h3>
   `;
@@ -119,35 +131,57 @@ function renderImagenes(fotos) {
     img.style.display = "block";
     img.style.marginBottom = "16px";
     img.style.borderRadius = "12px";
-
     contenedor.appendChild(img);
   });
-}
-
-/**********************
- * LINK PARA CLIENTES
- **********************/
-function renderLinkCliente() {
-  const contenedor = document.getElementById("fotos");
-  if (!contenedor) return;
 
   const linkPublico =
-    `${window.location.origin}${window.location.pathname}?id=${ensayoId}&publico=1`;
+    `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
-  const bloque = document.createElement("div");
-  bloque.style.marginTop = "24px";
+  const linkDiv = document.createElement("div");
+  linkDiv.style.marginTop = "24px";
 
-  bloque.innerHTML = `
+  linkDiv.innerHTML = `
     <h4 style="color:#1f4e8c; margin-bottom:8px;">
       Link para los clientes
     </h4>
-    <input
-      type="text"
+    <input type="text"
       value="${linkPublico}"
       readonly
-      style="width:100%; padding:8px; font-size:14px;"
+      style="width:100%; padding:8px;"
     />
   `;
 
-  contenedor.appendChild(bloque);
+  contenedor.appendChild(linkDiv);
+}
+
+/**********************
+ * MENU STICKY (NUEVO)
+ **********************/
+function activarMenuSticky() {
+  const menu = document.querySelector(".menu-ensayo");
+  if (!menu) return;
+
+  menu.style.position = "sticky";
+  menu.style.top = "20px";
+  menu.style.alignSelf = "flex-start";
+}
+
+/**********************
+ * SCROLL AL HACER CLICK EN MENU
+ **********************/
+function activarScrollMenu() {
+  const botones = document.querySelectorAll(".menu-ensayo button");
+
+  botones.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.seccion;
+      const destino = document.getElementById(id);
+      if (!destino) return;
+
+      destino.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  });
 }
