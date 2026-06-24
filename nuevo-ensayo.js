@@ -19,7 +19,7 @@ const firebaseConfig = {
   apiKey: "TU_API_KEY",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
+  storageBucket: "inlact.firebasestorage.app",
   messagingSenderId: "143868382036",
   appId: "TU_APP_ID"
 };
@@ -27,7 +27,7 @@ const firebaseConfig = {
 // 🔹 Init
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
+const storage = getStorage(app, "gs://inlact.firebasestorage.app");
 
 // ============================
 // CARGAR CLIENTES (NO TOCAR)
@@ -55,52 +55,57 @@ cargarClientes();
 // ============================
 const form = document.getElementById("formNuevoEnsayo");
 
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    try {
-      const cliente = selectCliente.value;
-      const fecha = document.getElementById("fecha").value;
-      const nombreEnsayo = document.getElementById("nombreEnsayo").value;
-      const propuesta = document.getElementById("propuesta").value;
-      const conclusion = document.getElementById("conclusion").value;
-      const propuestaComercial = document.getElementById("propuestaComercial").value;
+  try {
+    const cliente = selectCliente.value;
+    const fecha = document.getElementById("fecha").value;
+    const nombreEnsayo = document.getElementById("nombreEnsayo").value;
+    const propuesta = document.getElementById("propuesta").value;
+    const dosis = document.getElementById("dosis").value;
+    const elaboracion = document.getElementById("elaboracion").value;
+    const resultados = document.getElementById("resultados").value;
+    const conclusion = document.getElementById("conclusion").value;
+    const propuestaComercial = document.getElementById("propuestaComercial").value;
 
-      const archivo = document.getElementById("fotos").files[0];
+    const archivos = document.getElementById("fotos").files;
+    const fotosURL = [];
 
-      let fotoURL = "";
-
-      // 🔹 Si hay foto, la sube
-      if (archivo) {
-        const storageRef = ref(
-          storage,
-          `ensayos/${Date.now()}_${archivo.name}`
-        );
-        await uploadBytes(storageRef, archivo);
-        fotoURL = await getDownloadURL(storageRef);
-      }
-
-      // 🔹 Guarda en Firestore
-      await addDoc(collection(db, "ensayos"), {
-        cliente,
-        fecha,
-        nombreEnsayo,
-        propuesta,
-        conclusion,
-        propuestaComercial,
-        fotoURL,
-        createdAt: Timestamp.now()
-      });
-
-      alert("Ensayo guardado correctamente");
-      form.reset();
-
-    } catch (error) {
-      console.error("Error al guardar", error);
-      alert("Error al guardar el ensayo");
+    // 🔹 Subir fotos (si hay)
+    for (const archivo of archivos) {
+      const storageRef = ref(
+        storage,
+        `ensayos/${Date.now()}_${archivo.name}`
+      );
+      await uploadBytes(storageRef, archivo);
+      const url = await getDownloadURL(storageRef);
+      fotosURL.push(url);
     }
-  });
-} else {
-  console.error("No se encontró el formulario #formNuevoEnsayo");
-}
+
+    // 🔹 Guardar ensayo en Firestore
+    await addDoc(collection(db, "ensayos"), {
+      cliente,
+      fecha,
+      nombreEnsayo,
+      propuesta,
+      dosis,
+      elaboracion,
+      resultados,
+      conclusion,
+      propuestaComercial,
+      fotosURL,
+      createdAt: Timestamp.now()
+    });
+
+    alert("Ensayo guardado correctamente");
+    form.reset();
+
+    // 🔹 Redirección
+    window.location.href = "ensayos.html";
+
+  } catch (error) {
+    console.error("Error al guardar ensayo", error);
+    alert("Error al guardar el ensayo");
+  }
+});
