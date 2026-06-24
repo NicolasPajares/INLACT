@@ -1,4 +1,3 @@
-console.log("nuevo-ensayo.js cargado correctamente");
 /**********************
  * FIREBASE
  **********************/
@@ -18,9 +17,6 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-/**********************
- * CONFIG
- **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -30,9 +26,6 @@ const firebaseConfig = {
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
-/**********************
- * INIT
- **********************/
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -42,6 +35,7 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
+const inputFoto = document.getElementById("foto");
 
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
@@ -51,10 +45,9 @@ const elaboracionEl = document.getElementById("elaboracion");
 const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
-const fotosInput = document.getElementById("fotos");
 
 /**********************
- * CARGAR CLIENTES (RESTAURADO)
+ * CARGAR CLIENTES
  **********************/
 async function cargarClientes() {
   const snap = await getDocs(collection(db, "clientes"));
@@ -70,6 +63,17 @@ async function cargarClientes() {
 }
 
 /**********************
+ * SUBIR FOTO (opcional)
+ **********************/
+async function subirFoto(file) {
+  const nombreArchivo = `ensayos/${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, nombreArchivo);
+
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+}
+
+/**********************
  * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
@@ -79,31 +83,17 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    /***************
-     * SUBIR FOTOS
-     ***************/
-    const archivos = fotosInput?.files || [];
-    const urlsFotos = [];
+    let fotos = [];
 
-    for (let i = 0; i < archivos.length; i++) {
-      const archivo = archivos[i];
-      const storageRef = ref(
-        storage,
-        `ensayos/${Date.now()}_${archivo.name}`
-      );
-
-      await uploadBytes(storageRef, archivo);
-      const url = await getDownloadURL(storageRef);
-      urlsFotos.push(url);
+    // 👉 si hay foto, la subimos primero
+    if (inputFoto && inputFoto.files.length > 0) {
+      const urlFoto = await subirFoto(inputFoto.files[0]);
+      fotos.push(urlFoto);
     }
 
-    /***************
-     * GUARDAR DOC
-     ***************/
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
-
       nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
@@ -114,13 +104,12 @@ form.addEventListener("submit", async (e) => {
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
 
-      fotos: urlsFotos,
+      fotos: fotos,
       creadoEn: Timestamp.now()
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // redirige al ensayo
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
@@ -132,6 +121,4 @@ form.addEventListener("submit", async (e) => {
 /**********************
  * INIT
  **********************/
-window.addEventListener("DOMContentLoaded", () => {
-  cargarClientes();
-});
+cargarClientes();
