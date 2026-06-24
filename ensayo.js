@@ -31,6 +31,11 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
+ * ESTADO GLOBAL
+ **********************/
+let subidasPendientes = [];
+
+/**********************
  * PARSING URL
  **********************/
 const params = new URLSearchParams(window.location.search);
@@ -93,7 +98,9 @@ async function cargarEnsayo() {
     fotosDiv.innerHTML += `
       <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
     `;
-    document.getElementById("inputFotos").addEventListener("change", subirFotos);
+    document
+      .getElementById("inputFotos")
+      .addEventListener("change", subirFotos);
   }
 
   if (Array.isArray(data.fotos)) {
@@ -106,7 +113,7 @@ async function cargarEnsayo() {
 }
 
 /**********************
- * SUBIR FOTOS (CORREGIDO DEFINITIVO)
+ * SUBIR FOTOS (SEGURO)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
@@ -115,30 +122,33 @@ async function subirFotos(e) {
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
   for (const archivo of archivos) {
-    try {
-      // preview inmediato
-      const previewUrl = URL.createObjectURL(archivo);
-      const imgPreview = renderImagen(previewUrl);
+    const promesa = (async () => {
+      try {
+        // preview inmediata
+        const previewUrl = URL.createObjectURL(archivo);
+        const imgPreview = renderImagen(previewUrl);
 
-      const storageRef = ref(
-        storage,
-        `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-      );
+        const storageRef = ref(
+          storage,
+          `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
+        );
 
-      await uploadBytes(storageRef, archivo);
-      const urlFinal = await getDownloadURL(storageRef);
+        await uploadBytes(storageRef, archivo);
+        const urlFinal = await getDownloadURL(storageRef);
 
-      // SIEMPRE arrayUnion (NO leer doc, NO pisar datos)
-      await updateDoc(refEnsayo, {
-        fotos: arrayUnion(urlFinal)
-      });
+        await updateDoc(refEnsayo, {
+          fotos: arrayUnion(urlFinal)
+        });
 
-      imgPreview.src = urlFinal;
+        imgPreview.src = urlFinal;
 
-    } catch (err) {
-      console.error("Error subiendo imagen:", err);
-      alert("Error al subir una imagen");
-    }
+      } catch (err) {
+        console.error("Error subiendo imagen:", err);
+        alert("Error al subir una imagen");
+      }
+    })();
+
+    subidasPendientes.push(promesa);
   }
 
   e.target.value = "";
@@ -163,7 +173,7 @@ function renderImagen(url) {
 }
 
 /**********************
- * BOTÓN LINK CLIENTE
+ * BOTÓN LINK CLIENTE (ESPERA SUBIDAS)
  **********************/
 function agregarBotonLink() {
   const fotosDiv = document.getElementById("fotos");
@@ -175,7 +185,14 @@ function agregarBotonLink() {
   const linkDiv = document.createElement("div");
   linkDiv.style.marginTop = "16px";
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
+    if (subidasPendientes.length) {
+      btn.disabled = true;
+      btn.textContent = "Guardando imágenes…";
+      await Promise.all(subidasPendientes);
+      subidasPendientes = [];
+    }
+
     const linkCliente =
       `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
@@ -183,6 +200,8 @@ function agregarBotonLink() {
       <p><strong>Link para el cliente:</strong></p>
       <input type="text" value="${linkCliente}" readonly style="width:100%; padding:8px;" />
     `;
+
+    btn.textContent = "Link generado";
   });
 
   fotosDiv.appendChild(btn);
@@ -200,4 +219,7 @@ document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   });
 });
 
+/**********************
+ * INIT
+ **********************/
 cargarEnsayo();
