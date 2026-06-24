@@ -7,8 +7,6 @@ import {
   collection,
   getDocs,
   addDoc,
-  updateDoc,
-  doc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -74,21 +72,21 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // ✅ VALIDAR FECHA
-    let fechaTimestamp = null;
-    if (fechaEl.value) {
-      const fechaDate = new Date(fechaEl.value);
-      if (!isNaN(fechaDate)) {
-        fechaTimestamp = Timestamp.fromDate(fechaDate);
-      }
+    // ✅ FECHA SEGURA
+    const fechaValue = fechaEl.value;
+    const fechaDate = fechaValue ? new Date(fechaValue) : null;
+
+    if (!fechaDate || isNaN(fechaDate.getTime())) {
+      alert("Fecha inválida");
+      return;
     }
 
     // 1️⃣ Crear ensayo
     const nuevoEnsayo = {
-      clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre,
+      clienteId: selectCliente.value || "",
+      clienteNombre: clienteOption?.dataset?.nombre || "",
       nombreEnsayo: nombreEnsayoEl.value || "",
-      fecha: fechaTimestamp,
+      fecha: Timestamp.fromDate(fechaDate),
 
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
@@ -105,7 +103,7 @@ form.addEventListener("submit", async (e) => {
 
     // 2️⃣ Subir fotos (si hay)
     const fotosURLs = [];
-    const files = fotosInput.files;
+    const files = fotosInput?.files || [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -119,18 +117,19 @@ form.addEventListener("submit", async (e) => {
       fotosURLs.push(url);
     }
 
-    // 3️⃣ Guardar URLs en el documento principal
+    // 3️⃣ Guardar URLs si hubo fotos
     if (fotosURLs.length > 0) {
-      await updateDoc(doc(db, "ensayos", docRef.id), {
-        fotos: fotosURLs
-      });
+      await addDoc(
+        collection(db, "ensayos", docRef.id, "fotos"),
+        { urls: fotosURLs }
+      );
     }
 
     // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("Error guardando ensayo:", error);
+    console.error("🔥 ERROR REAL:", error);
     alert("Error al guardar el ensayo");
   }
 });
