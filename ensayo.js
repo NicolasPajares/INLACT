@@ -31,7 +31,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * URL
+ * PARSING URL
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
@@ -83,36 +83,42 @@ async function cargarEnsayo() {
     `;
   });
 
+  /**********************
+   * IMÁGENES
+   **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `<h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>`;
 
   if (!esPublico) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.multiple = true;
-    input.style.marginBottom = "16px";
-    input.addEventListener("change", subirFotos);
-    fotosDiv.appendChild(input);
+    fotosDiv.innerHTML += `
+      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
+    `;
+    document.getElementById("inputFotos").addEventListener("change", subirFotos);
   }
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => renderImagen(url));
   }
 
-  if (!esPublico) agregarBotonLink();
+  if (!esPublico) {
+    agregarBotonLink();
+  }
 }
 
 /**********************
- * SUBIR FOTOS (FIX DEFINITIVO)
+ * SUBIR FOTOS (CORREGIDO DEFINITIVO)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
   if (!archivos.length) return;
 
+  const refEnsayo = doc(db, "ensayos", ensayoId);
+
   for (const archivo of archivos) {
     try {
-      const img = renderImagen(URL.createObjectURL(archivo));
+      // preview inmediato
+      const previewUrl = URL.createObjectURL(archivo);
+      const imgPreview = renderImagen(previewUrl);
 
       const storageRef = ref(
         storage,
@@ -120,13 +126,15 @@ async function subirFotos(e) {
       );
 
       await uploadBytes(storageRef, archivo);
-      const url = await getDownloadURL(storageRef);
+      const urlFinal = await getDownloadURL(storageRef);
 
-      await updateDoc(doc(db, "ensayos", ensayoId), {
-        fotos: arrayUnion(url)
+      // SIEMPRE arrayUnion (NO leer doc, NO pisar datos)
+      await updateDoc(refEnsayo, {
+        fotos: arrayUnion(urlFinal)
       });
 
-      img.src = url;
+      imgPreview.src = urlFinal;
+
     } catch (err) {
       console.error("Error subiendo imagen:", err);
       alert("Error al subir una imagen");
@@ -155,7 +163,7 @@ function renderImagen(url) {
 }
 
 /**********************
- * LINK CLIENTE
+ * BOTÓN LINK CLIENTE
  **********************/
 function agregarBotonLink() {
   const fotosDiv = document.getElementById("fotos");
@@ -167,15 +175,15 @@ function agregarBotonLink() {
   const linkDiv = document.createElement("div");
   linkDiv.style.marginTop = "16px";
 
-  btn.onclick = () => {
-    const link =
+  btn.addEventListener("click", () => {
+    const linkCliente =
       `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
     linkDiv.innerHTML = `
       <p><strong>Link para el cliente:</strong></p>
-      <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
+      <input type="text" value="${linkCliente}" readonly style="width:100%; padding:8px;" />
     `;
-  };
+  });
 
   fotosDiv.appendChild(btn);
   fotosDiv.appendChild(linkDiv);
@@ -185,10 +193,11 @@ function agregarBotonLink() {
  * SCROLL MENÚ
  **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
-  btn.onclick = () => {
-    const destino = document.getElementById(btn.dataset.seccion);
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.seccion;
+    const destino = document.getElementById(id);
     if (destino) destino.scrollIntoView({ behavior: "smooth" });
-  };
+  });
 });
 
 cargarEnsayo();
