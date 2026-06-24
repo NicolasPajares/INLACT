@@ -31,7 +31,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * PARSING URL
+ * URL
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
@@ -83,62 +83,54 @@ async function cargarEnsayo() {
     `;
   });
 
-  /**********************
-   * IMÁGENES
-   **********************/
   const fotosDiv = document.getElementById("fotos");
   fotosDiv.innerHTML = `<h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>`;
 
   if (!esPublico) {
-    fotosDiv.innerHTML += `
-      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
-    `;
-    document.getElementById("inputFotos").addEventListener("change", subirFotos);
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.style.marginBottom = "16px";
+    input.addEventListener("change", subirFotos);
+    fotosDiv.appendChild(input);
   }
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => renderImagen(url));
   }
 
-  if (!esPublico) {
-    agregarBotonLink();
-  }
+  if (!esPublico) agregarBotonLink();
 }
 
 /**********************
- * SUBIR FOTOS (FIX REAL)
+ * SUBIR FOTOS (FIX DEFINITIVO)
  **********************/
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files);
   if (!archivos.length) return;
 
-  const refEnsayo = doc(db, "ensayos", ensayoId);
-  const snap = await getDoc(refEnsayo);
-  const data = snap.data() || {};
-
   for (const archivo of archivos) {
-    const previewUrl = URL.createObjectURL(archivo);
-    const imgPreview = renderImagen(previewUrl);
+    try {
+      const img = renderImagen(URL.createObjectURL(archivo));
 
-    const storageRef = ref(
-      storage,
-      `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-    );
+      const storageRef = ref(
+        storage,
+        `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
+      );
 
-    await uploadBytes(storageRef, archivo);
-    const urlFinal = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, archivo);
+      const url = await getDownloadURL(storageRef);
 
-    if (Array.isArray(data.fotos)) {
-      await updateDoc(refEnsayo, {
-        fotos: arrayUnion(urlFinal)
+      await updateDoc(doc(db, "ensayos", ensayoId), {
+        fotos: arrayUnion(url)
       });
-    } else {
-      await setDoc(refEnsayo, {
-        fotos: [urlFinal]
-      }, { merge: true });
-    }
 
-    imgPreview.src = urlFinal;
+      img.src = url;
+    } catch (err) {
+      console.error("Error subiendo imagen:", err);
+      alert("Error al subir una imagen");
+    }
   }
 
   e.target.value = "";
@@ -163,7 +155,7 @@ function renderImagen(url) {
 }
 
 /**********************
- * BOTÓN LINK CLIENTE
+ * LINK CLIENTE
  **********************/
 function agregarBotonLink() {
   const fotosDiv = document.getElementById("fotos");
@@ -175,15 +167,15 @@ function agregarBotonLink() {
   const linkDiv = document.createElement("div");
   linkDiv.style.marginTop = "16px";
 
-  btn.addEventListener("click", () => {
-    const linkCliente =
+  btn.onclick = () => {
+    const link =
       `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
     linkDiv.innerHTML = `
       <p><strong>Link para el cliente:</strong></p>
-      <input type="text" value="${linkCliente}" readonly style="width:100%; padding:8px;" />
+      <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
     `;
-  });
+  };
 
   fotosDiv.appendChild(btn);
   fotosDiv.appendChild(linkDiv);
@@ -193,11 +185,10 @@ function agregarBotonLink() {
  * SCROLL MENÚ
  **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const id = btn.dataset.seccion;
-    const destino = document.getElementById(id);
+  btn.onclick = () => {
+    const destino = document.getElementById(btn.dataset.seccion);
     if (destino) destino.scrollIntoView({ behavior: "smooth" });
-  });
+  };
 });
 
 cargarEnsayo();
