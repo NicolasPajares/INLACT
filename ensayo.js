@@ -7,13 +7,12 @@ import {
   doc,
   getDoc,
   updateDoc,
-  setDoc,
   arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getStorage,
   ref,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
@@ -31,16 +30,13 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * ESTADO GLOBAL
- **********************/
-let subidasPendientes = [];
-
-/**********************
- * PARSING URL
+ * URL
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
 const esPublico = params.get("publico") === "1";
+
+let subidasPendientes = [];
 
 /**********************
  * CARGAR ENSAYO
@@ -96,66 +92,95 @@ async function cargarEnsayo() {
 
   if (!esPublico) {
     fotosDiv.innerHTML += `
-      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
+      <input type="file" id="inputFotos" accept="image/*" multiple />
+      <button id="btnGuardarFotos" style="margin-top:16px;">
+        Guardar imágenes y generar link
+      </button>
+      <div id="estadoSubida" style="margin-top:12px;"></div>
     `;
+
     document
       .getElementById("inputFotos")
       .addEventListener("change", subirFotos);
+
+    document
+      .getElementById("btnGuardarFotos")
+      .addEventListener("click", guardarYGenerarLink);
   }
 
   if (Array.isArray(data.fotos)) {
     data.fotos.forEach(url => renderImagen(url));
   }
-
-  if (!esPublico) {
-    agregarBotonLink();
-  }
 }
 
 /**********************
- * SUBIR FOTOS (SEGURO)
+ * SUBIR FOTOS (ROBUSTO)
  **********************/
-async function subirFotos(e) {
+function subirFotos(e) {
   const archivos = Array.from(e.target.files);
   if (!archivos.length) return;
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
+  subidasPendientes = [];
 
-  for (const archivo of archivos) {
-    const promesa = (async () => {
-      try {
-        // preview inmediata
-        const previewUrl = URL.createObjectURL(archivo);
-        const imgPreview = renderImagen(previewUrl);
+  archivos.forEach(archivo => {
+    const promesa = new Promise(resolve => {
+      const previewUrl = URL.createObjectURL(archivo);
+      const imgPreview = renderImagen(previewUrl);
 
-        const storageRef = ref(
-          storage,
-          `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-        );
+      const storageRef = ref(
+        storage,
+        `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
+      );
 
-        await uploadBytes(storageRef, archivo);
-        const urlFinal = await getDownloadURL(storageRef);
+      const uploadTask = uploadBytesResumable(storageRef, archivo);
 
-        await updateDoc(refEnsayo, {
-          fotos: arrayUnion(urlFinal)
-        });
-
-        imgPreview.src = urlFinal;
-
-      } catch (err) {
-        console.error("Error subiendo imagen:", err);
-        alert("Error al subir una imagen");
-      }
-    })();
+      uploadTask.on(
+        "state_changed",
+        null,
+        err => {
+          console.error("Error Storage:", err);
+          resolve(); // 🔥 nunca bloquear
+        },
+        async () => {
+          try {
+            const urlFinal = await getDownloadURL(uploadTask.snapshot.ref);
+            await updateDoc(refEnsayo, {
+              fotos: arrayUnion(urlFinal)
+            });
+            imgPreview.src = urlFinal;
+          } catch (e) {
+            console.error("Error Firestore:", e);
+          }
+          resolve();
+        }
+      );
+    });
 
     subidasPendientes.push(promesa);
-  }
-
-  e.target.value = "";
+  });
 }
 
 /**********************
- * RENDER IMAGEN
+ * GUARDAR + LINK
+ **********************/
+async function guardarYGenerarLink() {
+  const estado = document.getElementById("estadoSubida");
+  estado.textContent = "Guardando imágenes...";
+
+  await Promise.all(subidasPendientes);
+
+  const link =
+    `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
+
+  estado.innerHTML = `
+    <p><strong>Link para el cliente:</strong></p>
+    <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
+  `;
+}
+
+/**********************
+ * RENDER IMG
  **********************/
 function renderImagen(url) {
   const fotosDiv = document.getElementById("fotos");
@@ -164,7 +189,6 @@ function renderImagen(url) {
   img.src = url;
   img.style.width = "100%";
   img.style.maxWidth = "480px";
-  img.style.display = "block";
   img.style.marginBottom = "16px";
   img.style.borderRadius = "12px";
 
@@ -173,53 +197,13 @@ function renderImagen(url) {
 }
 
 /**********************
- * BOTÓN LINK CLIENTE (ESPERA SUBIDAS)
- **********************/
-function agregarBotonLink() {
-  const fotosDiv = document.getElementById("fotos");
-
-  const btn = document.createElement("button");
-  btn.textContent = "Guardar y generar link para cliente";
-  btn.style.marginTop = "32px";
-
-  const linkDiv = document.createElement("div");
-  linkDiv.style.marginTop = "16px";
-
-  btn.addEventListener("click", async () => {
-    if (subidasPendientes.length) {
-      btn.disabled = true;
-      btn.textContent = "Guardando imágenes…";
-      await Promise.all(subidasPendientes);
-      subidasPendientes = [];
-    }
-
-    const linkCliente =
-      `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
-
-    linkDiv.innerHTML = `
-      <p><strong>Link para el cliente:</strong></p>
-      <input type="text" value="${linkCliente}" readonly style="width:100%; padding:8px;" />
-    `;
-
-    btn.textContent = "Link generado";
-  });
-
-  fotosDiv.appendChild(btn);
-  fotosDiv.appendChild(linkDiv);
-}
-
-/**********************
- * SCROLL MENÚ
+ * SCROLL
  **********************/
 document.querySelectorAll(".menu-ensayo button").forEach(btn => {
   btn.addEventListener("click", () => {
     const id = btn.dataset.seccion;
-    const destino = document.getElementById(id);
-    if (destino) destino.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   });
 });
 
-/**********************
- * INIT
- **********************/
 cargarEnsayo();
