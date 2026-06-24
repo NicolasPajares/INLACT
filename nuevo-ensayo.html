@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <title>INLACT · Nuevo ensayo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <meta name="description" content="INLACT - Crear nuevo ensayo">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="nuevo-ensayo.css">
+  <!-- Tus CSS -->
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="nuevo-ensayo.css" />
 </head>
 
 <body>
@@ -21,79 +20,13 @@
 </header>
 
 <main>
-
 <section class="card card-formulario">
 
   <h1>Crear nuevo ensayo</h1>
 
+  <!-- ⚠️ IDs IMPORTANTES, NO CAMBIAR -->
   <form id="formNuevoEnsayo" enctype="multipart/form-data">
 
     <label for="cliente">Cliente</label>
     <select id="cliente" required>
-      <option value="">Seleccionar cliente</option>
-    </select>
-
-    <label for="fecha">Fecha del ensayo</label>
-    <input type="date" id="fecha" required>
-
-    <label for="nombreEnsayo">Nombre del ensayo</label>
-    <input
-      type="text"
-      id="nombreEnsayo"
-      placeholder="Ej: Ensayo mozzarella cilindro"
-      required
-    >
-
-    <label for="propuesta">Propuesta</label>
-    <textarea id="propuesta" rows="4"></textarea>
-
-    <label for="dosis">Dosis</label>
-    <textarea id="dosis" rows="3"></textarea>
-
-    <label for="elaboracion">Elaboración</label>
-    <textarea id="elaboracion" rows="4"></textarea>
-
-    <label for="resultados">Resultados</label>
-    <textarea id="resultados" rows="4"></textarea>
-
-    <label for="conclusion">Conclusión</label>
-    <textarea id="conclusion" rows="4"></textarea>
-
-    <label for="propuestaComercial">Propuesta comercial</label>
-    <textarea id="propuestaComercial" rows="4"></textarea>
-
-    <label for="fotos">Fotos del ensayo</label>
-    <input
-      type="file"
-      id="fotos"
-      accept="image/*"
-      multiple
-    >
-
-    <div class="acciones-form">
-      <button type="submit" class="btn-guardar">
-        💾 Guardar ensayo
-      </button>
-
-      <button
-        type="button"
-        class="btn-cancelar"
-        onclick="location.href='ensayos.html'">
-        ✖ Cancelar
-      </button>
-    </div>
-
-  </form>
-
-</section>
-
-</main>
-
-<footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
-
-<script type="module" src="nuevo-ensayo.js"></script>
-
-</body>
-</html>
+      <option value="">Seleccionar cliente
