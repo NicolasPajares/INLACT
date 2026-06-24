@@ -55,9 +55,11 @@ async function cargarClientes() {
   snap.forEach(docu => {
     const cliente = docu.data();
     const option = document.createElement("option");
+
     option.value = docu.id;
     option.textContent = cliente.nombre || "Cliente sin nombre";
     option.dataset.nombre = cliente.nombre || "";
+
     selectCliente.appendChild(option);
   });
 }
@@ -72,10 +74,10 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ Crear ensayo en Firestore
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre,
+      clienteNombre: clienteOption?.dataset?.nombre || "",
+
       nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
@@ -90,14 +92,22 @@ form.addEventListener("submit", async (e) => {
       creadoEn: Timestamp.now()
     };
 
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+    console.log("ENSAYO A GUARDAR:", nuevoEnsayo);
 
-    // 2️⃣ Subir fotos (si hay)
-    const fotosURLs = [];
+    const docRef = await addDoc(
+      collection(db, "ensayos"),
+      nuevoEnsayo
+    );
+
+    /**********************
+     * SUBIR FOTOS (SI HAY)
+     **********************/
     const files = fotosInput.files;
+    const fotosURLs = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+
       const storageRef = ref(
         storage,
         `ensayos/${docRef.id}/${Date.now()}_${file.name}`
@@ -108,7 +118,6 @@ form.addEventListener("submit", async (e) => {
       fotosURLs.push(url);
     }
 
-    // 3️⃣ Guardar URLs si hubo fotos
     if (fotosURLs.length > 0) {
       await addDoc(
         collection(db, "ensayos", docRef.id, "fotos"),
@@ -116,11 +125,10 @@ form.addEventListener("submit", async (e) => {
       );
     }
 
-    // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("Error guardando ensayo:", error);
+    console.error("ERROR REAL:", error);
     alert("Error al guardar el ensayo");
   }
 });
