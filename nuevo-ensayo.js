@@ -1,24 +1,15 @@
+/**********************
+ * FIREBASE
+ **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
   collection,
   getDocs,
   addDoc,
-  updateDoc,
-  doc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-/**********************
- * FIREBASE
- **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -30,30 +21,37 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 /**********************
  * DOM
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-const fotoEl = document.getElementById("fotoEnsayo");
+
+const fechaEl = document.getElementById("fecha");
+const nombreEnsayoEl = document.getElementById("nombreEnsayo");
+const propuestaEl = document.getElementById("propuesta");
+const dosisEl = document.getElementById("dosis");
+const elaboracionEl = document.getElementById("elaboracion");
+const resultadosEl = document.getElementById("resultados");
+const conclusionEl = document.getElementById("conclusion");
+const propuestaComercialEl = document.getElementById("propuestaComercial");
 
 /**********************
- * CARGAR CLIENTES (NO SE TOCA)
+ * CARGAR CLIENTES
  **********************/
 async function cargarClientes() {
   const snap = await getDocs(collection(db, "clientes"));
-  snap.forEach(d => {
-    const o = document.createElement("option");
-    o.value = d.id;
-    o.textContent = d.data().nombre || "Cliente sin nombre";
-    o.dataset.nombre = d.data().nombre || "";
-    selectCliente.appendChild(o);
+
+  snap.forEach(docu => {
+    const cliente = docu.data();
+    const option = document.createElement("option");
+    option.value = docu.id;
+    option.textContent = cliente.nombre || "Cliente sin nombre";
+    option.dataset.nombre = cliente.nombre || "";
+    selectCliente.appendChild(option);
   });
 }
-
-cargarClientes();
 
 /**********************
  * GUARDAR ENSAYO
@@ -65,46 +63,34 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ Crear ensayo base
-    const docRef = await addDoc(collection(db, "ensayos"), {
+    const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
-      nombreEnsayo: nombreEnsayo.value,
-      fecha: Timestamp.fromDate(new Date(fecha.value)),
+      nombreEnsayo: nombreEnsayoEl.value,
+      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
-      propuesta: propuesta.value || "",
-      dosis: dosis.value || "",
-      elaboracion: elaboracion.value || "",
-      resultados: resultados.value || "",
-      conclusion: conclusion.value || "",
-      propuestaComercial: propuestaComercial.value || "",
+      propuesta: propuestaEl.value || "",
+      dosis: dosisEl.value || "",
+      elaboracion: elaboracionEl.value || "",
+      resultados: resultadosEl.value || "",
+      conclusion: conclusionEl.value || "",
+      propuestaComercial: propuestaComercialEl.value || "",
 
       fotos: [],
       creadoEn: Timestamp.now()
-    });
+    };
 
-    // 2️⃣ Subir foto SOLO si existe
-    if (fotoEl.files.length > 0) {
-      const file = fotoEl.files[0];
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-      const storageRef = ref(
-        storage,
-        `ensayos/${docRef.id}/${Date.now()}_${file.name}`
-      );
-
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      await updateDoc(doc(db, "ensayos", docRef.id), {
-        fotos: [url]
-      });
-    }
-
-    // 3️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
   }
 });
+
+/**********************
+ * INIT
+ **********************/
+cargarClientes();
