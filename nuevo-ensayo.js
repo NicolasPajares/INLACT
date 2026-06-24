@@ -35,7 +35,7 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-const fotosInput = document.getElementById("fotos");
+const fotosInput = document.getElementById("foto"); // 👈 CLAVE
 
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
@@ -72,20 +72,17 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // ✅ FECHA SEGURA
-    const fechaValue = fechaEl.value;
-    const fechaDate = fechaValue ? new Date(fechaValue) : null;
-
-    if (!fechaDate || isNaN(fechaDate.getTime())) {
+    const fechaDate = new Date(fechaEl.value);
+    if (isNaN(fechaDate.getTime())) {
       alert("Fecha inválida");
       return;
     }
 
     // 1️⃣ Crear ensayo
     const nuevoEnsayo = {
-      clienteId: selectCliente.value || "",
-      clienteNombre: clienteOption?.dataset?.nombre || "",
-      nombreEnsayo: nombreEnsayoEl.value || "",
+      clienteId: selectCliente.value,
+      clienteNombre: clienteOption.dataset.nombre,
+      nombreEnsayo: nombreEnsayoEl.value,
       fecha: Timestamp.fromDate(fechaDate),
 
       propuesta: propuestaEl.value || "",
@@ -101,12 +98,8 @@ form.addEventListener("submit", async (e) => {
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // 2️⃣ Subir fotos (si hay)
-    const fotosURLs = [];
-    const files = fotosInput?.files || [];
-
-    console.log("📸 Archivos seleccionados:", files);
-console.log("📸 Cantidad:", files.length);
+    // 2️⃣ Subir fotos
+    const files = fotosInput.files;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -117,14 +110,15 @@ console.log("📸 Cantidad:", files.length);
 
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-      fotosURLs.push(url);
+
+      nuevoEnsayo.fotos.push(url);
     }
 
-    // 3️⃣ Guardar URLs si hubo fotos
-    if (fotosURLs.length > 0) {
+    // 3️⃣ Actualizar documento con URLs
+    if (nuevoEnsayo.fotos.length > 0) {
       await addDoc(
         collection(db, "ensayos", docRef.id, "fotos"),
-        { urls: fotosURLs }
+        { urls: nuevoEnsayo.fotos }
       );
     }
 
