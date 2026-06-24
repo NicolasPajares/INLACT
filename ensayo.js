@@ -12,10 +12,13 @@ import {
 import {
   getStorage,
   ref,
-  uploadBytes,
+  uploadBytesResumable,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+/**********************
+ * CONFIG
+ **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -25,12 +28,15 @@ const firebaseConfig = {
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
+/**********************
+ * INIT
+ **********************/
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * URL
+ * URL PARAMS
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
@@ -53,24 +59,30 @@ async function cargarEnsayo() {
   if (!snap.exists()) return;
 
   const data = snap.data();
-
   const fotosDiv = document.getElementById("fotos");
+
   fotosDiv.innerHTML = `<h3>Imágenes</h3>`;
 
   if (!esPublico) {
     fotosDiv.innerHTML += `
       <input type="file" id="inputFotos" accept="image/*" multiple />
+      <br><br>
       <button id="btnGuardar">Guardar imágenes y generar link</button>
       <p id="estado"></p>
       <div id="link"></div>
     `;
 
-    document.getElementById("inputFotos").addEventListener("change", onSeleccionFotos);
-    document.getElementById("btnGuardar").addEventListener("click", guardarImagenes);
+    document
+      .getElementById("inputFotos")
+      .addEventListener("change", onSeleccionFotos);
+
+    document
+      .getElementById("btnGuardar")
+      .addEventListener("click", guardarImagenes);
   }
 
   if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => renderImagen(url));
+    data.fotos.forEach(url => renderImagen(url, false));
   }
 }
 
@@ -83,12 +95,32 @@ function onSeleccionFotos(e) {
 
   archivos.forEach(file => {
     imagenesPendientes.push(file);
-
     const previewUrl = URL.createObjectURL(file);
     renderImagen(previewUrl, true);
   });
 
   e.target.value = "";
+}
+
+/**********************
+ * SUBIDA SEGURA (CLAVE)
+ **********************/
+function subirImagen(storageRef, archivo, estado) {
+  return new Promise((resolve, reject) => {
+    const task = uploadBytesResumable(storageRef, archivo);
+
+    task.on(
+      "state_changed",
+      (snap) => {
+        const pct = Math.round(
+          (snap.bytesTransferred / snap.totalBytes) * 100
+        );
+        estado.textContent = `Subiendo imagen… ${pct}%`;
+      },
+      (error) => reject(error),
+      () => resolve()
+    );
+  });
 }
 
 /**********************
@@ -102,7 +134,7 @@ async function guardarImagenes() {
   const btn = document.getElementById("btnGuardar");
 
   btn.disabled = true;
-  estado.textContent = "Guardando imágenes...";
+  estado.textContent = "Iniciando subida...";
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
@@ -113,23 +145,22 @@ async function guardarImagenes() {
         `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
       );
 
-      await uploadBytes(storageRef, archivo);
-      const urlFinal = await getDownloadURL(storageRef);
+      await subirImagen(storageRef, archivo, estado);
+      const url = await getDownloadURL(storageRef);
 
       await updateDoc(refEnsayo, {
-        fotos: arrayUnion(urlFinal)
+        fotos: arrayUnion(url)
       });
     }
 
     estado.textContent = "Imágenes guardadas correctamente ✅";
+    imagenesPendientes = [];
     mostrarLink();
 
-    imagenesPendientes = [];
-
   } catch (err) {
-    console.error(err);
-    estado.textContent = "❌ Error guardando imágenes";
-    alert("Error al subir imágenes. Mirá la consola.");
+    console.error("ERROR:", err);
+    estado.textContent = "❌ Error subiendo imágenes";
+    alert("Error subiendo imágenes. Revisá la consola.");
   } finally {
     subiendo = false;
     btn.disabled = false;
@@ -139,14 +170,14 @@ async function guardarImagenes() {
 /**********************
  * RENDER IMAGEN
  **********************/
-function renderImagen(url, esPreview = false) {
+function renderImagen(url, esPreview) {
   const fotosDiv = document.getElementById("fotos");
 
   const img = document.createElement("img");
   img.src = url;
   img.style.maxWidth = "100%";
-  img.style.marginBottom = "16px";
-  img.style.borderRadius = "12px";
+  img.style.marginBottom = "12px";
+  img.style.borderRadius = "10px";
   img.style.opacity = esPreview ? "0.6" : "1";
 
   fotosDiv.appendChild(img);
@@ -166,4 +197,7 @@ function mostrarLink() {
   `;
 }
 
+/**********************
+ * INIT
+ **********************/
 cargarEnsayo();
