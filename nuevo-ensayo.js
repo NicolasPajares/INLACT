@@ -6,7 +6,6 @@ import {
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 import {
   getStorage,
   ref,
@@ -14,9 +13,9 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-/* =====================
+/* =========================
    FIREBASE CONFIG
-===================== */
+========================= */
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
   authDomain: "inlact.firebaseapp.com",
@@ -28,69 +27,75 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app, "gs://inlact.appspot.com");
+const storage = getStorage(app);
 
-/* =====================
-   CARGAR CLIENTES
-   (NO SE TOCA)
-===================== */
+/* =========================
+   CARGAR CLIENTES (NO TOCAR)
+========================= */
 const selectCliente = document.getElementById("cliente");
 
 async function cargarClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
-  snap.forEach(doc => {
-    const opt = document.createElement("option");
-    opt.value = doc.id;
-    opt.textContent = doc.data().nombre;
-    selectCliente.appendChild(opt);
-  });
+  try {
+    const snap = await getDocs(collection(db, "clientes"));
+    snap.forEach(doc => {
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.textContent = doc.data().nombre;
+      selectCliente.appendChild(opt);
+    });
+  } catch (err) {
+    console.error("Error cargando clientes", err);
+  }
 }
-
 cargarClientes();
 
-/* =====================
+/* =========================
    GUARDAR ENSAYO
-===================== */
+========================= */
 const form = document.getElementById("formNuevoEnsayo");
 
 form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  e.preventDefault(); // 🚨 CLAVE ABSOLUTA
 
   try {
-    const cliente = selectCliente.value;
-    const propuesta = document.getElementById("propuesta").value;
-    const conclusion = document.getElementById("conclusion").value;
-    const archivos = document.getElementById("fotos").files;
+    const data = {
+      cliente: selectCliente.value,
+      fecha: document.getElementById("fecha").value,
+      nombreEnsayo: document.getElementById("nombreEnsayo").value,
+      propuesta: document.getElementById("propuesta").value,
+      dosis: document.getElementById("dosis").value,
+      elaboracion: document.getElementById("elaboracion").value,
+      resultados: document.getElementById("resultados").value,
+      conclusion: document.getElementById("conclusion").value,
+      propuestaComercial: document.getElementById("propuestaComercial").value,
+      fechaCreacion: Timestamp.now(),
+      fotos: []
+    };
 
-    const fotosURL = [];
+    const files = document.getElementById("fotos").files;
 
-    // 🔹 SUBE FOTOS (si hay)
-    if (archivos.length > 0) {
-      for (const archivo of archivos) {
+    if (files.length > 0) {
+      for (const file of files) {
         const storageRef = ref(
           storage,
-          `ensayos/${Date.now()}_${archivo.name}`
+          `ensayos/${Date.now()}_${file.name}`
         );
-        await uploadBytes(storageRef, archivo);
+        await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
-        fotosURL.push(url);
+        data.fotos.push(url);
       }
     }
 
-    // 🔹 GUARDA ENSAYO
-    await addDoc(collection(db, "ensayos"), {
-      cliente,
-      propuesta,
-      conclusion,
-      fotos: fotosURL,
-      fecha: Timestamp.now()
-    });
+    await addDoc(collection(db, "ensayos"), data);
 
-    alert("✅ Ensayo guardado correctamente");
-    window.location.href = "ensayos.html";
+    alert("Ensayo guardado correctamente");
+    form.reset();
 
-  } catch (err) {
-    console.error("❌ Error al guardar", err);
+    // opcional
+    // location.href = "ensayos.html";
+
+  } catch (error) {
+    console.error("Error al guardar ensayo", error);
     alert("Error al guardar el ensayo");
   }
 });
