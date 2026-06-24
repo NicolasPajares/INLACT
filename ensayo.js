@@ -33,18 +33,14 @@ const auth = getAuth(app);
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
+const esPublico = params.get("publico") === "1";
 
 /**********************
  * INIT
  **********************/
 signInAnonymously(auth)
-  .then(() => iniciar())
-  .catch(() => iniciar());
-
-async function iniciar() {
-  await cargarEnsayo();
-  activarMenu();
-}
+  .then(() => cargarEnsayo())
+  .catch(() => cargarEnsayo());
 
 /**********************
  * CARGAR ENSAYO
@@ -59,12 +55,8 @@ async function cargarEnsayo() {
   const data = snap.data();
 
   // Encabezado
-  document.getElementById("empresa").textContent =
-    data.clienteNombre || "";
-
-  document.getElementById("nombre-ensayo").textContent =
-    data.nombreEnsayo || "";
-
+  document.getElementById("empresa").textContent = data.clienteNombre || "";
+  document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
   document.getElementById("fecha").textContent =
     data.fecha?.toDate().toLocaleDateString() || "";
 
@@ -80,8 +72,13 @@ async function cargarEnsayo() {
     data.propuestaComercial
   );
 
-  // Imágenes (SIN CAMBIOS)
+  // Imágenes
   renderImagenes(data.fotos || []);
+
+  // Link para clientes (solo si NO es público)
+  if (!esPublico) {
+    renderLinkCliente();
+  }
 }
 
 /**********************
@@ -128,21 +125,29 @@ function renderImagenes(fotos) {
 }
 
 /**********************
- * MENÚ IZQUIERDO → SCROLL
+ * LINK PARA CLIENTES
  **********************/
-function activarMenu() {
-  const botones = document.querySelectorAll(".menu-ensayo button");
+function renderLinkCliente() {
+  const contenedor = document.getElementById("fotos");
+  if (!contenedor) return;
 
-  botones.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.seccion;
-      const destino = document.getElementById(id);
-      if (!destino) return;
+  const linkPublico =
+    `${window.location.origin}${window.location.pathname}?id=${ensayoId}&publico=1`;
 
-      destino.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
-  });
+  const bloque = document.createElement("div");
+  bloque.style.marginTop = "24px";
+
+  bloque.innerHTML = `
+    <h4 style="color:#1f4e8c; margin-bottom:8px;">
+      Link para los clientes
+    </h4>
+    <input
+      type="text"
+      value="${linkPublico}"
+      readonly
+      style="width:100%; padding:8px; font-size:14px;"
+    />
+  `;
+
+  contenedor.appendChild(bloque);
 }
