@@ -7,24 +7,9 @@ import {
   collection,
   getDocs,
   addDoc,
-  Timestamp,
-  updateDoc,
-  doc
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getAuth,
-  signInAnonymously
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-/**********************
- * CONFIG
- **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -36,13 +21,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-/**********************
- * AUTH
- **********************/
-await signInAnonymously(auth);
 
 /**********************
  * DOM
@@ -60,42 +38,54 @@ const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
 
 /**********************
- * INPUT FOTOS (inyectado)
+ * BLOQUE IMÁGENES (ANTES DE BOTONES)
  **********************/
-form.insertAdjacentHTML(
-  "beforeend",
-  `
-  <label>Imágenes</label>
-  <input type="file" id="fotosInput" accept="image/*" multiple />
-  <div id="previewFotos" style="margin-top:12px;"></div>
-`
-);
+const accionesForm = document.querySelector(".acciones-form");
 
-const fotosInput = document.getElementById("fotosInput");
-const previewFotos = document.getElementById("previewFotos");
+accionesForm.insertAdjacentHTML("beforebegin", `
+  <div id="bloqueImagenes">
+    <label>Imágenes</label>
+    <input type="file" id="inputFotos" accept="image/*" multiple />
+    <div id="previewFotos" style="margin-top:12px;"></div>
+  </div>
+`);
 
-let fotosSeleccionadas = [];
+const fotosInput = document.getElementById("inputFotos");
+const previewDiv = document.getElementById("previewFotos");
 
 /**********************
- * PREVIEW
+ * PREVIEW IMÁGENES
  **********************/
-fotosInput.addEventListener("change", e => {
-  const archivos = Array.from(e.target.files);
+let fotosBase64 = [];
+
+fotosInput.addEventListener("change", async () => {
+  fotosBase64 = [];
+  previewDiv.innerHTML = "";
+
+  const archivos = Array.from(fotosInput.files);
   if (!archivos.length) return;
 
-  archivos.forEach(file => {
-    fotosSeleccionadas.push(file);
+  for (const archivo of archivos) {
+    const base64 = await archivoToBase64(archivo);
+    fotosBase64.push(base64);
 
     const img = document.createElement("img");
-    img.src = URL.createObjectURL(file);
-    img.style.maxWidth = "200px";
+    img.src = base64;
+    img.style.maxWidth = "100%";
     img.style.marginBottom = "12px";
-    img.style.borderRadius = "8px";
-    previewFotos.appendChild(img);
-  });
-
-  fotosInput.value = "";
+    img.style.borderRadius = "12px";
+    previewDiv.appendChild(img);
+  }
 });
+
+function archivoToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 /**********************
  * CARGAR CLIENTES
@@ -116,19 +106,14 @@ async function cargarClientes() {
 /**********************
  * GUARDAR ENSAYO
  **********************/
-form.addEventListener("submit", async e => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const btn = form.querySelector(".btn-guardar");
-  btn.disabled = true;
-  btn.textContent = "Guardando...";
 
   try {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ crear ensayo vacío de fotos
-    const docRef = await addDoc(collection(db, "ensayos"), {
+    const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
       nombreEnsayo: nombreEnsayoEl.value,
@@ -139,40 +124,17 @@ form.addEventListener("submit", async e => {
       resultados: resultadosEl.value || "",
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
-      fotos: [],
+      fotos: fotosBase64,
       creadoEn: Timestamp.now()
-    });
+    };
 
-    const ensayoId = docRef.id;
-    const urlsFotos = [];
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // 2️⃣ subir fotos a Storage
-    for (const archivo of fotosSeleccionadas) {
-      const storageRef = ref(
-        storage,
-        `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
-      );
+    window.location.href = `ensayo.html?id=${docRef.id}`;
 
-      await uploadBytes(storageRef, archivo);
-      const url = await getDownloadURL(storageRef);
-      urlsFotos.push(url);
-    }
-
-    // 3️⃣ guardar URLs
-    if (urlsFotos.length) {
-      await updateDoc(doc(db, "ensayos", ensayoId), {
-        fotos: urlsFotos
-      });
-    }
-
-    // 4️⃣ ir al ensayo
-    window.location.href = `ensayo.html?id=${ensayoId}`;
-
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
-    btn.disabled = false;
-    btn.textContent = "💾 Guardar ensayo";
   }
 });
 
