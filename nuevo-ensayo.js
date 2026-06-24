@@ -7,8 +7,6 @@ import {
   collection,
   getDocs,
   addDoc,
-  updateDoc,
-  doc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -53,6 +51,7 @@ const propuestaComercialEl = document.getElementById("propuestaComercial");
  **********************/
 async function cargarClientes() {
   const snap = await getDocs(collection(db, "clientes"));
+
   snap.forEach(docu => {
     const cliente = docu.data();
     const option = document.createElement("option");
@@ -73,12 +72,21 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
+    // ✅ FECHA SEGURA
+    const fechaValue = fechaEl.value;
+    const fechaDate = fechaValue ? new Date(fechaValue) : null;
+
+    if (!fechaDate || isNaN(fechaDate.getTime())) {
+      alert("Fecha inválida");
+      return;
+    }
+
     // 1️⃣ Crear ensayo
-    const docRef = await addDoc(collection(db, "ensayos"), {
-      clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre,
-      nombreEnsayo: nombreEnsayoEl.value,
-      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+    const nuevoEnsayo = {
+      clienteId: selectCliente.value || "",
+      clienteNombre: clienteOption?.dataset?.nombre || "",
+      nombreEnsayo: nombreEnsayoEl.value || "",
+      fecha: Timestamp.fromDate(fechaDate),
 
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
@@ -89,11 +97,13 @@ form.addEventListener("submit", async (e) => {
 
       fotos: [],
       creadoEn: Timestamp.now()
-    });
+    };
+
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
     // 2️⃣ Subir fotos (si hay)
     const fotosURLs = [];
-    const files = fotosInput.files;
+    const files = fotosInput?.files || [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -107,19 +117,20 @@ form.addEventListener("submit", async (e) => {
       fotosURLs.push(url);
     }
 
-    // 3️⃣ Guardar URLs en el MISMO documento
+    // 3️⃣ Guardar URLs si hubo fotos
     if (fotosURLs.length > 0) {
-      await updateDoc(doc(db, "ensayos", docRef.id), {
-        fotos: fotosURLs
-      });
+      await addDoc(
+        collection(db, "ensayos", docRef.id, "fotos"),
+        { urls: fotosURLs }
+      );
     }
 
     // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("🔥 Error REAL:", error);
-    alert("Error al guardar el ensayo (ver consola)");
+    console.error("🔥 ERROR REAL:", error);
+    alert("Error al guardar el ensayo");
   }
 });
 
