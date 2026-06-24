@@ -1,6 +1,3 @@
-/**********************
- * FIREBASE
- **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
@@ -19,6 +16,9 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+/**********************
+ * FIREBASE
+ **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -37,39 +37,23 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-
-const fechaEl = document.getElementById("fecha");
-const nombreEnsayoEl = document.getElementById("nombreEnsayo");
-const propuestaEl = document.getElementById("propuesta");
-const dosisEl = document.getElementById("dosis");
-const elaboracionEl = document.getElementById("elaboracion");
-const resultadosEl = document.getElementById("resultados");
-const conclusionEl = document.getElementById("conclusion");
-const propuestaComercialEl = document.getElementById("propuestaComercial");
 const fotoEl = document.getElementById("fotoEnsayo");
 
 /**********************
- * CARGAR CLIENTES (UNA SOLA VEZ)
+ * CARGAR CLIENTES (NO SE TOCA)
  **********************/
-let clientesCargados = false;
-
 async function cargarClientes() {
-  if (clientesCargados) return;
-  clientesCargados = true;
-
-  selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
-
   const snap = await getDocs(collection(db, "clientes"));
-
-  snap.forEach(docu => {
-    const cliente = docu.data();
-    const option = document.createElement("option");
-    option.value = docu.id;
-    option.textContent = cliente.nombre || "Cliente sin nombre";
-    option.dataset.nombre = cliente.nombre || "";
-    selectCliente.appendChild(option);
+  snap.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d.id;
+    o.textContent = d.data().nombre || "Cliente sin nombre";
+    o.dataset.nombre = d.data().nombre || "";
+    selectCliente.appendChild(o);
   });
 }
+
+cargarClientes();
 
 /**********************
  * GUARDAR ENSAYO
@@ -77,36 +61,29 @@ async function cargarClientes() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (!selectCliente.value) {
-    alert("Seleccioná un cliente");
-    return;
-  }
-
   try {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ Crear ensayo sin imagen
-    const ensayoBase = {
+    // 1️⃣ Crear ensayo base
+    const docRef = await addDoc(collection(db, "ensayos"), {
       clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre || "",
-      nombreEnsayo: nombreEnsayoEl.value || "",
-      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+      clienteNombre: clienteOption.dataset.nombre,
+      nombreEnsayo: nombreEnsayo.value,
+      fecha: Timestamp.fromDate(new Date(fecha.value)),
 
-      propuesta: propuestaEl.value || "",
-      dosis: dosisEl.value || "",
-      elaboracion: elaboracionEl.value || "",
-      resultados: resultadosEl.value || "",
-      conclusion: conclusionEl.value || "",
-      propuestaComercial: propuestaComercialEl.value || "",
+      propuesta: propuesta.value || "",
+      dosis: dosis.value || "",
+      elaboracion: elaboracion.value || "",
+      resultados: resultados.value || "",
+      conclusion: conclusion.value || "",
+      propuestaComercial: propuestaComercial.value || "",
 
       fotos: [],
       creadoEn: Timestamp.now()
-    };
+    });
 
-    const docRef = await addDoc(collection(db, "ensayos"), ensayoBase);
-
-    // 2️⃣ Subir imagen si existe
+    // 2️⃣ Subir foto SOLO si existe
     if (fotoEl.files.length > 0) {
       const file = fotoEl.files[0];
 
@@ -131,8 +108,3 @@ form.addEventListener("submit", async (e) => {
     alert("Error al guardar el ensayo");
   }
 });
-
-/**********************
- * INIT
- **********************/
-document.addEventListener("DOMContentLoaded", cargarClientes);
