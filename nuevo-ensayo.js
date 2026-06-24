@@ -1,8 +1,4 @@
-/**********************
- * IMPORTS FIREBASE
- **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
   getFirestore,
   collection,
@@ -10,7 +6,6 @@ import {
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
 import {
   getStorage,
   ref,
@@ -18,90 +13,64 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-/**********************
- * CONFIG
- **********************/
+/* ========================
+   FIREBASE CONFIG
+======================== */
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
   storageBucket: "inlact.appspot.com",
   messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:XXXX"
+  appId: "1:143868382036:web:xxxx"
 };
 
-/**********************
- * INIT
- **********************/
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-/**********************
- * CARGAR CLIENTES
- **********************/
-const selectCliente = document.getElementById("cliente");
+/* ========================
+   CARGAR CLIENTES (NO TOCAR)
+======================== */
+const clienteSelect = document.getElementById("cliente");
 
 async function cargarClientes() {
-  selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
-
-  const querySnapshot = await getDocs(collection(db, "clientes"));
-
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-
-    const option = document.createElement("option");
-    option.value = doc.id;
-    option.textContent = data.nombre || data.razonSocial || "Cliente sin nombre";
-
-    selectCliente.appendChild(option);
+  const snap = await getDocs(collection(db, "clientes"));
+  snap.forEach(doc => {
+    const opt = document.createElement("option");
+    opt.value = doc.id;
+    opt.textContent = doc.data().nombre;
+    clienteSelect.appendChild(opt);
   });
 }
 
-// ⚠️ ESTO ES CLAVE
 cargarClientes();
 
-/**********************
- * FORM ENSAYO
- **********************/
-const form = document.getElementById("formNuevoEnsayo");
+/* ========================
+   GUARDAR ENSAYO
+======================== */
+const form = document.getElementById("formEnsayo");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
-    const cliente = selectCliente.value;
-    const observaciones = document.getElementById("observaciones").value;
-    const fileInput = document.getElementById("foto");
+    const cliente = clienteSelect.value;
+    const conclusion = document.getElementById("conclusion").value;
+    const propuesta = document.getElementById("propuesta").value;
+    const archivo = document.getElementById("foto").files[0];
 
-    let imageUrl = "";
+    let fotoURL = "";
 
-    // ====== STORAGE (OPCIONAL) ======
-    if (fileInput && fileInput.files.length > 0) {
-      const file = fileInput.files[0];
-
+    // 🔹 SI HAY FOTO → STORAGE
+    if (archivo) {
       const storageRef = ref(
         storage,
-        `ensayos/${Date.now()}_${file.name}`
+        `ensayos/${Date.now()}_${archivo.name}`
       );
 
-      await uploadBytes(storageRef, file);
-      imageUrl = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, archivo);
+      fotoURL = await getDownloadURL(storageRef);
     }
 
-    // ====== FIRESTORE ======
-    await addDoc(collection(db, "ensayos"), {
-      clienteId: cliente,
-      observaciones: observaciones,
-      imagen: imageUrl,
-      createdAt: Timestamp.now()
-    });
-
-    alert("Ensayo guardado correctamente");
-    form.reset();
-
-  } catch (error) {
-    console.error("Error al guardar ensayo:", error);
-    alert("Error al guardar el ensayo");
-  }
-});
+    // 🔹 FIRE
