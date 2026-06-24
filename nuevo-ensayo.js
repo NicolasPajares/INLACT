@@ -74,14 +74,21 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
+    // ✅ VALIDAR FECHA
+    let fechaTimestamp = null;
+    if (fechaEl.value) {
+      const fechaDate = new Date(fechaEl.value);
+      if (!isNaN(fechaDate)) {
+        fechaTimestamp = Timestamp.fromDate(fechaDate);
+      }
+    }
+
     // 1️⃣ Crear ensayo
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
-      nombreEnsayo: nombreEnsayoEl.value,
-      fecha: fechaEl.value
-        ? Timestamp.fromDate(new Date(fechaEl.value))
-        : Timestamp.now(),
+      nombreEnsayo: nombreEnsayoEl.value || "",
+      fecha: fechaTimestamp,
 
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
@@ -96,7 +103,7 @@ form.addEventListener("submit", async (e) => {
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // 2️⃣ Subir fotos
+    // 2️⃣ Subir fotos (si hay)
     const fotosURLs = [];
     const files = fotosInput.files;
 
@@ -112,7 +119,7 @@ form.addEventListener("submit", async (e) => {
       fotosURLs.push(url);
     }
 
-    // 3️⃣ Actualizar documento con fotos
+    // 3️⃣ Guardar URLs en el documento principal
     if (fotosURLs.length > 0) {
       await updateDoc(doc(db, "ensayos", docRef.id), {
         fotos: fotosURLs
@@ -123,7 +130,7 @@ form.addEventListener("submit", async (e) => {
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("ERROR REAL:", error);
+    console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
   }
 });
