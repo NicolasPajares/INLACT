@@ -35,7 +35,7 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-const fotosInput = document.getElementById("foto"); // 👈 CLAVE
+const fotosInput = document.getElementById("fotos"); // ✅ CORREGIDO
 
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
@@ -79,7 +79,7 @@ form.addEventListener("submit", async (e) => {
     }
 
     // 1️⃣ Crear ensayo
-    const nuevoEnsayo = {
+    const docRef = await addDoc(collection(db, "ensayos"), {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
       nombreEnsayo: nombreEnsayoEl.value,
@@ -92,17 +92,16 @@ form.addEventListener("submit", async (e) => {
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
 
-      fotos: [],
       creadoEn: Timestamp.now()
-    };
+    });
 
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
-
-    // 2️⃣ Subir fotos
+    // 2️⃣ Subir fotos (si hay)
     const files = fotosInput.files;
+    const fotosURLs = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
+
       const storageRef = ref(
         storage,
         `ensayos/${docRef.id}/${Date.now()}_${file.name}`
@@ -110,15 +109,14 @@ form.addEventListener("submit", async (e) => {
 
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-
-      nuevoEnsayo.fotos.push(url);
+      fotosURLs.push(url);
     }
 
-    // 3️⃣ Actualizar documento con URLs
-    if (nuevoEnsayo.fotos.length > 0) {
+    // 3️⃣ Guardar URLs
+    if (fotosURLs.length > 0) {
       await addDoc(
         collection(db, "ensayos", docRef.id, "fotos"),
-        { urls: nuevoEnsayo.fotos }
+        { urls: fotosURLs }
       );
     }
 
