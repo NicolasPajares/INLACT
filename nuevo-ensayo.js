@@ -49,19 +49,32 @@ const propuestaComercialEl = document.getElementById("propuestaComercial");
 const fotoEl = document.getElementById("fotoEnsayo");
 
 /**********************
- * CARGAR CLIENTES
+ * CARGAR CLIENTES (ROBUSTO)
  **********************/
 async function cargarClientes() {
-  const snap = await getDocs(collection(db, "clientes"));
+  selectCliente.innerHTML = `<option value="">Cargando clientes...</option>`;
+  selectCliente.disabled = true;
 
-  snap.forEach(docu => {
-    const cliente = docu.data();
-    const option = document.createElement("option");
-    option.value = docu.id;
-    option.textContent = cliente.nombre || "Cliente sin nombre";
-    option.dataset.nombre = cliente.nombre || "";
-    selectCliente.appendChild(option);
-  });
+  try {
+    const snap = await getDocs(collection(db, "clientes"));
+
+    selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
+
+    snap.forEach(docu => {
+      const cliente = docu.data();
+      const option = document.createElement("option");
+      option.value = docu.id;
+      option.textContent = cliente.nombre || "Cliente sin nombre";
+      option.dataset.nombre = cliente.nombre || "";
+      selectCliente.appendChild(option);
+    });
+
+    selectCliente.disabled = false;
+
+  } catch (err) {
+    console.error("Error cargando clientes", err);
+    selectCliente.innerHTML = `<option value="">Error al cargar clientes</option>`;
+  }
 }
 
 /**********************
@@ -70,15 +83,21 @@ async function cargarClientes() {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  if (!selectCliente.value) {
+    alert("Tenés que seleccionar un cliente");
+    return;
+  }
+
   try {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ Crear ensayo SIN fotos
+    // 1️⃣ Crear ensayo base
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
-      clienteNombre: clienteOption.dataset.nombre,
-      nombreEnsayo: nombreEnsayoEl.value,
+      clienteNombre: clienteOption.dataset.nombre || "",
+
+      nombreEnsayo: nombreEnsayoEl.value || "",
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
       propuesta: propuestaEl.value || "",
@@ -94,7 +113,7 @@ form.addEventListener("submit", async (e) => {
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    // 2️⃣ Si hay imagen, subirla y guardar URL
+    // 2️⃣ Subir imagen SOLO si existe
     if (fotoEl.files.length > 0) {
       const file = fotoEl.files[0];
 
@@ -123,4 +142,4 @@ form.addEventListener("submit", async (e) => {
 /**********************
  * INIT
  **********************/
-cargarClientes();
+document.addEventListener("DOMContentLoaded", cargarClientes);
