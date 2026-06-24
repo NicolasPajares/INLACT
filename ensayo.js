@@ -135,3 +135,21 @@ function renderImagenes(fotos) {
     contenedor.appendChild(img);
   });
 }
+/**********************
+ * NAVEGACIÓN MENÚ → CONTENIDO
+ **********************/
+document
+  .querySelectorAll(".menu-ensayo button")
+  .forEach(btn => {
+    btn.addEventListener("click", () => {
+      const seccionId = btn.dataset.seccion;
+      const seccion = document.getElementById(seccionId);
+
+      if (!seccion) return;
+
+      seccion.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  });
