@@ -126,3 +126,20 @@ async function subirImagen() {
     estado.textContent = "❌ Error al subir la imagen";
   }
 }
+function mostrarLinkCliente() {
+  const linkDiv = document.getElementById("linkCliente");
+
+  const link =
+    `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
+
+  linkDiv.innerHTML = `
+    <p><strong>Link para el cliente:</strong></p>
+    <input 
+      type="text" 
+      value="${link}" 
+      readonly 
+      style="width:100%; padding:8px;"
+      onclick="this.select()"
+    />
+  `;
+}
