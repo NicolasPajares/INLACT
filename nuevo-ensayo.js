@@ -105,6 +105,9 @@ form.addEventListener("submit", async (e) => {
     const fotosURLs = [];
     const files = fotosInput?.files || [];
 
+    console.log("📸 Archivos seleccionados:", files);
+console.log("📸 Cantidad:", files.length);
+
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const storageRef = ref(
