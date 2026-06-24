@@ -21,13 +21,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /**********************
- * CONFIG
+ * CONFIG (BUCKET REAL)
  **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
-  storageBucket: "inlact.firebasestorage.app", ,
+  storageBucket: "inlact.firebasestorage.app", // ✅ BUCKET CORRECTO
   messagingSenderId: "143868382036",
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
@@ -49,6 +49,18 @@ const esPublico = params.get("publico") === "1";
  **********************/
 let imagenesPendientes = [];
 let subiendo = false;
+
+/**********************
+ * AUTH + INIT
+ **********************/
+signInAnonymously(auth)
+  .then(() => {
+    console.log("Auth anónima OK");
+    cargarEnsayo();
+  })
+  .catch(() => {
+    cargarEnsayo(); // por si las rules están abiertas
+  });
 
 /**********************
  * CARGAR ENSAYO
@@ -97,35 +109,29 @@ async function cargarEnsayo() {
   });
 
   const fotosDiv = document.getElementById("fotos");
-  fotosDiv.innerHTML = `<h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>`;
-
-  // Imágenes existentes
-  if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => renderImagen(url));
-  }
+  fotosDiv.innerHTML = `<h3 style="color:#1f4e8c;">Imágenes</h3>`;
 
   if (!esPublico) {
     fotosDiv.innerHTML += `
-      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
-      <button id="btnGuardarFotos">Guardar imágenes</button>
-      <p id="estadoFotos" style="margin-top:12px;"></p>
-      <div id="linkCliente" style="margin-top:16px;"></div>
+      <input type="file" id="inputFotos" accept="image/*" multiple />
+      <button id="btnGuardar">Guardar imágenes y generar link</button>
+      <p id="estado"></p>
+      <div id="link"></div>
     `;
 
-    document
-      .getElementById("inputFotos")
-      .addEventListener("change", seleccionarFotos);
+    document.getElementById("inputFotos").addEventListener("change", onSeleccionFotos);
+    document.getElementById("btnGuardar").addEventListener("click", guardarImagenes);
+  }
 
-    document
-      .getElementById("btnGuardarFotos")
-      .addEventListener("click", guardarFotos);
+  if (Array.isArray(data.fotos)) {
+    data.fotos.forEach(url => renderImagen(url));
   }
 }
 
 /**********************
- * SELECCIONAR FOTOS
+ * SELECCIÓN DE FOTOS
  **********************/
-function seleccionarFotos(e) {
+function onSeleccionFotos(e) {
   const archivos = Array.from(e.target.files);
   if (!archivos.length) return;
 
@@ -139,17 +145,17 @@ function seleccionarFotos(e) {
 }
 
 /**********************
- * GUARDAR FOTOS
+ * SUBIR Y GUARDAR
  **********************/
-async function guardarFotos() {
+async function guardarImagenes() {
   if (subiendo || !imagenesPendientes.length) return;
 
   subiendo = true;
-  const estado = document.getElementById("estadoFotos");
-  const btn = document.getElementById("btnGuardarFotos");
+  const estado = document.getElementById("estado");
+  const btn = document.getElementById("btnGuardar");
 
   btn.disabled = true;
-  estado.textContent = "Guardando imágenes…";
+  estado.textContent = "Guardando imágenes...";
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
@@ -161,21 +167,20 @@ async function guardarFotos() {
       );
 
       await uploadBytes(storageRef, archivo);
-      const urlFinal = await getDownloadURL(storageRef);
+      const url = await getDownloadURL(storageRef);
 
       await updateDoc(refEnsayo, {
-        fotos: arrayUnion(urlFinal)
+        fotos: arrayUnion(url)
       });
     }
 
     estado.textContent = "Imágenes guardadas correctamente ✅";
+    mostrarLink();
     imagenesPendientes = [];
-    mostrarLinkCliente();
 
   } catch (err) {
     console.error(err);
     estado.textContent = "❌ Error al guardar imágenes";
-    alert("Error subiendo imágenes. Revisá la consola.");
   } finally {
     subiendo = false;
     btn.disabled = false;
@@ -183,56 +188,28 @@ async function guardarFotos() {
 }
 
 /**********************
- * RENDER IMAGEN
+ * RENDER IMG
  **********************/
 function renderImagen(url, preview = false) {
-  const fotosDiv = document.getElementById("fotos");
-
   const img = document.createElement("img");
   img.src = url;
   img.style.maxWidth = "480px";
-  img.style.width = "100%";
   img.style.display = "block";
   img.style.marginBottom = "16px";
   img.style.borderRadius = "12px";
   img.style.opacity = preview ? "0.6" : "1";
-
-  fotosDiv.appendChild(img);
+  document.getElementById("fotos").appendChild(img);
 }
 
 /**********************
  * LINK CLIENTE
  **********************/
-function mostrarLinkCliente() {
-  const linkDiv = document.getElementById("linkCliente");
+function mostrarLink() {
   const link =
     `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
-  linkDiv.innerHTML = `
-    <p><strong>Link para el cliente:</strong></p>
-    <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
+  document.getElementById("link").innerHTML = `
+    <p><strong>Link para el cliente</strong></p>
+    <input type="text" value="${link}" readonly style="width:100%" />
   `;
 }
-
-/**********************
- * MENÚ SCROLL
- **********************/
-document.querySelectorAll(".menu-ensayo button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const destino = document.getElementById(btn.dataset.seccion);
-    if (destino) destino.scrollIntoView({ behavior: "smooth" });
-  });
-});
-
-/**********************
- * AUTENTICACIÓN + INIT
- **********************/
-signInAnonymously(auth)
-  .then(() => {
-    console.log("Sesión anónima iniciada ✅");
-    cargarEnsayo();
-  })
-  .catch(err => {
-    console.error("Error autenticando:", err);
-    alert("No se pudo iniciar sesión. Recargá la página.");
-  });
