@@ -27,7 +27,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
+  storageBucket: "inlact.firebasestorage.app", ,
   messagingSenderId: "143868382036",
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
