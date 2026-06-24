@@ -35,7 +35,7 @@ const storage = getStorage(app);
  **********************/
 const form = document.getElementById("formNuevoEnsayo");
 const selectCliente = document.getElementById("cliente");
-const inputFoto = document.getElementById("foto");
+const fotosInput = document.getElementById("fotos");
 
 const fechaEl = document.getElementById("fecha");
 const nombreEnsayoEl = document.getElementById("nombreEnsayo");
@@ -63,17 +63,6 @@ async function cargarClientes() {
 }
 
 /**********************
- * SUBIR FOTO (opcional)
- **********************/
-async function subirFoto(file) {
-  const nombreArchivo = `ensayos/${Date.now()}_${file.name}`;
-  const storageRef = ref(storage, nombreArchivo);
-
-  await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
-}
-
-/**********************
  * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
@@ -83,14 +72,7 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    let fotos = [];
-
-    // 👉 si hay foto, la subimos primero
-    if (inputFoto && inputFoto.files.length > 0) {
-      const urlFoto = await subirFoto(inputFoto.files[0]);
-      fotos.push(urlFoto);
-    }
-
+    // 1️⃣ Crear ensayo en Firestore
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre,
@@ -104,12 +86,37 @@ form.addEventListener("submit", async (e) => {
       conclusion: conclusionEl.value || "",
       propuestaComercial: propuestaComercialEl.value || "",
 
-      fotos: fotos,
+      fotos: [],
       creadoEn: Timestamp.now()
     };
 
     const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
+    // 2️⃣ Subir fotos (si hay)
+    const fotosURLs = [];
+    const files = fotosInput.files;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const storageRef = ref(
+        storage,
+        `ensayos/${docRef.id}/${Date.now()}_${file.name}`
+      );
+
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      fotosURLs.push(url);
+    }
+
+    // 3️⃣ Guardar URLs si hubo fotos
+    if (fotosURLs.length > 0) {
+      await addDoc(
+        collection(db, "ensayos", docRef.id, "fotos"),
+        { urls: fotosURLs }
+      );
+    }
+
+    // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
