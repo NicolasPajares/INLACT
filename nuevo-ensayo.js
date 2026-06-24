@@ -1,3 +1,4 @@
+console.log("nuevo-ensayo.js cargado correctamente");
 /**********************
  * FIREBASE
  **********************/
