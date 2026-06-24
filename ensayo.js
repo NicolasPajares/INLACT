@@ -38,8 +38,13 @@ const ensayoId = params.get("id");
  * INIT
  **********************/
 signInAnonymously(auth)
-  .then(cargarEnsayo)
-  .catch(cargarEnsayo);
+  .then(() => iniciar())
+  .catch(() => iniciar());
+
+async function iniciar() {
+  await cargarEnsayo();
+  activarMenu();
+}
 
 /**********************
  * CARGAR ENSAYO
@@ -75,8 +80,8 @@ async function cargarEnsayo() {
     data.propuestaComercial
   );
 
-  // Imágenes (al final)
-  renderImagenes(data.fotos);
+  // Imágenes (SIN CAMBIOS)
+  renderImagenes(data.fotos || []);
 }
 
 /**********************
@@ -87,11 +92,7 @@ function renderBloque(id, titulo, contenido) {
   if (!contenedor) return;
 
   contenedor.innerHTML = `
-    <h3 style="
-      color:#1f4e8c;
-      margin-bottom:12px;
-      font-weight:600;
-    ">
+    <h3 style="color:#1f4e8c; margin-bottom:12px; font-weight:600;">
       ${titulo}
     </h3>
     <p style="white-space:pre-line;">
@@ -107,18 +108,8 @@ function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
 
-  // Si no hay imágenes → no mostrar nada
-  if (!Array.isArray(fotos) || fotos.length === 0) {
-    contenedor.innerHTML = "";
-    return;
-  }
-
   contenedor.innerHTML = `
-    <h3 style="
-      color:#1f4e8c;
-      margin-bottom:16px;
-      font-weight:600;
-    ">
+    <h3 style="color:#1f4e8c; margin-bottom:16px; font-weight:600;">
       Imágenes
     </h3>
   `;
@@ -135,21 +126,23 @@ function renderImagenes(fotos) {
     contenedor.appendChild(img);
   });
 }
+
 /**********************
- * NAVEGACIÓN MENÚ → CONTENIDO
+ * MENÚ IZQUIERDO → SCROLL
  **********************/
-document
-  .querySelectorAll(".menu-ensayo button")
-  .forEach(btn => {
+function activarMenu() {
+  const botones = document.querySelectorAll(".menu-ensayo button");
+
+  botones.forEach(btn => {
     btn.addEventListener("click", () => {
-      const seccionId = btn.dataset.seccion;
-      const seccion = document.getElementById(seccionId);
+      const id = btn.dataset.seccion;
+      const destino = document.getElementById(id);
+      if (!destino) return;
 
-      if (!seccion) return;
-
-      seccion.scrollIntoView({
+      destino.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
     });
   });
+}
