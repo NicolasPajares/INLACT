@@ -53,43 +53,54 @@ cargarClientes();
 // ============================
 // GUARDAR ENSAYO
 // ============================
-const form = document.getElementById("form-ensayo");
+const form = document.getElementById("formNuevoEnsayo");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+if (form) {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  try {
-    const cliente = selectCliente.value;
-    const conclusion = document.getElementById("conclusion").value;
-    const propuesta = document.getElementById("propuesta").value;
-    const archivo = document.getElementById("foto").files[0];
+    try {
+      const cliente = selectCliente.value;
+      const fecha = document.getElementById("fecha").value;
+      const nombreEnsayo = document.getElementById("nombreEnsayo").value;
+      const propuesta = document.getElementById("propuesta").value;
+      const conclusion = document.getElementById("conclusion").value;
+      const propuestaComercial = document.getElementById("propuestaComercial").value;
 
-    let fotoURL = "";
+      const archivo = document.getElementById("fotos").files[0];
 
-    // 🔹 Si hay foto, la sube
-    if (archivo) {
-      const storageRef = ref(
-        storage,
-        `ensayos/${Date.now()}_${archivo.name}`
-      );
-      await uploadBytes(storageRef, archivo);
-      fotoURL = await getDownloadURL(storageRef);
+      let fotoURL = "";
+
+      // 🔹 Si hay foto, la sube
+      if (archivo) {
+        const storageRef = ref(
+          storage,
+          `ensayos/${Date.now()}_${archivo.name}`
+        );
+        await uploadBytes(storageRef, archivo);
+        fotoURL = await getDownloadURL(storageRef);
+      }
+
+      // 🔹 Guarda en Firestore
+      await addDoc(collection(db, "ensayos"), {
+        cliente,
+        fecha,
+        nombreEnsayo,
+        propuesta,
+        conclusion,
+        propuestaComercial,
+        fotoURL,
+        createdAt: Timestamp.now()
+      });
+
+      alert("Ensayo guardado correctamente");
+      form.reset();
+
+    } catch (error) {
+      console.error("Error al guardar", error);
+      alert("Error al guardar el ensayo");
     }
-
-    // 🔹 Guarda en Firestore (con o sin foto)
-    await addDoc(collection(db, "ensayos"), {
-      cliente,
-      conclusion,
-      propuesta,
-      fotoURL,
-      fecha: Timestamp.now()
-    });
-
-    alert("Ensayo guardado correctamente");
-    form.reset();
-
-  } catch (error) {
-    console.error("Error al guardar", error);
-    alert("Error al guardar el ensayo");
-  }
-});
+  });
+} else {
+  console.error("No se encontró el formulario #formNuevoEnsayo");
+}
