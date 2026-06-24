@@ -12,9 +12,13 @@ import {
 import {
   getStorage,
   ref,
-  uploadBytesResumable,
+  uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /**********************
  * CONFIG
@@ -28,15 +32,13 @@ const firebaseConfig = {
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
-/**********************
- * INIT
- **********************/
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const auth = getAuth(app);
 
 /**********************
- * URL PARAMS
+ * URL
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
@@ -59,82 +61,95 @@ async function cargarEnsayo() {
   if (!snap.exists()) return;
 
   const data = snap.data();
-  const fotosDiv = document.getElementById("fotos");
 
-  fotosDiv.innerHTML = `<h3>Imágenes</h3>`;
+  document.getElementById("empresa").textContent = data.clienteNombre || "";
+  document.getElementById("nombre-ensayo").textContent = data.nombreEnsayo || "";
+  document.getElementById("fecha").textContent =
+    data.fecha?.toDate().toLocaleDateString() || "";
+
+  const secciones = [
+    "propuesta",
+    "dosis",
+    "elaboracion",
+    "resultados",
+    "conclusion",
+    "propuestacomercial"
+  ];
+
+  const titulos = {
+    propuesta: "Propuesta",
+    dosis: "Dosis",
+    elaboracion: "Elaboración",
+    resultados: "Resultados",
+    conclusion: "Conclusión",
+    propuestacomercial: "Propuesta comercial"
+  };
+
+  secciones.forEach(id => {
+    const campo = id === "propuestacomercial"
+      ? "propuestaComercial"
+      : id;
+
+    document.getElementById(id).innerHTML = `
+      <h3 style="color:#1f4e8c; margin-bottom:16px;">${titulos[id]}</h3>
+      <p>${data[campo] || ""}</p>
+    `;
+  });
+
+  const fotosDiv = document.getElementById("fotos");
+  fotosDiv.innerHTML = `<h3 style="color:#1f4e8c; margin-bottom:16px;">Imágenes</h3>`;
+
+  // Imágenes existentes
+  if (Array.isArray(data.fotos)) {
+    data.fotos.forEach(url => renderImagen(url));
+  }
 
   if (!esPublico) {
     fotosDiv.innerHTML += `
-      <input type="file" id="inputFotos" accept="image/*" multiple />
-      <br><br>
-      <button id="btnGuardar">Guardar imágenes y generar link</button>
-      <p id="estado"></p>
-      <div id="link"></div>
+      <input type="file" id="inputFotos" accept="image/*" multiple style="margin-bottom:16px;" />
+      <button id="btnGuardarFotos">Guardar imágenes</button>
+      <p id="estadoFotos" style="margin-top:12px;"></p>
+      <div id="linkCliente" style="margin-top:16px;"></div>
     `;
 
     document
       .getElementById("inputFotos")
-      .addEventListener("change", onSeleccionFotos);
+      .addEventListener("change", seleccionarFotos);
 
     document
-      .getElementById("btnGuardar")
-      .addEventListener("click", guardarImagenes);
-  }
-
-  if (Array.isArray(data.fotos)) {
-    data.fotos.forEach(url => renderImagen(url, false));
+      .getElementById("btnGuardarFotos")
+      .addEventListener("click", guardarFotos);
   }
 }
 
 /**********************
  * SELECCIONAR FOTOS
  **********************/
-function onSeleccionFotos(e) {
+function seleccionarFotos(e) {
   const archivos = Array.from(e.target.files);
   if (!archivos.length) return;
 
   archivos.forEach(file => {
     imagenesPendientes.push(file);
-    const previewUrl = URL.createObjectURL(file);
-    renderImagen(previewUrl, true);
+    const preview = URL.createObjectURL(file);
+    renderImagen(preview, true);
   });
 
   e.target.value = "";
 }
 
 /**********************
- * SUBIDA SEGURA (CLAVE)
+ * GUARDAR FOTOS
  **********************/
-function subirImagen(storageRef, archivo, estado) {
-  return new Promise((resolve, reject) => {
-    const task = uploadBytesResumable(storageRef, archivo);
-
-    task.on(
-      "state_changed",
-      (snap) => {
-        const pct = Math.round(
-          (snap.bytesTransferred / snap.totalBytes) * 100
-        );
-        estado.textContent = `Subiendo imagen… ${pct}%`;
-      },
-      (error) => reject(error),
-      () => resolve()
-    );
-  });
-}
-
-/**********************
- * GUARDAR IMÁGENES
- **********************/
-async function guardarImagenes() {
+async function guardarFotos() {
   if (subiendo || !imagenesPendientes.length) return;
 
   subiendo = true;
-  const estado = document.getElementById("estado");
-  const btn = document.getElementById("btnGuardar");
+  const estado = document.getElementById("estadoFotos");
+  const btn = document.getElementById("btnGuardarFotos");
 
   btn.disabled = true;
-  estado.textContent = "Iniciando subida...";
+  estado.textContent = "Guardando imágenes…";
 
   const refEnsayo = doc(db, "ensayos", ensayoId);
 
@@ -145,21 +160,21 @@ async function guardarImagenes() {
         `ensayos/${ensayoId}/${Date.now()}_${archivo.name}`
       );
 
-      await subirImagen(storageRef, archivo, estado);
-      const url = await getDownloadURL(storageRef);
+      await uploadBytes(storageRef, archivo);
+      const urlFinal = await getDownloadURL(storageRef);
 
       await updateDoc(refEnsayo, {
-        fotos: arrayUnion(url)
+        fotos: arrayUnion(urlFinal)
       });
     }
 
     estado.textContent = "Imágenes guardadas correctamente ✅";
     imagenesPendientes = [];
-    mostrarLink();
+    mostrarLinkCliente();
 
   } catch (err) {
-    console.error("ERROR:", err);
-    estado.textContent = "❌ Error subiendo imágenes";
+    console.error(err);
+    estado.textContent = "❌ Error al guardar imágenes";
     alert("Error subiendo imágenes. Revisá la consola.");
   } finally {
     subiendo = false;
@@ -170,15 +185,17 @@ async function guardarImagenes() {
 /**********************
  * RENDER IMAGEN
  **********************/
-function renderImagen(url, esPreview) {
+function renderImagen(url, preview = false) {
   const fotosDiv = document.getElementById("fotos");
 
   const img = document.createElement("img");
   img.src = url;
-  img.style.maxWidth = "100%";
-  img.style.marginBottom = "12px";
-  img.style.borderRadius = "10px";
-  img.style.opacity = esPreview ? "0.6" : "1";
+  img.style.maxWidth = "480px";
+  img.style.width = "100%";
+  img.style.display = "block";
+  img.style.marginBottom = "16px";
+  img.style.borderRadius = "12px";
+  img.style.opacity = preview ? "0.6" : "1";
 
   fotosDiv.appendChild(img);
 }
@@ -186,18 +203,36 @@ function renderImagen(url, esPreview) {
 /**********************
  * LINK CLIENTE
  **********************/
-function mostrarLink() {
-  const linkDiv = document.getElementById("link");
+function mostrarLinkCliente() {
+  const linkDiv = document.getElementById("linkCliente");
   const link =
     `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
   linkDiv.innerHTML = `
-    <p><strong>Link para el cliente</strong></p>
-    <input type="text" value="${link}" readonly style="width:100%" />
+    <p><strong>Link para el cliente:</strong></p>
+    <input type="text" value="${link}" readonly style="width:100%; padding:8px;" />
   `;
 }
 
 /**********************
- * INIT
+ * MENÚ SCROLL
  **********************/
-cargarEnsayo();
+document.querySelectorAll(".menu-ensayo button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const destino = document.getElementById(btn.dataset.seccion);
+    if (destino) destino.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
+/**********************
+ * AUTENTICACIÓN + INIT
+ **********************/
+signInAnonymously(auth)
+  .then(() => {
+    console.log("Sesión anónima iniciada ✅");
+    cargarEnsayo();
+  })
+  .catch(err => {
+    console.error("Error autenticando:", err);
+    alert("No se pudo iniciar sesión. Recargá la página.");
+  });
