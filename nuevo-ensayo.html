@@ -7,10 +7,7 @@
     <meta name="description" content="INLACT - Crear nuevo ensayo">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
-
-    <!-- CSS específico -->
     <link rel="stylesheet" href="nuevo-ensayo.css">
 </head>
 
@@ -30,18 +27,15 @@
     <h1>Crear nuevo ensayo</h1>
 
     <form id="formNuevoEnsayo" enctype="multipart/form-data">
-        
-        <!-- CLIENTE -->
+
         <label for="cliente">Cliente</label>
         <select id="cliente" name="cliente" required>
             <option value="">Seleccionar cliente</option>
         </select>
 
-        <!-- FECHA -->
         <label for="fecha">Fecha del ensayo</label>
         <input type="date" id="fecha" name="fecha" required>
 
-        <!-- NOMBRE ENSAYO -->
         <label for="nombreEnsayo">Nombre del ensayo</label>
         <input
             type="text"
@@ -51,73 +45,34 @@
             required
         >
 
-        <!-- PROPUESTA -->
         <label for="propuesta">Propuesta</label>
-        <textarea
-            id="propuesta"
-            name="propuesta"
-            rows="4"
-            placeholder="Objetivo del ensayo, hipótesis, planteo técnico..."
-        ></textarea>
+        <textarea id="propuesta" name="propuesta" rows="4"></textarea>
 
-        <!-- DOSIS -->
         <label for="dosis">Dosis</label>
-        <textarea
-            id="dosis"
-            name="dosis"
-            rows="3"
-            placeholder="Ej: 250 ml / 1000 L de agua"
-        ></textarea>
+        <textarea id="dosis" name="dosis" rows="3"></textarea>
 
-        <!-- ELABORACIÓN -->
         <label for="elaboracion">Elaboración</label>
-        <textarea
-            id="elaboracion"
-            name="elaboracion"
-            rows="4"
-            placeholder="Descripción del proceso de elaboración"
-        ></textarea>
+        <textarea id="elaboracion" name="elaboracion" rows="4"></textarea>
 
-        <!-- RESULTADOS -->
         <label for="resultados">Resultados</label>
-        <textarea
-            id="resultados"
-            name="resultados"
-            rows="4"
-            placeholder="Observaciones, mediciones, comportamiento"
-        ></textarea>
+        <textarea id="resultados" name="resultados" rows="4"></textarea>
 
-        <!-- CONCLUSIÓN -->
         <label for="conclusion">Conclusión</label>
-        <textarea
-            id="conclusion"
-            name="conclusion"
-            rows="4"
-            placeholder="Conclusión técnica del ensayo"
-        ></textarea>
+        <textarea id="conclusion" name="conclusion" rows="4"></textarea>
 
-        <!-- PROPUESTA COMERCIAL -->
         <label for="propuestaComercial">Propuesta comercial</label>
-        <textarea
-            id="propuestaComercial"
-            name="propuestaComercial"
-            rows="4"
-            placeholder="Propuesta comercial, recomendación o próximos pasos"
-        ></textarea>
+        <textarea id="propuestaComercial" name="propuestaComercial" rows="4"></textarea>
 
-    
-        <!-- FOTO -->
-<label for="fotos">Fotos del ensayo</label>
-<input
-    type="file"
-    id="fotos"
-    name="fotos"
-    accept="image/*"
-    multiple
->
-        
+        <!-- FOTOS -->
+        <label for="fotos">Fotos del ensayo</label>
+        <input
+            type="file"
+            id="fotos"
+            name="fotos"
+            accept="image/*"
+            multiple
+        >
 
-        <!-- ACCIONES -->
         <div class="acciones-form">
             <button type="submit" class="btn-guardar">
                 💾 Guardar ensayo
