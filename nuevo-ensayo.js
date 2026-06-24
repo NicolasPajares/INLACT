@@ -5,6 +5,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import {
   getFirestore,
   collection,
+  getDocs,
   addDoc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -20,12 +21,12 @@ import {
  * CONFIG
  **********************/
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_SENDER_ID",
-  appId: "TU_APP_ID"
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  authDomain: "inlact.firebaseapp.com",
+  projectId: "inlact",
+  storageBucket: "inlact.appspot.com",
+  messagingSenderId: "143868382036",
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 /**********************
@@ -36,63 +37,98 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 /**********************
- * FORM
+ * DOM
  **********************/
-const form = document.getElementById("form-ensayo");
+const form = document.getElementById("formNuevoEnsayo");
+const selectCliente = document.getElementById("cliente");
 
-const fecha = document.getElementById("fecha");
-const cliente = document.getElementById("cliente");
-const producto = document.getElementById("producto");
-const lote = document.getElementById("lote");
-const analisis = document.getElementById("analisis");
-const resultado = document.getElementById("resultado");
-const observaciones = document.getElementById("observaciones");
-const propuesta = document.getElementById("propuesta");
+const fechaEl = document.getElementById("fecha");
+const nombreEnsayoEl = document.getElementById("nombreEnsayo");
+const propuestaEl = document.getElementById("propuesta");
+const dosisEl = document.getElementById("dosis");
+const elaboracionEl = document.getElementById("elaboracion");
+const resultadosEl = document.getElementById("resultados");
+const conclusionEl = document.getElementById("conclusion");
+const propuestaComercialEl = document.getElementById("propuestaComercial");
 const fotosInput = document.getElementById("fotos");
 
 /**********************
- * SUBMIT
+ * CARGAR CLIENTES (RESTAURADO)
+ **********************/
+async function cargarClientes() {
+  const snap = await getDocs(collection(db, "clientes"));
+
+  snap.forEach(docu => {
+    const cliente = docu.data();
+    const option = document.createElement("option");
+    option.value = docu.id;
+    option.textContent = cliente.nombre || "Cliente sin nombre";
+    option.dataset.nombre = cliente.nombre || "";
+    selectCliente.appendChild(option);
+  });
+}
+
+/**********************
+ * GUARDAR ENSAYO
  **********************/
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
-    const archivos = fotosInput.files;
+    const clienteOption =
+      selectCliente.options[selectCliente.selectedIndex];
+
+    /***************
+     * SUBIR FOTOS
+     ***************/
+    const archivos = fotosInput?.files || [];
     const urlsFotos = [];
 
-    if (archivos.length > 0) {
-      for (let i = 0; i < archivos.length; i++) {
-        const archivo = archivos[i];
+    for (let i = 0; i < archivos.length; i++) {
+      const archivo = archivos[i];
+      const storageRef = ref(
+        storage,
+        `ensayos/${Date.now()}_${archivo.name}`
+      );
 
-        const storageRef = ref(
-          storage,
-          `ensayos/${Date.now()}_${archivo.name}`
-        );
-
-        await uploadBytes(storageRef, archivo);
-        const url = await getDownloadURL(storageRef);
-        urlsFotos.push(url);
-      }
+      await uploadBytes(storageRef, archivo);
+      const url = await getDownloadURL(storageRef);
+      urlsFotos.push(url);
     }
 
-    await addDoc(collection(db, "ensayos"), {
-      fecha: Timestamp.fromDate(new Date(fecha.value)),
-      cliente: cliente.value,
-      producto: producto.value,
-      lote: lote.value,
-      analisis: analisis.value,
-      resultado: resultado.value,
-      observaciones: observaciones.value,
-      propuesta: propuesta.value,
-      fotos: urlsFotos,
-      creado: Timestamp.now()
-    });
+    /***************
+     * GUARDAR DOC
+     ***************/
+    const nuevoEnsayo = {
+      clienteId: selectCliente.value,
+      clienteNombre: clienteOption.dataset.nombre,
 
-    alert("Ensayo guardado correctamente");
-    form.reset();
+      nombreEnsayo: nombreEnsayoEl.value,
+      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+
+      propuesta: propuestaEl.value || "",
+      dosis: dosisEl.value || "",
+      elaboracion: elaboracionEl.value || "",
+      resultados: resultadosEl.value || "",
+      conclusion: conclusionEl.value || "",
+      propuestaComercial: propuestaComercialEl.value || "",
+
+      fotos: urlsFotos,
+      creadoEn: Timestamp.now()
+    };
+
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+
+    // redirige al ensayo
+    window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
-    console.error("Error al guardar el ensayo:", error);
+    console.error("Error guardando ensayo:", error);
     alert("Error al guardar el ensayo");
   }
 });
+
+/**********************
+ * INIT
+ **********************/
+cargarClientes();
