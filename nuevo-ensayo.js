@@ -7,6 +7,8 @@ import {
   collection,
   getDocs,
   addDoc,
+  updateDoc,
+  doc,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -55,11 +57,9 @@ async function cargarClientes() {
   snap.forEach(docu => {
     const cliente = docu.data();
     const option = document.createElement("option");
-
     option.value = docu.id;
     option.textContent = cliente.nombre || "Cliente sin nombre";
     option.dataset.nombre = cliente.nombre || "";
-
     selectCliente.appendChild(option);
   });
 }
@@ -74,12 +74,14 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
+    // 1️⃣ Crear ensayo
     const nuevoEnsayo = {
       clienteId: selectCliente.value,
-      clienteNombre: clienteOption?.dataset?.nombre || "",
-
+      clienteNombre: clienteOption.dataset.nombre,
       nombreEnsayo: nombreEnsayoEl.value,
-      fecha: Timestamp.fromDate(new Date(fechaEl.value)),
+      fecha: fechaEl.value
+        ? Timestamp.fromDate(new Date(fechaEl.value))
+        : Timestamp.now(),
 
       propuesta: propuestaEl.value || "",
       dosis: dosisEl.value || "",
@@ -92,22 +94,14 @@ form.addEventListener("submit", async (e) => {
       creadoEn: Timestamp.now()
     };
 
-    console.log("ENSAYO A GUARDAR:", nuevoEnsayo);
+    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
 
-    const docRef = await addDoc(
-      collection(db, "ensayos"),
-      nuevoEnsayo
-    );
-
-    /**********************
-     * SUBIR FOTOS (SI HAY)
-     **********************/
-    const files = fotosInput.files;
+    // 2️⃣ Subir fotos
     const fotosURLs = [];
+    const files = fotosInput.files;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-
       const storageRef = ref(
         storage,
         `ensayos/${docRef.id}/${Date.now()}_${file.name}`
@@ -118,13 +112,14 @@ form.addEventListener("submit", async (e) => {
       fotosURLs.push(url);
     }
 
+    // 3️⃣ Actualizar documento con fotos
     if (fotosURLs.length > 0) {
-      await addDoc(
-        collection(db, "ensayos", docRef.id, "fotos"),
-        { urls: fotosURLs }
-      );
+      await updateDoc(doc(db, "ensayos", docRef.id), {
+        fotos: fotosURLs
+      });
     }
 
+    // 4️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
   } catch (error) {
