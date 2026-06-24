@@ -49,32 +49,26 @@ const propuestaComercialEl = document.getElementById("propuestaComercial");
 const fotoEl = document.getElementById("fotoEnsayo");
 
 /**********************
- * CARGAR CLIENTES (ROBUSTO)
+ * CARGAR CLIENTES (UNA SOLA VEZ)
  **********************/
+let clientesCargados = false;
+
 async function cargarClientes() {
-  selectCliente.innerHTML = `<option value="">Cargando clientes...</option>`;
-  selectCliente.disabled = true;
+  if (clientesCargados) return;
+  clientesCargados = true;
 
-  try {
-    const snap = await getDocs(collection(db, "clientes"));
+  selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
 
-    selectCliente.innerHTML = `<option value="">Seleccionar cliente</option>`;
+  const snap = await getDocs(collection(db, "clientes"));
 
-    snap.forEach(docu => {
-      const cliente = docu.data();
-      const option = document.createElement("option");
-      option.value = docu.id;
-      option.textContent = cliente.nombre || "Cliente sin nombre";
-      option.dataset.nombre = cliente.nombre || "";
-      selectCliente.appendChild(option);
-    });
-
-    selectCliente.disabled = false;
-
-  } catch (err) {
-    console.error("Error cargando clientes", err);
-    selectCliente.innerHTML = `<option value="">Error al cargar clientes</option>`;
-  }
+  snap.forEach(docu => {
+    const cliente = docu.data();
+    const option = document.createElement("option");
+    option.value = docu.id;
+    option.textContent = cliente.nombre || "Cliente sin nombre";
+    option.dataset.nombre = cliente.nombre || "";
+    selectCliente.appendChild(option);
+  });
 }
 
 /**********************
@@ -84,7 +78,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (!selectCliente.value) {
-    alert("Tenés que seleccionar un cliente");
+    alert("Seleccioná un cliente");
     return;
   }
 
@@ -92,11 +86,10 @@ form.addEventListener("submit", async (e) => {
     const clienteOption =
       selectCliente.options[selectCliente.selectedIndex];
 
-    // 1️⃣ Crear ensayo base
-    const nuevoEnsayo = {
+    // 1️⃣ Crear ensayo sin imagen
+    const ensayoBase = {
       clienteId: selectCliente.value,
       clienteNombre: clienteOption.dataset.nombre || "",
-
       nombreEnsayo: nombreEnsayoEl.value || "",
       fecha: Timestamp.fromDate(new Date(fechaEl.value)),
 
@@ -111,9 +104,9 @@ form.addEventListener("submit", async (e) => {
       creadoEn: Timestamp.now()
     };
 
-    const docRef = await addDoc(collection(db, "ensayos"), nuevoEnsayo);
+    const docRef = await addDoc(collection(db, "ensayos"), ensayoBase);
 
-    // 2️⃣ Subir imagen SOLO si existe
+    // 2️⃣ Subir imagen si existe
     if (fotoEl.files.length > 0) {
       const file = fotoEl.files[0];
 
@@ -123,18 +116,18 @@ form.addEventListener("submit", async (e) => {
       );
 
       await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
+      const url = await getDownloadURL(storageRef);
 
       await updateDoc(doc(db, "ensayos", docRef.id), {
-        fotos: [downloadURL]
+        fotos: [url]
       });
     }
 
     // 3️⃣ Redirigir
     window.location.href = `ensayo.html?id=${docRef.id}`;
 
-  } catch (error) {
-    console.error("Error guardando ensayo:", error);
+  } catch (err) {
+    console.error(err);
     alert("Error al guardar el ensayo");
   }
 });
