@@ -1,7 +1,18 @@
+/* ====== AJUSTES ESTRUCTURALES MÍNIMOS ====== */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 /* layout general */
 .contenedor-ensayo {
   display: flex;
-  min-height: calc(100vh - 120px);
+  flex: 1; /* permite que el main ocupe entre header y footer */
 }
 
 /* menú izquierdo */
@@ -12,6 +23,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  align-self: stretch; /* 🔥 se estira del header al footer */
 }
 
 .menu-ensayo button {
@@ -69,11 +82,6 @@
   margin-bottom: 60px;
 }
 
-.bloque h3 {
-  margin-bottom: 8px;
-  color: #1f4e8c;
-}
-
 /* fotos */
 .fotos {
   display: grid;
@@ -98,21 +106,17 @@
 .bloque h3 {
   font-size: 22px;
   margin-bottom: 24px;
+  color: #1f4e8c;
 }
 
 /* 🔥 ENCABEZADO COMO PANTALLA */
 .encabezado-ensayo {
-  min-height: 85vh;              /* ocupa casi una pantalla */
+  min-height: 85vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;       /* centra vertical */
-  align-items: center;           /* centra horizontal */
+  justify-content: center;
+  align-items: center;
   text-align: center;
 
-  scroll-margin-top: 120px;      /* compensa header fijo */
+  scroll-margin-top: 120px;
 }
-
-
-
-
-
