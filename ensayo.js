@@ -163,7 +163,7 @@ function activarMenuSticky() {
 
   menu.style.position = "sticky";
   menu.style.top = "20px";
-  menu.style.alignSelf = "flex-start";
+
 }
 
 /**********************
