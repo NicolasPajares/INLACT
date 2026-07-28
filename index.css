@@ -43,10 +43,10 @@ header h2 {
 ================================ */
 main {
     padding: 25px;
-    max-width: 1200px;
-    margin: auto;
+    width: 100%;
+    max-width: none;
+    margin: 0;
 }
-
 /* ===============================
    TARJETAS
 ================================ */
