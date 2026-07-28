@@ -237,3 +237,10 @@ footer {
     background: #FFD54F;
     color: #333;
 }
+/* SOLO PARA ENSAYO */
+main.contenedor-ensayo{
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
