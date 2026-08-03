@@ -1,137 +1,286 @@
 /* ===============================
    RESET BÁSICO
 ================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 /* ===============================
-   BODY
+   ESTILOS GENERALES
 ================================ */
-body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f3f7fb;
-  color: #2c3e50;
+body{
+  font-family:"Segoe UI", Arial, sans-serif;
+  background:#f3f7fb;
+  color:#2c3e50;
 }
 
 /* ===============================
    MAIN
 ================================ */
-main {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+main{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
 }
 
 /* ===============================
-   BOTÓN NUEVO ENSAYO (IGUAL CLIENTES)
+   BOTÓN NUEVO ENSAYO
 ================================ */
-#btnNuevoEnsayo {
-  width: 100%;
-  padding: 18px;
-  margin-bottom: 25px;
+#btnNuevoEnsayo{
 
-  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  color: #ffffff;
+  width:100%;
+  padding:18px;
+  margin-bottom:25px;
 
-  border: none;
-  border-radius: 14px;
+  background:linear-gradient(135deg,#1f4e8c,#3b82f6);
+  color:#fff;
 
-  font-size: 20px;
-  font-weight: 700;
+  border:none;
+  border-radius:14px;
 
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  font-size:20px;
+  font-weight:700;
 
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor:pointer;
+
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+
+  transition:.2s;
+
 }
 
-#btnNuevoEnsayo:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+#btnNuevoEnsayo:hover{
+
+  transform:scale(1.03);
+  box-shadow:0 12px 25px rgba(0,0,0,.35);
+
 }
 
 /* ===============================
-   TÍTULO
+   TITULO
 ================================ */
-h2 {
-  font-size: 22px;
-  margin-bottom: 12px;
-  color: #1f4e8c;
+
+h2{
+
+  font-size:22px;
+  margin-bottom:12px;
+  color:#1f4e8c;
+
 }
 
 /* ===============================
    BUSCADOR
 ================================ */
-#buscadorEnsayos {
-  width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 20px;
 
-  font-size: 16px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  outline: none;
+#buscadorEnsayos{
+
+  width:100%;
+  padding:14px 16px;
+  margin-bottom:20px;
+
+  font-size:16px;
+
+  border-radius:10px;
+  border:1px solid #d1d5db;
+
+  outline:none;
+
 }
 
-#buscadorEnsayos:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+#buscadorEnsayos:focus{
+
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px rgba(59,130,246,.20);
+
 }
 
 /* ===============================
    LISTA
 ================================ */
-#listaEnsayos {
-  list-style: none;
+
+#listaEnsayos{
+
+  list-style:none;
+
 }
 
 /* ===============================
-   VOLVER
+   TARJETA ENSAYO
 ================================ */
-main button:last-of-type {
-  padding: 14px 20px;
-  font-size: 16px;
 
-  background: #ffffff;
-  border: 2px solid #1f4e8c;
-  color: #1f4e8c;
+.cliente-item{
 
-  border-radius: 12px;
-  cursor: pointer;
+  background:#fff;
 
-  transition: background 0.2s ease, color 0.2s ease;
+  padding:16px 18px;
+
+  margin-bottom:14px;
+
+  border-radius:14px;
+
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  cursor:pointer;
+
+  transition:.15s;
+
 }
 
-main button:last-of-type:hover {
-  background: #1f4e8c;
-  color: #ffffff;
+.cliente-item:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:0 10px 22px rgba(0,0,0,.15);
+
+}
+
+/* ===============================
+   INFORMACIÓN
+================================ */
+
+.cliente-info{
+
+  flex:1;
+
+}
+
+.cliente-info strong{
+
+  display:block;
+
+  font-size:18px;
+
+  margin:4px 0;
+
+}
+
+.cliente-info small{
+
+  display:block;
+
+  color:#6b7280;
+
+  font-size:14px;
+
+}
+
+/* ===============================
+   BOTÓN BORRAR
+================================ */
+
+.btn-borrar{
+
+  margin-left:12px;
+
+  width:42px;
+  height:42px;
+
+  border:none;
+  border-radius:50%;
+
+  background:#fee2e2;
+  color:#b91c1c;
+
+  font-size:20px;
+  font-weight:bold;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:.2s;
+
+}
+
+.btn-borrar:hover{
+
+  background:#fecaca;
+
+  transform:scale(1.10);
+
+}
+
+/* ===============================
+   BOTÓN VOLVER
+================================ */
+
+main button:last-of-type{
+
+  padding:14px 20px;
+
+  font-size:16px;
+
+  background:#fff;
+
+  border:2px solid #1f4e8c;
+
+  color:#1f4e8c;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+}
+
+main button:last-of-type:hover{
+
+  background:#1f4e8c;
+
+  color:#fff;
+
 }
 
 /* ===============================
    ACCESO ACTIVO
 ================================ */
-.quick-actions .action-card.active {
-    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
+
+.quick-actions .action-card.active{
+
+  background:linear-gradient(135deg,#1f4e8c,#3b82f6);
+
+  box-shadow:0 8px 22px rgba(31,78,140,.35);
+
 }
 
-.quick-actions .action-card.active span {
-    color: #ffffff;
+.quick-actions .action-card.active span{
+
+  color:#fff;
+
 }
 
-.quick-actions .action-card.active img {
-    filter: brightness(0) invert(1);
+.quick-actions .action-card.active img{
+
+  filter:brightness(0) invert(1);
+
 }
 
 /* ===============================
    RESPONSIVE
 ================================ */
-@media (min-width: 768px) {
-  #btnNuevoEnsayo {
-    font-size: 22px;
-    padding: 20px;
+
+@media (min-width:768px){
+
+  #btnNuevoEnsayo{
+
+    font-size:22px;
+    padding:20px;
+
   }
+
+  .cliente-item{
+
+    padding:18px 22px;
+
+  }
+
 }
