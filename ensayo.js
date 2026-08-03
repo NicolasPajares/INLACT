@@ -1,172 +1,192 @@
-/*************************
+/**********************
  * FIREBASE
- *************************/
+ **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getFirestore,
-  collection,
-  getDocs,
-  deleteDoc,
   doc,
-  query,
-  orderBy
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+/**********************
+ * CONFIG
+ **********************/
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
   projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
+  storageBucket: "inlact.firebasestorage.app",
   messagingSenderId: "143868382036",
   appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-/*************************
- * ELEMENTOS DOM
- *************************/
-const listaEnsayos = document.getElementById("listaEnsayos");
-const buscador = document.getElementById("buscadorEnsayos");
-const btnNuevoEnsayo = document.getElementById("btnNuevoEnsayo");
+/**********************
+ * URL PARAMS
+ **********************/
+const params = new URLSearchParams(window.location.search);
+const ensayoId = params.get("id");
+const esPublico = params.get("publico") === "1";
 
-let ensayos = [];
+/**********************
+ * INIT (AUTH)
+ **********************/
+signInAnonymously(auth)
+  .then(() => iniciar())
+  .catch(() => iniciar());
 
-/*************************
- * NUEVO ENSAYO
- *************************/
-btnNuevoEnsayo.addEventListener("click", () => {
-  window.location.href = "nuevo-ensayo.html";
-});
-
-/*************************
- * CARGAR ENSAYOS
- *************************/
-async function cargarEnsayos() {
-
-  listaEnsayos.innerHTML = "<li>Cargando ensayos...</li>";
-
-  ensayos = [];
-
-  const q = query(
-    collection(db, "ensayos"),
-    orderBy("fecha", "desc")
-  );
-
-  const snap = await getDocs(q);
-
-  snap.forEach(d => {
-    ensayos.push({
-      id: d.id,
-      ...d.data()
-    });
-  });
-
-  if (ensayos.length === 0) {
-    listaEnsayos.innerHTML = "<li>No hay ensayos cargados</li>";
-    return;
-  }
-
-  renderEnsayos(ensayos);
-
+async function iniciar() {
+  await cargarEnsayo();
+  activarMenuSticky();
+  activarScrollMenu();
 }
 
-/*************************
- * RENDER ENSAYOS
- *************************/
-function renderEnsayos(lista) {
+/**********************
+ * CARGAR ENSAYO
+ **********************/
+async function cargarEnsayo() {
+  if (!ensayoId) return;
 
-  listaEnsayos.innerHTML = "";
+  const refEnsayo = doc(db, "ensayos", ensayoId);
+  const snap = await getDoc(refEnsayo);
+  if (!snap.exists()) return;
 
-  lista.forEach(e => {
+  const data = snap.data();
 
-    const li = document.createElement("li");
-    li.className = "cliente-item";
+  document.getElementById("empresa").textContent =
+    data.clienteNombre || "";
 
-    // INFORMACIÓN
-    const info = document.createElement("div");
-    info.className = "cliente-info";
+  document.getElementById("nombre-ensayo").textContent =
+    data.nombreEnsayo || "";
 
-    const fecha = e.fecha?.toDate
-      ? e.fecha.toDate().toLocaleDateString("es-AR")
-      : "--/--/----";
+  document.getElementById("fecha").textContent =
+    data.fecha?.toDate().toLocaleDateString() || "";
 
-    info.innerHTML = `
-      <div class="fecha-ensayo">
-        ${fecha}
-      </div>
+  renderBloque("propuesta", "Propuesta", data.propuesta);
+  renderBloque("dosis", "Dosis", data.dosis);
+  renderBloque("elaboracion", "Elaboración", data.elaboracion);
+  renderBloque("resultados", "Resultados", data.resultados);
+  renderBloque("conclusion", "Conclusión", data.conclusion);
 
-      <div class="cliente-ensayo">
-        ${e.clienteNombre || "Cliente sin nombre"}
-      </div>
+  renderBloque(
+    "propuestacomercial",
+    "Propuesta comercial",
+    data.propuestaComercial
+  );
 
-      <div class="nombre-ensayo">
-        ${e.nombreEnsayo || "Ensayo sin nombre"}
-      </div>
+  renderImagenes(data.fotos || []);
+}
+
+/**********************
+ * RENDER BLOQUE TEXTO
+ **********************/
+function renderBloque(id, titulo, contenido) {
+  const contenedor = document.getElementById(id);
+  if (!contenedor) return;
+
+  contenedor.innerHTML = `
+    <h3 style="
+      color:#1f4e8c;
+      margin-bottom:12px;
+      font-weight:600;
+    ">
+      ${titulo}
+    </h3>
+    <p style="white-space:pre-line;">
+      ${contenido || "—"}
+    </p>
+  `;
+}
+
+/**********************
+ * RENDER IMÁGENES
+ **********************/
+function renderImagenes(fotos) {
+  const contenedor = document.getElementById("fotos");
+  if (!contenedor) return;
+
+  contenedor.innerHTML = `
+    <h3 style="
+      color:#1f4e8c;
+      margin-bottom:16px;
+      font-weight:600;
+    ">
+      Imágenes
+    </h3>
+  `;
+
+  fotos.forEach(url => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.style.width = "100%";
+    img.style.maxWidth = "480px";
+    img.style.display = "block";
+    img.style.marginBottom = "16px";
+    img.style.borderRadius = "12px";
+
+    contenedor.appendChild(img);
+  });
+
+  // SOLO EL USUARIO INTERNO VE EL LINK
+  if (!esPublico) {
+
+    const linkPublico =
+      `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
+
+    const linkDiv = document.createElement("div");
+    linkDiv.style.marginTop = "24px";
+
+    linkDiv.innerHTML = `
+      <h4 style="color:#1f4e8c; margin-bottom:8px;">
+        Link para los clientes
+      </h4>
+
+      <input
+        type="text"
+        value="${linkPublico}"
+        readonly
+        style="width:100%; padding:8px;"
+      />
     `;
 
-    info.onclick = () => {
-      window.location.href = `ensayo.html?id=${e.id}`;
-    };
-
-    /*************************
-     * BOTÓN BORRAR
-     *************************/
-    const btnBorrar = document.createElement("button");
-    btnBorrar.className = "btn-borrar";
-    btnBorrar.textContent = "✖";
-
-    btnBorrar.onclick = async (ev) => {
-
-      ev.stopPropagation();
-
-      const ok = confirm(
-        `¿Querés borrar el ensayo "${e.nombreEnsayo}"?`
-      );
-
-      if (!ok) return;
-
-      await deleteDoc(doc(db, "ensayos", e.id));
-
-      cargarEnsayos();
-
-    };
-
-    li.appendChild(info);
-    li.appendChild(btnBorrar);
-
-    listaEnsayos.appendChild(li);
-
-  });
-
+    contenedor.appendChild(linkDiv);
+  }
 }
-/*************************
- * BUSCADOR
- *************************/
-buscador.addEventListener("input", () => {
 
-  const texto = buscador.value.toLowerCase();
+/**********************
+ * MENU STICKY
+ **********************/
+function activarMenuSticky() {
+  const menu = document.querySelector(".menu-ensayo");
+  if (!menu) return;
 
-  const filtrados = ensayos.filter(e =>
+  menu.style.position = "sticky";
+  menu.style.top = "20px";
+}
 
-    (e.clienteNombre || "")
-      .toLowerCase()
-      .includes(texto)
+/**********************
+ * SCROLL MENU
+ **********************/
+function activarScrollMenu() {
+  const botones = document.querySelectorAll(".menu-ensayo button");
 
-    ||
+  botones.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.seccion;
+      const destino = document.getElementById(id);
+      if (!destino) return;
 
-    (e.nombreEnsayo || "")
-      .toLowerCase()
-      .includes(texto)
-
-  );
-
-  renderEnsayos(filtrados);
-
-});
-
-/*************************
- * INIT
- *************************/
-cargarEnsayos();
+      destino.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  });
+}
