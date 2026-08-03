@@ -6,6 +6,8 @@ import {
   getFirestore,
   collection,
   getDocs,
+  deleteDoc,
+  doc,
   query,
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -42,7 +44,9 @@ btnNuevoEnsayo.addEventListener("click", () => {
  * CARGAR ENSAYOS
  *************************/
 async function cargarEnsayos() {
-  listaEnsayos.innerHTML = "<li class='item-cargando'>Cargando ensayos...</li>";
+
+  listaEnsayos.innerHTML = "<li>Cargando ensayos...</li>";
+
   ensayos = [];
 
   const q = query(
@@ -52,16 +56,15 @@ async function cargarEnsayos() {
 
   const snap = await getDocs(q);
 
-  snap.forEach(docu => {
+  snap.forEach(d => {
     ensayos.push({
-      id: docu.id,
-      ...docu.data()
+      id: d.id,
+      ...d.data()
     });
   });
 
   if (ensayos.length === 0) {
-    listaEnsayos.innerHTML =
-      "<li class='item-vacio'>No hay ensayos cargados</li>";
+    listaEnsayos.innerHTML = "<li>No hay ensayos cargados</li>";
     return;
   }
 
@@ -72,48 +75,84 @@ async function cargarEnsayos() {
  * RENDER ENSAYOS
  *************************/
 function renderEnsayos(lista) {
+
   listaEnsayos.innerHTML = "";
 
   lista.forEach(e => {
+
     const li = document.createElement("li");
-    li.className = "ensayo-item";
+    li.className = "cliente-item";
 
     const fecha = e.fecha?.toDate
-      ? e.fecha.toDate().toLocaleDateString("es-AR", {
-          day: "2-digit",
-          month: "2-digit"
-        })
-      : "--/--";
+      ? e.fecha.toDate().toLocaleDateString("es-AR")
+      : "--/--/----";
 
-    li.innerHTML = `
-      <div class="ensayo-principal">
-        <strong>
-          ${fecha} ${e.clienteNombre || "Cliente sin nombre"} – 
-          ${e.nombreEnsayo || "Ensayo sin nombre"}
-        </strong>
-      </div>
+    // INFORMACIÓN
+    const info = document.createElement("div");
+    info.className = "cliente-info";
+
+    info.innerHTML = `
+      <small>${fecha}</small>
+      <strong>${e.clienteNombre || "Cliente sin nombre"}</strong>
+      <small>${e.nombreEnsayo || "Ensayo sin nombre"}</small>
     `;
 
-    li.addEventListener("click", () => {
+    info.onclick = () => {
       window.location.href = `ensayo.html?id=${e.id}`;
-    });
+    };
+
+    // BOTÓN BORRAR
+    const btnBorrar = document.createElement("button");
+    btnBorrar.className = "btn-borrar";
+    btnBorrar.textContent = "✖";
+
+    btnBorrar.onclick = async (ev) => {
+
+      ev.stopPropagation();
+
+      const ok = confirm(
+        `¿Querés borrar el ensayo "${e.nombreEnsayo}"?`
+      );
+
+      if (!ok) return;
+
+      await deleteDoc(doc(db, "ensayos", e.id));
+
+      cargarEnsayos();
+
+    };
+
+    li.appendChild(info);
+    li.appendChild(btnBorrar);
 
     listaEnsayos.appendChild(li);
-  });
-}
 
+  });
+
+}
 /*************************
  * BUSCADOR
  *************************/
 buscador.addEventListener("input", () => {
+
   const texto = buscador.value.toLowerCase();
 
   const filtrados = ensayos.filter(e =>
-    (e.clienteNombre || "").toLowerCase().includes(texto) ||
-    (e.nombreEnsayo || "").toLowerCase().includes(texto)
+
+    (e.clienteNombre || "")
+      .toLowerCase()
+      .includes(texto)
+
+    ||
+
+    (e.nombreEnsayo || "")
+      .toLowerCase()
+      .includes(texto)
+
   );
 
   renderEnsayos(filtrados);
+
 });
 
 /*************************
