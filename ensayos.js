@@ -69,6 +69,7 @@ async function cargarEnsayos() {
   }
 
   renderEnsayos(ensayos);
+
 }
 
 /*************************
@@ -83,25 +84,35 @@ function renderEnsayos(lista) {
     const li = document.createElement("li");
     li.className = "cliente-item";
 
-    const fecha = e.fecha?.toDate
-      ? e.fecha.toDate().toLocaleDateString("es-AR")
-      : "--/--/----";
-
     // INFORMACIÓN
     const info = document.createElement("div");
     info.className = "cliente-info";
 
+    const fecha = e.fecha?.toDate
+      ? e.fecha.toDate().toLocaleDateString("es-AR")
+      : "--/--/----";
+
     info.innerHTML = `
-      <small>${fecha}</small>
-      <strong>${e.clienteNombre || "Cliente sin nombre"}</strong>
-      <small>${e.nombreEnsayo || "Ensayo sin nombre"}</small>
+      <div class="fecha-ensayo">
+        ${fecha}
+      </div>
+
+      <div class="cliente-ensayo">
+        ${e.clienteNombre || "Cliente sin nombre"}
+      </div>
+
+      <div class="nombre-ensayo">
+        ${e.nombreEnsayo || "Ensayo sin nombre"}
+      </div>
     `;
 
     info.onclick = () => {
       window.location.href = `ensayo.html?id=${e.id}`;
     };
 
-    // BOTÓN BORRAR
+    /*************************
+     * BOTÓN BORRAR
+     *************************/
     const btnBorrar = document.createElement("button");
     btnBorrar.className = "btn-borrar";
     btnBorrar.textContent = "✖";
