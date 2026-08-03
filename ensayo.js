@@ -33,6 +33,7 @@ const auth = getAuth(app);
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
+const esPublico = params.get("publico") === "1";
 
 /**********************
  * INIT (AUTH)
@@ -43,8 +44,8 @@ signInAnonymously(auth)
 
 async function iniciar() {
   await cargarEnsayo();
-  activarMenuSticky();   // ✅ ÚNICO CAMBIO NUEVO
-  activarScrollMenu();   // (esto ya lo tenías / se mantiene)
+  activarMenuSticky();
+  activarScrollMenu();
 }
 
 /**********************
@@ -59,7 +60,6 @@ async function cargarEnsayo() {
 
   const data = snap.data();
 
-  // Encabezado
   document.getElementById("empresa").textContent =
     data.clienteNombre || "";
 
@@ -69,19 +69,18 @@ async function cargarEnsayo() {
   document.getElementById("fecha").textContent =
     data.fecha?.toDate().toLocaleDateString() || "";
 
-  // Secciones
   renderBloque("propuesta", "Propuesta", data.propuesta);
   renderBloque("dosis", "Dosis", data.dosis);
   renderBloque("elaboracion", "Elaboración", data.elaboracion);
   renderBloque("resultados", "Resultados", data.resultados);
   renderBloque("conclusion", "Conclusión", data.conclusion);
+
   renderBloque(
     "propuestacomercial",
     "Propuesta comercial",
     data.propuestaComercial
   );
 
-  // Imágenes
   renderImagenes(data.fotos || []);
 }
 
@@ -107,7 +106,7 @@ function renderBloque(id, titulo, contenido) {
 }
 
 /**********************
- * RENDER IMÁGENES + LINK CLIENTE
+ * RENDER IMÁGENES
  **********************/
 function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
@@ -131,31 +130,38 @@ function renderImagenes(fotos) {
     img.style.display = "block";
     img.style.marginBottom = "16px";
     img.style.borderRadius = "12px";
+
     contenedor.appendChild(img);
   });
 
-  const linkPublico =
-    `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
+  // SOLO EL USUARIO INTERNO VE EL LINK
+  if (!esPublico) {
 
-  const linkDiv = document.createElement("div");
-  linkDiv.style.marginTop = "24px";
+    const linkPublico =
+      `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
 
-  linkDiv.innerHTML = `
-    <h4 style="color:#1f4e8c; margin-bottom:8px;">
-      Link para los clientes
-    </h4>
-    <input type="text"
-      value="${linkPublico}"
-      readonly
-      style="width:100%; padding:8px;"
-    />
-  `;
+    const linkDiv = document.createElement("div");
+    linkDiv.style.marginTop = "24px";
 
-  contenedor.appendChild(linkDiv);
+    linkDiv.innerHTML = `
+      <h4 style="color:#1f4e8c; margin-bottom:8px;">
+        Link para los clientes
+      </h4>
+
+      <input
+        type="text"
+        value="${linkPublico}"
+        readonly
+        style="width:100%; padding:8px;"
+      />
+    `;
+
+    contenedor.appendChild(linkDiv);
+  }
 }
 
 /**********************
- * MENU STICKY (NUEVO)
+ * MENU STICKY
  **********************/
 function activarMenuSticky() {
   const menu = document.querySelector(".menu-ensayo");
@@ -163,11 +169,10 @@ function activarMenuSticky() {
 
   menu.style.position = "sticky";
   menu.style.top = "20px";
-
 }
 
 /**********************
- * SCROLL AL HACER CLICK EN MENU
+ * SCROLL MENU
  **********************/
 function activarScrollMenu() {
   const botones = document.querySelectorAll(".menu-ensayo button");
