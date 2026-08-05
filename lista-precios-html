@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+    <title>INLACT · Lista de precios</title>
+
+    <meta name="description" content="INLACT - Gestión de listas de precios">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS General -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="lista-precios.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+
+</header>
+
+<main>
+
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+
+<section class="quick-actions">
+
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
+    </a>
+
+    <a href="stock.html" class="action-card">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
+
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
+
+    <a href="precios.html" class="action-card active">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
+
+</section>
+
+<!-- ===============================
+     LISTAS DE PRECIOS
+================================ -->
+
+<section class="card">
+
+    <button id="btnNuevaLista">
+        ➕ Crear nueva lista de precios
+    </button>
+
+    <h2>Listado de listas de precios</h2>
+
+    <input
+        type="text"
+        id="buscadorListas"
+        placeholder="Buscar lista de precios..."
+    >
+
+    <ul id="listaPrecios"></ul>
+
+</section>
+
+<!-- ===============================
+     VOLVER
+================================ -->
+
+<section style="text-align:center; margin-top:20px;">
+
+    <button onclick="window.location.href='precios.html'">
+        ⬅ Volver
+    </button>
+
+</section>
+
+</main>
+
+<footer>
+
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+
+</footer>
+
+<script type="module" src="lista-precios.js"></script>
+
+</body>
+</html>
