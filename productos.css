@@ -1,0 +1,253 @@
+/* ==========================================
+   PRODUCTOS.CSS
+   ========================================== */
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f5f7fb;
+}
+
+/*==========================================
+  CONTENIDO
+==========================================*/
+
+main{
+
+    max-width:900px;
+
+    margin:auto;
+
+    padding:20px;
+
+}
+
+/*==========================================
+  BOTÓN NUEVO PRODUCTO
+==========================================*/
+
+#btnNuevoProducto{
+
+    width:100%;
+
+    padding:16px;
+
+    margin-bottom:25px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#1f78ff;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+#btnNuevoProducto:hover{
+
+    background:#005fe0;
+
+}
+
+/*==========================================
+  TITULO
+==========================================*/
+
+h2{
+
+    color:#1f78ff;
+
+    margin-bottom:15px;
+
+}
+
+/*==========================================
+  BUSCADOR
+==========================================*/
+
+#buscadorProductos{
+
+    width:100%;
+
+    padding:14px;
+
+    border:1px solid #d9d9d9;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    margin-bottom:20px;
+
+}
+
+/*==========================================
+  LISTA
+==========================================*/
+
+#listaProductos{
+
+    list-style:none;
+
+    padding:0;
+
+    margin:0;
+
+}
+
+/*==========================================
+  TARJETA
+==========================================*/
+
+.producto-item{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:18px;
+
+    margin-bottom:14px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+    transition:.2s;
+
+}
+
+.producto-item:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/*==========================================
+  INFORMACIÓN
+==========================================*/
+
+.producto-info{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.producto-info strong{
+
+    display:block;
+
+    color:#1f78ff;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.producto-info small{
+
+    display:block;
+
+    margin-top:6px;
+
+    color:#777;
+
+    font-size:15px;
+
+}
+
+/*==========================================
+  BOTÓN ELIMINAR
+==========================================*/
+
+.btn-borrar{
+
+    background:none;
+
+    border:none;
+
+    color:#8c8c8c;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    margin-left:15px;
+
+    transition:.2s;
+
+}
+
+.btn-borrar:hover{
+
+    color:#d50000;
+
+}
+
+/*==========================================
+  BOTÓN VOLVER
+==========================================*/
+
+#btnVolver{
+
+    width:100%;
+
+    margin-top:20px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#444;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+#btnVolver:hover{
+
+    background:#222;
+
+}
+
+/*==========================================
+  RESPONSIVE
+==========================================*/
+
+@media(max-width:700px){
+
+    .producto-item{
+
+        padding:16px;
+
+    }
+
+}
