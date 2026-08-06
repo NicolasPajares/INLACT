@@ -1,1 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>INLACT · Nuevo Producto</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="nuevo-producto.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+
+</header>
+
+<main>
+
+<section class="card">
+
+<h2>Nuevo Producto</h2>
+
+<form id="formProducto">
+
+<label>
+
+Código Art.
+
+<input
+type="text"
+id="codigo"
+required>
+
+</label>
+
+<label>
+
+Descripción
+
+<input
+type="text"
+id="descripcion"
+required>
+
+</label>
+
+<label>
+
+Unidad
+
+<select id="unidad" required>
+
+<option value="">Seleccionar...</option>
+
+<option value="Sobres">Sobres</option>
+
+<option value="Kg">Kg</option>
+
+<option value="Litros">Litros</option>
+
+</select>
+
+</label>
+
+<button
+type="submit"
+id="btnGuardar">
+
+Guardar Producto
+
+</button>
+
+<button
+type="button"
+id="btnCancelar">
+
+Cancelar
+
+</button>
+
+</form>
+
+</section>
+
+</main>
+
+<script type="module" src="nuevo-producto.js"></script>
+
+</body>
+
+</html>
