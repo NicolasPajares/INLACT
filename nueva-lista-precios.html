@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>INLACT · Nueva lista de precios</title>
+
+    <meta name="description" content="INLACT - Nueva lista de precios">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="nueva-lista-precios.css">
+</head>
+
+<body>
+
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+</header>
+
+<main>
+
+<section class="card card-formulario">
+
+    <h1>Crear nueva lista de precios</h1>
+
+    <form id="formNuevaLista">
+
+        <label for="nombreLista">
+            Nombre de la lista
+        </label>
+
+        <input
+            type="text"
+            id="nombreLista"
+            placeholder="Ej.: Lista General Agosto 2026"
+            required
+        >
+
+        <label for="fecha">
+            Fecha
+        </label>
+
+        <input
+            type="date"
+            id="fecha"
+            required
+        >
+
+        <hr>
+
+        <h2>Productos</h2>
+
+        <button
+            type="button"
+            id="btnAgregarProducto"
+            class="btn-agregar"
+        >
+            ➕ Agregar producto
+        </button>
+
+        <div id="listaProductos"></div>
+
+        <div class="acciones-form">
+
+            <button
+                type="submit"
+                class="btn-guardar"
+            >
+                💾 Guardar lista de precios
+            </button>
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="location.href='lista-precios.html'"
+            >
+                ✖ Cancelar
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+</main>
+
+<footer>
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+</footer>
+
+<script type="module" src="nueva-lista-precios.js"></script>
+
+</body>
+</html>
