@@ -1,0 +1,350 @@
+/* ===============================
+   RESET
+================================ */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:#f3f7fb;
+    color:#2c3e50;
+}
+
+/* ===============================
+   MAIN
+================================ */
+main{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+/* ===============================
+   BOTONES PRINCIPALES
+================================ */
+
+#btnProductos,
+#btnUbicaciones,
+#btnIngreso,
+#btnEgreso,
+#btnTransferencia{
+
+    width:100%;
+
+    padding:18px;
+
+    margin-bottom:16px;
+
+    background:linear-gradient(135deg,#1f4e8c,#3b82f6);
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:14px;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.22);
+
+    transition:.20s;
+}
+
+#btnProductos:hover,
+#btnUbicaciones:hover,
+#btnIngreso:hover,
+#btnEgreso:hover,
+#btnTransferencia:hover{
+
+    transform:scale(1.02);
+
+    box-shadow:0 12px 25px rgba(0,0,0,.30);
+
+}
+
+/* ===============================
+   TITULOS
+================================ */
+
+h2{
+
+    margin-top:20px;
+
+    margin-bottom:12px;
+
+    color:#1f4e8c;
+
+    font-size:22px;
+
+}
+
+/* ===============================
+   SELECT
+================================ */
+
+#ubicacionSeleccionada{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    margin-bottom:18px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    background:#fff;
+
+    outline:none;
+
+}
+
+#ubicacionSeleccionada:focus{
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 0 2px rgba(59,130,246,.18);
+
+}
+
+/* ===============================
+   BUSCADOR
+================================ */
+
+#buscadorStock{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    margin-bottom:20px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    outline:none;
+
+}
+
+#buscadorStock:focus{
+
+    border-color:#3b82f6;
+
+    box-shadow:0 0 0 2px rgba(59,130,246,.18);
+
+}
+
+/* ===============================
+   LISTA
+================================ */
+
+#listaStock{
+
+    list-style:none;
+
+}
+
+/* ===============================
+   TARJETA PRODUCTO
+================================ */
+
+.stock-item{
+
+    background:#fff;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    margin-bottom:15px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+
+    transition:.18s;
+
+}
+
+.stock-item:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 22px rgba(0,0,0,.15);
+
+}
+
+/* ===============================
+   INFORMACION
+================================ */
+
+.stock-info{
+
+    flex:1;
+
+    min-width:0;
+
+}
+
+.stock-info strong{
+
+    display:block;
+
+    color:#1f4e8c;
+
+    font-size:18px;
+
+    margin-bottom:6px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.stock-info small{
+
+    color:#6b7280;
+
+    font-size:15px;
+
+}
+
+/* ===============================
+   BOTON ELIMINAR
+================================ */
+
+.btn-borrar{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:12px;
+
+    border:2px solid #29579b;
+
+    background:#fff;
+
+    color:#29579b;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin-left:15px;
+
+    transition:.20s;
+
+}
+
+.btn-borrar:hover{
+
+    background:#29579b;
+
+    color:#fff;
+
+}
+
+/* ===============================
+   BOTON VOLVER
+================================ */
+
+main button:last-of-type{
+
+    padding:14px 20px;
+
+    font-size:16px;
+
+    background:#fff;
+
+    color:#1f4e8c;
+
+    border:2px solid #1f4e8c;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.20s;
+
+}
+
+main button:last-of-type:hover{
+
+    background:#1f4e8c;
+
+    color:#fff;
+
+}
+
+/* ===============================
+   DESKTOP
+================================ */
+
+@media(min-width:768px){
+
+#btnProductos,
+#btnUbicaciones,
+#btnIngreso,
+#btnEgreso,
+#btnTransferencia{
+
+    font-size:22px;
+
+    padding:20px;
+
+}
+
+.stock-item{
+
+    padding:20px 22px;
+
+}
+
+}
+
+/* ===============================
+   ACCESO ACTIVO
+================================ */
+
+.quick-actions .action-card.active{
+
+    background:linear-gradient(135deg,#1f4e8c,#3b82f6);
+
+    box-shadow:0 8px 22px rgba(31,78,140,.35);
+
+}
+
+.quick-actions .action-card.active span{
+
+    color:#fff;
+
+}
+
+.quick-actions .action-card.active img{
+
+    filter:brightness(0) invert(1);
+
+}
