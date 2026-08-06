@@ -1,37 +1,118 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Stock – INLACT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <title>INLACT · Stock</title>
+
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Gestión de stock">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="stock.css">
 </head>
 
 <body>
 
 <header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>STOCK</h2>
-  <nav>
-    <a href="index.html">Inicio</a>
-    <a href="clientes.html">Clientes</a>
-    <a href="ensayos.html">Ensayos</a>
-    <a href="precios.html">Precios</a>
-  </nav>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
 </header>
 
 <main>
-  <div class="card">
-    <h3>Insumos</h3>
-    <ul>
-      <li>Reactivo A – 12 unidades</li>
-      <li>Reactivo B – 5 unidades</li>
-      <li>Frascos estériles – 30 unidades</li>
-    </ul>
-  </div>
+
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+<section class="quick-actions">
+
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
+    </a>
+
+    <a href="stock.html" class="action-card active">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
+
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
+
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
+
+</section>
+
+<!-- ===============================
+     GESTIÓN DE STOCK
+================================ -->
+<section class="card">
+
+    <button id="btnProductos">
+        📦 Productos
+    </button>
+
+    <button id="btnUbicaciones">
+        📍 Ubicaciones
+    </button>
+
+    <button id="btnIngreso">
+        📥 Ingreso de stock
+    </button>
+
+    <button id="btnEgreso">
+        📤 Egreso de stock
+    </button>
+
+    <button id="btnTransferencia">
+        🔄 Transferencia
+    </button>
+
+    <h2>Existencias</h2>
+
+    <select id="ubicacionSeleccionada">
+        <option value="">Seleccionar ubicación...</option>
+    </select>
+
+    <input
+        type="text"
+        id="buscadorStock"
+        placeholder="Buscar producto..."
+    >
+
+    <ul id="listaStock"></ul>
+
+</section>
+
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
+
+    <button onclick="window.location.href='index.html'">
+        ⬅ Volver al inicio
+    </button>
+
+</section>
+
 </main>
+
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="stock.js"></script>
 
 </body>
 </html>
