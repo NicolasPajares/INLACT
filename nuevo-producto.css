@@ -1,103 +1,175 @@
-<!DOCTYPE html>
-<html lang="es">
+/* ===============================
+   RESET BÁSICO
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-<head>
+/* ===============================
+   ESTILOS GENERALES
+================================ */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f3f7fb;
+  color: #2c3e50;
+}
 
-    <meta charset="UTF-8">
+/* ===============================
+   MAIN
+================================ */
+main {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
 
-    <title>INLACT · Nuevo Producto</title>
+/* ===============================
+   TARJETA
+================================ */
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 25px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+/* ===============================
+   TITULO
+================================ */
+h2 {
+  color: #1f4e8c;
+  font-size: 24px;
+  margin-bottom: 25px;
+}
 
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="nuevo-producto.css">
+/* ===============================
+   LABELS
+================================ */
+label {
+  display: block;
+  margin-bottom: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
 
-</head>
+/* ===============================
+   INPUTS Y SELECT
+================================ */
+input,
+select {
 
-<body>
+  width: 100%;
 
-<header>
+  margin-top: 8px;
 
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
+  padding: 14px 16px;
 
-    <h2>NICOLÁS PAJARES</h2>
+  font-size: 16px;
 
-</header>
+  border: 1px solid #d1d5db;
 
-<main>
+  border-radius: 10px;
 
-<section class="card">
+  outline: none;
 
-<h2>Nuevo Producto</h2>
+  transition: .2s;
 
-<form id="formProducto">
+}
 
-<label>
+input:focus,
+select:focus {
 
-Código Art.
+  border-color: #3b82f6;
 
-<input
-type="text"
-id="codigo"
-required>
+  box-shadow: 0 0 0 2px rgba(59,130,246,.20);
 
-</label>
+}
 
-<label>
+/* ===============================
+   BOTÓN GUARDAR
+================================ */
+#btnGuardar {
 
-Descripción
+  width: 100%;
 
-<input
-type="text"
-id="descripcion"
-required>
+  margin-top: 15px;
 
-</label>
+  padding: 18px;
 
-<label>
+  background: linear-gradient(135deg,#1f4e8c,#3b82f6);
 
-Unidad
+  color: white;
 
-<select id="unidad" required>
+  border: none;
 
-<option value="">Seleccionar...</option>
+  border-radius: 14px;
 
-<option value="Sobres">Sobres</option>
+  font-size: 20px;
 
-<option value="Kg">Kg</option>
+  font-weight: 700;
 
-<option value="Litros">Litros</option>
+  cursor: pointer;
 
-</select>
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 
-</label>
+  transition: transform .2s, box-shadow .2s;
 
-<button
-type="submit"
-id="btnGuardar">
+}
 
-Guardar Producto
+#btnGuardar:hover {
 
-</button>
+  transform: scale(1.03);
 
-<button
-type="button"
-id="btnCancelar">
+  box-shadow: 0 12px 25px rgba(0,0,0,.35);
 
-Cancelar
+}
 
-</button>
+/* ===============================
+   BOTÓN CANCELAR
+================================ */
+#btnCancelar {
 
-</form>
+  width: 100%;
 
-</section>
+  margin-top: 15px;
 
-</main>
+  padding: 16px;
 
-<script type="module" src="nuevo-producto.js"></script>
+  background: #ffffff;
 
-</body>
+  color: #1f4e8c;
 
-</html>
+  border: 2px solid #1f4e8c;
+
+  border-radius: 12px;
+
+  font-size: 17px;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+}
+
+#btnCancelar:hover {
+
+  background: #1f4e8c;
+
+  color: #ffffff;
+
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (min-width:768px){
+
+  .card{
+
+    padding:35px;
+
+  }
+
+}
