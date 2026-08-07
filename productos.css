@@ -177,22 +177,40 @@ h2 {
    BOTÓN VOLVER
 ================================ */
 #btnVolver {
-  padding: 14px 20px;
+
+  display: block;
+
+  width: fit-content;
+
+  min-width: 170px;
+
+  margin: 25px auto 0;
+
+  padding: 14px 24px;
+
   font-size: 16px;
 
   background: #ffffff;
+
   border: 2px solid #1f4e8c;
+
   color: #1f4e8c;
 
   border-radius: 12px;
+
   cursor: pointer;
 
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background .2s ease,
+              color .2s ease;
+
 }
 
 #btnVolver:hover {
+
   background: #1f4e8c;
+
   color: #ffffff;
+
 }
 
 /* ===============================
