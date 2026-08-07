@@ -61,27 +61,55 @@ btnVolver.addEventListener("click", () => {
  **********************/
 async function cargarUbicaciones() {
 
-    const q = query(
-        collection(db, "ubicaciones"),
-        where("activo", "==", true),
-        orderBy("nombre")
-    );
+    try {
 
-    const snapshot = await getDocs(q);
+        const q = query(
+            collection(db, "ubicaciones"),
+            where("activo", "==", true),
+            orderBy("nombre")
+        );
 
-    ubicaciones = [];
+        const snapshot = await getDocs(q);
 
-    snapshot.forEach(doc => {
+        ubicaciones = [];
 
-        ubicaciones.push({
+        snapshot.forEach(doc => {
 
-            id: doc.id,
-
-            ...doc.data()
+            ubicaciones.push({
+                id: doc.id,
+                ...doc.data()
+            });
 
         });
 
-    });
+    } catch (error) {
+
+        console.error("Consulta con índice falló:", error);
+
+        const snapshot = await getDocs(collection(db, "ubicaciones"));
+
+        ubicaciones = [];
+
+        snapshot.forEach(doc => {
+
+            const datos = doc.data();
+
+            if (datos.activo) {
+
+                ubicaciones.push({
+                    id: doc.id,
+                    ...datos
+                });
+
+            }
+
+        });
+
+        ubicaciones.sort((a, b) =>
+            a.nombre.localeCompare(b.nombre)
+        );
+
+    }
 
     mostrarUbicaciones(ubicaciones);
 
