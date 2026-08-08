@@ -1,6 +1,7 @@
-/**********************
+/*********************************
  * FIREBASE
- **********************/
+ *********************************/
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
@@ -8,6 +9,11 @@ import {
     collection,
     getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+/*********************************
+ * CONFIG FIREBASE
+ *********************************/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -21,166 +27,242 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/**********************
+
+/*********************************
  * ELEMENTOS
- **********************/
+ *********************************/
 
-const btnProductos = document.getElementById("btnProductos");
-const btnUbicaciones = document.getElementById("btnUbicaciones");
-const btnIngreso = document.getElementById("btnIngreso");
-const btnEgreso = document.getElementById("btnEgreso");
-const btnTransferencia = document.getElementById("btnTransferencia");
+const btnProductos =
+    document.getElementById("btnProductos");
 
-const ubicacionSelect = document.getElementById("ubicacionSeleccionada");
-const buscador = document.getElementById("buscadorStock");
-const lista = document.getElementById("listaStock");
+const btnUbicaciones =
+    document.getElementById("btnUbicaciones");
 
-/**********************
+const btnIngreso =
+    document.getElementById("btnIngreso");
+
+const btnEgreso =
+    document.getElementById("btnEgreso");
+
+const btnTransferencia =
+    document.getElementById("btnTransferencia");
+
+const buscador =
+    document.getElementById("buscadorStock");
+
+const lista =
+    document.getElementById("listaStock");
+
+
+/*********************************
  * VARIABLES
- **********************/
+ *********************************/
 
-let ubicaciones = [];
 let existencias = [];
-let existenciasFiltradas = [];
 
-/**********************
+
+/*********************************
  * NAVEGACIÓN
- **********************/
+ *********************************/
 
 btnProductos.addEventListener("click", () => {
+
     window.location.href = "productos.html";
+
 });
+
 
 btnUbicaciones.addEventListener("click", () => {
+
     window.location.href = "ubicaciones.html";
+
 });
+
 
 btnIngreso.addEventListener("click", () => {
+
     window.location.href = "ingreso-stock.html";
+
 });
+
 
 btnEgreso.addEventListener("click", () => {
+
     window.location.href = "egreso-stock.html";
+
 });
+
 
 btnTransferencia.addEventListener("click", () => {
+
     window.location.href = "transferencia-stock.html";
+
 });
 
-/**********************
- * CARGAR UBICACIONES
- **********************/
 
-async function cargarUbicaciones() {
+/*********************************
+ * CARGAR STOCK
+ *********************************/
 
-    ubicacionSelect.innerHTML =
-        `<option value="">Seleccionar ubicación...</option>`;
+async function cargarExistencias() {
 
-    const snap = await getDocs(collection(db, "ubicaciones"));
+    try {
 
-    ubicaciones = [];
+        const snapshot =
+            await getDocs(
+                collection(db, "stock")
+            );
 
-    snap.forEach(doc => {
 
-        const datos = doc.data();
+        existencias = [];
 
-        if (datos.activo !== false) {
 
-            ubicaciones.push({
-                id: doc.id,
-                ...datos
-            });
+        snapshot.forEach(doc => {
 
-        }
+            const datos = doc.data();
 
-    });
 
-    ubicaciones.sort((a, b) =>
-        a.nombre.localeCompare(b.nombre)
-    );
+            /*
+             * Solo guardamos registros
+             * que tengan cantidad mayor a 0
+             */
 
-    ubicaciones.forEach(u => {
+            const cantidad =
+                Number(datos.cantidad || 0);
 
-        const option = document.createElement("option");
 
-        option.value = u.id;
-        option.textContent = u.nombre;
+            if (cantidad > 0) {
 
-        ubicacionSelect.appendChild(option);
+                existencias.push({
 
-    });
+                    id: doc.id,
+
+                    productoId:
+                        datos.productoId || "",
+
+                    productoNombre:
+                        datos.productoNombre || "Producto sin nombre",
+
+                    ubicacionId:
+                        datos.ubicacionId || "",
+
+                    ubicacionNombre:
+                        datos.ubicacionNombre || "Ubicación sin nombre",
+
+                    cantidad:
+                        cantidad,
+
+                    unidad:
+                        datos.unidad || ""
+
+                });
+
+            }
+
+        });
+
+
+        /*
+         * Ordenamos por producto
+         * y después por ubicación
+         */
+
+        existencias.sort((a, b) => {
+
+            const producto =
+                a.productoNombre.localeCompare(
+                    b.productoNombre
+                );
+
+            if (producto !== 0) {
+
+                return producto;
+
+            }
+
+            return a.ubicacionNombre.localeCompare(
+                b.ubicacionNombre
+            );
+
+        });
+
+
+        renderExistencias(existencias);
+
+
+    } catch (error) {
+
+        console.error(
+            "Error cargando stock:",
+            error
+        );
+
+
+        lista.innerHTML = `
+            <li class="stock-item">
+                <div class="stock-info">
+                    <strong>Error al cargar el stock</strong>
+                    <small>Revisá la consola para ver el error.</small>
+                </div>
+            </li>
+        `;
+
+    }
 
 }
 
-/**********************
- * CARGAR EXISTENCIAS
- *
- * (Temporal)
- * Luego leeremos
- * movimientos_stock
- **********************/
 
-function cargarExistencias() {
+/*********************************
+ * RENDER STOCK
+ *********************************/
 
-    existencias = [];
-
-    renderExistencias([]);
-
-}
-
-/**********************
- * RENDER
- **********************/
-
-function renderExistencias(listaProductos) {
+function renderExistencias(listaStock) {
 
     lista.innerHTML = "";
 
-    if (listaProductos.length === 0) {
 
-        lista.innerHTML =
-            "<li>No hay productos para mostrar.</li>";
+    if (listaStock.length === 0) {
+
+        lista.innerHTML = `
+            <li class="stock-item">
+                <div class="stock-info">
+                    <strong>No hay stock para mostrar.</strong>
+                </div>
+            </li>
+        `;
 
         return;
 
     }
-    listaProductos.forEach(p => {
 
-        const li = document.createElement("li");
+
+    listaStock.forEach(stock => {
+
+        const li =
+            document.createElement("li");
+
         li.className = "stock-item";
 
-        /*==============================
-          INFORMACIÓN
-        ==============================*/
 
-        const info = document.createElement("div");
+        const info =
+            document.createElement("div");
+
         info.className = "stock-info";
 
+
         info.innerHTML = `
-            <strong>${p.descripcion}</strong>
-            <small>${p.cantidad}</small>
+            <strong>${stock.productoNombre}</strong>
+
+            <small>
+                📍 ${stock.ubicacionNombre}
+                ·
+                ${stock.cantidad} ${stock.unidad}
+            </small>
         `;
 
-        /*==============================
-          BOTÓN BORRAR
-        ==============================*/
-
-        const btnBorrar = document.createElement("button");
-        btnBorrar.className = "btn-borrar";
-        btnBorrar.textContent = "✖";
-
-        btnBorrar.onclick = (e) => {
-
-            e.stopPropagation();
-
-            alert(
-                "Más adelante este botón permitirá editar, desactivar o eliminar el producto."
-            );
-
-        };
 
         li.appendChild(info);
-        li.appendChild(btnBorrar);
+
 
         lista.appendChild(li);
 
@@ -188,44 +270,79 @@ function renderExistencias(listaProductos) {
 
 }
 
-/**********************
- * CAMBIO DE UBICACIÓN
- **********************/
 
-ubicacionSelect.addEventListener("change", () => {
-
-    cargarExistencias();
-
-});
-
-/**********************
+/*********************************
  * BUSCADOR
- **********************/
+ *
+ * Busca tanto:
+ *
+ * 1. PRODUCTO
+ * 2. UBICACIÓN
+ *********************************/
 
 buscador.addEventListener("input", () => {
 
-    const texto = buscador.value.toLowerCase();
-
-    existenciasFiltradas = existencias.filter(p =>
-        (p.descripcion || "")
+    const texto =
+        buscador.value
         .toLowerCase()
-        .includes(texto)
-    );
+        .trim();
 
-    renderExistencias(existenciasFiltradas);
+
+    /*
+     * Si no hay texto,
+     * mostramos todo el stock.
+     */
+
+    if (texto === "") {
+
+        renderExistencias(existencias);
+
+        return;
+
+    }
+
+
+    /*
+     * Buscamos en:
+     *
+     * productoNombre
+     * ubicacionNombre
+     */
+
+    const resultado =
+        existencias.filter(stock => {
+
+            const producto =
+                (stock.productoNombre || "")
+                .toLowerCase();
+
+            const ubicacion =
+                (stock.ubicacionNombre || "")
+                .toLowerCase();
+
+
+            return (
+                producto.includes(texto) ||
+                ubicacion.includes(texto)
+            );
+
+        });
+
+
+    renderExistencias(resultado);
 
 });
 
-/**********************
- * INIT
- **********************/
+
+/*********************************
+ * INICIAR
+ *********************************/
 
 async function iniciar() {
 
-    await cargarUbicaciones();
-
-    cargarExistencias();
+    await cargarExistencias();
 
 }
+
 
 iniciar();
