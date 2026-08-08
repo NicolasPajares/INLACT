@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
-    <title>INLACT · Stock</title>
 
     <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Gestión de stock">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stock - INLACT</title>
 
     <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
 
     <!-- CSS específico -->
     <link rel="stylesheet" href="stock.css">
+
 </head>
 
 <body>
 
-<header>
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
+    <!-- ===============================
+         ENCABEZADO
+    ================================ -->
 
     <h2>NICOLÁS PAJARES</h2>
-</header>
 
-<main>
 
-<!-- ===============================
-     ACCESOS RÁPIDOS
-================================ -->
-<section class="quick-actions">
+    <!-- ===============================
+         ACCESOS PRINCIPALES
+    ================================ -->
 
     <a href="clientes.html" class="action-card">
         <img src="img/icon-clientes.svg" alt="">
@@ -52,67 +52,87 @@
         <span>Precios</span>
     </a>
 
-</section>
 
-<!-- ===============================
-     GESTIÓN DE STOCK
-================================ -->
-<section class="card">
+    <!-- ===============================
+         CONTENIDO PRINCIPAL
+    ================================ -->
 
-    <button id="btnProductos">
-        📦 Productos
-    </button>
+    <main>
 
-    <button id="btnUbicaciones">
-        📍 Ubicaciones
-    </button>
 
-    <button id="btnIngreso">
-        📥 Ingreso de stock
-    </button>
+        <!-- ===============================
+             BOTONES DE STOCK
+        ================================ -->
 
-    <button id="btnEgreso">
-        📤 Egreso de stock
-    </button>
+        <button id="btnProductos">
+            📦 Productos
+        </button>
 
-    <button id="btnTransferencia">
-        🔄 Transferencia
-    </button>
+        <button id="btnUbicaciones">
+            📍 Ubicaciones
+        </button>
 
-    <h2>Existencias</h2>
+        <button id="btnIngreso">
+            📥 Ingreso de stock
+        </button>
 
-    <select id="ubicacionSeleccionada">
-        <option value="">Seleccionar ubicación...</option>
-    </select>
+        <button id="btnEgreso">
+            📤 Egreso de stock
+        </button>
 
-    <input
-        type="text"
-        id="buscadorStock"
-        placeholder="Buscar producto..."
-    >
+        <button id="btnTransferencia">
+            🔄 Transferencia
+        </button>
 
-    <ul id="listaStock"></ul>
 
-</section>
+        <!-- ===============================
+             EXISTENCIAS
+        ================================ -->
 
-<!-- ===============================
-     VOLVER
-================================ -->
-<section style="text-align:center; margin-top:20px;">
+        <h2>Existencias</h2>
 
-    <button onclick="window.location.href='index.html'">
-        ⬅ Volver al inicio
-    </button>
 
-</section>
+        <!--
+            BUSCADOR ÚNICO
 
-</main>
+            Permite buscar:
+            - Producto
+            - Ubicación
+        -->
 
-<footer>
-    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
-</footer>
+        <input
+            type="text"
+            id="buscadorStock"
+            placeholder="Buscar producto o ubicación..."
+            autocomplete="off"
+        >
 
-<script type="module" src="stock.js"></script>
+
+        <!-- ===============================
+             LISTA DE EXISTENCIAS
+        ================================ -->
+
+        <ul id="listaStock"></ul>
+
+
+        <!-- ===============================
+             VOLVER
+        ================================ -->
+
+        <button onclick="window.location.href='index.html'">
+            ⬅ Volver al inicio
+        </button>
+
+
+    </main>
+
+
+    <!-- ===============================
+         JAVASCRIPT
+    ================================ -->
+
+    <script type="module" src="stock.js"></script>
 
 </body>
+
 </html>
