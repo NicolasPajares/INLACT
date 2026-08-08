@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+  <meta charset="UTF-8">
+  <title>Stock – INLACT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+    <meta charset="UTF-8">
+    <title>INLACT · Stock</title>
 
     <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Gestión de stock">
@@ -12,14 +17,11 @@
 
     <!-- CSS específico -->
     <link rel="stylesheet" href="stock.css">
-
 </head>
 
 <body>
 
-    <!-- ===============================
-         ENCABEZADO
-    ================================ -->
+<header>
 
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
@@ -27,10 +29,14 @@
 
     <h2>NICOLÁS PAJARES</h2>
 
+</header>
 
-    <!-- ===============================
-         MENÚ PRINCIPAL
-    ================================ -->
+<main>
+
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+<section class="quick-actions">
 
     <a href="clientes.html" class="action-card">
         <img src="img/icon-clientes.svg" alt="">
@@ -52,10 +58,12 @@
         <span>Precios</span>
     </a>
 
+</section>
 
-    <!-- ===============================
-         ACCIONES DE STOCK
-    ================================ -->
+<!-- ===============================
+     GESTIÓN DE STOCK
+================================ -->
+<section class="card">
 
     <button id="btnProductos">
         📦 Productos
@@ -77,52 +85,36 @@
         🔄 Transferencia
     </button>
 
-
-    <!-- ===============================
-         EXISTENCIAS
-    ================================ -->
-
     <h2>Existencias</h2>
-
-
-    <!--
-        BUSCADOR ÚNICO
-
-        Permitirá buscar:
-        - Productos
-        - Ubicaciones
-    -->
 
     <input
         type="text"
         id="buscadorStock"
         placeholder="Buscar producto o ubicación..."
-        autocomplete="off"
     >
-
-
-    <!-- ===============================
-         LISTA DE EXISTENCIAS
-    ================================ -->
 
     <ul id="listaStock"></ul>
 
+</section>
 
-    <!-- ===============================
-         VOLVER
-    ================================ -->
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
 
     <button onclick="window.location.href='index.html'">
         ⬅ Volver al inicio
     </button>
 
+</section>
 
-    <!-- ===============================
-         JAVASCRIPT
-    ================================ -->
+</main>
 
-    <script type="module" src="stock.js"></script>
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
+
+<script type="module" src="stock.js"></script>
 
 </body>
-
 </html>
