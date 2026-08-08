@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
+    <title>INLACT · Stock</title>
 
     <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Gestión de stock">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Stock - INLACT</title>
 
     <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
@@ -19,122 +17,102 @@
 
 <body>
 
-    <!-- ===============================
-         ENCABEZADO
-    ================================ -->
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
 
-    <header>
-        <h2>NICOLÁS PAJARES</h2>
-    </header>
+    <h2>NICOLÁS PAJARES</h2>
+</header>
 
+<main>
 
-    <!-- ===============================
-         ACCESOS PRINCIPALES
-    ================================ -->
+<!-- ===============================
+     ACCESOS RÁPIDOS
+================================ -->
+<section class="quick-actions">
 
-    <nav class="quick-actions">
+    <a href="clientes.html" class="action-card">
+        <img src="img/icon-clientes.svg" alt="">
+        <span>Clientes</span>
+    </a>
 
-        <a href="clientes.html" class="action-card">
-            <img src="img/icon-clientes.svg" alt="">
-            <span>Clientes</span>
-        </a>
+    <a href="stock.html" class="action-card active">
+        <img src="img/icon-stock.svg" alt="">
+        <span>Stock</span>
+    </a>
 
-        <a href="stock.html" class="action-card active">
-            <img src="img/icon-stock.svg" alt="">
-            <span>Stock</span>
-        </a>
+    <a href="ensayos.html" class="action-card">
+        <img src="img/icon-ensayos.svg" alt="">
+        <span>Ensayos</span>
+    </a>
 
-        <a href="ensayos.html" class="action-card">
-            <img src="img/icon-ensayos.svg" alt="">
-            <span>Ensayos</span>
-        </a>
+    <a href="precios.html" class="action-card">
+        <img src="img/icon-precios.svg" alt="">
+        <span>Precios</span>
+    </a>
 
-        <a href="precios.html" class="action-card">
-            <img src="img/icon-precios.svg" alt="">
-            <span>Precios</span>
-        </a>
+</section>
 
-    </nav>
+<!-- ===============================
+     GESTIÓN DE STOCK
+================================ -->
+<section class="card">
 
+    <button id="btnProductos">
+        📦 Productos
+    </button>
 
-    <!-- ===============================
-         CONTENIDO PRINCIPAL
-    ================================ -->
+    <button id="btnUbicaciones">
+        📍 Ubicaciones
+    </button>
 
-    <main>
+    <button id="btnIngreso">
+        📥 Ingreso de stock
+    </button>
 
-        <!-- ===============================
-             ACCIONES DE STOCK
-        ================================ -->
+    <button id="btnEgreso">
+        📤 Egreso de stock
+    </button>
 
-        <section class="stock-actions">
+    <button id="btnTransferencia">
+        🔄 Transferencia
+    </button>
 
-            <button id="btnProductos">
-                📦 Productos
-            </button>
+    <h2>Existencias</h2>
 
-            <button id="btnUbicaciones">
-                📍 Ubicaciones
-            </button>
+    <select id="ubicacionSeleccionada">
+        <option value="">Seleccionar ubicación...</option>
+    </select>
 
-            <button id="btnIngreso">
-                📥 Ingreso de stock
-            </button>
+    <input
+        type="text"
+        id="buscadorStock"
+        placeholder="Buscar producto..."
+    >
 
-            <button id="btnEgreso">
-                📤 Egreso de stock
-            </button>
+    <ul id="listaStock"></ul>
 
-            <button id="btnTransferencia">
-                🔄 Transferencia
-            </button>
+</section>
 
-        </section>
+<!-- ===============================
+     VOLVER
+================================ -->
+<section style="text-align:center; margin-top:20px;">
 
+    <button onclick="window.location.href='index.html'">
+        ⬅ Volver al inicio
+    </button>
 
-        <!-- ===============================
-             EXISTENCIAS
-        ================================ -->
+</section>
 
-        <section class="existencias">
+</main>
 
-            <h2>Existencias</h2>
+<footer>
+    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+</footer>
 
-
-            <!-- BUSCADOR DE PRODUCTO -->
-
-            <input
-                type="text"
-                id="buscadorStock"
-                placeholder="Buscar producto..."
-                autocomplete="off"
-            >
-
-
-            <!-- LISTA DE STOCK -->
-
-            <ul id="listaStock"></ul>
-
-        </section>
-
-
-        <!-- ===============================
-             VOLVER
-        ================================ -->
-
-        <button id="btnVolver">
-            ⬅ Volver al inicio
-        </button>
-
-    </main>
-
-
-    <!-- ===============================
-         JAVASCRIPT
-    ================================ -->
-
-    <script type="module" src="stock.js"></script>
+<script type="module" src="stock.js"></script>
 
 </body>
-
 </html>
