@@ -3,18 +3,14 @@
 
 <head>
 
-    <meta charset="UTF-8">
-
     <!-- SEO / Mobile -->
     <meta name="description" content="INLACT - Gestión de stock">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Stock - INLACT</title>
-
-    <!-- CSS base (misma estética que index) -->
+    <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
 
-    <!-- CSS específico de stock -->
+    <!-- CSS específico -->
     <link rel="stylesheet" href="stock.css">
 
 </head>
@@ -55,69 +51,60 @@
 
 
 <!-- ===============================
-     CONTENIDO STOCK
+     ACCIONES DE STOCK
 ================================ -->
 
-<main>
+<button id="btnProductos">
+    📦 Productos
+</button>
+
+<button id="btnUbicaciones">
+    📍 Ubicaciones
+</button>
+
+<button id="btnIngreso">
+    📥 Ingreso de stock
+</button>
+
+<button id="btnEgreso">
+    📤 Egreso de stock
+</button>
+
+<button id="btnTransferencia">
+    🔄 Transferencia
+</button>
 
 
-    <!-- ===============================
-         BOTONES DE STOCK
-    ================================ -->
+<!-- ===============================
+     EXISTENCIAS
+================================ -->
 
-    <button id="btnProductos">
-        📦 Productos
-    </button>
-
-    <button id="btnUbicaciones">
-        📍 Ubicaciones
-    </button>
-
-    <button id="btnIngreso">
-        📥 Ingreso de stock
-    </button>
-
-    <button id="btnEgreso">
-        📤 Egreso de stock
-    </button>
-
-    <button id="btnTransferencia">
-        🔄 Transferencia
-    </button>
+<h2>Existencias</h2>
 
 
-    <!-- ===============================
-         EXISTENCIAS
-    ================================ -->
+<!-- BUSCADOR ÚNICO
+     Busca productos o ubicaciones -->
 
-    <h2>Existencias</h2>
-
-
-    <!-- BUSCADOR ÚNICO -->
-
-    <input
-        type="text"
-        id="buscadorStock"
-        placeholder="Buscar producto o ubicación..."
-        autocomplete="off"
-    >
+<input
+    type="text"
+    id="buscadorStock"
+    placeholder="Buscar producto o ubicación..."
+    autocomplete="off"
+>
 
 
-    <!-- LISTA DE EXISTENCIAS -->
+<!-- LISTA DE EXISTENCIAS -->
 
-    <ul id="listaStock"></ul>
-
-
-    <!-- ===============================
-         VOLVER
-    ================================ -->
-
-    <button id="btnVolver">
-        ⬅ Volver al inicio
-    </button>
+<ul id="listaStock"></ul>
 
 
-</main>
+<!-- ===============================
+     VOLVER
+================================ -->
+
+<button onclick="window.location.href='index.html'">
+    ⬅ Volver al inicio
+</button>
 
 
 <!-- ===============================
@@ -125,7 +112,6 @@
 ================================ -->
 
 <script type="module" src="stock.js"></script>
-
 
 </body>
 
