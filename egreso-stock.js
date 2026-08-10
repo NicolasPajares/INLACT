@@ -1409,7 +1409,8 @@ form.addEventListener(
                 )
             );
 
-
+            
+            window.location.href = "stock.html";
             /*
             ===============================
             RECARGAR STOCK
