@@ -159,11 +159,13 @@ async function cargarExistencias() {
                         datos.ubicacionNombre ||
                         "Ubicación sin nombre",
 
-                    cantidad:
-                        cantidad,
+                    cantidad: cantidad,
 
                     unidad:
-                        datos.unidad || ""
+                    datos.unidad || "",
+
+                    observacion:
+                    datos.observacion || ""
 
                 });
 
