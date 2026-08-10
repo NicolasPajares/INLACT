@@ -1,0 +1,374 @@
+/* ===============================
+   RESET
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ===============================
+   TITULO
+================================ */
+
+.card-formulario h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    text-align: center;
+}
+
+
+/* ===============================
+   BODY
+================================ */
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f7fb;
+    color: #2c3e50;
+}
+
+
+/* ===============================
+   MAIN
+================================ */
+
+main {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+
+/* ===============================
+   FORMULARIO
+================================ */
+
+#formEgresoStock {
+    width: 100%;
+}
+
+
+/* ===============================
+   LABELS
+================================ */
+
+#formEgresoStock label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
+   INPUTS
+================================ */
+
+#formEgresoStock input,
+#formEgresoStock select,
+#formEgresoStock textarea {
+
+    width: 100%;
+
+    padding: 13px 15px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #fff;
+
+    color: #2c3e50;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition: .20s;
+}
+
+
+/* ===============================
+   FOCUS
+================================ */
+
+#formEgresoStock input:focus,
+#formEgresoStock select:focus,
+#formEgresoStock textarea:focus {
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 2px rgba(59, 130, 246, .18);
+}
+
+
+/* ===============================
+   CAMPOS SOLO LECTURA
+================================ */
+
+#cantidadDisponible {
+    background: #f3f7fb !important;
+    color: #1f4e8c !important;
+    font-weight: 600;
+}
+
+
+/* ===============================
+   TEXTAREA
+================================ */
+
+#formEgresoStock textarea {
+
+    resize: vertical;
+
+    min-height: 100px;
+}
+
+
+/* ===============================
+   LISTA DE PRODUCTOS
+   Y CLIENTES
+================================ */
+
+#listaProductos,
+#listaClientes {
+
+    width: 100%;
+
+    margin-top: -12px;
+
+    margin-bottom: 18px;
+
+    background: #fff;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow: 0 6px 15px rgba(0, 0, 0, .08);
+}
+
+
+/* ===============================
+   ELEMENTOS DE LAS LISTAS
+================================ */
+
+#listaProductos div,
+#listaClientes div {
+
+    padding: 12px 15px;
+
+    cursor: pointer;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+    border-bottom: 1px solid #edf0f3;
+
+    transition: .15s;
+}
+
+
+#listaProductos div:last-child,
+#listaClientes div:last-child {
+
+    border-bottom: none;
+}
+
+
+#listaProductos div:hover,
+#listaClientes div:hover {
+
+    background: #f3f7fb;
+
+    color: #1f4e8c;
+}
+
+
+/* ===============================
+   CONTENEDOR CLIENTE
+================================ */
+
+#contenedorCliente {
+    width: 100%;
+}
+
+
+/* ===============================
+   ACCIONES
+================================ */
+
+.acciones-form {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 10px;
+}
+
+
+/* ===============================
+   BOTON GUARDAR
+================================ */
+
+.btn-guardar {
+
+    flex: 1;
+
+    padding: 14px 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1f4e8c,
+            #3b82f6
+        );
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 15px rgba(31, 78, 140, .25);
+
+    transition: .20s;
+}
+
+
+.btn-guardar:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 20px rgba(31, 78, 140, .35);
+}
+
+
+/* ===============================
+   BOTON CANCELAR
+================================ */
+
+.btn-cancelar {
+
+    flex: 1;
+
+    padding: 14px 20px;
+
+    background: #fff;
+
+    color: #1f4e8c;
+
+    border: 2px solid #1f4e8c;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .20s;
+}
+
+
+.btn-cancelar:hover {
+
+    background: #1f4e8c;
+
+    color: #fff;
+}
+
+
+/* ===============================
+   FOOTER
+================================ */
+
+footer {
+
+    text-align: center;
+
+    padding: 25px 20px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+footer a {
+
+    color: #1f4e8c;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
+   DESKTOP
+================================ */
+
+@media (min-width: 768px) {
+
+    h1 {
+        font-size: 32px;
+    }
+
+
+    .acciones-form {
+
+        max-width: 600px;
+
+        margin-left: auto;
+
+        margin-right: auto;
+    }
+}
+
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+    .acciones-form {
+
+        flex-direction: column;
+    }
+
+
+    .btn-guardar,
+    .btn-cancelar {
+
+        width: 100%;
+    }
+}
