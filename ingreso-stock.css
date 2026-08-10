@@ -1,0 +1,314 @@
+/* ===============================
+   RESET
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ===============================
+   BODY
+================================ */
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f3f7fb;
+    color: #2c3e50;
+}
+
+
+/* ===============================
+   MAIN
+================================ */
+
+main {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+
+/* ===============================
+   TITULO PRINCIPAL
+================================ */
+
+h1 {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    font-size: 30px;
+}
+
+
+/* ===============================
+   TITULO USUARIO
+================================ */
+
+h2 {
+    margin-top: 20px;
+    margin-bottom: 12px;
+    color: #1f4e8c;
+    font-size: 22px;
+}
+
+
+/* ===============================
+   FORMULARIO
+================================ */
+
+#formIngresoStock {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+}
+
+
+/* ===============================
+   LABELS
+================================ */
+
+#formIngresoStock label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
+   INPUTS
+================================ */
+
+#formIngresoStock input,
+#formIngresoStock select,
+#formIngresoStock textarea {
+
+    width: 100%;
+
+    padding: 13px 15px;
+
+    margin-bottom: 18px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    background: #fff;
+
+    color: #2c3e50;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition: .20s;
+}
+
+
+/* ===============================
+   FOCUS
+================================ */
+
+#formIngresoStock input:focus,
+#formIngresoStock select:focus,
+#formIngresoStock textarea:focus {
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 2px rgba(59, 130, 246, .18);
+}
+
+
+/* ===============================
+   TEXTAREA
+================================ */
+
+#formIngresoStock textarea {
+
+    resize: vertical;
+
+    min-height: 100px;
+}
+
+
+/* ===============================
+   ACCIONES
+================================ */
+
+.acciones-form {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 10px;
+}
+
+
+/* ===============================
+   BOTON GUARDAR
+================================ */
+
+.btn-guardar {
+
+    flex: 1;
+
+    padding: 14px 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1f4e8c,
+            #3b82f6
+        );
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 15px rgba(31, 78, 140, .25);
+
+    transition: .20s;
+}
+
+
+.btn-guardar:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 20px rgba(31, 78, 140, .35);
+}
+
+
+/* ===============================
+   BOTON CANCELAR
+================================ */
+
+.btn-cancelar {
+
+    flex: 1;
+
+    padding: 14px 20px;
+
+    background: #fff;
+
+    color: #1f4e8c;
+
+    border: 2px solid #1f4e8c;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .20s;
+}
+
+
+.btn-cancelar:hover {
+
+    background: #1f4e8c;
+
+    color: #fff;
+}
+
+
+/* ===============================
+   FOOTER
+================================ */
+
+footer {
+
+    text-align: center;
+
+    padding: 25px 20px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+footer a {
+
+    color: #1f4e8c;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
+   DESKTOP
+================================ */
+
+@media (min-width: 768px) {
+
+    #formIngresoStock {
+
+        padding: 30px;
+    }
+
+
+    h1 {
+
+        font-size: 32px;
+    }
+
+
+    .acciones-form {
+
+        max-width: 600px;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+}
+
+
+/* ===============================
+   MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+    .acciones-form {
+
+        flex-direction: column;
+    }
+
+
+    .btn-guardar,
+    .btn-cancelar {
+
+        width: 100%;
+    }
+
+}
