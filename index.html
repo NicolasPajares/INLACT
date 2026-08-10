@@ -8,11 +8,21 @@
     <title>INLACT</title>
 
     <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Registro de visitas y clientes">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="description"
+        content="INLACT - Registro de visitas y clientes"
+    >
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <!-- CSS principal -->
-    <link rel="stylesheet" href="index.css">
+    <link
+        rel="stylesheet"
+        href="index.css"
+    >
 
     <!-- Leaflet CSS -->
     <link
@@ -22,12 +32,19 @@
 
 </head>
 
+
 <body>
+
 
 <header>
 
     <figure>
-        <img src="img/logo.jpg" alt="INLACT">
+
+        <img
+            src="img/logo.jpg"
+            alt="INLACT"
+        >
+
     </figure>
 
     <h2>NICOLÁS PAJARES</h2>
@@ -35,35 +52,67 @@
 </header>
 
 
+
 <main>
 
+
 <!-- ACCESOS RÁPIDOS -->
+
 <section class="quick-actions">
 
-    <a href="clientes.html" class="action-card">
+    <a
+        href="clientes.html"
+        class="action-card"
+    >
+
         <img src="img/icon-clientes.svg">
+
         <span>Clientes</span>
+
     </a>
 
-    <a href="stock.html" class="action-card">
+
+    <a
+        href="stock.html"
+        class="action-card"
+    >
+
         <img src="img/icon-stock.svg">
+
         <span>Stock</span>
+
     </a>
 
-    <a href="ensayos.html" class="action-card">
+
+    <a
+        href="ensayos.html"
+        class="action-card"
+    >
+
         <img src="img/icon-ensayos.svg">
+
         <span>Ensayos</span>
+
     </a>
 
-    <a href="precios.html" class="action-card">
+
+    <a
+        href="precios.html"
+        class="action-card"
+    >
+
         <img src="img/icon-precios.svg">
+
         <span>Precios</span>
+
     </a>
 
 </section>
 
 
+
 <!-- MAPA -->
+
 <section class="card">
 
     <h2>Mapa de clientes</h2>
@@ -73,7 +122,9 @@
 </section>
 
 
+
 <!-- VISITAS CERCANAS -->
+
 <section class="card">
 
     <h2>Visitas cercanas</h2>
@@ -84,13 +135,15 @@
 
     <div
         id="acciones"
-        class="lista-clientes">
-    </div>
+        class="lista-clientes"
+    ></div>
 
 </section>
 
 
+
 <!-- ÚLTIMAS VISITAS -->
+
 <section class="card">
 
     <h3>Últimas visitas</h3>
@@ -99,7 +152,8 @@
 
     <a
         href="#"
-        id="abrir-historial">
+        id="abrir-historial"
+    >
         Ver historial completo →
     </a>
 
@@ -109,29 +163,38 @@
 </main>
 
 
+
 <footer>
 
     <p>
+
         © INLACT ·
+
         <a href="aviso-legal.html">
             Aviso Legal
         </a>
+
     </p>
 
 </footer>
 
 
+
 <!-- Leaflet -->
+
 <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
 
 
 <!-- App principal -->
+
 <script
     type="module"
-    src="app.js">
-</script>
+    src="app.js"
+></script>
+
 
 
 <!-- ============================================================
@@ -141,20 +204,28 @@
 
 <script type="module">
 
+
 import {
     initializeApp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+}
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 
 import {
     getFirestore,
     collection,
     getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+}
+from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 
 /* ============================================================
    FIREBASE
    ============================================================ */
+
 
 const firebaseConfig = {
 
@@ -182,13 +253,16 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
+
 const db =
     getFirestore(app);
+
 
 
 /* ============================================================
    ELEMENTO
    ============================================================ */
+
 
 const lista =
     document.getElementById(
@@ -196,11 +270,14 @@ const lista =
     );
 
 
+
 /* ============================================================
    FECHA
    ============================================================ */
 
+
 function obtenerFecha(item) {
+
 
     /*
      * VISITAS
@@ -215,6 +292,7 @@ function obtenerFecha(item) {
         return item.fecha.toDate();
 
     }
+
 
 
     /*
@@ -258,6 +336,7 @@ function obtenerFecha(item) {
         const fecha =
             new Date(item.fecha);
 
+
         if (
             !isNaN(fecha.getTime())
         ) {
@@ -278,11 +357,14 @@ function obtenerFecha(item) {
 }
 
 
+
 /* ============================================================
    FORMATEAR FECHA
    ============================================================ */
 
+
 function mostrarFecha(fecha) {
+
 
     if (!fecha) {
 
@@ -294,28 +376,38 @@ function mostrarFecha(fecha) {
     return fecha.toLocaleString(
         "es-AR",
         {
+
             day: "2-digit",
+
             month: "2-digit",
+
             year: "numeric",
+
             hour: "2-digit",
+
             minute: "2-digit"
+
         }
     );
 
 }
 
 
+
 /* ============================================================
    CARGAR ACTIVIDADES
    ============================================================ */
 
+
 async function cargarUltimasActividades() {
+
 
     lista.innerHTML =
         "<li>Cargando...</li>";
 
 
     try {
+
 
         /*
          * Cargamos las dos colecciones
@@ -346,7 +438,49 @@ async function cargarUltimasActividades() {
         ]);
 
 
+
         const actividades = [];
+
+
+
+        /* ====================================================
+           IDENTIFICAR EGRESOS DE VENTA
+           ==================================================== */
+
+        /*
+         * Guardamos los ID de los egresos
+         * de tipo venta.
+         *
+         * Esto nos permite detectar cuando
+         * una venta también fue registrada
+         * en "visitas".
+         */
+
+        const idsEgresosVenta =
+            new Set();
+
+
+        egresosSnap.forEach(
+            docSnap => {
+
+                const e =
+                    docSnap.data();
+
+
+                if (
+                    e.tipoEgreso ===
+                    "venta"
+                ) {
+
+                    idsEgresosVenta.add(
+                        docSnap.id
+                    );
+
+                }
+
+            }
+        );
+
 
 
         /* ====================================================
@@ -356,12 +490,61 @@ async function cargarUltimasActividades() {
         visitasSnap.forEach(
             docSnap => {
 
+
                 const v =
                     docSnap.data();
 
 
+
+                /*
+                 * =================================================
+                 * EVITAR DUPLICAR LAS VENTAS
+                 * =================================================
+                 *
+                 * Cuando se registra una venta,
+                 * egreso-stock.js crea:
+                 *
+                 * 1. Un documento en "egresos"
+                 * 2. Un documento en "visitas"
+                 *
+                 * El documento de visitas contiene:
+                 *
+                 * egresoId
+                 *
+                 * Si ese egreso existe en "egresos",
+                 * NO agregamos esta visita al INDEX.
+                 *
+                 * La venta será mostrada desde "egresos".
+                 *
+                 * IMPORTANTE:
+                 *
+                 * Solo hacemos esto cuando:
+                 *
+                 * tipoVisita === "Venta"
+                 *
+                 * y existe egresoId.
+                 *
+                 * Las demás visitas siguen funcionando
+                 * exactamente igual.
+                 */
+
+                if (
+                    v.tipoVisita === "Venta" &&
+                    v.egresoId &&
+                    idsEgresosVenta.has(
+                        v.egresoId
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+
                 const fecha =
                     obtenerFecha(v);
+
 
 
                 actividades.push({
@@ -376,6 +559,7 @@ async function cargarUltimasActividades() {
 
                     cliente:
                         v.cliente ||
+                        v.clienteNombre ||
                         "Cliente sin nombre",
 
                     tipo:
@@ -395,24 +579,26 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
            EGRESOS - SOLO VENTAS
            ==================================================== */
 
+
         egresosSnap.forEach(
             docSnap => {
+
 
                 const e =
                     docSnap.data();
 
 
+
                 /*
-                 * IMPORTANTE:
+                 * Solo mostramos ventas.
                  *
-                 * Los demás egresos
-                 * no aparecen acá.
-                 *
-                 * Solo venta.
+                 * Otros egresos de stock
+                 * no aparecen en Últimas visitas.
                  */
 
                 if (
@@ -425,8 +611,10 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 const fecha =
                     obtenerFecha(e);
+
 
 
                 actividades.push({
@@ -467,23 +655,28 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
            ORDENAR POR FECHA
            MÁS RECIENTE PRIMERO
            ==================================================== */
 
+
         actividades.sort(
             (a, b) => {
+
 
                 const fechaA =
                     a.fecha
                         ? a.fecha.getTime()
                         : 0;
 
+
                 const fechaB =
                     b.fecha
                         ? b.fecha.getTime()
                         : 0;
+
 
                 return fechaB - fechaA;
 
@@ -491,8 +684,10 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /*
-         * Mostrar solamente las últimas 5
+         * Mostrar solamente
+         * las últimas 5
          */
 
         const ultimas =
@@ -502,7 +697,10 @@ async function cargarUltimasActividades() {
             );
 
 
-        lista.innerHTML = "";
+
+        lista.innerHTML =
+            "";
+
 
 
         if (
@@ -517,12 +715,15 @@ async function cargarUltimasActividades() {
         }
 
 
+
         /* ====================================================
            MOSTRAR
            ==================================================== */
 
+
         ultimas.forEach(
             actividad => {
+
 
                 const li =
                     document.createElement(
@@ -530,14 +731,17 @@ async function cargarUltimasActividades() {
                     );
 
 
+
                 /* =================================================
                    VENTA
                    ================================================= */
+
 
                 if (
                     actividad.origen ===
                     "venta"
                 ) {
+
 
                     li.innerHTML = `
 
@@ -583,14 +787,18 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 /* =================================================
                    VISITA / ENSAYO
                    ================================================= */
 
+
                 else {
+
 
                     let clase =
                         "tag-visita";
+
 
 
                     if (
@@ -626,14 +834,17 @@ async function cargarUltimasActividades() {
                     }
 
 
+
                     let productosHTML =
                         "";
+
 
 
                     if (
                         actividad.productos &&
                         actividad.productos.length
                     ) {
+
 
                         productosHTML =
                             actividad.productos
@@ -656,6 +867,7 @@ async function cargarUltimasActividades() {
                                 );
 
                     }
+
 
 
                     li.innerHTML = `
@@ -694,6 +906,7 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 lista.appendChild(
                     li
                 );
@@ -704,7 +917,9 @@ async function cargarUltimasActividades() {
 
     }
 
+
     catch (error) {
+
 
         console.error(
             "Error cargando actividades:",
@@ -729,22 +944,27 @@ async function cargarUltimasActividades() {
 }
 
 
+
 /* ============================================================
    INICIAR
    ============================================================ */
 
+
 cargarUltimasActividades();
+
 
 
 /* ============================================================
    HISTORIAL COMPLETO
    ============================================================ */
 
+
 document
     .getElementById(
         "abrir-historial"
     )
     .onclick = event => {
+
 
         event.preventDefault();
 
@@ -756,6 +976,7 @@ document
         );
 
     };
+
 
 </script>
 
