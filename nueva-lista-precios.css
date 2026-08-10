@@ -285,3 +285,43 @@ hr{
     }
 
 }
+/* ============================================================
+   BOTONES FINALES - CENTRADOS
+============================================================ */
+
+#formNuevaLista .acciones-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 700px;
+    margin: 30px auto 0 auto;
+}
+
+/* Los botones no ocupan todo el ancho */
+#formNuevaLista .acciones-form .btn-guardar,
+#formNuevaLista .acciones-form .btn-cancelar {
+    flex: 0 0 auto;
+    width: 220px;
+    max-width: 220px;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    #formNuevaLista .acciones-form {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    #formNuevaLista .acciones-form .btn-guardar,
+    #formNuevaLista .acciones-form .btn-cancelar {
+        width: 100%;
+        max-width: 350px;
+    }
+
+}
