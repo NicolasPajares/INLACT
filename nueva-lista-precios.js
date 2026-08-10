@@ -1,6 +1,6 @@
 /* ============================================================
    NUEVA LISTA DE PRECIOS
-   ============================================================ */
+============================================================ */
 
 import {
     initializeApp
@@ -17,7 +17,7 @@ import {
 
 /* ============================================================
    FIREBASE
-   ============================================================ */
+============================================================ */
 
 const firebaseConfig = {
 
@@ -51,7 +51,7 @@ const db =
 
 /* ============================================================
    ELEMENTOS
-   ============================================================ */
+============================================================ */
 
 const form =
     document.getElementById(
@@ -85,7 +85,7 @@ const listaProductos =
 
 /* ============================================================
    VARIABLES
-   ============================================================ */
+============================================================ */
 
 let productos = [];
 
@@ -93,8 +93,85 @@ let productosAgregados = [];
 
 
 /* ============================================================
+   BOTÓN AGREGAR PRODUCTO INFERIOR
+============================================================ */
+
+/*
+ * Creamos un segundo botón dinámicamente.
+ *
+ * De esta manera no hace falta modificar
+ * el HTML que ya tenés funcionando.
+ */
+
+const btnAgregarProductoInferior =
+    document.createElement(
+        "button"
+    );
+
+
+btnAgregarProductoInferior.type =
+    "button";
+
+
+btnAgregarProductoInferior.className =
+    "btn-agregar btn-agregar-inferior";
+
+
+btnAgregarProductoInferior.textContent =
+    "➕ Agregar producto";
+
+
+/*
+ * Lo agregamos inicialmente al final
+ * del contenedor de productos.
+ */
+
+listaProductos.appendChild(
+    btnAgregarProductoInferior
+);
+
+
+/*
+ * Función que mantiene el botón
+ * siempre debajo de la última fila.
+ */
+
+function actualizarBotonAgregarInferior() {
+
+    /*
+     * Lo sacamos temporalmente
+     * del contenedor.
+     */
+
+    if (
+        btnAgregarProductoInferior.parentElement ===
+        listaProductos
+    ) {
+
+        listaProductos.removeChild(
+            btnAgregarProductoInferior
+        );
+
+    }
+
+
+    /*
+     * Lo volvemos a poner al final.
+     *
+     * Así siempre queda debajo
+     * del último producto.
+     */
+
+    listaProductos.appendChild(
+        btnAgregarProductoInferior
+    );
+
+}
+
+
+/* ============================================================
    CARGAR PRODUCTOS
-   ============================================================ */
+============================================================ */
 
 async function cargarProductos() {
 
@@ -199,7 +276,7 @@ async function cargarProductos() {
 
 /* ============================================================
    CREAR SELECTOR DE PRODUCTOS
-   ============================================================ */
+============================================================ */
 
 function crearBuscadorProducto(
     contenedor,
@@ -264,7 +341,9 @@ function crearBuscadorProducto(
      * MOSTRAR PRODUCTO SELECCIONADO
      */
 
-    if (productoSeleccionado) {
+    if (
+        productoSeleccionado
+    ) {
 
         buscador.value =
             productoSeleccionado.descripcion;
@@ -381,6 +460,7 @@ function crearBuscadorProducto(
                         </strong>
 
                         <small>
+
                             ${
                                 producto.codigo
                                     ? `Código: ${producto.codigo}`
@@ -392,6 +472,7 @@ function crearBuscadorProducto(
                                     ? ` · ${producto.unidad}`
                                     : ""
                             }
+
                         </small>
 
                     `;
@@ -458,7 +539,7 @@ function crearBuscadorProducto(
 
 /* ============================================================
    SELECCIONAR PRODUCTO
-   ============================================================ */
+============================================================ */
 
 function seleccionarProducto(
     producto,
@@ -527,7 +608,9 @@ function seleccionarProducto(
      * Guardar producto en la fila
      */
 
-    if (fila) {
+    if (
+        fila
+    ) {
 
         fila.dataset.productoId =
             producto.id;
@@ -555,7 +638,9 @@ function seleccionarProducto(
             );
 
 
-        if (unidad) {
+        if (
+            unidad
+        ) {
 
             unidad.textContent =
                 producto.unidad ||
@@ -577,7 +662,7 @@ function seleccionarProducto(
 
 /* ============================================================
    CREAR FILA PRODUCTO
-   ============================================================ */
+============================================================ */
 
 function agregarFilaProducto() {
 
@@ -725,7 +810,17 @@ function agregarFilaProducto() {
 
             fila.remove();
 
+
             actualizarProductosAgregados();
+
+
+            /*
+             * Aseguramos que el botón
+             * inferior quede nuevamente
+             * debajo del último producto.
+             */
+
+            actualizarBotonAgregarInferior();
 
         }
     );
@@ -760,8 +855,14 @@ function agregarFilaProducto() {
     );
 
 
-    listaProductos.appendChild(
-        fila
+    /*
+     * Insertamos la fila antes
+     * del botón inferior.
+     */
+
+    listaProductos.insertBefore(
+        fila,
+        btnAgregarProductoInferior
     );
 
 
@@ -770,6 +871,14 @@ function agregarFilaProducto() {
      */
 
     actualizarProductosAgregados();
+
+
+    /*
+     * Mantener botón inferior
+     * al final.
+     */
+
+    actualizarBotonAgregarInferior();
 
 
     /*
@@ -782,7 +891,9 @@ function agregarFilaProducto() {
         );
 
 
-    if (input) {
+    if (
+        input
+    ) {
 
         input.focus();
 
@@ -793,7 +904,7 @@ function agregarFilaProducto() {
 
 /* ============================================================
    ACTUALIZAR PRODUCTOS AGREGADOS
-   ============================================================ */
+============================================================ */
 
 function actualizarProductosAgregados() {
 
@@ -872,8 +983,8 @@ function actualizarProductosAgregados() {
 
 
 /* ============================================================
-   AGREGAR PRODUCTO
-   ============================================================ */
+   AGREGAR PRODUCTO — BOTÓN SUPERIOR
+============================================================ */
 
 btnAgregarProducto.addEventListener(
     "click",
@@ -886,8 +997,22 @@ btnAgregarProducto.addEventListener(
 
 
 /* ============================================================
+   AGREGAR PRODUCTO — BOTÓN INFERIOR
+============================================================ */
+
+btnAgregarProductoInferior.addEventListener(
+    "click",
+    () => {
+
+        agregarFilaProducto();
+
+    }
+);
+
+
+/* ============================================================
    GUARDAR LISTA
-   ============================================================ */
+============================================================ */
 
 form.addEventListener(
     "submit",
@@ -1068,7 +1193,9 @@ form.addEventListener(
             );
 
 
-        if (botonGuardar) {
+        if (
+            botonGuardar
+        ) {
 
             botonGuardar.disabled =
                 true;
@@ -1117,7 +1244,9 @@ form.addEventListener(
             );
 
 
-            if (botonGuardar) {
+            if (
+                botonGuardar
+            ) {
 
                 botonGuardar.disabled =
                     false;
@@ -1135,7 +1264,7 @@ form.addEventListener(
 
 /* ============================================================
    FECHA POR DEFECTO
-   ============================================================ */
+============================================================ */
 
 function establecerFechaActual() {
 
@@ -1182,7 +1311,7 @@ function establecerFechaActual() {
 
 /* ============================================================
    INICIAR
-   ============================================================ */
+============================================================ */
 
 async function iniciar() {
 
