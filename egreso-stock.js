@@ -1,24 +1,25 @@
-/*************************************************
+/************************************************************
  * FIREBASE
- *************************************************/
+ ************************************************************/
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
     getFirestore,
     collection,
     getDocs,
     doc,
-    getDoc,
-    runTransaction,
+    updateDoc,
     addDoc,
     serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/*************************************************
+/************************************************************
  * CONFIG FIREBASE
- *************************************************/
+ ************************************************************/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -33,11 +34,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-/*************************************************
+/************************************************************
  * ELEMENTOS
- *************************************************/
+ ************************************************************/
 
-const formulario =
+const form =
     document.getElementById("formEgresoStock");
 
 const tipoEgreso =
@@ -49,22 +50,22 @@ const productoBuscador =
 const listaProductos =
     document.getElementById("listaProductos");
 
-const producto =
+const productoInput =
     document.getElementById("producto");
 
-const ubicacion =
+const ubicacionSelect =
     document.getElementById("ubicacion");
 
-const lote =
+const loteSelect =
     document.getElementById("lote");
 
 const cantidadDisponible =
     document.getElementById("cantidadDisponible");
 
-const cantidad =
+const cantidadInput =
     document.getElementById("cantidad");
 
-const unidad =
+const unidadSelect =
     document.getElementById("unidad");
 
 const contenedorCliente =
@@ -76,31 +77,31 @@ const clienteBuscador =
 const listaClientes =
     document.getElementById("listaClientes");
 
-const cliente =
+const clienteInput =
     document.getElementById("cliente");
 
-const fecha =
+const fechaInput =
     document.getElementById("fecha");
 
-const observacion =
+const observacionInput =
     document.getElementById("observacion");
 
 
-/*************************************************
+/************************************************************
  * VARIABLES
- *************************************************/
+ ************************************************************/
 
 let productos = [];
-let ubicaciones = [];
+let stock = [];
 let clientes = [];
-let existencias = [];
 
+let productoSeleccionado = null;
 let stockSeleccionado = null;
 
 
-/*************************************************
+/************************************************************
  * CARGAR PRODUCTOS
- *************************************************/
+ ************************************************************/
 
 async function cargarProductos() {
 
@@ -117,19 +118,40 @@ async function cargarProductos() {
 
             const datos = docSnap.data();
 
-            productos.push({
-                id: docSnap.id,
-                nombre:
-                    datos.nombre ||
-                    datos.descripcion ||
-                    "Producto sin nombre"
-            });
+            if (datos.activo !== false) {
+
+                productos.push({
+                    id: docSnap.id,
+                    ...datos
+                });
+
+            }
+
+        });
+
+        productos.sort((a, b) => {
+
+            const nombreA =
+                (
+                    a.descripcion ||
+                    a.nombre ||
+                    ""
+                ).toLowerCase();
+
+            const nombreB =
+                (
+                    b.descripcion ||
+                    b.nombre ||
+                    ""
+                ).toLowerCase();
+
+            return nombreA.localeCompare(nombreB);
 
         });
 
         console.log(
             "Productos cargados:",
-            productos
+            productos.length
         );
 
     } catch (error) {
@@ -139,58 +161,100 @@ async function cargarProductos() {
             error
         );
 
+        alert(
+            "No se pudieron cargar los productos."
+        );
+
     }
 }
 
 
-/*************************************************
- * CARGAR UBICACIONES
- *************************************************/
+/************************************************************
+ * CARGAR STOCK
+ ************************************************************/
 
-async function cargarUbicaciones() {
+async function cargarStock() {
 
     try {
 
         const snapshot =
             await getDocs(
-                collection(db, "ubicaciones")
+                collection(db, "stock")
             );
 
-        ubicaciones = [];
+        stock = [];
 
         snapshot.forEach(docSnap => {
 
-            const datos = docSnap.data();
+            const datos =
+                docSnap.data();
 
-            ubicaciones.push({
-                id: docSnap.id,
-                nombre:
-                    datos.nombre ||
-                    datos.descripcion ||
-                    "Ubicación sin nombre"
-            });
+            const cantidad =
+                Number(datos.cantidad || 0);
+
+            /*
+             * Solo stock disponible
+             */
+
+            if (cantidad > 0) {
+
+                stock.push({
+
+                    id: docSnap.id,
+
+                    productoId:
+                        datos.productoId || "",
+
+                    productoNombre:
+                        datos.productoNombre || "",
+
+                    lote:
+                        datos.lote || "",
+
+                    ubicacionId:
+                        datos.ubicacionId ||
+                        datos.ubicacionID ||
+                        "",
+
+                    ubicacionNombre:
+                        datos.ubicacionNombre ||
+                        "",
+
+                    cantidad:
+                        cantidad,
+
+                    unidad:
+                        datos.unidad || ""
+
+                });
+
+            }
 
         });
 
         console.log(
-            "Ubicaciones cargadas:",
-            ubicaciones
+            "Stock cargado:",
+            stock
         );
 
     } catch (error) {
 
         console.error(
-            "Error cargando ubicaciones:",
+            "Error cargando stock:",
             error
+        );
+
+        alert(
+            "No se pudo cargar el stock."
         );
 
     }
 }
 
 
-/*************************************************
+/************************************************************
  * CARGAR CLIENTES
- *************************************************/
+ ************************************************************/
 
 async function cargarClientes() {
 
@@ -205,21 +269,36 @@ async function cargarClientes() {
 
         snapshot.forEach(docSnap => {
 
-            const datos = docSnap.data();
+            const datos =
+                docSnap.data();
 
             clientes.push({
+
                 id: docSnap.id,
-                nombre:
-                    datos.nombre ||
-                    datos.nombreCliente ||
-                    "Cliente sin nombre"
+
+                ...datos
+
             });
+
+        });
+
+        clientes.sort((a, b) => {
+
+            const nombreA =
+                obtenerNombreCliente(a)
+                    .toLowerCase();
+
+            const nombreB =
+                obtenerNombreCliente(b)
+                    .toLowerCase();
+
+            return nombreA.localeCompare(nombreB);
 
         });
 
         console.log(
             "Clientes cargados:",
-            clientes
+            clientes.length
         );
 
     } catch (error) {
@@ -229,87 +308,36 @@ async function cargarClientes() {
             error
         );
 
-    }
-}
-
-
-/*************************************************
- * CARGAR STOCK
- *************************************************/
-
-async function cargarExistencias() {
-
-    try {
-
-        const snapshot =
-            await getDocs(
-                collection(db, "stock")
-            );
-
-        existencias = [];
-
-        snapshot.forEach(docSnap => {
-
-            const datos = docSnap.data();
-
-            const cantidadStock =
-                Number(datos.cantidad || 0);
-
-            if (cantidadStock > 0) {
-
-                existencias.push({
-
-                    id: docSnap.id,
-
-                    productoId:
-                        datos.productoId || "",
-
-                    productoNombre:
-                        datos.productoNombre ||
-                        "Producto sin nombre",
-
-                    ubicacionId:
-                        datos.ubicacionId || "",
-
-                    ubicacionNombre:
-                        datos.ubicacionNombre ||
-                        "Ubicación sin nombre",
-
-                    lote:
-                        datos.lote ||
-                        "Sin lote",
-
-                    cantidad:
-                        cantidadStock,
-
-                    unidad:
-                        datos.unidad || ""
-
-                });
-
-            }
-
-        });
-
-        console.log(
-            "Existencias cargadas:",
-            existencias
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Error cargando existencias:",
-            error
+        alert(
+            "No se pudieron cargar los clientes."
         );
 
     }
 }
 
 
-/*************************************************
+/************************************************************
+ * NOMBRE CLIENTE
+ ************************************************************/
+
+function obtenerNombreCliente(cliente) {
+
+    return (
+        cliente.nombre ||
+        cliente.razonSocial ||
+        cliente.razon_social ||
+        cliente.nombreFantasia ||
+        cliente.nombreCompleto ||
+        cliente.empresa ||
+        "Cliente sin nombre"
+    );
+
+}
+
+
+/************************************************************
  * BUSCADOR DE PRODUCTOS
- *************************************************/
+ ************************************************************/
 
 productoBuscador.addEventListener(
     "input",
@@ -320,52 +348,116 @@ productoBuscador.addEventListener(
                 .toLowerCase()
                 .trim();
 
-        producto.value = "";
+        productoInput.value = "";
+
+        productoSeleccionado = null;
+
+        stockSeleccionado = null;
+
+        ubicacionSelect.innerHTML = `
+            <option value="">
+                Seleccionar ubicación
+            </option>
+        `;
+
+        loteSelect.innerHTML = `
+            <option value="">
+                Seleccionar lote
+            </option>
+        `;
+
+        cantidadDisponible.value = "";
 
         listaProductos.innerHTML = "";
 
-        if (!texto) {
-
+        if (texto === "") {
             return;
-
         }
 
-        const resultados =
-            productos.filter(item =>
-                item.nombre
-                    .toLowerCase()
-                    .includes(texto)
-            );
 
-        resultados.forEach(item => {
+        /*
+         * Buscar producto
+         */
+
+        const resultados =
+            productos.filter(producto => {
+
+                const nombre =
+                    (
+                        producto.descripcion ||
+                        producto.nombre ||
+                        ""
+                    )
+                    .toLowerCase();
+
+                const codigo =
+                    (
+                        producto.codigo ||
+                        producto.codigoArt ||
+                        ""
+                    )
+                    .toLowerCase();
+
+                return (
+                    nombre.includes(texto) ||
+                    codigo.includes(texto)
+                );
+
+            });
+
+
+        if (resultados.length === 0) {
+
+            listaProductos.innerHTML = `
+                <div class="resultado-producto">
+                    No se encontraron productos.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        resultados.forEach(producto => {
 
             const opcion =
                 document.createElement("div");
 
-            opcion.textContent =
-                item.nombre;
-
             opcion.className =
-                "opcion-producto";
+                "resultado-producto";
+
+            opcion.textContent =
+                producto.descripcion ||
+                producto.nombre ||
+                "Producto sin nombre";
+
+
+            if (
+                producto.codigo ||
+                producto.codigoArt
+            ) {
+
+                opcion.textContent +=
+                    " · " +
+                    (
+                        producto.codigo ||
+                        producto.codigoArt
+                    );
+
+            }
+
 
             opcion.addEventListener(
                 "click",
                 () => {
 
-                    productoBuscador.value =
-                        item.nombre;
-
-                    producto.value =
-                        item.id;
-
-                    listaProductos.innerHTML = "";
-
-                    cargarUbicacionesProducto(
-                        item.id
+                    seleccionarProducto(
+                        producto
                     );
 
                 }
             );
+
 
             listaProductos.appendChild(
                 opcion
@@ -377,21 +469,122 @@ productoBuscador.addEventListener(
 );
 
 
-/*************************************************
- * UBICACIONES DEL PRODUCTO
- *************************************************/
+/************************************************************
+ * SELECCIONAR PRODUCTO
+ ************************************************************/
 
-function cargarUbicacionesProducto(
-    productoId
-) {
+function seleccionarProducto(producto) {
 
-    ubicacion.innerHTML = `
+    productoSeleccionado =
+        producto;
+
+    productoInput.value =
+        producto.id;
+
+    productoBuscador.value =
+        producto.descripcion ||
+        producto.nombre ||
+        "";
+
+    listaProductos.innerHTML = "";
+
+
+    /*
+     * Buscar TODAS las existencias
+     * de ese producto
+     */
+
+    const existenciasProducto =
+        stock.filter(item =>
+            item.productoId === producto.id &&
+            Number(item.cantidad) > 0
+        );
+
+
+    console.log(
+        "Existencias del producto:",
+        existenciasProducto
+    );
+
+
+    /*
+     * Si no tiene stock
+     */
+
+    if (
+        existenciasProducto.length === 0
+    ) {
+
+        alert(
+            "Este producto no tiene stock disponible."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Crear lista de ubicaciones
+     * sin repetir
+     */
+
+    const ubicacionesMap =
+        new Map();
+
+
+    existenciasProducto.forEach(item => {
+
+        if (
+            item.ubicacionId &&
+            !ubicacionesMap.has(
+                item.ubicacionId
+            )
+        ) {
+
+            ubicacionesMap.set(
+                item.ubicacionId,
+                item.ubicacionNombre ||
+                "Ubicación sin nombre"
+            );
+
+        }
+
+    });
+
+
+    ubicacionSelect.innerHTML = `
         <option value="">
             Seleccionar ubicación
         </option>
     `;
 
-    lote.innerHTML = `
+
+    ubicacionesMap.forEach(
+        (nombre, id) => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = id;
+
+            option.textContent =
+                nombre;
+
+            ubicacionSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /*
+     * Limpiar lote
+     */
+
+    loteSelect.innerHTML = `
         <option value="">
             Seleccionar lote
         </option>
@@ -399,63 +592,21 @@ function cargarUbicacionesProducto(
 
     cantidadDisponible.value = "";
 
-    stockSeleccionado = null;
-
-    const ubicacionesIds =
-        [
-            ...new Set(
-                existencias
-                    .filter(stock =>
-                        stock.productoId === productoId
-                    )
-                    .map(stock =>
-                        stock.ubicacionId
-                    )
-            )
-        ];
-
-    ubicacionesIds.forEach(
-        ubicacionId => {
-
-            const stock =
-                existencias.find(
-                    item =>
-                        item.productoId === productoId &&
-                        item.ubicacionId === ubicacionId
-                );
-
-            if (!stock) {
-                return;
-            }
-
-            const opcion =
-                document.createElement("option");
-
-            opcion.value =
-                ubicacionId;
-
-            opcion.textContent =
-                stock.ubicacionNombre;
-
-            ubicacion.appendChild(
-                opcion
-            );
-
-        }
-    );
-
 }
 
 
-/*************************************************
+/************************************************************
  * CAMBIO DE UBICACIÓN
- *************************************************/
+ ************************************************************/
 
-ubicacion.addEventListener(
+ubicacionSelect.addEventListener(
     "change",
     () => {
 
-        lote.innerHTML = `
+        const ubicacionId =
+            ubicacionSelect.value;
+
+        loteSelect.innerHTML = `
             <option value="">
                 Seleccionar lote
             </option>
@@ -465,14 +616,9 @@ ubicacion.addEventListener(
 
         stockSeleccionado = null;
 
-        const productoId =
-            producto.value;
-
-        const ubicacionId =
-            ubicacion.value;
 
         if (
-            !productoId ||
+            !productoSeleccionado ||
             !ubicacionId
         ) {
 
@@ -480,53 +626,80 @@ ubicacion.addEventListener(
 
         }
 
-        const lotes =
-            existencias.filter(
-                stock =>
-                    stock.productoId === productoId &&
-                    stock.ubicacionId === ubicacionId &&
-                    Number(stock.cantidad) > 0
+
+        /*
+         * Stock del producto
+         * en esa ubicación
+         */
+
+        const existencias =
+            stock.filter(item =>
+
+                item.productoId ===
+                    productoSeleccionado.id
+
+                &&
+
+                item.ubicacionId ===
+                    ubicacionId
+
+                &&
+
+                Number(item.cantidad) > 0
+
             );
 
-        lotes.forEach(
-            stock => {
 
-                const opcion =
-                    document.createElement("option");
+        console.log(
+            "Stock en ubicación:",
+            existencias
+        );
 
-                opcion.value =
-                    stock.id;
 
-                opcion.textContent =
-                    `${stock.lote} — ${stock.cantidad} ${stock.unidad}`;
+        /*
+         * Crear lotes
+         */
 
-                lote.appendChild(
-                    opcion
+        existencias.forEach(item => {
+
+            const option =
+                document.createElement(
+                    "option"
                 );
 
-            }
-        );
+            option.value =
+                item.id;
+
+            option.textContent =
+                `${item.lote} · ${item.cantidad} ${item.unidad}`;
+
+            loteSelect.appendChild(
+                option
+            );
+
+        });
 
     }
 );
 
 
-/*************************************************
+/************************************************************
  * CAMBIO DE LOTE
- *************************************************/
+ ************************************************************/
 
-lote.addEventListener(
+loteSelect.addEventListener(
     "change",
     () => {
 
         const stockId =
-            lote.value;
+            loteSelect.value;
 
         stockSeleccionado =
-            existencias.find(
-                stock =>
-                    stock.id === stockId
+            stock.find(
+                item =>
+                    item.id === stockId
             );
+
 
         if (!stockSeleccionado) {
 
@@ -537,22 +710,77 @@ lote.addEventListener(
 
         }
 
+
         cantidadDisponible.value =
             `${stockSeleccionado.cantidad} ${stockSeleccionado.unidad}`;
 
-        unidad.value =
+
+        /*
+         * Sugerir unidad
+         */
+
+        const unidad =
             stockSeleccionado.unidad;
 
-        cantidad.max =
-            stockSeleccionado.cantidad;
+        if (unidad) {
+
+            const existe =
+                Array.from(
+                    unidadSelect.options
+                ).some(
+                    option =>
+                        option.value === unidad
+                );
+
+            if (existe) {
+
+                unidadSelect.value =
+                    unidad;
+
+            }
+
+        }
 
     }
 );
 
 
-/*************************************************
+/************************************************************
+ * TIPO DE EGRESO
+ ************************************************************/
+
+tipoEgreso.addEventListener(
+    "change",
+    () => {
+
+        if (
+            tipoEgreso.value ===
+            "venta"
+        ) {
+
+            contenedorCliente.style.display =
+                "block";
+
+        } else {
+
+            contenedorCliente.style.display =
+                "none";
+
+            clienteBuscador.value = "";
+
+            clienteInput.value = "";
+
+            listaClientes.innerHTML = "";
+
+        }
+
+    }
+);
+
+
+/************************************************************
  * BUSCADOR DE CLIENTES
- *************************************************/
+ ************************************************************/
 
 clienteBuscador.addEventListener(
     "input",
@@ -563,49 +791,88 @@ clienteBuscador.addEventListener(
                 .toLowerCase()
                 .trim();
 
-        cliente.value = "";
+        clienteInput.value = "";
 
         listaClientes.innerHTML = "";
 
-        if (!texto) {
+
+        if (texto === "") {
+            return;
+        }
+
+
+        const resultados =
+            clientes.filter(cliente => {
+
+                const nombre =
+                    obtenerNombreCliente(
+                        cliente
+                    )
+                    .toLowerCase();
+
+                const codigo =
+                    (
+                        cliente.codigo ||
+                        cliente.codigoCliente ||
+                        ""
+                    )
+                    .toLowerCase();
+
+                return (
+                    nombre.includes(texto) ||
+                    codigo.includes(texto)
+                );
+
+            });
+
+
+        if (resultados.length === 0) {
+
+            listaClientes.innerHTML = `
+                <div class="resultado-cliente">
+                    No se encontraron clientes.
+                </div>
+            `;
 
             return;
 
         }
 
-        const resultados =
-            clientes.filter(item =>
-                item.nombre
-                    .toLowerCase()
-                    .includes(texto)
-            );
 
-        resultados.forEach(item => {
+        resultados.forEach(cliente => {
 
             const opcion =
-                document.createElement("div");
-
-            opcion.textContent =
-                item.nombre;
+                document.createElement(
+                    "div"
+                );
 
             opcion.className =
-                "opcion-cliente";
+                "resultado-cliente";
+
+            opcion.textContent =
+                obtenerNombreCliente(
+                    cliente
+                );
+
 
             opcion.addEventListener(
                 "click",
                 () => {
 
-                    clienteBuscador.value =
-                        item.nombre;
+                    clienteInput.value =
+                        cliente.id;
 
-                    cliente.value =
-                        item.id;
+                    clienteBuscador.value =
+                        obtenerNombreCliente(
+                            cliente
+                        );
 
                     listaClientes.innerHTML =
                         "";
 
                 }
             );
+
 
             listaClientes.appendChild(
                 opcion
@@ -617,37 +884,37 @@ clienteBuscador.addEventListener(
 );
 
 
-/*************************************************
- * TIPO DE EGRESO
- *************************************************/
+/************************************************************
+ * CLICK FUERA DE LOS BUSCADORES
+ ************************************************************/
 
-tipoEgreso.addEventListener(
-    "change",
-    () => {
+document.addEventListener(
+    "click",
+    event => {
 
         if (
-            tipoEgreso.value === "venta"
+            !productoBuscador.contains(
+                event.target
+            ) &&
+            !listaProductos.contains(
+                event.target
+            )
         ) {
 
-            contenedorCliente.style.display =
-                "block";
-
-            clienteBuscador.required =
-                true;
-
-        } else {
-
-            contenedorCliente.style.display =
-                "none";
-
-            clienteBuscador.required =
-                false;
-
-            clienteBuscador.value =
+            listaProductos.innerHTML =
                 "";
 
-            cliente.value =
-                "";
+        }
+
+
+        if (
+            !clienteBuscador.contains(
+                event.target
+            ) &&
+            !listaClientes.contains(
+                event.target
+            )
+        ) {
 
             listaClientes.innerHTML =
                 "";
@@ -658,258 +925,62 @@ tipoEgreso.addEventListener(
 );
 
 
-/*************************************************
- * VALIDAR CANTIDAD
- *************************************************/
+/************************************************************
+ * FECHA ACTUAL
+ ************************************************************/
 
-cantidad.addEventListener(
-    "input",
-    () => {
+function colocarFechaActual() {
 
-        if (!stockSeleccionado) {
-            return;
-        }
+    const hoy =
+        new Date();
 
-        const valor =
-            Number(cantidad.value);
+    const año =
+        hoy.getFullYear();
 
-        if (
-            valor >
-            stockSeleccionado.cantidad
-        ) {
+    const mes =
+        String(
+            hoy.getMonth() + 1
+        ).padStart(2, "0");
 
-            cantidad.value =
-                stockSeleccionado.cantidad;
+    const dia =
+        String(
+            hoy.getDate()
+        ).padStart(2, "0");
 
-        }
+    fechaInput.value =
+        `${año}-${mes}-${dia}`;
 
-    }
-);
+}
 
 
-/*************************************************
- * GUARDAR EGRESO
- *************************************************/
-
-formulario.addEventListener(
-    "submit",
-    async event => {
-
-        event.preventDefault();
-
-        if (!stockSeleccionado) {
-
-            alert(
-                "Seleccioná un producto, ubicación y lote."
-            );
-
-            return;
-
-        }
-
-        const cantidadRetirar =
-            Number(cantidad.value);
-
-        if (
-            !cantidadRetirar ||
-            cantidadRetirar <= 0
-        ) {
-
-            alert(
-                "Ingresá una cantidad válida."
-            );
-
-            return;
-
-        }
-
-        if (
-            cantidadRetirar >
-            stockSeleccionado.cantidad
-        ) {
-
-            alert(
-                "No podés retirar más cantidad de la disponible."
-            );
-
-            return;
-
-        }
-
-        if (
-            tipoEgreso.value === "venta" &&
-            !cliente.value
-        ) {
-
-            alert(
-                "Seleccioná un cliente."
-            );
-
-            return;
-
-        }
-
-        try {
-
-            const stockRef =
-                doc(
-                    db,
-                    "stock",
-                    stockSeleccionado.id
-                );
-
-            await runTransaction(
-                db,
-                async transaction => {
-
-                    const stockDoc =
-                        await transaction.get(
-                            stockRef
-                        );
-
-                    if (!stockDoc.exists()) {
-
-                        throw new Error(
-                            "El registro de stock ya no existe."
-                        );
-
-                    }
-
-                    const datos =
-                        stockDoc.data();
-
-                    const cantidadActual =
-                        Number(
-                            datos.cantidad || 0
-                        );
-
-                    if (
-                        cantidadRetirar >
-                        cantidadActual
-                    ) {
-
-                        throw new Error(
-                            "La cantidad disponible cambió. Actualizá la página."
-                        );
-
-                    }
-
-                    const nuevaCantidad =
-                        cantidadActual -
-                        cantidadRetirar;
-
-                    transaction.update(
-                        stockRef,
-                        {
-                            cantidad:
-                                nuevaCantidad
-                        }
-                    );
-
-                }
-            );
-
-
-            /****************************************
-             * REGISTRAR MOVIMIENTO
-             ****************************************/
-
-            await addDoc(
-                collection(
-                    db,
-                    "movimientosStock"
-                ),
-                {
-
-                    tipo:
-                        tipoEgreso.value,
-
-                    productoId:
-                        stockSeleccionado.productoId,
-
-                    productoNombre:
-                        stockSeleccionado.productoNombre,
-
-                    ubicacionId:
-                        stockSeleccionado.ubicacionId,
-
-                    ubicacionNombre:
-                        stockSeleccionado.ubicacionNombre,
-
-                    lote:
-                        stockSeleccionado.lote,
-
-                    cantidad:
-                        cantidadRetirar,
-
-                    unidad:
-                        stockSeleccionado.unidad,
-
-                    clienteId:
-                        cliente.value || null,
-
-                    clienteNombre:
-                        clienteBuscador.value || null,
-
-                    fecha:
-                        fecha.value,
-
-                    observacion:
-                        observacion.value || "",
-
-                    creadoEn:
-                        serverTimestamp()
-
-                }
-            );
-
-
-            alert(
-                "Egreso registrado correctamente."
-            );
-
-            window.location.href =
-                "stock.html";
-
-        } catch (error) {
-
-            console.error(
-                "Error registrando egreso:",
-                error
-            );
-
-            alert(
-                error.message ||
-                "No se pudo registrar el egreso."
-            );
-
-        }
-
-    }
-);
-
-
-/*************************************************
+/************************************************************
  * INICIAR
- *************************************************/
+ ************************************************************/
 
 async function iniciar() {
 
+    colocarFechaActual();
+
+    /*
+     * Al entrar como ajuste,
+     * ocultamos cliente.
+     */
+
     contenedorCliente.style.display =
         "none";
+
 
     await Promise.all([
 
         cargarProductos(),
 
-        cargarUbicaciones(),
+        cargarStock(),
 
-        cargarClientes(),
-
-        cargarExistencias()
+        cargarClientes()
 
     ]);
 
 }
+
 
 iniciar();
