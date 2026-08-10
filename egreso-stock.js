@@ -1,9 +1,11 @@
-/************************************************************
- * FIREBASE
- ************************************************************/
+/*
+************************************************************
+* FIREBASE
+************************************************************
+*/
 
 import { initializeApp } from
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
     getFirestore,
@@ -14,12 +16,14 @@ import {
     addDoc,
     serverTimestamp
 } from
-    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/************************************************************
- * CONFIG FIREBASE
- ************************************************************/
+/*
+************************************************************
+* CONFIG FIREBASE
+************************************************************
+*/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -34,9 +38,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-/************************************************************
- * ELEMENTOS
- ************************************************************/
+/*
+************************************************************
+* ELEMENTOS
+************************************************************
+*/
 
 const form =
     document.getElementById("formEgresoStock");
@@ -87,9 +93,11 @@ const observacionInput =
     document.getElementById("observacion");
 
 
-/************************************************************
- * VARIABLES
- ************************************************************/
+/*
+************************************************************
+* VARIABLES
+************************************************************
+*/
 
 let productos = [];
 let stock = [];
@@ -99,9 +107,11 @@ let productoSeleccionado = null;
 let stockSeleccionado = null;
 
 
-/************************************************************
- * CARGAR PRODUCTOS
- ************************************************************/
+/*
+************************************************************
+* CARGAR PRODUCTOS
+************************************************************
+*/
 
 async function cargarProductos() {
 
@@ -166,12 +176,15 @@ async function cargarProductos() {
         );
 
     }
+
 }
 
 
-/************************************************************
- * CARGAR STOCK
- ************************************************************/
+/*
+************************************************************
+* CARGAR STOCK
+************************************************************
+*/
 
 async function cargarStock() {
 
@@ -190,7 +203,9 @@ async function cargarStock() {
                 docSnap.data();
 
             const cantidad =
-                Number(datos.cantidad || 0);
+                Number(
+                    datos.cantidad || 0
+                );
 
             /*
              * Solo stock disponible
@@ -200,7 +215,8 @@ async function cargarStock() {
 
                 stock.push({
 
-                    id: docSnap.id,
+                    id:
+                        docSnap.id,
 
                     productoId:
                         datos.productoId || "",
@@ -249,12 +265,15 @@ async function cargarStock() {
         );
 
     }
+
 }
 
 
-/************************************************************
- * CARGAR CLIENTES
- ************************************************************/
+/*
+************************************************************
+* CARGAR CLIENTES
+************************************************************
+*/
 
 async function cargarClientes() {
 
@@ -274,7 +293,8 @@ async function cargarClientes() {
 
             clientes.push({
 
-                id: docSnap.id,
+                id:
+                    docSnap.id,
 
                 ...datos
 
@@ -292,7 +312,9 @@ async function cargarClientes() {
                 obtenerNombreCliente(b)
                     .toLowerCase();
 
-            return nombreA.localeCompare(nombreB);
+            return nombreA.localeCompare(
+                nombreB
+            );
 
         });
 
@@ -313,12 +335,15 @@ async function cargarClientes() {
         );
 
     }
+
 }
 
 
-/************************************************************
- * NOMBRE CLIENTE
- ************************************************************/
+/*
+************************************************************
+* NOMBRE CLIENTE
+************************************************************
+*/
 
 function obtenerNombreCliente(cliente) {
 
@@ -335,9 +360,11 @@ function obtenerNombreCliente(cliente) {
 }
 
 
-/************************************************************
- * BUSCADOR DE PRODUCTOS
- ************************************************************/
+/*
+************************************************************
+* BUSCADOR DE PRODUCTOS
+************************************************************
+*/
 
 productoBuscador.addEventListener(
     "input",
@@ -371,7 +398,9 @@ productoBuscador.addEventListener(
         listaProductos.innerHTML = "";
 
         if (texto === "") {
+
             return;
+
         }
 
 
@@ -415,6 +444,7 @@ productoBuscador.addEventListener(
             `;
 
             return;
+
         }
 
 
@@ -469,9 +499,11 @@ productoBuscador.addEventListener(
 );
 
 
-/************************************************************
- * SELECCIONAR PRODUCTO
- ************************************************************/
+/*
+************************************************************
+* SELECCIONAR PRODUCTO
+************************************************************
+*/
 
 function seleccionarProducto(producto) {
 
@@ -520,6 +552,7 @@ function seleccionarProducto(producto) {
         );
 
         return;
+
     }
 
 
@@ -567,7 +600,8 @@ function seleccionarProducto(producto) {
                     "option"
                 );
 
-            option.value = id;
+            option.value =
+                id;
 
             option.textContent =
                 nombre;
@@ -595,9 +629,11 @@ function seleccionarProducto(producto) {
 }
 
 
-/************************************************************
- * CAMBIO DE UBICACIÓN
- ************************************************************/
+/*
+************************************************************
+* CAMBIO DE UBICACIÓN
+************************************************************
+*/
 
 ubicacionSelect.addEventListener(
     "change",
@@ -683,9 +719,11 @@ ubicacionSelect.addEventListener(
 );
 
 
-/************************************************************
- * CAMBIO DE LOTE
- ************************************************************/
+/*
+************************************************************
+* CAMBIO DE LOTE
+************************************************************
+*/
 
 loteSelect.addEventListener(
     "change",
@@ -745,9 +783,11 @@ loteSelect.addEventListener(
 );
 
 
-/************************************************************
- * TIPO DE EGRESO
- ************************************************************/
+/*
+************************************************************
+* TIPO DE EGRESO
+************************************************************
+*/
 
 tipoEgreso.addEventListener(
     "change",
@@ -778,9 +818,11 @@ tipoEgreso.addEventListener(
 );
 
 
-/************************************************************
- * BUSCADOR DE CLIENTES
- ************************************************************/
+/*
+************************************************************
+* BUSCADOR DE CLIENTES
+************************************************************
+*/
 
 clienteBuscador.addEventListener(
     "input",
@@ -797,7 +839,9 @@ clienteBuscador.addEventListener(
 
 
         if (texto === "") {
+
             return;
+
         }
 
 
@@ -884,9 +928,11 @@ clienteBuscador.addEventListener(
 );
 
 
-/************************************************************
- * CLICK FUERA DE LOS BUSCADORES
- ************************************************************/
+/*
+************************************************************
+* CLICK FUERA DE LOS BUSCADORES
+************************************************************
+*/
 
 document.addEventListener(
     "click",
@@ -925,9 +971,11 @@ document.addEventListener(
 );
 
 
-/************************************************************
- * FECHA ACTUAL
- ************************************************************/
+/*
+************************************************************
+* FECHA ACTUAL
+************************************************************
+*/
 
 function colocarFechaActual() {
 
@@ -953,13 +1001,16 @@ function colocarFechaActual() {
 }
 
 
-/************************************************************
- * INICIAR
- ************************************************************/
+/*
+************************************************************
+* INICIAR
+************************************************************
+*/
 
 async function iniciar() {
 
     colocarFechaActual();
+
 
     /*
      * Al entrar como ajuste,
@@ -982,288 +1033,451 @@ async function iniciar() {
 
 }
 
-
 iniciar();
 
-/* ============================================================
-   REGISTRAR EGRESO
-============================================================ */
 
-form.addEventListener("submit", async (event) => {
+/*
+============================================================
+REGISTRAR EGRESO
+============================================================
+*/
 
-    event.preventDefault();
+form.addEventListener(
+    "submit",
+    async (event) => {
 
-    try {
+        event.preventDefault();
 
-        /* ===============================
-           VALIDACIONES
-        =============================== */
+        try {
 
-        if (!productoSeleccionado) {
+            /*
+            ===============================
+            VALIDACIONES
+            ===============================
+            */
 
-            alert("Seleccioná un producto.");
-
-            return;
-
-        }
-
-
-        if (!stockSeleccionado) {
-
-            alert("Seleccioná un lote.");
-
-            return;
-
-        }
-
-
-        const cantidadRetirar =
-            Number(cantidadInput.value);
-
-
-        if (
-            !cantidadRetirar ||
-            cantidadRetirar <= 0
-        ) {
-
-            alert(
-                "Ingresá una cantidad válida."
-            );
-
-            return;
-
-        }
-
-
-        const cantidadDisponibleActual =
-            Number(
-                stockSeleccionado.cantidad
-            );
-
-
-        if (
-            cantidadRetirar >
-            cantidadDisponibleActual
-        ) {
-
-            alert(
-                `No podés retirar ${cantidadRetirar} ${stockSeleccionado.unidad}. ` +
-                `La cantidad disponible es ${cantidadDisponibleActual} ${stockSeleccionado.unidad}.`
-            );
-
-            return;
-
-        }
-
-
-        /* ===============================
-           CLIENTE
-        =============================== */
-
-        let clienteId = "";
-        let clienteNombre = "";
-
-        if (
-            tipoEgreso.value === "venta"
-        ) {
-
-            clienteId =
-                clienteInput.value;
-
-            clienteNombre =
-                clienteBuscador.value.trim();
-
-
-            if (!clienteId) {
+            if (!productoSeleccionado) {
 
                 alert(
-                    "Seleccioná un cliente."
+                    "Seleccioná un producto."
                 );
 
                 return;
 
             }
 
-        }
+
+            if (!stockSeleccionado) {
+
+                alert(
+                    "Seleccioná un lote."
+                );
+
+                return;
+
+            }
 
 
-        /* ===============================
-           NUEVA CANTIDAD
-        =============================== */
-
-        const nuevaCantidad =
-            cantidadDisponibleActual -
-            cantidadRetirar;
+            const cantidadRetirar =
+                Number(
+                    cantidadInput.value
+                );
 
 
-        /* ===============================
-           CONFIRMACIÓN
-        =============================== */
+            if (
+                !cantidadRetirar ||
+                cantidadRetirar <= 0
+            ) {
 
-        const confirmar =
-            confirm(
-                `¿Registrar egreso de ${cantidadRetirar} ${stockSeleccionado.unidad}?\n\n` +
-                `Producto: ${productoSeleccionado.descripcion || productoSeleccionado.nombre}\n` +
-                `Lote: ${stockSeleccionado.lote}\n` +
-                `Ubicación: ${stockSeleccionado.ubicacionNombre}\n` +
-                `Disponible después del egreso: ${nuevaCantidad} ${stockSeleccionado.unidad}`
+                alert(
+                    "Ingresá una cantidad válida."
+                );
+
+                return;
+
+            }
+
+
+            const cantidadDisponibleActual =
+                Number(
+                    stockSeleccionado.cantidad
+                );
+
+
+            if (
+                cantidadRetirar >
+                cantidadDisponibleActual
+            ) {
+
+                alert(
+                    `No podés retirar ${cantidadRetirar} ${stockSeleccionado.unidad}. ` +
+                    `La cantidad disponible es ${cantidadDisponibleActual} ${stockSeleccionado.unidad}.`
+                );
+
+                return;
+
+            }
+
+
+            /*
+            ===============================
+            CLIENTE
+            ===============================
+            */
+
+            let clienteId = "";
+            let clienteNombre = "";
+
+            if (
+                tipoEgreso.value ===
+                "venta"
+            ) {
+
+                clienteId =
+                    clienteInput.value;
+
+                clienteNombre =
+                    clienteBuscador.value.trim();
+
+
+                if (!clienteId) {
+
+                    alert(
+                        "Seleccioná un cliente."
+                    );
+
+                    return;
+
+                }
+
+            }
+
+
+            /*
+            ===============================
+            NUEVA CANTIDAD
+            ===============================
+            */
+
+            const nuevaCantidad =
+                cantidadDisponibleActual -
+                cantidadRetirar;
+
+
+            /*
+            ===============================
+            CONFIRMACIÓN
+            ===============================
+            */
+
+            const confirmar =
+                confirm(
+                    `¿Registrar egreso de ${cantidadRetirar} ${stockSeleccionado.unidad}?\n\n` +
+                    `Producto: ${productoSeleccionado.descripcion || productoSeleccionado.nombre}\n` +
+                    `Lote: ${stockSeleccionado.lote}\n` +
+                    `Ubicación: ${stockSeleccionado.ubicacionNombre}\n` +
+                    `Disponible después del egreso: ${nuevaCantidad} ${stockSeleccionado.unidad}`
+                );
+
+
+            if (!confirmar) {
+
+                return;
+
+            }
+
+
+            /*
+            ===============================
+            DATOS COMUNES
+            ===============================
+            */
+
+            const productoNombre =
+                productoSeleccionado.descripcion ||
+                productoSeleccionado.nombre ||
+                "";
+
+            const unidad =
+                unidadSelect.value ||
+                stockSeleccionado.unidad;
+
+            const observacion =
+                observacionInput.value.trim();
+
+            const fecha =
+                fechaInput.value;
+
+
+            /*
+            ===============================
+            ACTUALIZAR STOCK
+            ===============================
+            */
+
+            const stockRef =
+                doc(
+                    db,
+                    "stock",
+                    stockSeleccionado.id
+                );
+
+
+            await updateDoc(
+                stockRef,
+                {
+                    cantidad:
+                        nuevaCantidad
+                }
             );
 
 
-        if (!confirmar) {
+            /*
+            ===============================
+            REGISTRAR EGRESO
+            ===============================
+            */
 
-            return;
+            const egresoRef =
+                await addDoc(
+                    collection(db, "egresos"),
+                    {
 
-        }
+                        tipoEgreso:
+                            tipoEgreso.value,
+
+                        productoId:
+                            productoSeleccionado.id,
+
+                        productoNombre:
+                            productoNombre,
+
+                        lote:
+                            stockSeleccionado.lote,
+
+                        ubicacionId:
+                            stockSeleccionado.ubicacionId,
+
+                        ubicacionNombre:
+                            stockSeleccionado.ubicacionNombre,
+
+                        cantidad:
+                            cantidadRetirar,
+
+                        unidad:
+                            unidad,
+
+                        clienteId:
+                            clienteId,
+
+                        clienteNombre:
+                            clienteNombre,
+
+                        fecha:
+                            fecha,
+
+                        observacion:
+                            observacion,
+
+                        stockAnterior:
+                            cantidadDisponibleActual,
+
+                        stockPosterior:
+                            nuevaCantidad,
+
+                        creadoEn:
+                            serverTimestamp()
+
+                    }
+                );
 
 
-        /* ===============================
-           ACTUALIZAR STOCK
-        =============================== */
+            /*
+            ==================================================
+            SI ES VENTA:
+            REGISTRAR TAMBIÉN EN EL HISTORIAL DEL CLIENTE
+            ==================================================
+            */
 
-        const stockRef =
-            doc(
-                db,
-                "stock",
-                stockSeleccionado.id
+            if (
+                tipoEgreso.value ===
+                "venta"
+                &&
+                clienteId
+            ) {
+
+                await addDoc(
+                    collection(db, "visitas"),
+                    {
+
+                        /*
+                         * Cliente
+                         */
+
+                        clienteId:
+                            clienteId,
+
+                        clienteNombre:
+                            clienteNombre,
+
+
+                        /*
+                         * Tipo que verá cliente.js
+                         */
+
+                        tipoVisita:
+                            "Venta",
+
+
+                        /*
+                         * Fecha
+                         */
+
+                        fecha:
+                            fecha,
+
+
+                        /*
+                         * Producto vendido
+                         */
+
+                        productos: [
+
+                            {
+
+                                nombre:
+                                    productoNombre,
+
+                                cantidad:
+                                    cantidadRetirar,
+
+                                unidad:
+                                    unidad,
+
+                                lote:
+                                    stockSeleccionado.lote
+
+                            }
+
+                        ],
+
+
+                        /*
+                         * Datos adicionales
+                         */
+
+                        ubicacionNombre:
+                            stockSeleccionado.ubicacionNombre,
+
+                        observacion:
+                            observacion,
+
+
+                        /*
+                         * Referencia al egreso
+                         */
+
+                        egresoId:
+                            egresoRef.id,
+
+
+                        /*
+                         * Fecha de creación
+                         */
+
+                        creadoEn:
+                            serverTimestamp()
+
+                    }
+                );
+
+            }
+
+
+            /*
+            ===============================
+            MENSAJE
+            ===============================
+            */
+
+            alert(
+                "✅ Egreso registrado correctamente." +
+                (
+                    tipoEgreso.value === "venta"
+                        ? "\n\nLa venta también fue agregada al historial del cliente."
+                        : ""
+                )
             );
 
 
-        await updateDoc(
-            stockRef,
-            {
-                cantidad: nuevaCantidad
-            }
-        );
+            /*
+            ===============================
+            RECARGAR STOCK
+            ===============================
+            */
+
+            await cargarStock();
 
 
-        /* ===============================
-           REGISTRAR MOVIMIENTO
-        =============================== */
+            /*
+            ===============================
+            LIMPIAR FORMULARIO
+            ===============================
+            */
 
-        await addDoc(
-            collection(db, "egresos"),
-            {
+            form.reset();
 
-                tipoEgreso:
-                    tipoEgreso.value,
+            productoInput.value =
+                "";
 
-                productoId:
-                    productoSeleccionado.id,
+            productoSeleccionado =
+                null;
 
-                productoNombre:
-                    productoSeleccionado.descripcion ||
-                    productoSeleccionado.nombre ||
-                    "",
+            stockSeleccionado =
+                null;
 
-                lote:
-                    stockSeleccionado.lote,
+            listaProductos.innerHTML =
+                "";
 
-                ubicacionId:
-                    stockSeleccionado.ubicacionId,
+            listaClientes.innerHTML =
+                "";
 
-                ubicacionNombre:
-                    stockSeleccionado.ubicacionNombre,
+            cantidadDisponible.value =
+                "";
 
-                cantidad:
-                    cantidadRetirar,
+            ubicacionSelect.innerHTML = `
+                <option value="">
+                    Seleccionar ubicación
+                </option>
+            `;
 
-                unidad:
-                    unidadSelect.value ||
-                    stockSeleccionado.unidad,
+            loteSelect.innerHTML = `
+                <option value="">
+                    Seleccionar lote
+                </option>
+            `;
 
-                clienteId:
-                    clienteId,
-
-                clienteNombre:
-                    clienteNombre,
-
-                fecha:
-                    fechaInput.value,
-
-                observacion:
-                    observacionInput.value.trim(),
-
-                stockAnterior:
-                    cantidadDisponibleActual,
-
-                stockPosterior:
-                    nuevaCantidad,
-
-                creadoEn:
-                    serverTimestamp()
-
-            }
-        );
+            contenedorCliente.style.display =
+                "none";
 
 
-        /* ===============================
-           MENSAJE
-        =============================== */
-
-        alert(
-            "✅ Egreso registrado correctamente.\n\n" +
-            `Se descontaron ${cantidadRetirar} ${stockSeleccionado.unidad} del stock.`
-        );
+            colocarFechaActual();
 
 
-        /* ===============================
-           RECARGAR STOCK
-        =============================== */
+        } catch (error) {
 
-        await cargarStock();
-
-
-        /* ===============================
-           LIMPIAR FORMULARIO
-        =============================== */
-
-        form.reset();
-
-        productoInput.value = "";
-
-        productoSeleccionado = null;
-
-        stockSeleccionado = null;
-
-        listaProductos.innerHTML = "";
-
-        listaClientes.innerHTML = "";
-
-        cantidadDisponible.value = "";
-
-        ubicacionSelect.innerHTML = `
-            <option value="">
-                Seleccionar ubicación
-            </option>
-        `;
-
-        loteSelect.innerHTML = `
-            <option value="">
-                Seleccionar lote
-            </option>
-        `;
-
-        contenedorCliente.style.display =
-            "none";
+            console.error(
+                "ERROR REGISTRANDO EGRESO:",
+                error
+            );
 
 
-        colocarFechaActual();
+            alert(
+                "❌ No se pudo registrar el egreso.\n\n" +
+                "Revisá la consola para ver el error."
+            );
 
-
-    } catch (error) {
-
-        console.error(
-            "ERROR REGISTRANDO EGRESO:",
-            error
-        );
-
-
-        alert(
-            "❌ No se pudo registrar el egreso.\n\n" +
-            "Revisá la consola para ver el error."
-        );
+        }
 
     }
-
-});
+);
