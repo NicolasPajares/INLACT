@@ -1,139 +1,208 @@
-<!-- SEO / Mobile -->
-<meta name="description" content="INLACT - Ingreso de stock">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="es">
 
-<!-- CSS base -->
-<link rel="stylesheet" href="index.css">
+<head>
 
-<!-- CSS específico -->
-<link rel="stylesheet" href="ingreso-stock.css">
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Ingreso de stock">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>INLACT · Ingreso de Stock</title>
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
 
-<h2>NICOLÁS PAJARES</h2>
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="ingreso-stock.css">
 
-<!-- ===============================
+    <title>INLACT · Ingreso de Stock</title>
+
+</head>
+
+<body>
+
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+</header>
+<main>
+
+    <!-- ===============================
  FORMULARIO INGRESO STOCK
-
-
 ================================ -->
 
-    <form id="formIngresoStock">
-            <h1>Ingreso de stock</h1>
-    
-        <label for="producto">
-            Producto
-        </label>
+<form id="formIngresoStock">
 
-        <select id="producto" required>
-            <option value="">
-                Seleccionar producto
-            </option>
-        </select>
+    <h1>Ingreso de stock</h1>
 
 
-        <label for="lote">
-            Lote
-        </label>
+    <!-- ===============================
+     PRODUCTO BUSCABLE
+    =============================== -->
 
-        <input
-            type="text"
-            id="lote"
-            placeholder="Ej: L240315"
-            required
-        >
+    <label for="productoBuscador">
+        Producto
+    </label>
 
+    <input
+        type="text"
+        id="productoBuscador"
+        placeholder="Escribí para buscar un producto..."
+        autocomplete="off"
+        required
+    >
 
-        <label for="ubicacion">
-            Ubicación
-        </label>
+    <div id="listaProductos"></div>
 
-        <select id="ubicacion" required>
-            <option value="">
-                Seleccionar ubicación
-            </option>
-        </select>
+    <!--
+        Este campo guarda internamente
+        el ID real del producto de Firestore.
+    -->
 
-
-        <label for="cantidad">
-            Cantidad
-        </label>
-
-        <input
-            type="number"
-            id="cantidad"
-            placeholder="Ej: 50"
-            min="0.01"
-            step="any"
-            required
-        >
+    <input
+        type="hidden"
+        id="producto"
+    >
 
 
-        <label for="unidad">
-            Unidad
-        </label>
+    <!-- ===============================
+     LOTE
+    =============================== -->
 
-        <select id="unidad" required>
-            <option value="">
-                Seleccionar unidad
-            </option>
+    <label for="lote">
+        Lote
+    </label>
 
-            <option value="sobres">
-                Sobres
-            </option>
-
-            <option value="kg">
-                Kg
-            </option>
-
-            <option value="unidades">
-                Unidades
-            </option>
-        </select>
+    <input
+        type="text"
+        id="lote"
+        placeholder="Ej: L240315"
+        required
+    >
 
 
-        <label for="fecha">
-            Fecha de ingreso
-        </label>
+    <!-- ===============================
+     UBICACIÓN
+    =============================== -->
 
-        <input
-            type="date"
-            id="fecha"
-            required
-        >
+    <label for="ubicacion">
+        Ubicación
+    </label>
 
+    <select id="ubicacion" required>
 
-        <label for="observacion">
-            Observación
-        </label>
+        <option value="">
+            Seleccionar ubicación
+        </option>
 
-        <textarea
-            id="observacion"
-            placeholder="Ej: Compra a proveedor"
-            rows="4"
-        ></textarea>
+    </select>
 
 
-        <div class="acciones-form">
+    <!-- ===============================
+     CANTIDAD
+    =============================== -->
 
-            <button
-                type="submit"
-                class="btn-guardar">
-                💾 Registrar ingreso
-            </button>
+    <label for="cantidad">
+        Cantidad
+    </label>
 
-            <button
-                type="button"
-                class="btn-cancelar"
-                onclick="location.href='stock.html'">
-                ✖ Cancelar
-            </button>
+    <input
+        type="number"
+        id="cantidad"
+        placeholder="Ej: 50"
+        min="0.01"
+        step="any"
+        required
+    >
 
-        </div>
 
-    </form>
+    <!-- ===============================
+     UNIDAD
+    =============================== -->
+
+    <label for="unidad">
+        Unidad
+    </label>
+
+    <select id="unidad" required>
+
+        <option value="">
+            Seleccionar unidad
+        </option>
+
+        <option value="sobres">
+            Sobres
+        </option>
+
+        <option value="kg">
+            Kg
+        </option>
+
+        <option value="unidades">
+            Unidades
+        </option>
+
+    </select>
+
+
+    <!-- ===============================
+     FECHA
+    =============================== -->
+
+    <label for="fecha">
+        Fecha de ingreso
+    </label>
+
+    <input
+        type="date"
+        id="fecha"
+        required
+    >
+
+
+    <!-- ===============================
+     OBSERVACIÓN
+    =============================== -->
+
+    <label for="observacion">
+        Observación
+    </label>
+
+    <textarea
+        id="observacion"
+        placeholder="Ej: Compra a proveedor"
+        rows="4"
+    ></textarea>
+
+
+    <!-- ===============================
+     ACCIONES
+    =============================== -->
+
+    <div class="acciones-form">
+
+        <button
+            type="submit"
+            class="btn-guardar">
+            💾 Registrar ingreso
+        </button>
+
+        <button
+            type="button"
+            class="btn-cancelar"
+            onclick="location.href='stock.html'">
+            ✖ Cancelar
+        </button>
+
+    </div>
+
+
+</form>
+
 
 </section>
+
 
 <p>
     © INLACT ·
@@ -141,3 +210,13 @@
         Aviso Legal
     </a>
 </p>
+   
+
+        
+       
+
+
+</body>
+
+</html>
+```
