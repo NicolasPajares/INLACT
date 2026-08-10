@@ -1,234 +1,29 @@
 /* ============================================================
-   RESET
-============================================================ */
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-
-/* ============================================================
-   BODY
-============================================================ */
-
-body {
-    font-family: "Segoe UI", Arial, sans-serif;
-    background: #f3f7fb;
-    color: #2c3e50;
-}
-
-
-/* ============================================================
-   MAIN
-============================================================ */
-
-main {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
-
-
-/* ============================================================
-   CARD
-============================================================ */
-
-.card-formulario {
-    background: #ffffff;
-    border-radius: 18px;
-    padding: 30px;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, .08);
-}
-
-
-/* ============================================================
-   TITULO
-============================================================ */
-
-.card-formulario h1 {
-    color: #1f4e8c;
-    margin-bottom: 25px;
-    font-size: 30px;
-    text-align: center;
-}
-
-
-/* ============================================================
-   LABELS
-============================================================ */
-
-label {
-    display: block;
-    margin-top: 18px;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #1f4e8c;
-}
-
-
-/* ============================================================
-   INPUTS
-============================================================ */
-
-input,
-select,
-textarea {
-    width: 100%;
-    padding: 14px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    font-size: 16px;
-    outline: none;
-    transition: .2s;
-}
-
-
-input:focus,
-select:focus,
-textarea:focus {
-    border-color: #3b82f6;
-
-    box-shadow:
-        0 0 0 2px rgba(59, 130, 246, .2);
-}
-
-
-/* ============================================================
-   HR
-============================================================ */
-
-hr {
-    margin: 35px 0;
-    border: none;
-    border-top: 1px solid #dbe4ef;
-}
-
-
-/* ============================================================
-   SUBTITULO
-============================================================ */
-
-.card-formulario h2 {
-    color: #1f4e8c;
-    margin-bottom: 18px;
-}
-
-
-/* ============================================================
-   LISTA DE PRODUCTOS
-============================================================ */
-
-#listaProductos {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    margin-bottom: 20px;
-}
-
-
-/* ============================================================
-   TARJETA PRODUCTO
-============================================================ */
-
-.producto-item {
-    background: white;
-    border-radius: 14px;
-    padding: 18px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
-}
-
-
-/* ============================================================
-   BOTON AGREGAR PRODUCTO
-============================================================ */
-
-.btn-agregar {
-    display: block;
-
-    width: 100%;
-
-    padding: 16px;
-
-    border: none;
-
-    border-radius: 12px;
-
-    background: #eef5ff;
-
-    color: #1f4e8c;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: .2s;
-
-    margin: 0 0 30px 0;
-}
-
-
-.btn-agregar:hover {
-    background: #dbeafe;
-}
-
-
-/* ============================================================
    BOTONES FINALES
 ============================================================ */
 
 #formNuevaLista .acciones-form {
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     gap: 15px;
 
     width: 100%;
 
     margin: 30px auto 0 auto;
-
 }
 
 
 /* ============================================================
-   GUARDAR / CANCELAR
+   BOTÓN GUARDAR
 ============================================================ */
 
-#formNuevaLista .acciones-form .btn-guardar,
-#formNuevaLista .acciones-form .btn-cancelar {
-
-    flex: 0 0 220px;
-
+#formNuevaLista .btn-guardar {
     width: 220px;
 
-    max-width: 220px;
+    flex: none;
 
-    padding: 16px;
-
-    border-radius: 12px;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: .2s;
-}
-
-
-/* ============================================================
-   BOTON GUARDAR
-============================================================ */
-
-#formNuevaLista .acciones-form .btn-guardar {
+    padding: 14px 20px;
 
     background:
         linear-gradient(
@@ -237,36 +32,68 @@ hr {
             #3b82f6
         );
 
-    color: white;
+    color: #fff;
 
     border: none;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 15px rgba(31, 78, 140, .25);
+
+    transition: .20s;
 }
 
 
-#formNuevaLista .acciones-form .btn-guardar:hover {
-    transform: scale(1.02);
+#formNuevaLista .btn-guardar:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 9px 20px rgba(31, 78, 140, .35);
 }
 
 
 /* ============================================================
-   BOTON CANCELAR
+   BOTÓN CANCELAR
 ============================================================ */
 
-#formNuevaLista .acciones-form .btn-cancelar {
+#formNuevaLista .btn-cancelar {
+    width: 220px;
 
-    background: white;
+    flex: none;
+
+    padding: 14px 20px;
+
+    background: #fff;
+
+    color: #1f4e8c;
 
     border: 2px solid #1f4e8c;
 
-    color: #1f4e8c;
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .20s;
 }
 
 
-#formNuevaLista .acciones-form .btn-cancelar:hover {
+#formNuevaLista .btn-cancelar:hover {
 
     background: #1f4e8c;
 
-    color: white;
+    color: #fff;
 }
 
 
@@ -280,20 +107,16 @@ hr {
 
         flex-direction: column;
 
-        align-items: center;
-
+        width: 100%;
     }
 
 
-    #formNuevaLista .acciones-form .btn-guardar,
-    #formNuevaLista .acciones-form .btn-cancelar {
+    #formNuevaLista .btn-guardar,
+    #formNuevaLista .btn-cancelar {
 
         width: 100%;
 
         max-width: 350px;
-
-        flex: 0 0 auto;
-
     }
 
 }
