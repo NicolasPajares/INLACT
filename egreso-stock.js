@@ -984,3 +984,286 @@ async function iniciar() {
 
 
 iniciar();
+
+/* ============================================================
+   REGISTRAR EGRESO
+============================================================ */
+
+form.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    try {
+
+        /* ===============================
+           VALIDACIONES
+        =============================== */
+
+        if (!productoSeleccionado) {
+
+            alert("Seleccioná un producto.");
+
+            return;
+
+        }
+
+
+        if (!stockSeleccionado) {
+
+            alert("Seleccioná un lote.");
+
+            return;
+
+        }
+
+
+        const cantidadRetirar =
+            Number(cantidadInput.value);
+
+
+        if (
+            !cantidadRetirar ||
+            cantidadRetirar <= 0
+        ) {
+
+            alert(
+                "Ingresá una cantidad válida."
+            );
+
+            return;
+
+        }
+
+
+        const cantidadDisponibleActual =
+            Number(
+                stockSeleccionado.cantidad
+            );
+
+
+        if (
+            cantidadRetirar >
+            cantidadDisponibleActual
+        ) {
+
+            alert(
+                `No podés retirar ${cantidadRetirar} ${stockSeleccionado.unidad}. ` +
+                `La cantidad disponible es ${cantidadDisponibleActual} ${stockSeleccionado.unidad}.`
+            );
+
+            return;
+
+        }
+
+
+        /* ===============================
+           CLIENTE
+        =============================== */
+
+        let clienteId = "";
+        let clienteNombre = "";
+
+        if (
+            tipoEgreso.value === "venta"
+        ) {
+
+            clienteId =
+                clienteInput.value;
+
+            clienteNombre =
+                clienteBuscador.value.trim();
+
+
+            if (!clienteId) {
+
+                alert(
+                    "Seleccioná un cliente."
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* ===============================
+           NUEVA CANTIDAD
+        =============================== */
+
+        const nuevaCantidad =
+            cantidadDisponibleActual -
+            cantidadRetirar;
+
+
+        /* ===============================
+           CONFIRMACIÓN
+        =============================== */
+
+        const confirmar =
+            confirm(
+                `¿Registrar egreso de ${cantidadRetirar} ${stockSeleccionado.unidad}?\n\n` +
+                `Producto: ${productoSeleccionado.descripcion || productoSeleccionado.nombre}\n` +
+                `Lote: ${stockSeleccionado.lote}\n` +
+                `Ubicación: ${stockSeleccionado.ubicacionNombre}\n` +
+                `Disponible después del egreso: ${nuevaCantidad} ${stockSeleccionado.unidad}`
+            );
+
+
+        if (!confirmar) {
+
+            return;
+
+        }
+
+
+        /* ===============================
+           ACTUALIZAR STOCK
+        =============================== */
+
+        const stockRef =
+            doc(
+                db,
+                "stock",
+                stockSeleccionado.id
+            );
+
+
+        await updateDoc(
+            stockRef,
+            {
+                cantidad: nuevaCantidad
+            }
+        );
+
+
+        /* ===============================
+           REGISTRAR MOVIMIENTO
+        =============================== */
+
+        await addDoc(
+            collection(db, "egresos"),
+            {
+
+                tipoEgreso:
+                    tipoEgreso.value,
+
+                productoId:
+                    productoSeleccionado.id,
+
+                productoNombre:
+                    productoSeleccionado.descripcion ||
+                    productoSeleccionado.nombre ||
+                    "",
+
+                lote:
+                    stockSeleccionado.lote,
+
+                ubicacionId:
+                    stockSeleccionado.ubicacionId,
+
+                ubicacionNombre:
+                    stockSeleccionado.ubicacionNombre,
+
+                cantidad:
+                    cantidadRetirar,
+
+                unidad:
+                    unidadSelect.value ||
+                    stockSeleccionado.unidad,
+
+                clienteId:
+                    clienteId,
+
+                clienteNombre:
+                    clienteNombre,
+
+                fecha:
+                    fechaInput.value,
+
+                observacion:
+                    observacionInput.value.trim(),
+
+                stockAnterior:
+                    cantidadDisponibleActual,
+
+                stockPosterior:
+                    nuevaCantidad,
+
+                creadoEn:
+                    serverTimestamp()
+
+            }
+        );
+
+
+        /* ===============================
+           MENSAJE
+        =============================== */
+
+        alert(
+            "✅ Egreso registrado correctamente.\n\n" +
+            `Se descontaron ${cantidadRetirar} ${stockSeleccionado.unidad} del stock.`
+        );
+
+
+        /* ===============================
+           RECARGAR STOCK
+        =============================== */
+
+        await cargarStock();
+
+
+        /* ===============================
+           LIMPIAR FORMULARIO
+        =============================== */
+
+        form.reset();
+
+        productoInput.value = "";
+
+        productoSeleccionado = null;
+
+        stockSeleccionado = null;
+
+        listaProductos.innerHTML = "";
+
+        listaClientes.innerHTML = "";
+
+        cantidadDisponible.value = "";
+
+        ubicacionSelect.innerHTML = `
+            <option value="">
+                Seleccionar ubicación
+            </option>
+        `;
+
+        loteSelect.innerHTML = `
+            <option value="">
+                Seleccionar lote
+            </option>
+        `;
+
+        contenedorCliente.style.display =
+            "none";
+
+
+        colocarFechaActual();
+
+
+    } catch (error) {
+
+        console.error(
+            "ERROR REGISTRANDO EGRESO:",
+            error
+        );
+
+
+        alert(
+            "❌ No se pudo registrar el egreso.\n\n" +
+            "Revisá la consola para ver el error."
+        );
+
+    }
+
+});
