@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Ingreso de stock">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="ingreso-stock.css">
+
+    <title>INLACT · Ingreso de Stock</title>
+
+</head>
+
+<body>
+
+<header>
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+</header>
+<main>
+
+<!-- ===============================
+ FORMULARIO EGRESO STOCK
+================================ -->
+
+<form id="formEgresoStock">
+
+    <h1>Egreso de stock</h1>
+
+
+    <!-- ===============================
+         TIPO DE EGRESO
+    ================================ -->
+
+    <label for="tipoEgreso">
+        Tipo de egreso
+    </label>
+
+    <select id="tipoEgreso" required>
+
+        <option value="">
+            Seleccionar tipo de egreso
+        </option>
+
+        <option value="ajuste">
+            🔧 Ajuste de stock
+        </option>
+
+        <option value="venta">
+            🧾 Venta / entrega a cliente
+        </option>
+
+    </select>
+
+
+    <!-- ===============================
+         PRODUCTO
+    ================================ -->
+
+    <label for="productoBuscador">
+        Producto
+    </label>
+
+    <input
+        type="text"
+        id="productoBuscador"
+        placeholder="Escribí para buscar un producto..."
+        autocomplete="off"
+        required
+    >
+
+    <div id="listaProductos"></div>
+
+    <!--
+        Guarda internamente el ID real
+        del producto de Firestore.
+    -->
+
+    <input
+        type="hidden"
+        id="producto"
+    >
+
+
+    <!-- ===============================
+         UBICACIÓN
+    ================================ -->
+
+    <label for="ubicacion">
+        Ubicación de origen
+    </label>
+
+    <select id="ubicacion" required>
+
+        <option value="">
+            Seleccionar ubicación
+        </option>
+
+    </select>
+
+
+    <!-- ===============================
+         LOTE
+    ================================ -->
+
+    <label for="lote">
+        Lote
+    </label>
+
+    <select id="lote" required>
+
+        <option value="">
+            Seleccionar lote
+        </option>
+
+    </select>
+
+
+    <!-- ===============================
+         CANTIDAD DISPONIBLE
+    ================================ -->
+
+    <label for="cantidadDisponible">
+        Cantidad disponible
+    </label>
+
+    <input
+        type="text"
+        id="cantidadDisponible"
+        readonly
+        placeholder="Se mostrará al seleccionar el lote"
+    >
+
+
+    <!-- ===============================
+         CANTIDAD A RETIRAR
+    ================================ -->
+
+    <label for="cantidad">
+        Cantidad a retirar
+    </label>
+
+    <input
+        type="number"
+        id="cantidad"
+        placeholder="Ej: 10"
+        min="0.01"
+        step="any"
+        required
+    >
+
+
+    <!-- ===============================
+         UNIDAD
+    ================================ -->
+
+    <label for="unidad">
+        Unidad
+    </label>
+
+    <select id="unidad" required>
+
+        <option value="">
+            Seleccionar unidad
+        </option>
+
+        <option value="sobres">
+            Sobres
+        </option>
+
+        <option value="kg">
+            Kg
+        </option>
+
+        <option value="unidades">
+            Unidades
+        </option>
+
+    </select>
+
+
+    <!-- ===============================
+         CLIENTE
+         Solo para ventas
+    ================================ -->
+
+    <div id="contenedorCliente">
+
+        <label for="clienteBuscador">
+            Cliente
+        </label>
+
+        <input
+            type="text"
+            id="clienteBuscador"
+            placeholder="Escribí para buscar un cliente..."
+            autocomplete="off"
+        >
+
+        <div id="listaClientes"></div>
+
+        <!--
+            Guarda internamente el ID real
+            del cliente de Firestore.
+        -->
+
+        <input
+            type="hidden"
+            id="cliente"
+        >
+
+    </div>
+
+
+    <!-- ===============================
+         FECHA
+    ================================ -->
+
+    <label for="fecha">
+        Fecha de egreso
+    </label>
+
+    <input
+        type="date"
+        id="fecha"
+        required
+    >
+
+
+    <!-- ===============================
+         OBSERVACIÓN
+    ================================ -->
+
+    <label for="observacion">
+        Observación
+    </label>
+
+    <textarea
+        id="observacion"
+        placeholder="Ej: Venta a cliente / Ajuste por inventario"
+        rows="4"
+    ></textarea>
+
+
+    <!-- ===============================
+         ACCIONES
+    ================================ -->
+
+    <div class="acciones-form">
+
+        <button
+            type="submit"
+            class="btn-guardar">
+            💾 Registrar egreso
+        </button>
+
+        <button
+            type="button"
+            class="btn-cancelar"
+            onclick="location.href='stock.html'">
+            ✖ Cancelar
+        </button>
+
+    </div>
+
+
+</form>
+
+</section>
+  <p>
+    © INLACT ·
+    <a href="aviso-legal.html">
+        Aviso Legal
+    </a>
+</p>
