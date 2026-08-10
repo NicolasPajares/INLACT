@@ -121,15 +121,13 @@ async function cargarExistencias() {
 
             const datos = doc.data();
 
-
-            /*
-             * Solo guardamos registros
-             * que tengan cantidad mayor a 0
-             */
-
             const cantidad =
                 Number(datos.cantidad || 0);
 
+
+            /*
+             * Solo mostramos stock disponible
+             */
 
             if (cantidad > 0) {
 
@@ -141,13 +139,19 @@ async function cargarExistencias() {
                         datos.productoId || "",
 
                     productoNombre:
-                        datos.productoNombre || "Producto sin nombre",
+                        datos.productoNombre ||
+                        "Producto sin nombre",
+
+                    lote:
+                        datos.lote ||
+                        "Sin lote",
 
                     ubicacionId:
                         datos.ubicacionId || "",
 
                     ubicacionNombre:
-                        datos.ubicacionNombre || "Ubicación sin nombre",
+                        datos.ubicacionNombre ||
+                        "Ubicación sin nombre",
 
                     cantidad:
                         cantidad,
@@ -163,8 +167,10 @@ async function cargarExistencias() {
 
 
         /*
-         * Ordenamos por producto
-         * y después por ubicación
+         * Orden:
+         * Producto
+         * Ubicación
+         * Lote
          */
 
         existencias.sort((a, b) => {
@@ -175,13 +181,22 @@ async function cargarExistencias() {
                 );
 
             if (producto !== 0) {
-
                 return producto;
-
             }
 
-            return a.ubicacionNombre.localeCompare(
-                b.ubicacionNombre
+
+            const ubicacion =
+                a.ubicacionNombre.localeCompare(
+                    b.ubicacionNombre
+                );
+
+            if (ubicacion !== 0) {
+                return ubicacion;
+            }
+
+
+            return a.lote.localeCompare(
+                b.lote
             );
 
         });
@@ -200,10 +215,19 @@ async function cargarExistencias() {
 
         lista.innerHTML = `
             <li class="stock-item">
+
                 <div class="stock-info">
-                    <strong>Error al cargar el stock</strong>
-                    <small>Revisá la consola para ver el error.</small>
+
+                    <strong>
+                        Error al cargar el stock
+                    </strong>
+
+                    <small>
+                        Revisá la consola para ver el error.
+                    </small>
+
                 </div>
+
             </li>
         `;
 
@@ -225,9 +249,15 @@ function renderExistencias(listaStock) {
 
         lista.innerHTML = `
             <li class="stock-item">
+
                 <div class="stock-info">
-                    <strong>No hay stock para mostrar.</strong>
+
+                    <strong>
+                        No hay stock para mostrar.
+                    </strong>
+
                 </div>
+
             </li>
         `;
 
@@ -251,12 +281,20 @@ function renderExistencias(listaStock) {
 
 
         info.innerHTML = `
-            <strong>${stock.productoNombre}</strong>
+            <strong>
+                ${stock.productoNombre}
+            </strong>
 
             <small>
                 📍 ${stock.ubicacionNombre}
-                ·
-                ${stock.cantidad} ${stock.unidad}
+            </small>
+
+            <small>
+                🏷️ Lote: ${stock.lote}
+            </small>
+
+            <small>
+                📦 ${stock.cantidad} ${stock.unidad}
             </small>
         `;
 
@@ -274,10 +312,11 @@ function renderExistencias(listaStock) {
 /*********************************
  * BUSCADOR
  *
- * Busca tanto:
+ * Busca:
  *
- * 1. PRODUCTO
- * 2. UBICACIÓN
+ * PRODUCTO
+ * UBICACIÓN
+ * LOTE
  *********************************/
 
 buscador.addEventListener("input", () => {
@@ -289,8 +328,8 @@ buscador.addEventListener("input", () => {
 
 
     /*
-     * Si no hay texto,
-     * mostramos todo el stock.
+     * Sin búsqueda:
+     * mostrar todo
      */
 
     if (texto === "") {
@@ -301,13 +340,6 @@ buscador.addEventListener("input", () => {
 
     }
 
-
-    /*
-     * Buscamos en:
-     *
-     * productoNombre
-     * ubicacionNombre
-     */
 
     const resultado =
         existencias.filter(stock => {
@@ -320,10 +352,15 @@ buscador.addEventListener("input", () => {
                 (stock.ubicacionNombre || "")
                 .toLowerCase();
 
+            const lote =
+                (stock.lote || "")
+                .toLowerCase();
+
 
             return (
                 producto.includes(texto) ||
-                ubicacion.includes(texto)
+                ubicacion.includes(texto) ||
+                lote.includes(texto)
             );
 
         });
