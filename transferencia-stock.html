@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>INLACT - Transferencia de stock</title>
+
+    <meta
+        name="description"
+        content="INLACT - Transferencia de stock"
+    >
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <!-- CSS principal -->
+    <link
+        rel="stylesheet"
+        href="index.css"
+    >
+
+    <!-- CSS stock -->
+    <link
+        rel="stylesheet"
+        href="stock.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <figure>
+
+        <img
+            src="img/logo.jpg"
+            alt="INLACT"
+        >
+
+    </figure>
+
+    <h2>
+        NICOLÁS PAJARES
+    </h2>
+
+</header>
+
+
+<main>
+
+
+<section class="card">
+
+    <h2>
+        🔄 Transferencia de stock
+    </h2>
+
+
+    <!-- PRODUCTO -->
+
+    <label for="productoBuscador">
+        Producto
+    </label>
+
+    <input
+        type="text"
+        id="productoBuscador"
+        placeholder="Buscar producto..."
+        autocomplete="off"
+    >
+
+    <input
+        type="hidden"
+        id="producto"
+    >
+
+    <div
+        id="listaProductos"
+        class="lista-resultados">
+    </div>
+
+
+    <!-- LOTE -->
+
+    <label for="lote">
+        Lote
+    </label>
+
+    <select id="lote">
+
+        <option value="">
+            Seleccionar lote
+        </option>
+
+    </select>
+
+
+    <!-- ORIGEN -->
+
+    <label for="ubicacionOrigen">
+        Ubicación de origen
+    </label>
+
+    <select id="ubicacionOrigen">
+
+        <option value="">
+            Seleccionar ubicación de origen
+        </option>
+
+    </select>
+
+
+    <!-- DESTINO -->
+
+    <label for="ubicacionDestino">
+        Ubicación de destino
+    </label>
+
+    <select id="ubicacionDestino">
+
+        <option value="">
+            Seleccionar ubicación de destino
+        </option>
+
+    </select>
+
+
+    <!-- DISPONIBLE -->
+
+    <label for="cantidadDisponible">
+        Disponible en origen
+    </label>
+
+    <input
+        type="text"
+        id="cantidadDisponible"
+        readonly
+    >
+
+
+    <!-- CANTIDAD -->
+
+    <label for="cantidad">
+        Cantidad a transferir
+    </label>
+
+    <input
+        type="number"
+        id="cantidad"
+        min="0"
+        step="any"
+        placeholder="Ingresar cantidad"
+    >
+
+
+    <!-- OBSERVACIÓN -->
+
+    <label for="observacion">
+        Observación
+    </label>
+
+    <textarea
+        id="observacion"
+        placeholder="Observación opcional"
+    ></textarea>
+
+
+    <!-- BOTÓN -->
+
+    <button
+        type="button"
+        id="btnTransferir"
+    >
+        🔄 Transferir stock
+    </button>
+
+
+    <button
+        type="button"
+        onclick="window.location.href='stock.html'"
+    >
+        ⬅ Volver a stock
+    </button>
+
+
+</section>
+
+
+</main>
+
+
+<footer>
+
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+
+</footer>
+
+
+<script
+    type="module"
+    src="transferencia-stock.js">
+</script>
+
+
+</body>
+
+</html>
