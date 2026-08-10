@@ -10,18 +10,6 @@
 
 
 /* ===============================
-   TITULO
-================================ */
-
-.card-formulario h1 {
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #1f4e8c;
-    text-align: center;
-}
-
-
-/* ===============================
    BODY
 ================================ */
 
@@ -40,6 +28,18 @@ main {
     max-width: 900px;
     margin: auto;
     padding: 20px;
+}
+
+
+/* ===============================
+   TITULO
+================================ */
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    text-align: center;
 }
 
 
@@ -70,7 +70,7 @@ main {
 
 
 /* ===============================
-   INPUTS
+   INPUTS Y SELECTS
 ================================ */
 
 #formEgresoStock input,
@@ -117,12 +117,14 @@ main {
 
 
 /* ===============================
-   CAMPOS SOLO LECTURA
+   CANTIDAD DISPONIBLE
 ================================ */
 
 #cantidadDisponible {
-    background: #f3f7fb !important;
-    color: #1f4e8c !important;
+    background: #f3f7fb;
+
+    color: #1f4e8c;
+
     font-weight: 600;
 }
 
@@ -140,11 +142,33 @@ main {
 
 
 /* ===============================
-   LISTA DE PRODUCTOS
-   Y CLIENTES
+   LISTA PRODUCTOS
 ================================ */
 
-#listaProductos,
+#listaProductos {
+
+    width: 100%;
+
+    margin-top: -12px;
+
+    margin-bottom: 18px;
+
+    background: #fff;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow: 0 6px 15px rgba(0, 0, 0, .08);
+}
+
+
+/* ===============================
+   LISTA CLIENTES
+================================ */
+
 #listaClientes {
 
     width: 100%;
@@ -166,7 +190,7 @@ main {
 
 
 /* ===============================
-   ELEMENTOS DE LAS LISTAS
+   OPCIONES DE LISTAS
 ================================ */
 
 #listaProductos div,
