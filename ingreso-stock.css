@@ -1,5 +1,5 @@
 /* ===============================
-   RESET
+RESET
 ================================ */
 
 * {
@@ -8,17 +8,21 @@
     box-sizing: border-box;
 }
 
+
 /* ===============================
-   TITULO
+TITULO
 ================================ */
+
 .card-formulario h1 {
-  font-size: 28px;
-  margin-bottom: 25px;
-  color: #1f4e8c;
-  text-align: center;
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    text-align: center;
 }
+
+
 /* ===============================
-   BODY
+BODY
 ================================ */
 
 body {
@@ -29,7 +33,7 @@ body {
 
 
 /* ===============================
-   MAIN
+MAIN
 ================================ */
 
 main {
@@ -39,21 +43,17 @@ main {
 }
 
 
-
 /* ===============================
-   FORMULARIO
+FORMULARIO
 ================================ */
 
 #formIngresoStock {
-    background: #ffffff;
-    padding: 25px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+    width: 100%;
 }
 
 
 /* ===============================
-   LABELS
+LABELS
 ================================ */
 
 #formIngresoStock label {
@@ -70,7 +70,7 @@ main {
 
 
 /* ===============================
-   INPUTS
+INPUTS
 ================================ */
 
 #formIngresoStock input,
@@ -102,7 +102,7 @@ main {
 
 
 /* ===============================
-   FOCUS
+FOCUS
 ================================ */
 
 #formIngresoStock input:focus,
@@ -117,7 +117,7 @@ main {
 
 
 /* ===============================
-   TEXTAREA
+TEXTAREA
 ================================ */
 
 #formIngresoStock textarea {
@@ -129,7 +129,7 @@ main {
 
 
 /* ===============================
-   ACCIONES
+ACCIONES
 ================================ */
 
 .acciones-form {
@@ -143,7 +143,7 @@ main {
 
 
 /* ===============================
-   BOTON GUARDAR
+BOTON GUARDAR
 ================================ */
 
 .btn-guardar {
@@ -188,7 +188,7 @@ main {
 
 
 /* ===============================
-   BOTON CANCELAR
+BOTON CANCELAR
 ================================ */
 
 .btn-cancelar {
@@ -224,7 +224,7 @@ main {
 
 
 /* ===============================
-   FOOTER
+FOOTER
 ================================ */
 
 footer {
@@ -250,28 +250,21 @@ footer a {
 
 
 /* ===============================
-   DESKTOP
+DESKTOP
 ================================ */
 
 @media (min-width: 768px) {
 
-    #formIngresoStock {
-
-        padding: 30px;
-    }
-
-
     h1 {
-
         font-size: 32px;
     }
-
 
     .acciones-form {
 
         max-width: 600px;
 
         margin-left: auto;
+
         margin-right: auto;
     }
 
@@ -279,7 +272,7 @@ footer a {
 
 
 /* ===============================
-   MOBILE
+MOBILE
 ================================ */
 
 @media (max-width: 600px) {
