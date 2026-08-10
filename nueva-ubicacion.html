@@ -3,72 +3,85 @@
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <title>INLACT · Nueva Ubicación</title>
-
+    <!-- SEO / Mobile -->
+    <meta name="description" content="INLACT - Crear nueva ubicación">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- CSS base -->
     <link rel="stylesheet" href="index.css">
+
+    <!-- CSS específico -->
     <link rel="stylesheet" href="nueva-ubicacion.css">
+
+    <title>INLACT · Nueva Ubicación</title>
 
 </head>
 
 <body>
 
-<header>
-
-    <figure>
-        <img src="img/logo.jpg" alt="INLACT">
-    </figure>
-
-    <h2>NICOLÁS PAJARES</h2>
-
-</header>
-
 <main>
 
-<section class="card">
+    <section>
 
-<h2>Nueva Ubicación</h2>
+        <figure>
+            <img src="img/logo.jpg" alt="INLACT">
+        </figure>
 
-<form id="formUbicacion">
+        <h2>NICOLÁS PAJARES</h2>
 
-<label>
+        <h1>Crear nueva ubicación</h1>
 
-Nombre de la ubicación
+        <form id="formNuevaUbicacion">
 
-<input
-type="text"
-id="nombre"
-required
-placeholder="Ej.: Depósito Villa María">
+            <label for="nombre">
+                Nombre de la ubicación
+            </label>
 
-</label>
+            <input
+                type="text"
+                id="nombre"
+                placeholder="Ej: Depósito Villa María"
+                required
+            >
 
-<button
-type="submit"
-id="btnGuardar">
+            <div class="acciones-form">
 
-Guardar Ubicación
+                <button
+                    type="submit"
+                    class="btn-guardar">
+                    💾 Guardar ubicación
+                </button>
 
-</button>
+                <button
+                    type="button"
+                    class="btn-cancelar"
+                    onclick="location.href='ubicaciones.html'">
+                    ✖ Cancelar
+                </button>
 
-<button
-type="button"
-id="btnCancelar">
+            </div>
 
-Cancelar
+        </form>
 
-</button>
-
-</form>
-
-</section>
+    </section>
 
 </main>
 
-<script type="module" src="nueva-ubicacion.js"></script>
+<footer>
+
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+
+</footer>
+
+<script
+    type="module"
+    src="nueva-ubicacion.js">
+</script>
 
 </body>
 
