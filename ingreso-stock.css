@@ -39,29 +39,6 @@ main {
 }
 
 
-/* ===============================
-   TITULO PRINCIPAL
-================================ */
-
-h1 {
-    margin-top: 20px;
-    margin-bottom: 25px;
-    color: #1f4e8c;
-    font-size: 30px;
-}
-
-
-/* ===============================
-   TITULO USUARIO
-================================ */
-
-h2 {
-    margin-top: 20px;
-    margin-bottom: 12px;
-    color: #1f4e8c;
-    font-size: 22px;
-}
-
 
 /* ===============================
    FORMULARIO
