@@ -318,6 +318,11 @@ function renderExistencias(listaStock) {
             <small>
                 📦 ${stock.cantidad} ${stock.unidad}
             </small>
+            ${stock.observacion ? `
+    <small>
+        📝 ${stock.observacion}
+    </small>
+` : ""}
         `;
 
 
