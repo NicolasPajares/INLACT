@@ -1,19 +1,21 @@
-/*********************************
+/************************************************************
  * FIREBASE
- *********************************/
+ ************************************************************/
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
     getFirestore,
     collection,
     getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from
+    "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/*********************************
+/************************************************************
  * CONFIG FIREBASE
- *********************************/
+ ************************************************************/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -28,9 +30,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-/*********************************
+/************************************************************
  * ELEMENTOS
- *********************************/
+ ************************************************************/
 
 const btnProductos =
     document.getElementById("btnProductos");
@@ -54,16 +56,16 @@ const lista =
     document.getElementById("listaStock");
 
 
-/*********************************
+/************************************************************
  * VARIABLES
- *********************************/
+ ************************************************************/
 
 let existencias = [];
 
 
-/*********************************
+/************************************************************
  * NAVEGACIÓN
- *********************************/
+ ************************************************************/
 
 btnProductos.addEventListener("click", () => {
 
@@ -71,13 +73,11 @@ btnProductos.addEventListener("click", () => {
 
 });
 
-
 btnUbicaciones.addEventListener("click", () => {
 
     window.location.href = "ubicaciones.html";
 
 });
-
 
 btnIngreso.addEventListener("click", () => {
 
@@ -85,13 +85,11 @@ btnIngreso.addEventListener("click", () => {
 
 });
 
-
 btnEgreso.addEventListener("click", () => {
 
     window.location.href = "egreso-stock.html";
 
 });
-
 
 btnTransferencia.addEventListener("click", () => {
 
@@ -100,9 +98,9 @@ btnTransferencia.addEventListener("click", () => {
 });
 
 
-/*********************************
+/************************************************************
  * CARGAR STOCK
- *********************************/
+ ************************************************************/
 
 async function cargarExistencias() {
 
@@ -146,8 +144,16 @@ async function cargarExistencias() {
                         datos.lote ||
                         "Sin lote",
 
+                    /*
+                     * Aceptamos las dos variantes:
+                     * ubicacionID
+                     * ubicacionId
+                     */
+
                     ubicacionId:
-                        datos.ubicacionId || "",
+                        datos.ubicacionID ||
+                        datos.ubicacionId ||
+                        "",
 
                     ubicacionNombre:
                         datos.ubicacionNombre ||
@@ -202,7 +208,17 @@ async function cargarExistencias() {
         });
 
 
-        renderExistencias(existencias);
+        /*
+         * IMPORTANTE:
+         *
+         * Al abrir la página NO mostramos
+         * todo el stock.
+         *
+         * La lista queda vacía hasta
+         * realizar una búsqueda.
+         */
+
+        lista.innerHTML = "";
 
 
     } catch (error) {
@@ -236,14 +252,18 @@ async function cargarExistencias() {
 }
 
 
-/*********************************
+/************************************************************
  * RENDER STOCK
- *********************************/
+ ************************************************************/
 
 function renderExistencias(listaStock) {
 
     lista.innerHTML = "";
 
+
+    /*
+     * Si la búsqueda no encuentra nada
+     */
 
     if (listaStock.length === 0) {
 
@@ -253,7 +273,7 @@ function renderExistencias(listaStock) {
                 <div class="stock-info">
 
                     <strong>
-                        No hay stock para mostrar.
+                        No se encontraron resultados.
                     </strong>
 
                 </div>
@@ -309,15 +329,15 @@ function renderExistencias(listaStock) {
 }
 
 
-/*********************************
+/************************************************************
  * BUSCADOR
  *
- * Busca:
+ * Busca por:
  *
  * PRODUCTO
  * UBICACIÓN
  * LOTE
- *********************************/
+ ************************************************************/
 
 buscador.addEventListener("input", () => {
 
@@ -328,18 +348,23 @@ buscador.addEventListener("input", () => {
 
 
     /*
-     * Sin búsqueda:
-     * mostrar todo
+     * SIN BÚSQUEDA
+     *
+     * No mostramos nada.
      */
 
     if (texto === "") {
 
-        renderExistencias(existencias);
+        lista.innerHTML = "";
 
         return;
 
     }
 
+
+    /*
+     * BUSCAR
+     */
 
     const resultado =
         existencias.filter(stock => {
@@ -371,15 +396,14 @@ buscador.addEventListener("input", () => {
 });
 
 
-/*********************************
+/************************************************************
  * INICIAR
- *********************************/
+ ************************************************************/
 
 async function iniciar() {
 
     await cargarExistencias();
 
 }
-
 
 iniciar();
