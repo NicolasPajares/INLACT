@@ -1,5 +1,5 @@
 /* ===============================
-   RESET
+RESET
 ================================ */
 
 * {
@@ -10,7 +10,19 @@
 
 
 /* ===============================
-   BODY
+TITULO
+================================ */
+
+.card-formulario h1 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    text-align: center;
+}
+
+
+/* ===============================
+BODY
 ================================ */
 
 body {
@@ -21,7 +33,7 @@ body {
 
 
 /* ===============================
-   MAIN
+MAIN
 ================================ */
 
 main {
@@ -32,19 +44,7 @@ main {
 
 
 /* ===============================
-   TITULO
-================================ */
-
-h1 {
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #1f4e8c;
-    text-align: center;
-}
-
-
-/* ===============================
-   FORMULARIO
+FORMULARIO
 ================================ */
 
 #formEgresoStock {
@@ -53,7 +53,7 @@ h1 {
 
 
 /* ===============================
-   LABELS
+LABELS
 ================================ */
 
 #formEgresoStock label {
@@ -70,11 +70,11 @@ h1 {
 
 
 /* ===============================
-   INPUTS Y SELECTS
+INPUTS
 ================================ */
 
-#formEgresoStock input,
-#formEgresoStock select,
+#formEgresosoStock input,
+#formEgrespStock select,
 #formEgresoStock textarea {
 
     width: 100%;
@@ -102,12 +102,12 @@ h1 {
 
 
 /* ===============================
-   FOCUS
+FOCUS
 ================================ */
 
-#formEgresoStock input:focus,
-#formEgresoStock select:focus,
-#formEgresoStock textarea:focus {
+#formIngresoStock input:focus,
+#formIngresoStock select:focus,
+#formIngresoStock textarea:focus {
 
     border-color: #3b82f6;
 
@@ -117,23 +117,10 @@ h1 {
 
 
 /* ===============================
-   CANTIDAD DISPONIBLE
+TEXTAREA
 ================================ */
 
-#cantidadDisponible {
-    background: #f3f7fb;
-
-    color: #1f4e8c;
-
-    font-weight: 600;
-}
-
-
-/* ===============================
-   TEXTAREA
-================================ */
-
-#formEgresoStock textarea {
+#formIngresoStock textarea {
 
     resize: vertical;
 
@@ -142,101 +129,7 @@ h1 {
 
 
 /* ===============================
-   LISTA PRODUCTOS
-================================ */
-
-#listaProductos {
-
-    width: 100%;
-
-    margin-top: -12px;
-
-    margin-bottom: 18px;
-
-    background: #fff;
-
-    border: 1px solid #d1d5db;
-
-    border-radius: 10px;
-
-    overflow: hidden;
-
-    box-shadow: 0 6px 15px rgba(0, 0, 0, .08);
-}
-
-
-/* ===============================
-   LISTA CLIENTES
-================================ */
-
-#listaClientes {
-
-    width: 100%;
-
-    margin-top: -12px;
-
-    margin-bottom: 18px;
-
-    background: #fff;
-
-    border: 1px solid #d1d5db;
-
-    border-radius: 10px;
-
-    overflow: hidden;
-
-    box-shadow: 0 6px 15px rgba(0, 0, 0, .08);
-}
-
-
-/* ===============================
-   OPCIONES DE LISTAS
-================================ */
-
-#listaProductos div,
-#listaClientes div {
-
-    padding: 12px 15px;
-
-    cursor: pointer;
-
-    color: #2c3e50;
-
-    font-size: 16px;
-
-    border-bottom: 1px solid #edf0f3;
-
-    transition: .15s;
-}
-
-
-#listaProductos div:last-child,
-#listaClientes div:last-child {
-
-    border-bottom: none;
-}
-
-
-#listaProductos div:hover,
-#listaClientes div:hover {
-
-    background: #f3f7fb;
-
-    color: #1f4e8c;
-}
-
-
-/* ===============================
-   CONTENEDOR CLIENTE
-================================ */
-
-#contenedorCliente {
-    width: 100%;
-}
-
-
-/* ===============================
-   ACCIONES
+ACCIONES
 ================================ */
 
 .acciones-form {
@@ -250,7 +143,7 @@ h1 {
 
 
 /* ===============================
-   BOTON GUARDAR
+BOTON GUARDAR
 ================================ */
 
 .btn-guardar {
@@ -295,7 +188,7 @@ h1 {
 
 
 /* ===============================
-   BOTON CANCELAR
+BOTON CANCELAR
 ================================ */
 
 .btn-cancelar {
@@ -331,7 +224,7 @@ h1 {
 
 
 /* ===============================
-   FOOTER
+FOOTER
 ================================ */
 
 footer {
@@ -357,7 +250,7 @@ footer a {
 
 
 /* ===============================
-   DESKTOP
+DESKTOP
 ================================ */
 
 @media (min-width: 768px) {
@@ -365,7 +258,6 @@ footer a {
     h1 {
         font-size: 32px;
     }
-
 
     .acciones-form {
 
@@ -375,11 +267,12 @@ footer a {
 
         margin-right: auto;
     }
+
 }
 
 
 /* ===============================
-   MOBILE
+MOBILE
 ================================ */
 
 @media (max-width: 600px) {
@@ -395,4 +288,5 @@ footer a {
 
         width: 100%;
     }
+
 }
