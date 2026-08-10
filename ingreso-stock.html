@@ -36,15 +36,29 @@
         <form id="formIngresoStock">
                 <h1>Ingreso de stock</h1>
         
-            <label for="producto">
-                Producto
-            </label>
+            <label for="productoBuscador">
+        Producto
+    </label>
 
-            <select id="producto" required>
-                <option value="">
-                    Seleccionar producto
-                </option>
-            </select>
+    <input
+        type="text"
+        id="productoBuscador"
+        placeholder="Escribí para buscar un producto..."
+        autocomplete="off"
+        required
+    >
+
+    <div id="listaProductos"></div>
+
+    <!--
+        Este campo guarda internamente
+        el ID real del producto de Firestore.
+    -->
+
+    <input
+        type="hidden"
+        id="producto"
+    >
 
 
             <label for="lote">
