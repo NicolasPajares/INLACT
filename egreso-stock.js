@@ -1,27 +1,19 @@
-/****************************************************
- * FIREBASE
- ****************************************************/
+/* =========================================================
+   FIREBASE
+========================================================= */
 
-import { initializeApp } from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
     getFirestore,
     collection,
-    getDocs,
-    query,
-    where,
-    doc,
-    runTransaction,
-    addDoc,
-    serverTimestamp
-} from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/****************************************************
- * CONFIG FIREBASE
- ****************************************************/
+/* =========================================================
+   CONFIG FIREBASE
+========================================================= */
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -36,12 +28,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-/****************************************************
- * ELEMENTOS
- ****************************************************/
+/* =========================================================
+   ELEMENTOS
+========================================================= */
 
 const formulario =
-    document.getElementById("formegresosoStock");
+    document.getElementById("formEgresoStock");
 
 const tipoEgreso =
     document.getElementById("tipoEgreso");
@@ -64,15 +56,6 @@ const lote =
 const cantidadDisponible =
     document.getElementById("cantidadDisponible");
 
-const cantidad =
-    document.getElementById("cantidad");
-
-const unidad =
-    document.getElementById("unidad");
-
-const contenedorCliente =
-    document.getElementById("contenedorCliente");
-
 const clienteBuscador =
     document.getElementById("clienteBuscador");
 
@@ -82,28 +65,26 @@ const listaClientes =
 const cliente =
     document.getElementById("cliente");
 
-const fecha =
-    document.getElementById("fecha");
-
-const observacion =
-    document.getElementById("observacion");
+const contenedorCliente =
+    document.getElementById("contenedorCliente");
 
 
-/****************************************************
- * VARIABLES
- ****************************************************/
+/* =========================================================
+   VARIABLES
+========================================================= */
 
 let productos = [];
+let ubicaciones = [];
+let stock = [];
 let clientes = [];
-let stockDisponible = [];
 
 let productoSeleccionado = null;
 let stockSeleccionado = null;
 
 
-/****************************************************
- * CARGAR PRODUCTOS
- ****************************************************/
+/* =========================================================
+   CARGAR PRODUCTOS
+========================================================= */
 
 async function cargarProductos() {
 
@@ -116,29 +97,32 @@ async function cargarProductos() {
 
         productos = [];
 
-        snapshot.forEach(docSnap => {
+        snapshot.forEach(doc => {
 
-            const datos = docSnap.data();
+            const datos = doc.data();
 
-            if (datos.activo !== false) {
+            productos.push({
 
-                productos.push({
+                id: doc.id,
 
-                    id: docSnap.id,
+                descripcion:
+                    datos.descripcion ||
+                    datos.nombre ||
+                    "Producto sin nombre"
 
-                    ...datos
-
-                });
-
-            }
+            });
 
         });
 
         productos.sort((a, b) =>
-            (a.descripcion || "")
-            .localeCompare(
-                b.descripcion || ""
+            a.descripcion.localeCompare(
+                b.descripcion
             )
+        );
+
+        console.log(
+            "Productos cargados:",
+            productos.length
         );
 
     } catch (error) {
@@ -148,18 +132,14 @@ async function cargarProductos() {
             error
         );
 
-        alert(
-            "No se pudieron cargar los productos."
-        );
-
     }
 
 }
 
 
-/****************************************************
- * BUSCADOR DE PRODUCTOS
- ****************************************************/
+/* =========================================================
+   BUSCAR PRODUCTOS
+========================================================= */
 
 productoBuscador.addEventListener(
     "input",
@@ -167,27 +147,14 @@ productoBuscador.addEventListener(
 
         const texto =
             productoBuscador.value
-            .toLowerCase()
-            .trim();
+                .toLowerCase()
+                .trim();
 
         productoSeleccionado = null;
+
         producto.value = "";
 
-        ubicacion.innerHTML = `
-            <option value="">
-                Seleccionar ubicación
-            </option>
-        `;
-
-        lote.innerHTML = `
-            <option value="">
-                Seleccionar lote
-            </option>
-        `;
-
-        cantidadDisponible.value = "";
-
-        stockSeleccionado = null;
+        limpiarUbicaciones();
 
         if (texto === "") {
 
@@ -200,16 +167,16 @@ productoBuscador.addEventListener(
 
         const resultados =
             productos.filter(p =>
-                (p.descripcion || "")
-                .toLowerCase()
-                .includes(texto)
+                p.descripcion
+                    .toLowerCase()
+                    .includes(texto)
             );
 
 
         listaProductos.innerHTML = "";
 
 
-        resultados.slice(0, 10).forEach(p => {
+        resultados.forEach(p => {
 
             const opcion =
                 document.createElement("div");
@@ -220,6 +187,7 @@ productoBuscador.addEventListener(
             opcion.textContent =
                 p.descripcion;
 
+
             opcion.addEventListener(
                 "click",
                 () => {
@@ -229,7 +197,10 @@ productoBuscador.addEventListener(
                 }
             );
 
-            listaProductos.appendChild(opcion);
+
+            listaProductos.appendChild(
+                opcion
+            );
 
         });
 
@@ -237,31 +208,35 @@ productoBuscador.addEventListener(
 );
 
 
-/****************************************************
- * SELECCIONAR PRODUCTO
- ****************************************************/
+/* =========================================================
+   SELECCIONAR PRODUCTO
+========================================================= */
 
 function seleccionarProducto(p) {
 
     productoSeleccionado = p;
 
-    producto.value = p.id;
-
     productoBuscador.value =
         p.descripcion;
 
+    producto.value =
+        p.id;
+
     listaProductos.innerHTML = "";
 
-    cargarStockProducto();
+    limpiarUbicaciones();
+
+    cargarUbicacionesParaProducto();
 
 }
 
 
-/****************************************************
- * CARGAR STOCK DEL PRODUCTO
- ****************************************************/
+/* =========================================================
+   CARGAR UBICACIONES
+   SOLO LAS QUE TIENEN STOCK DEL PRODUCTO
+========================================================= */
 
-async function cargarStockProducto() {
+async function cargarUbicacionesParaProducto() {
 
     if (!productoSeleccionado) {
         return;
@@ -269,41 +244,50 @@ async function cargarStockProducto() {
 
     try {
 
-        const q =
-            query(
-                collection(db, "stock"),
-                where(
-                    "productoId",
-                    "==",
-                    productoSeleccionado.id
-                )
+        const snapshot =
+            await getDocs(
+                collection(db, "stock")
             );
 
-        const snapshot =
-            await getDocs(q);
+        stock = [];
 
-        stockDisponible = [];
+        snapshot.forEach(doc => {
 
-        snapshot.forEach(docSnap => {
+            const datos = doc.data();
 
-            const datos =
-                docSnap.data();
+            const cantidad =
+                Number(datos.cantidad || 0);
 
-            const cantidadStock =
-                Number(
-                    datos.cantidad || 0
-                );
+            if (
+                cantidad > 0 &&
+                datos.productoId ===
+                    productoSeleccionado.id
+            ) {
 
-            if (cantidadStock > 0) {
+                stock.push({
 
-                stockDisponible.push({
+                    id: doc.id,
 
-                    id: docSnap.id,
+                    productoId:
+                        datos.productoId,
 
-                    ...datos,
+                    productoNombre:
+                        datos.productoNombre || "",
+
+                    lote:
+                        datos.lote || "",
+
+                    ubicacionId:
+                        datos.ubicacionId || "",
+
+                    ubicacionNombre:
+                        datos.ubicacionNombre || "",
 
                     cantidad:
-                        cantidadStock
+                        cantidad,
+
+                    unidad:
+                        datos.unidad || ""
 
                 });
 
@@ -312,18 +296,90 @@ async function cargarStockProducto() {
         });
 
 
-        cargarUbicacionesDisponibles();
+        /*
+         * Obtener ubicaciones únicas
+         */
 
+        const idsUbicaciones =
+            new Set();
+
+
+        stock.forEach(s => {
+
+            if (s.ubicacionId) {
+
+                idsUbicaciones.add(
+                    s.ubicacionId
+                );
+
+            }
+
+        });
+
+
+        ubicacion.innerHTML = `
+            <option value="">
+                Seleccionar ubicación
+            </option>
+        `;
+
+
+        const ubicacionesStock =
+            Array.from(idsUbicaciones);
+
+
+        ubicacionesStock.forEach(id => {
+
+            const item =
+                stock.find(
+                    s =>
+                        s.ubicacionId === id
+                );
+
+            if (!item) {
+                return;
+            }
+
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                item.ubicacionId;
+
+            option.textContent =
+                item.ubicacionNombre ||
+                "Ubicación sin nombre";
+
+
+            ubicacion.appendChild(
+                option
+            );
+
+        });
+
+
+        /*
+         * Si no hay stock
+         */
+
+        if (stock.length === 0) {
+
+            ubicacion.innerHTML = `
+                <option value="">
+                    Sin stock disponible
+                </option>
+            `;
+
+        }
 
     } catch (error) {
 
         console.error(
-            "Error cargando stock:",
+            "Error cargando ubicaciones:",
             error
-        );
-
-        alert(
-            "No se pudo cargar el stock del producto."
         );
 
     }
@@ -331,87 +387,9 @@ async function cargarStockProducto() {
 }
 
 
-/****************************************************
- * CARGAR UBICACIONES DISPONIBLES
- ****************************************************/
-
-function cargarUbicacionesDisponibles() {
-
-    ubicacion.innerHTML = `
-        <option value="">
-            Seleccionar ubicación
-        </option>
-    `;
-
-    lote.innerHTML = `
-        <option value="">
-            Seleccionar lote
-        </option>
-    `;
-
-    cantidadDisponible.value = "";
-
-    stockSeleccionado = null;
-
-
-    const ubicaciones = [];
-
-
-    stockDisponible.forEach(stock => {
-
-        const existe =
-            ubicaciones.find(
-                u =>
-                    u.id ===
-                    stock.ubicacionId
-            );
-
-        if (!existe) {
-
-            ubicaciones.push({
-
-                id:
-                    stock.ubicacionId,
-
-                nombre:
-                    stock.ubicacionNombre
-
-            });
-
-        }
-
-    });
-
-
-    ubicaciones.sort((a, b) =>
-        (a.nombre || "")
-        .localeCompare(
-            b.nombre || ""
-        )
-    );
-
-
-    ubicaciones.forEach(u => {
-
-        const option =
-            document.createElement("option");
-
-        option.value =
-            u.id;
-
-        option.textContent =
-            u.nombre;
-
-        ubicacion.appendChild(option);
-
-    });
-
-}
-
-
-/****************************************************
- * CAMBIO DE UBICACIÓN
- ****************************************************/
+/* =========================================================
+   CAMBIO DE UBICACIÓN
+========================================================= */
 
 ubicacion.addEventListener(
     "change",
@@ -436,26 +414,41 @@ ubicacion.addEventListener(
         }
 
 
-        const lotes =
-            stockDisponible.filter(
-                stock =>
-                    stock.ubicacionId ===
-                    ubicacionId
+        const stockUbicacion =
+            stock.filter(
+                s =>
+                    s.ubicacionId ===
+                    ubicacionId &&
+                    s.cantidad > 0
             );
 
 
-        lotes.forEach(stock => {
+        /*
+         * Ordenar lotes
+         */
+
+        stockUbicacion.sort((a, b) =>
+            a.lote.localeCompare(b.lote)
+        );
+
+
+        stockUbicacion.forEach(s => {
 
             const option =
-                document.createElement("option");
+                document.createElement(
+                    "option"
+                );
 
             option.value =
-                stock.id;
+                s.id;
 
             option.textContent =
-                `${stock.lote} · ${stock.cantidad} ${stock.unidad}`;
+                s.lote ||
+                "Sin lote";
 
-            lote.appendChild(option);
+            lote.appendChild(
+                option
+            );
 
         });
 
@@ -463,9 +456,9 @@ ubicacion.addEventListener(
 );
 
 
-/****************************************************
- * CAMBIO DE LOTE
- ****************************************************/
+/* =========================================================
+   CAMBIO DE LOTE
+========================================================= */
 
 lote.addEventListener(
     "change",
@@ -474,42 +467,42 @@ lote.addEventListener(
         const stockId =
             lote.value;
 
-        stockSeleccionado =
-            stockDisponible.find(
-                stock =>
-                    stock.id === stockId
-            );
+        cantidadDisponible.value = "";
+
+        stockSeleccionado = null;
 
 
-        if (!stockSeleccionado) {
-
-            cantidadDisponible.value =
-                "";
-
+        if (!stockId) {
             return;
-
         }
 
 
+        const seleccionado =
+            stock.find(
+                s =>
+                    s.id === stockId
+            );
+
+
+        if (!seleccionado) {
+            return;
+        }
+
+
+        stockSeleccionado =
+            seleccionado;
+
+
         cantidadDisponible.value =
-            `${stockSeleccionado.cantidad} ${stockSeleccionado.unidad}`;
-
-
-        /*
-         * Seleccionamos automáticamente
-         * la unidad correspondiente al stock.
-         */
-
-        unidad.value =
-            stockSeleccionado.unidad;
+            `${seleccionado.cantidad} ${seleccionado.unidad}`;
 
     }
 );
 
 
-/****************************************************
- * CARGAR CLIENTES
- ****************************************************/
+/* =========================================================
+   CARGAR CLIENTES
+========================================================= */
 
 async function cargarClientes() {
 
@@ -522,34 +515,35 @@ async function cargarClientes() {
 
         clientes = [];
 
-        snapshot.forEach(docSnap => {
+        snapshot.forEach(doc => {
 
-            const datos =
-                docSnap.data();
+            const datos = doc.data();
 
-            if (datos.activo !== false) {
+            clientes.push({
 
-                clientes.push({
+                id: doc.id,
 
-                    id:
-                        docSnap.id,
+                nombre:
+                    datos.nombre ||
+                    datos.nombreCliente ||
+                    "Cliente sin nombre"
 
-                    ...datos
-
-                });
-
-            }
+            });
 
         });
 
 
         clientes.sort((a, b) =>
-            (a.nombre || "")
-            .localeCompare(
-                b.nombre || ""
+            a.nombre.localeCompare(
+                b.nombre
             )
         );
 
+
+        console.log(
+            "Clientes cargados:",
+            clientes.length
+        );
 
     } catch (error) {
 
@@ -563,19 +557,104 @@ async function cargarClientes() {
 }
 
 
-/****************************************************
- * MOSTRAR / OCULTAR CLIENTE
- ****************************************************/
+/* =========================================================
+   BUSCAR CLIENTES
+========================================================= */
+
+clienteBuscador.addEventListener(
+    "input",
+    () => {
+
+        const texto =
+            clienteBuscador.value
+                .toLowerCase()
+                .trim();
+
+        cliente.value = "";
+
+
+        if (texto === "") {
+
+            listaClientes.innerHTML = "";
+
+            return;
+
+        }
+
+
+        const resultados =
+            clientes.filter(c =>
+                c.nombre
+                    .toLowerCase()
+                    .includes(texto)
+            );
+
+
+        listaClientes.innerHTML = "";
+
+
+        resultados.forEach(c => {
+
+            const opcion =
+                document.createElement("div");
+
+            opcion.className =
+                "opcion-cliente";
+
+            opcion.textContent =
+                c.nombre;
+
+
+            opcion.addEventListener(
+                "click",
+                () => {
+
+                    seleccionarCliente(c);
+
+                }
+            );
+
+
+            listaClientes.appendChild(
+                opcion
+            );
+
+        });
+
+    }
+);
+
+
+/* =========================================================
+   SELECCIONAR CLIENTE
+========================================================= */
+
+function seleccionarCliente(c) {
+
+    clienteBuscador.value =
+        c.nombre;
+
+    cliente.value =
+        c.id;
+
+    listaClientes.innerHTML = "";
+
+}
+
+
+/* =========================================================
+   MOSTRAR / OCULTAR CLIENTE
+========================================================= */
 
 tipoEgreso.addEventListener(
     "change",
     () => {
 
-        const esVenta =
-            tipoEgreso.value === "venta";
+        const tipo =
+            tipoEgreso.value;
 
 
-        if (esVenta) {
+        if (tipo === "venta") {
 
             contenedorCliente.style.display =
                 "block";
@@ -603,464 +682,69 @@ tipoEgreso.addEventListener(
 );
 
 
-/****************************************************
- * BUSCADOR DE CLIENTES
- ****************************************************/
-
-clienteBuscador.addEventListener(
-    "input",
-    () => {
-
-        const texto =
-            clienteBuscador.value
-            .toLowerCase()
-            .trim();
-
-        cliente.value = "";
-
-        listaClientes.innerHTML = "";
-
-
-        if (texto === "") {
-            return;
-        }
-
-
-        const resultados =
-            clientes.filter(c =>
-                (c.nombre || "")
-                .toLowerCase()
-                .includes(texto)
-            );
-
-
-        resultados.slice(0, 10).forEach(c => {
-
-            const opcion =
-                document.createElement("div");
-
-            opcion.className =
-                "opcion-cliente";
-
-            opcion.textContent =
-                c.nombre;
-
-            opcion.addEventListener(
-                "click",
-                () => {
-
-                    cliente.value =
-                        c.id;
-
-                    clienteBuscador.value =
-                        c.nombre;
-
-                    listaClientes.innerHTML =
-                        "";
-
-                }
-            );
-
-            listaClientes.appendChild(
-                opcion
-            );
-
-        });
-
-    }
-);
-
-
-/****************************************************
- * REGISTRAR EGRESO
- ****************************************************/
-
-formulario.addEventListener(
-    "submit",
-    async (e) => {
-
-        e.preventDefault();
-
-
-        /********************************************
-         * VALIDACIONES
-         ********************************************/
-
-        if (!productoSeleccionado) {
-
-            alert(
-                "Seleccioná un producto."
-            );
-
-            return;
-
-        }
-
-
-        if (!stockSeleccionado) {
-
-            alert(
-                "Seleccioná un lote."
-            );
-
-            return;
-
-        }
-
-
-        const cantidadRetirar =
-            Number(
-                cantidad.value
-            );
-
-
-        if (
-            !cantidadRetirar ||
-            cantidadRetirar <= 0
-        ) {
-
-            alert(
-                "Ingresá una cantidad válida."
-            );
-
-            return;
-
-        }
-
-
-        if (
-            cantidadRetirar >
-            stockSeleccionado.cantidad
-        ) {
-
-            alert(
-                `No podés retirar ${cantidadRetirar} ${stockSeleccionado.unidad}. ` +
-                `El lote solamente tiene ${stockSeleccionado.cantidad} ${stockSeleccionado.unidad}.`
-            );
-
-            return;
-
-        }
-
-
-        if (
-            tipoEgreso.value ===
-            "venta" &&
-            !cliente.value
-        ) {
-
-            alert(
-                "Seleccioná un cliente para registrar la venta."
-            );
-
-            return;
-
-        }
-
-
-        /********************************************
-         * DATOS
-         ********************************************/
-
-        const cantidadAnterior =
-            stockSeleccionado.cantidad;
-
-        const cantidadNueva =
-            cantidadAnterior -
-            cantidadRetirar;
-
-
-        const fechaEgreso =
-            fecha.value;
-
-
-        const tipo =
-            tipoEgreso.value;
-
-
-        const observacionTexto =
-            observacion.value.trim();
-
-
-        try {
-
-            /****************************************
-             * ACTUALIZAR STOCK
-             ****************************************/
-
-            await runTransaction(
-                db,
-                async transaction => {
-
-                    const stockRef =
-                        doc(
-                            db,
-                            "stock",
-                            stockSeleccionado.id
-                        );
-
-
-                    const stockSnap =
-                        await transaction.get(
-                            stockRef
-                        );
-
-
-                    if (!stockSnap.exists()) {
-
-                        throw new Error(
-                            "El registro de stock ya no existe."
-                        );
-
-                    }
-
-
-                    const datosActuales =
-                        stockSnap.data();
-
-
-                    const cantidadActual =
-                        Number(
-                            datosActuales.cantidad ||
-                            0
-                        );
-
-
-                    if (
-                        cantidadRetirar >
-                        cantidadActual
-                    ) {
-
-                        throw new Error(
-                            "El stock disponible cambió. No hay cantidad suficiente."
-                        );
-
-                    }
-
-
-                    const nuevoStock =
-                        cantidadActual -
-                        cantidadRetirar;
-
-
-                    transaction.update(
-                        stockRef,
-                        {
-                            cantidad:
-                                nuevoStock,
-
-                            actualizadoEn:
-                                serverTimestamp()
-                        }
-                    );
-
-                }
-            );
-
-
-            /****************************************
-             * REGISTRAR MOVIMIENTO
-             ****************************************/
-
-            await addDoc(
-                collection(
-                    db,
-                    "movimientos_stock"
-                ),
-                {
-
-                    tipo:
-                        "egreso",
-
-                    tipoEgreso:
-                        tipo,
-
-                    productoId:
-                        stockSeleccionado.productoId,
-
-                    productoNombre:
-                        stockSeleccionado.productoNombre,
-
-                    lote:
-                        stockSeleccionado.lote,
-
-                    ubicacionId:
-                        stockSeleccionado.ubicacionId,
-
-                    ubicacionNombre:
-                        stockSeleccionado.ubicacionNombre,
-
-                    cantidad:
-                        cantidadRetirar,
-
-                    unidad:
-                        stockSeleccionado.unidad,
-
-                    fecha:
-                        fechaEgreso,
-
-                    observacion:
-                        observacionTexto,
-
-                    creadoEn:
-                        serverTimestamp()
-
-                }
-            );
-
-
-            /****************************************
-             * SI ES VENTA:
-             * REGISTRAR ENTREGA AL CLIENTE
-             ****************************************/
-
-            if (
-                tipo ===
-                "venta"
-            ) {
-
-                const clienteSeleccionado =
-                    clientes.find(
-                        c =>
-                            c.id ===
-                            cliente.value
-                    );
-
-
-                await addDoc(
-                    collection(
-                        db,
-                        "entregas"
-                    ),
-                    {
-
-                        clienteId:
-                            cliente.value,
-
-                        clienteNombre:
-                            clienteSeleccionado
-                                ?.nombre ||
-                            "",
-
-                        productoId:
-                            stockSeleccionado.productoId,
-
-                        productoNombre:
-                            stockSeleccionado.productoNombre,
-
-                        lote:
-                            stockSeleccionado.lote,
-
-                        ubicacionId:
-                            stockSeleccionado.ubicacionId,
-
-                        ubicacionNombre:
-                            stockSeleccionado.ubicacionNombre,
-
-                        cantidad:
-                            cantidadRetirar,
-
-                        unidad:
-                            stockSeleccionado.unidad,
-
-                        fecha:
-                            fechaEgreso,
-
-                        observacion:
-                            observacionTexto,
-
-                        creadoEn:
-                            serverTimestamp()
-
-                    }
-                );
-
-            }
-
-
-            /****************************************
-             * ÉXITO
-             ****************************************/
-
-            alert(
-                tipo === "venta"
-                    ? "Venta / entrega registrada correctamente."
-                    : "Ajuste de stock registrado correctamente."
-            );
-
-
-            window.location.href =
-                "stock.html";
-
-
-        } catch (error) {
-
-            console.error(
-                "Error registrando egreso:",
-                error
-            );
-
-
-            alert(
-                "No se pudo registrar el egreso.\n\n" +
-                error.message
-            );
-
-        }
-
-    }
-);
-
-
-/****************************************************
- * FECHA POR DEFECTO
- ****************************************************/
-
-function colocarFechaActual() {
-
-    const hoy =
-        new Date();
-
-    const año =
-        hoy.getFullYear();
-
-    const mes =
-        String(
-            hoy.getMonth() + 1
-        ).padStart(2, "0");
-
-    const dia =
-        String(
-            hoy.getDate()
-        ).padStart(2, "0");
-
-
-    fecha.value =
-        `${año}-${mes}-${dia}`;
+/* =========================================================
+   LIMPIAR UBICACIONES
+========================================================= */
+
+function limpiarUbicaciones() {
+
+    ubicacion.innerHTML = `
+        <option value="">
+            Seleccionar ubicación
+        </option>
+    `;
+
+    lote.innerHTML = `
+        <option value="">
+            Seleccionar lote
+        </option>
+    `;
+
+    cantidadDisponible.value = "";
+
+    stockSeleccionado = null;
 
 }
 
 
-/****************************************************
- * INICIAR
- ****************************************************/
+/* =========================================================
+   FORMULARIO
+========================================================= */
+
+formulario.addEventListener(
+    "submit",
+    (e) => {
+
+        e.preventDefault();
+
+        alert(
+            "La carga de datos funciona correctamente. Todavía no registramos el egreso."
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INICIO
+========================================================= */
 
 async function iniciar() {
 
     /*
-     * Al principio ocultamos cliente.
+     * El cliente empieza oculto.
      */
 
     contenedorCliente.style.display =
         "none";
 
 
-    colocarFechaActual();
-
-
     await Promise.all([
+
         cargarProductos(),
+
         cargarClientes()
+
     ]);
 
 }
