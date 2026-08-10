@@ -1,19 +1,24 @@
-/* =========================================================
-   FIREBASE
-========================================================= */
+/*************************************************
+ * FIREBASE
+ *************************************************/
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
     getFirestore,
     collection,
-    getDocs
+    getDocs,
+    doc,
+    getDoc,
+    runTransaction,
+    addDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/* =========================================================
-   CONFIG FIREBASE
-========================================================= */
+/*************************************************
+ * CONFIG FIREBASE
+ *************************************************/
 
 const firebaseConfig = {
     apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
@@ -28,9 +33,9 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-/* =========================================================
-   ELEMENTOS
-========================================================= */
+/*************************************************
+ * ELEMENTOS
+ *************************************************/
 
 const formulario =
     document.getElementById("formEgresoStock");
@@ -56,6 +61,15 @@ const lote =
 const cantidadDisponible =
     document.getElementById("cantidadDisponible");
 
+const cantidad =
+    document.getElementById("cantidad");
+
+const unidad =
+    document.getElementById("unidad");
+
+const contenedorCliente =
+    document.getElementById("contenedorCliente");
+
 const clienteBuscador =
     document.getElementById("clienteBuscador");
 
@@ -65,26 +79,28 @@ const listaClientes =
 const cliente =
     document.getElementById("cliente");
 
-const contenedorCliente =
-    document.getElementById("contenedorCliente");
+const fecha =
+    document.getElementById("fecha");
+
+const observacion =
+    document.getElementById("observacion");
 
 
-/* =========================================================
-   VARIABLES
-========================================================= */
+/*************************************************
+ * VARIABLES
+ *************************************************/
 
 let productos = [];
 let ubicaciones = [];
-let stock = [];
 let clientes = [];
+let existencias = [];
 
-let productoSeleccionado = null;
 let stockSeleccionado = null;
 
 
-/* =========================================================
-   CARGAR PRODUCTOS
-========================================================= */
+/*************************************************
+ * CARGAR PRODUCTOS
+ *************************************************/
 
 async function cargarProductos() {
 
@@ -97,32 +113,23 @@ async function cargarProductos() {
 
         productos = [];
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(docSnap => {
 
-            const datos = doc.data();
+            const datos = docSnap.data();
 
             productos.push({
-
-                id: doc.id,
-
-                descripcion:
-                    datos.descripcion ||
+                id: docSnap.id,
+                nombre:
                     datos.nombre ||
+                    datos.descripcion ||
                     "Producto sin nombre"
-
             });
 
         });
 
-        productos.sort((a, b) =>
-            a.descripcion.localeCompare(
-                b.descripcion
-            )
-        );
-
         console.log(
             "Productos cargados:",
-            productos.length
+            productos
         );
 
     } catch (error) {
@@ -133,247 +140,42 @@ async function cargarProductos() {
         );
 
     }
-
 }
 
 
-/* =========================================================
-   BUSCAR PRODUCTOS
-========================================================= */
+/*************************************************
+ * CARGAR UBICACIONES
+ *************************************************/
 
-productoBuscador.addEventListener(
-    "input",
-    () => {
-
-        const texto =
-            productoBuscador.value
-                .toLowerCase()
-                .trim();
-
-        productoSeleccionado = null;
-
-        producto.value = "";
-
-        limpiarUbicaciones();
-
-        if (texto === "") {
-
-            listaProductos.innerHTML = "";
-
-            return;
-
-        }
-
-
-        const resultados =
-            productos.filter(p =>
-                p.descripcion
-                    .toLowerCase()
-                    .includes(texto)
-            );
-
-
-        listaProductos.innerHTML = "";
-
-
-        resultados.forEach(p => {
-
-            const opcion =
-                document.createElement("div");
-
-            opcion.className =
-                "opcion-producto";
-
-            opcion.textContent =
-                p.descripcion;
-
-
-            opcion.addEventListener(
-                "click",
-                () => {
-
-                    seleccionarProducto(p);
-
-                }
-            );
-
-
-            listaProductos.appendChild(
-                opcion
-            );
-
-        });
-
-    }
-);
-
-
-/* =========================================================
-   SELECCIONAR PRODUCTO
-========================================================= */
-
-function seleccionarProducto(p) {
-
-    productoSeleccionado = p;
-
-    productoBuscador.value =
-        p.descripcion;
-
-    producto.value =
-        p.id;
-
-    listaProductos.innerHTML = "";
-
-    limpiarUbicaciones();
-
-    cargarUbicacionesParaProducto();
-
-}
-
-
-/* =========================================================
-   CARGAR UBICACIONES
-   SOLO LAS QUE TIENEN STOCK DEL PRODUCTO
-========================================================= */
-
-async function cargarUbicacionesParaProducto() {
-
-    if (!productoSeleccionado) {
-        return;
-    }
+async function cargarUbicaciones() {
 
     try {
 
         const snapshot =
             await getDocs(
-                collection(db, "stock")
+                collection(db, "ubicaciones")
             );
 
-        stock = [];
+        ubicaciones = [];
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(docSnap => {
 
-            const datos = doc.data();
+            const datos = docSnap.data();
 
-            const cantidad =
-                Number(datos.cantidad || 0);
-
-            if (
-                cantidad > 0 &&
-                datos.productoId ===
-                    productoSeleccionado.id
-            ) {
-
-                stock.push({
-
-                    id: doc.id,
-
-                    productoId:
-                        datos.productoId,
-
-                    productoNombre:
-                        datos.productoNombre || "",
-
-                    lote:
-                        datos.lote || "",
-
-                    ubicacionId:
-                        datos.ubicacionId || "",
-
-                    ubicacionNombre:
-                        datos.ubicacionNombre || "",
-
-                    cantidad:
-                        cantidad,
-
-                    unidad:
-                        datos.unidad || ""
-
-                });
-
-            }
+            ubicaciones.push({
+                id: docSnap.id,
+                nombre:
+                    datos.nombre ||
+                    datos.descripcion ||
+                    "Ubicación sin nombre"
+            });
 
         });
 
-
-        /*
-         * Obtener ubicaciones únicas
-         */
-
-        const idsUbicaciones =
-            new Set();
-
-
-        stock.forEach(s => {
-
-            if (s.ubicacionId) {
-
-                idsUbicaciones.add(
-                    s.ubicacionId
-                );
-
-            }
-
-        });
-
-
-        ubicacion.innerHTML = `
-            <option value="">
-                Seleccionar ubicación
-            </option>
-        `;
-
-
-        const ubicacionesStock =
-            Array.from(idsUbicaciones);
-
-
-        ubicacionesStock.forEach(id => {
-
-            const item =
-                stock.find(
-                    s =>
-                        s.ubicacionId === id
-                );
-
-            if (!item) {
-                return;
-            }
-
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                item.ubicacionId;
-
-            option.textContent =
-                item.ubicacionNombre ||
-                "Ubicación sin nombre";
-
-
-            ubicacion.appendChild(
-                option
-            );
-
-        });
-
-
-        /*
-         * Si no hay stock
-         */
-
-        if (stock.length === 0) {
-
-            ubicacion.innerHTML = `
-                <option value="">
-                    Sin stock disponible
-                </option>
-            `;
-
-        }
+        console.log(
+            "Ubicaciones cargadas:",
+            ubicaciones
+        );
 
     } catch (error) {
 
@@ -383,126 +185,12 @@ async function cargarUbicacionesParaProducto() {
         );
 
     }
-
 }
 
 
-/* =========================================================
-   CAMBIO DE UBICACIÓN
-========================================================= */
-
-ubicacion.addEventListener(
-    "change",
-    () => {
-
-        lote.innerHTML = `
-            <option value="">
-                Seleccionar lote
-            </option>
-        `;
-
-        cantidadDisponible.value = "";
-
-        stockSeleccionado = null;
-
-
-        const ubicacionId =
-            ubicacion.value;
-
-        if (!ubicacionId) {
-            return;
-        }
-
-
-        const stockUbicacion =
-            stock.filter(
-                s =>
-                    s.ubicacionId ===
-                    ubicacionId &&
-                    s.cantidad > 0
-            );
-
-
-        /*
-         * Ordenar lotes
-         */
-
-        stockUbicacion.sort((a, b) =>
-            a.lote.localeCompare(b.lote)
-        );
-
-
-        stockUbicacion.forEach(s => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                s.id;
-
-            option.textContent =
-                s.lote ||
-                "Sin lote";
-
-            lote.appendChild(
-                option
-            );
-
-        });
-
-    }
-);
-
-
-/* =========================================================
-   CAMBIO DE LOTE
-========================================================= */
-
-lote.addEventListener(
-    "change",
-    () => {
-
-        const stockId =
-            lote.value;
-
-        cantidadDisponible.value = "";
-
-        stockSeleccionado = null;
-
-
-        if (!stockId) {
-            return;
-        }
-
-
-        const seleccionado =
-            stock.find(
-                s =>
-                    s.id === stockId
-            );
-
-
-        if (!seleccionado) {
-            return;
-        }
-
-
-        stockSeleccionado =
-            seleccionado;
-
-
-        cantidadDisponible.value =
-            `${seleccionado.cantidad} ${seleccionado.unidad}`;
-
-    }
-);
-
-
-/* =========================================================
-   CARGAR CLIENTES
-========================================================= */
+/*************************************************
+ * CARGAR CLIENTES
+ *************************************************/
 
 async function cargarClientes() {
 
@@ -515,34 +203,23 @@ async function cargarClientes() {
 
         clientes = [];
 
-        snapshot.forEach(doc => {
+        snapshot.forEach(docSnap => {
 
-            const datos = doc.data();
+            const datos = docSnap.data();
 
             clientes.push({
-
-                id: doc.id,
-
+                id: docSnap.id,
                 nombre:
                     datos.nombre ||
                     datos.nombreCliente ||
                     "Cliente sin nombre"
-
             });
 
         });
 
-
-        clientes.sort((a, b) =>
-            a.nombre.localeCompare(
-                b.nombre
-            )
-        );
-
-
         console.log(
             "Clientes cargados:",
-            clientes.length
+            clientes
         );
 
     } catch (error) {
@@ -553,69 +230,144 @@ async function cargarClientes() {
         );
 
     }
-
 }
 
 
-/* =========================================================
-   BUSCAR CLIENTES
-========================================================= */
+/*************************************************
+ * CARGAR STOCK
+ *************************************************/
 
-clienteBuscador.addEventListener(
+async function cargarExistencias() {
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                collection(db, "stock")
+            );
+
+        existencias = [];
+
+        snapshot.forEach(docSnap => {
+
+            const datos = docSnap.data();
+
+            const cantidadStock =
+                Number(datos.cantidad || 0);
+
+            if (cantidadStock > 0) {
+
+                existencias.push({
+
+                    id: docSnap.id,
+
+                    productoId:
+                        datos.productoId || "",
+
+                    productoNombre:
+                        datos.productoNombre ||
+                        "Producto sin nombre",
+
+                    ubicacionId:
+                        datos.ubicacionId || "",
+
+                    ubicacionNombre:
+                        datos.ubicacionNombre ||
+                        "Ubicación sin nombre",
+
+                    lote:
+                        datos.lote ||
+                        "Sin lote",
+
+                    cantidad:
+                        cantidadStock,
+
+                    unidad:
+                        datos.unidad || ""
+
+                });
+
+            }
+
+        });
+
+        console.log(
+            "Existencias cargadas:",
+            existencias
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error cargando existencias:",
+            error
+        );
+
+    }
+}
+
+
+/*************************************************
+ * BUSCADOR DE PRODUCTOS
+ *************************************************/
+
+productoBuscador.addEventListener(
     "input",
     () => {
 
         const texto =
-            clienteBuscador.value
+            productoBuscador.value
                 .toLowerCase()
                 .trim();
 
-        cliente.value = "";
+        producto.value = "";
 
+        listaProductos.innerHTML = "";
 
-        if (texto === "") {
-
-            listaClientes.innerHTML = "";
+        if (!texto) {
 
             return;
 
         }
 
-
         const resultados =
-            clientes.filter(c =>
-                c.nombre
+            productos.filter(item =>
+                item.nombre
                     .toLowerCase()
                     .includes(texto)
             );
 
-
-        listaClientes.innerHTML = "";
-
-
-        resultados.forEach(c => {
+        resultados.forEach(item => {
 
             const opcion =
                 document.createElement("div");
 
-            opcion.className =
-                "opcion-cliente";
-
             opcion.textContent =
-                c.nombre;
+                item.nombre;
 
+            opcion.className =
+                "opcion-producto";
 
             opcion.addEventListener(
                 "click",
                 () => {
 
-                    seleccionarCliente(c);
+                    productoBuscador.value =
+                        item.nombre;
+
+                    producto.value =
+                        item.id;
+
+                    listaProductos.innerHTML = "";
+
+                    cargarUbicacionesProducto(
+                        item.id
+                    );
 
                 }
             );
 
-
-            listaClientes.appendChild(
+            listaProductos.appendChild(
                 opcion
             );
 
@@ -625,68 +377,13 @@ clienteBuscador.addEventListener(
 );
 
 
-/* =========================================================
-   SELECCIONAR CLIENTE
-========================================================= */
+/*************************************************
+ * UBICACIONES DEL PRODUCTO
+ *************************************************/
 
-function seleccionarCliente(c) {
-
-    clienteBuscador.value =
-        c.nombre;
-
-    cliente.value =
-        c.id;
-
-    listaClientes.innerHTML = "";
-
-}
-
-
-/* =========================================================
-   MOSTRAR / OCULTAR CLIENTE
-========================================================= */
-
-tipoEgreso.addEventListener(
-    "change",
-    () => {
-
-        const tipo =
-            tipoEgreso.value;
-
-
-        if (tipo === "venta") {
-
-            contenedorCliente.style.display =
-                "block";
-
-            clienteBuscador.required =
-                true;
-
-        } else {
-
-            contenedorCliente.style.display =
-                "none";
-
-            clienteBuscador.required =
-                false;
-
-            clienteBuscador.value = "";
-
-            cliente.value = "";
-
-            listaClientes.innerHTML = "";
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   LIMPIAR UBICACIONES
-========================================================= */
-
-function limpiarUbicaciones() {
+function cargarUbicacionesProducto(
+    productoId
+) {
 
     ubicacion.innerHTML = `
         <option value="">
@@ -704,50 +401,515 @@ function limpiarUbicaciones() {
 
     stockSeleccionado = null;
 
+    const ubicacionesIds =
+        [
+            ...new Set(
+                existencias
+                    .filter(stock =>
+                        stock.productoId === productoId
+                    )
+                    .map(stock =>
+                        stock.ubicacionId
+                    )
+            )
+        ];
+
+    ubicacionesIds.forEach(
+        ubicacionId => {
+
+            const stock =
+                existencias.find(
+                    item =>
+                        item.productoId === productoId &&
+                        item.ubicacionId === ubicacionId
+                );
+
+            if (!stock) {
+                return;
+            }
+
+            const opcion =
+                document.createElement("option");
+
+            opcion.value =
+                ubicacionId;
+
+            opcion.textContent =
+                stock.ubicacionNombre;
+
+            ubicacion.appendChild(
+                opcion
+            );
+
+        }
+    );
+
 }
 
 
-/* =========================================================
-   FORMULARIO
-========================================================= */
+/*************************************************
+ * CAMBIO DE UBICACIÓN
+ *************************************************/
 
-formulario.addEventListener(
-    "submit",
-    (e) => {
+ubicacion.addEventListener(
+    "change",
+    () => {
 
-        e.preventDefault();
+        lote.innerHTML = `
+            <option value="">
+                Seleccionar lote
+            </option>
+        `;
 
-        alert(
-            "La carga de datos funciona correctamente. Todavía no registramos el egreso."
+        cantidadDisponible.value = "";
+
+        stockSeleccionado = null;
+
+        const productoId =
+            producto.value;
+
+        const ubicacionId =
+            ubicacion.value;
+
+        if (
+            !productoId ||
+            !ubicacionId
+        ) {
+
+            return;
+
+        }
+
+        const lotes =
+            existencias.filter(
+                stock =>
+                    stock.productoId === productoId &&
+                    stock.ubicacionId === ubicacionId &&
+                    Number(stock.cantidad) > 0
+            );
+
+        lotes.forEach(
+            stock => {
+
+                const opcion =
+                    document.createElement("option");
+
+                opcion.value =
+                    stock.id;
+
+                opcion.textContent =
+                    `${stock.lote} — ${stock.cantidad} ${stock.unidad}`;
+
+                lote.appendChild(
+                    opcion
+                );
+
+            }
         );
 
     }
 );
 
 
-/* =========================================================
-   INICIO
-========================================================= */
+/*************************************************
+ * CAMBIO DE LOTE
+ *************************************************/
+
+lote.addEventListener(
+    "change",
+    () => {
+
+        const stockId =
+            lote.value;
+
+        stockSeleccionado =
+            existencias.find(
+                stock =>
+                    stock.id === stockId
+            );
+
+        if (!stockSeleccionado) {
+
+            cantidadDisponible.value =
+                "";
+
+            return;
+
+        }
+
+        cantidadDisponible.value =
+            `${stockSeleccionado.cantidad} ${stockSeleccionado.unidad}`;
+
+        unidad.value =
+            stockSeleccionado.unidad;
+
+        cantidad.max =
+            stockSeleccionado.cantidad;
+
+    }
+);
+
+
+/*************************************************
+ * BUSCADOR DE CLIENTES
+ *************************************************/
+
+clienteBuscador.addEventListener(
+    "input",
+    () => {
+
+        const texto =
+            clienteBuscador.value
+                .toLowerCase()
+                .trim();
+
+        cliente.value = "";
+
+        listaClientes.innerHTML = "";
+
+        if (!texto) {
+
+            return;
+
+        }
+
+        const resultados =
+            clientes.filter(item =>
+                item.nombre
+                    .toLowerCase()
+                    .includes(texto)
+            );
+
+        resultados.forEach(item => {
+
+            const opcion =
+                document.createElement("div");
+
+            opcion.textContent =
+                item.nombre;
+
+            opcion.className =
+                "opcion-cliente";
+
+            opcion.addEventListener(
+                "click",
+                () => {
+
+                    clienteBuscador.value =
+                        item.nombre;
+
+                    cliente.value =
+                        item.id;
+
+                    listaClientes.innerHTML =
+                        "";
+
+                }
+            );
+
+            listaClientes.appendChild(
+                opcion
+            );
+
+        });
+
+    }
+);
+
+
+/*************************************************
+ * TIPO DE EGRESO
+ *************************************************/
+
+tipoEgreso.addEventListener(
+    "change",
+    () => {
+
+        if (
+            tipoEgreso.value === "venta"
+        ) {
+
+            contenedorCliente.style.display =
+                "block";
+
+            clienteBuscador.required =
+                true;
+
+        } else {
+
+            contenedorCliente.style.display =
+                "none";
+
+            clienteBuscador.required =
+                false;
+
+            clienteBuscador.value =
+                "";
+
+            cliente.value =
+                "";
+
+            listaClientes.innerHTML =
+                "";
+
+        }
+
+    }
+);
+
+
+/*************************************************
+ * VALIDAR CANTIDAD
+ *************************************************/
+
+cantidad.addEventListener(
+    "input",
+    () => {
+
+        if (!stockSeleccionado) {
+            return;
+        }
+
+        const valor =
+            Number(cantidad.value);
+
+        if (
+            valor >
+            stockSeleccionado.cantidad
+        ) {
+
+            cantidad.value =
+                stockSeleccionado.cantidad;
+
+        }
+
+    }
+);
+
+
+/*************************************************
+ * GUARDAR EGRESO
+ *************************************************/
+
+formulario.addEventListener(
+    "submit",
+    async event => {
+
+        event.preventDefault();
+
+        if (!stockSeleccionado) {
+
+            alert(
+                "Seleccioná un producto, ubicación y lote."
+            );
+
+            return;
+
+        }
+
+        const cantidadRetirar =
+            Number(cantidad.value);
+
+        if (
+            !cantidadRetirar ||
+            cantidadRetirar <= 0
+        ) {
+
+            alert(
+                "Ingresá una cantidad válida."
+            );
+
+            return;
+
+        }
+
+        if (
+            cantidadRetirar >
+            stockSeleccionado.cantidad
+        ) {
+
+            alert(
+                "No podés retirar más cantidad de la disponible."
+            );
+
+            return;
+
+        }
+
+        if (
+            tipoEgreso.value === "venta" &&
+            !cliente.value
+        ) {
+
+            alert(
+                "Seleccioná un cliente."
+            );
+
+            return;
+
+        }
+
+        try {
+
+            const stockRef =
+                doc(
+                    db,
+                    "stock",
+                    stockSeleccionado.id
+                );
+
+            await runTransaction(
+                db,
+                async transaction => {
+
+                    const stockDoc =
+                        await transaction.get(
+                            stockRef
+                        );
+
+                    if (!stockDoc.exists()) {
+
+                        throw new Error(
+                            "El registro de stock ya no existe."
+                        );
+
+                    }
+
+                    const datos =
+                        stockDoc.data();
+
+                    const cantidadActual =
+                        Number(
+                            datos.cantidad || 0
+                        );
+
+                    if (
+                        cantidadRetirar >
+                        cantidadActual
+                    ) {
+
+                        throw new Error(
+                            "La cantidad disponible cambió. Actualizá la página."
+                        );
+
+                    }
+
+                    const nuevaCantidad =
+                        cantidadActual -
+                        cantidadRetirar;
+
+                    transaction.update(
+                        stockRef,
+                        {
+                            cantidad:
+                                nuevaCantidad
+                        }
+                    );
+
+                }
+            );
+
+
+            /****************************************
+             * REGISTRAR MOVIMIENTO
+             ****************************************/
+
+            await addDoc(
+                collection(
+                    db,
+                    "movimientosStock"
+                ),
+                {
+
+                    tipo:
+                        tipoEgreso.value,
+
+                    productoId:
+                        stockSeleccionado.productoId,
+
+                    productoNombre:
+                        stockSeleccionado.productoNombre,
+
+                    ubicacionId:
+                        stockSeleccionado.ubicacionId,
+
+                    ubicacionNombre:
+                        stockSeleccionado.ubicacionNombre,
+
+                    lote:
+                        stockSeleccionado.lote,
+
+                    cantidad:
+                        cantidadRetirar,
+
+                    unidad:
+                        stockSeleccionado.unidad,
+
+                    clienteId:
+                        cliente.value || null,
+
+                    clienteNombre:
+                        clienteBuscador.value || null,
+
+                    fecha:
+                        fecha.value,
+
+                    observacion:
+                        observacion.value || "",
+
+                    creadoEn:
+                        serverTimestamp()
+
+                }
+            );
+
+
+            alert(
+                "Egreso registrado correctamente."
+            );
+
+            window.location.href =
+                "stock.html";
+
+        } catch (error) {
+
+            console.error(
+                "Error registrando egreso:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "No se pudo registrar el egreso."
+            );
+
+        }
+
+    }
+);
+
+
+/*************************************************
+ * INICIAR
+ *************************************************/
 
 async function iniciar() {
 
-    /*
-     * El cliente empieza oculto.
-     */
-
     contenedorCliente.style.display =
         "none";
-
 
     await Promise.all([
 
         cargarProductos(),
 
-        cargarClientes()
+        cargarUbicaciones(),
+
+        cargarClientes(),
+
+        cargarExistencias()
 
     ]);
 
 }
-
 
 iniciar();
