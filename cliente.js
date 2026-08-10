@@ -7,7 +7,6 @@ import {
     collection,
     query,
     where,
-    orderBy,
     getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -314,14 +313,23 @@ document.addEventListener("DOMContentLoaded", async () => {
      * ============================================================
      * HISTORIAL CLIENTE
      *
-     * AHORA CARGA:
+     * CARGA:
      *
      * 1. VISITAS COMERCIALES
-     * 2. VENTAS DESDE EGRESOS
+     * 2. ENSAYOS
+     * 3. OTROS REGISTROS DE VISITAS
+     * 4. VENTAS DESDE EGRESOS
      *
-     * Más adelante agregaremos:
-     * 3. ENSAYOS
-     * 4. COTIZACIONES
+     * IMPORTANTE:
+     *
+     * Las ventas también generan un registro
+     * en "visitas" con tipoVisita = "Venta".
+     *
+     * ESE REGISTRO SE IGNORA ACÁ.
+     *
+     * La venta se toma solamente desde "egresos".
+     *
+     * Esto evita que aparezca duplicada.
      * ============================================================
      */
 
@@ -408,6 +416,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     /*
+                     * ==================================================
+                     * MUY IMPORTANTE
+                     *
+                     * Las ventas se registran también en "visitas"
+                     * con tipoVisita = "Venta".
+                     *
+                     * NO las agregamos al historial porque la venta
+                     * verdadera se toma desde "egresos".
+                     *
+                     * Esto evita el duplicado.
+                     * ==================================================
+                     */
+
+                    if (
+                        v.tipoVisita ===
+                        "Venta"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    /*
                      * Fecha
                      */
 
@@ -422,7 +454,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     ) {
 
                         fechaOrden =
-                            v.fecha.toDate()
+                            v.fecha
+                                .toDate()
                                 .getTime();
 
                     }
@@ -450,7 +483,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ) {
 
                             fechaOrden =
-                                fechaTexto.getTime();
+                                fechaTexto
+                                    .getTime();
 
                         }
 
@@ -476,7 +510,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * VENTAS
+             * VENTAS DESDE EGRESOS
              * ==================================================
              */
 
@@ -488,8 +522,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     /*
-                     * Solo los egresos que
-                     * realmente sean ventas.
+                     * Solo los egresos
+                     * que realmente sean ventas.
                      */
 
                     if (
@@ -531,7 +565,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                         ) {
 
                             fechaOrden =
-                                fechaTexto.getTime();
+                                fechaTexto
+                                    .getTime();
 
                         }
 
@@ -629,7 +664,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     /*
                      * ==========================================
-                     * VISITA COMERCIAL
+                     * VISITA / ENSAYO / OTROS
                      * ==========================================
                      */
 
@@ -839,7 +874,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         /*
                          * Usamos la misma clase
                          * "visita" para no necesitar
-                         * modificar el CSS existente.
+                         * modificar CSS.
                          */
 
                         div.className =
