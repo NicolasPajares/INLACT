@@ -10,18 +10,6 @@
 
 
 /* ===============================
-   TITULO
-================================ */
-
-#formTransferenciaStock h1 {
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #1f4e8c;
-    text-align: center;
-}
-
-
-/* ===============================
    BODY
 ================================ */
 
@@ -44,11 +32,14 @@ main {
 
 
 /* ===============================
-   FORMULARIO
+   TITULO
 ================================ */
 
-#formTransferenciaStock {
-    width: 100%;
+main h2 {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #1f4e8c;
+    text-align: center;
 }
 
 
@@ -56,7 +47,7 @@ main {
    LABELS
 ================================ */
 
-#formTransferenciaStock label {
+main label {
     display: block;
 
     margin-bottom: 7px;
@@ -73,9 +64,9 @@ main {
    INPUTS / SELECTS / TEXTAREA
 ================================ */
 
-#formTransferenciaStock input,
-#formTransferenciaStock select,
-#formTransferenciaStock textarea {
+main input,
+main select,
+main textarea {
 
     width: 100%;
 
@@ -105,9 +96,9 @@ main {
    FOCUS
 ================================ */
 
-#formTransferenciaStock input:focus,
-#formTransferenciaStock select:focus,
-#formTransferenciaStock textarea:focus {
+main input:focus,
+main select:focus,
+main textarea:focus {
 
     border-color: #3b82f6;
 
@@ -117,7 +108,19 @@ main {
 
 
 /* ===============================
-   CANTIDAD DISPONIBLE
+   TEXTAREA
+================================ */
+
+main textarea {
+
+    resize: vertical;
+
+    min-height: 100px;
+}
+
+
+/* ===============================
+   DISPONIBLE
 ================================ */
 
 #cantidadDisponible {
@@ -131,88 +134,77 @@ main {
 
 
 /* ===============================
-   DATOS DE TRANSFERENCIA
+   LISTA PRODUCTOS
 ================================ */
 
-.transferencia-info {
+#listaProductos {
+
+    width: 100%;
+
+    margin-top: -12px;
+
+    margin-bottom: 18px;
 
     background: #fff;
 
     border: 1px solid #d1d5db;
 
-    border-radius: 12px;
+    border-radius: 10px;
 
-    padding: 18px;
-
-    margin-bottom: 20px;
+    overflow: hidden;
 
     box-shadow:
-        0 4px 12px rgba(0, 0, 0, .05);
+        0 6px 15px rgba(0, 0, 0, .08);
 }
 
 
 /* ===============================
-   UBICACIONES
+   OPCIONES PRODUCTOS
 ================================ */
 
-.ubicacion-origen,
-.ubicacion-destino {
+#listaProductos div {
 
-    width: 100%;
+    padding: 12px 15px;
+
+    cursor: pointer;
+
+    color: #2c3e50;
+
+    font-size: 16px;
+
+    border-bottom: 1px solid #edf0f3;
+
+    transition: .15s;
 }
 
 
-/* ===============================
-   SEPARADOR
-================================ */
+#listaProductos div:last-child {
 
-.separador-transferencia {
+    border-bottom: none;
+}
 
-    text-align: center;
 
-    font-size: 25px;
+#listaProductos div:hover {
+
+    background: #f3f7fb;
 
     color: #1f4e8c;
-
-    margin: 5px 0 15px;
 }
 
 
 /* ===============================
-   TEXTAREA
+   BOTÓN TRANSFERIR
 ================================ */
 
-#formTransferenciaStock textarea {
+#btnTransferir {
 
-    resize: vertical;
-
-    min-height: 100px;
-}
-
-
-/* ===============================
-   ACCIONES
-================================ */
-
-.acciones-form {
-
-    display: flex;
-
-    gap: 12px;
-
-    margin-top: 10px;
-}
-
-
-/* ===============================
-   BOTON GUARDAR
-================================ */
-
-.btn-guardar {
-
-    flex: 1;
+    width: 100%;
 
     padding: 14px 20px;
+
+    margin-top: 10px;
+
+    margin-bottom: 12px;
 
     background:
         linear-gradient(
@@ -240,7 +232,7 @@ main {
 }
 
 
-.btn-guardar:hover {
+#btnTransferir:hover {
 
     transform: translateY(-1px);
 
@@ -250,12 +242,12 @@ main {
 
 
 /* ===============================
-   BOTON CANCELAR
+   BOTÓN VOLVER
 ================================ */
 
-.btn-cancelar {
+main button[onclick*="stock.html"] {
 
-    flex: 1;
+    width: 100%;
 
     padding: 14px 20px;
 
@@ -277,7 +269,7 @@ main {
 }
 
 
-.btn-cancelar:hover {
+main button[onclick*="stock.html"]:hover {
 
     background: #1f4e8c;
 
@@ -317,20 +309,21 @@ footer a {
 
 @media (min-width: 768px) {
 
-    #formTransferenciaStock h1 {
-
+    main h2 {
         font-size: 32px;
     }
 
-
-    .acciones-form {
-
+    #btnTransferir,
+    main button[onclick*="stock.html"] {
         max-width: 600px;
+
+        display: block;
 
         margin-left: auto;
 
         margin-right: auto;
     }
+
 }
 
 
@@ -340,15 +333,17 @@ footer a {
 
 @media (max-width: 600px) {
 
-    .acciones-form {
-
-        flex-direction: column;
+    main {
+        padding: 15px;
     }
 
+    main h2 {
+        font-size: 26px;
+    }
 
-    .btn-guardar,
-    .btn-cancelar {
-
+    #btnTransferir,
+    main button[onclick*="stock.html"] {
         width: 100%;
     }
+
 }
