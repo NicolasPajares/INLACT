@@ -3,85 +3,72 @@
 
 <head>
 
-    <!-- SEO / Mobile -->
-    <meta name="description" content="INLACT - Crear nueva ubicación">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- CSS base -->
-    <link rel="stylesheet" href="index.css">
-
-    <!-- CSS específico -->
-    <link rel="stylesheet" href="nueva-ubicacion.css">
+    <meta charset="UTF-8">
 
     <title>INLACT · Nueva Ubicación</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="nueva-ubicacion.css">
 
 </head>
 
 <body>
 
+<header>
+
+    <figure>
+        <img src="img/logo.jpg" alt="INLACT">
+    </figure>
+
+    <h2>NICOLÁS PAJARES</h2>
+
+</header>
+
 <main>
 
-    <section>
+<section class="card">
 
-        <figure>
-            <img src="img/logo.jpg" alt="INLACT">
-        </figure>
+<h2>Nueva Ubicación</h2>
 
-        <h2>NICOLÁS PAJARES</h2>
+<form id="formUbicacion">
 
-        <h1>Crear nueva ubicación</h1>
+<label>
 
-        <form id="formNuevaUbicacion">
+Nombre de la ubicación
 
-            <label for="nombre">
-                Nombre de la ubicación
-            </label>
+<input
+type="text"
+id="nombre"
+required
+placeholder="Ej.: Depósito Villa María">
 
-            <input
-                type="text"
-                id="nombre"
-                placeholder="Ej: Depósito Villa María"
-                required
-            >
+</label>
 
-            <div class="acciones-form">
+<button
+type="submit"
+id="btnGuardar">
 
-                <button
-                    type="submit"
-                    class="btn-guardar">
-                    💾 Guardar ubicación
-                </button>
+Guardar Ubicación
 
-                <button
-                    type="button"
-                    class="btn-cancelar"
-                    onclick="location.href='ubicaciones.html'">
-                    ✖ Cancelar
-                </button>
+</button>
 
-            </div>
+<button
+type="button"
+id="btnCancelar">
 
-        </form>
+Cancelar
 
-    </section>
+</button>
+
+</form>
+
+</section>
 
 </main>
 
-<footer>
-
-    <p>
-        © INLACT ·
-        <a href="aviso-legal.html">
-            Aviso Legal
-        </a>
-    </p>
-
-</footer>
-
-<script
-    type="module"
-    src="nueva-ubicacion.js">
-</script>
+<script type="module" src="nueva-ubicacion.js"></script>
 
 </body>
 
