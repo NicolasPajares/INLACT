@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <title>INLACT</title>
 
     <!-- SEO / Mobile -->
@@ -15,152 +18,748 @@
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
+    >
+
 </head>
 
 <body>
 
 <header>
+
     <figure>
         <img src="img/logo.jpg" alt="INLACT">
     </figure>
+
     <h2>NICOLÁS PAJARES</h2>
+
 </header>
+
 
 <main>
 
 <!-- ACCESOS RÁPIDOS -->
 <section class="quick-actions">
+
     <a href="clientes.html" class="action-card">
         <img src="img/icon-clientes.svg">
         <span>Clientes</span>
     </a>
+
     <a href="stock.html" class="action-card">
         <img src="img/icon-stock.svg">
         <span>Stock</span>
     </a>
+
     <a href="ensayos.html" class="action-card">
         <img src="img/icon-ensayos.svg">
         <span>Ensayos</span>
     </a>
+
     <a href="precios.html" class="action-card">
         <img src="img/icon-precios.svg">
         <span>Precios</span>
     </a>
+
 </section>
+
 
 <!-- MAPA -->
 <section class="card">
+
     <h2>Mapa de clientes</h2>
+
     <div id="map"></div>
+
 </section>
+
 
 <!-- VISITAS CERCANAS -->
 <section class="card">
+
     <h2>Visitas cercanas</h2>
-    <p id="estado">Buscando fábricas...</p>
-    <div id="acciones" class="lista-clientes"></div>
+
+    <p id="estado">
+        Buscando fábricas...
+    </p>
+
+    <div
+        id="acciones"
+        class="lista-clientes">
+    </div>
+
 </section>
+
 
 <!-- ÚLTIMAS VISITAS -->
 <section class="card">
+
     <h3>Últimas visitas</h3>
+
     <ul id="listaVisitas"></ul>
-    <a href="#" id="abrir-historial">Ver historial completo →</a>
+
+    <a
+        href="#"
+        id="abrir-historial">
+        Ver historial completo →
+    </a>
+
 </section>
+
 
 </main>
 
+
 <footer>
-    <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+
 </footer>
 
+
 <!-- Leaflet -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- App principal -->
-<script type="module" src="app.js"></script>
-
-<!-- 🔥 ÚLTIMAS VISITAS CON COLORES -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const lista = document.getElementById("listaVisitas");
-
-async function cargarUltimasVisitas() {
-  lista.innerHTML = "<li>Cargando...</li>";
-
-  const q = query(
-    collection(db, "visitas"),
-    orderBy("fecha", "desc"),
-    limit(5)
-  );
-
-  const snap = await getDocs(q);
-  lista.innerHTML = "";
-
-  if (snap.empty) {
-    lista.innerHTML = "<li>No hay visitas</li>";
-    return;
-  }
-
-  snap.forEach(doc => {
-    const v = doc.data();
-    const fecha = v.fecha?.toDate
-      ? v.fecha.toDate().toLocaleString("es-AR")
-      : "";
-
-    let clase = "tag-visita";
-    if (v.tipoVisita === "Entrega de productos") clase += " tag-entrega";
-    else if (v.tipoVisita === "Visita comercial") clase += " tag-comercial";
-    else if (v.tipoVisita === "Ensayo") clase += " tag-ensayo";
-
-    let productosHTML = "";
-    if (v.productos && v.productos.length) {
-      productosHTML = v.productos
-        .map(p => `📦 ${p.nombre} (${p.cantidad})`)
-        .join("<br>");
-    }
-
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <strong>${v.cliente}</strong><br>
-      <small>${fecha}</small><br>
-      <span class="${clase}">${v.tipoVisita || "Sin tipo"}</span>
-      ${productosHTML ? `<div class="productos">${productosHTML}</div>` : ""}
-    `;
-
-    lista.appendChild(li);
-  });
-}
-
-cargarUltimasVisitas();
-
-document.getElementById("abrir-historial").onclick = e => {
-  e.preventDefault();
-  window.open("historial.html", "historial", "width=420,height=700");
-};
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
+
+<!-- App principal -->
+<script
+    type="module"
+    src="app.js">
+</script>
+
+
+<!-- ============================================================
+     ÚLTIMAS ACTIVIDADES
+     VISITAS + ENSAYOS + VENTAS
+     ============================================================ -->
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+
+    authDomain:
+        "inlact.firebaseapp.com",
+
+    projectId:
+        "inlact",
+
+    storageBucket:
+        "inlact.appspot.com",
+
+    messagingSenderId:
+        "143868382036",
+
+    appId:
+        "1:143868382036:web:b5af0e4faced7e880216c1"
+
+};
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
+
+
+/* ============================================================
+   ELEMENTO
+   ============================================================ */
+
+const lista =
+    document.getElementById(
+        "listaVisitas"
+    );
+
+
+/* ============================================================
+   FECHA
+   ============================================================ */
+
+function obtenerFecha(item) {
+
+    /*
+     * VISITAS
+     * Firebase Timestamp
+     */
+
+    if (
+        item.fecha &&
+        typeof item.fecha.toDate === "function"
+    ) {
+
+        return item.fecha.toDate();
+
+    }
+
+
+    /*
+     * EGRESOS
+     * Actualmente guardan fecha como:
+     * YYYY-MM-DD
+     */
+
+    if (
+        typeof item.fecha === "string" &&
+        item.fecha.trim() !== ""
+    ) {
+
+        const partes =
+            item.fecha.split("-");
+
+
+        if (
+            partes.length === 3
+        ) {
+
+            const año =
+                Number(partes[0]);
+
+            const mes =
+                Number(partes[1]) - 1;
+
+            const dia =
+                Number(partes[2]);
+
+
+            return new Date(
+                año,
+                mes,
+                dia
+            );
+
+        }
+
+
+        const fecha =
+            new Date(item.fecha);
+
+        if (
+            !isNaN(fecha.getTime())
+        ) {
+
+            return fecha;
+
+        }
+
+    }
+
+
+    /*
+     * Si no hay fecha
+     */
+
+    return null;
+
+}
+
+
+/* ============================================================
+   FORMATEAR FECHA
+   ============================================================ */
+
+function mostrarFecha(fecha) {
+
+    if (!fecha) {
+
+        return "";
+
+    }
+
+
+    return fecha.toLocaleString(
+        "es-AR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CARGAR ACTIVIDADES
+   ============================================================ */
+
+async function cargarUltimasActividades() {
+
+    lista.innerHTML =
+        "<li>Cargando...</li>";
+
+
+    try {
+
+        /*
+         * Cargamos las dos colecciones
+         *
+         * visitas
+         * egresos
+         */
+
+        const [
+            visitasSnap,
+            egresosSnap
+        ] = await Promise.all([
+
+            getDocs(
+                collection(
+                    db,
+                    "visitas"
+                )
+            ),
+
+            getDocs(
+                collection(
+                    db,
+                    "egresos"
+                )
+            )
+
+        ]);
+
+
+        const actividades = [];
+
+
+        /* ====================================================
+           VISITAS
+           ==================================================== */
+
+        visitasSnap.forEach(
+            docSnap => {
+
+                const v =
+                    docSnap.data();
+
+
+                const fecha =
+                    obtenerFecha(v);
+
+
+                actividades.push({
+
+                    id:
+                        docSnap.id,
+
+                    origen:
+                        "visita",
+
+                    fecha,
+
+                    cliente:
+                        v.cliente ||
+                        "Cliente sin nombre",
+
+                    tipo:
+                        v.tipoVisita ||
+                        "Sin tipo",
+
+                    productos:
+                        Array.isArray(
+                            v.productos
+                        )
+                            ? v.productos
+                            : []
+
+                });
+
+            }
+        );
+
+
+        /* ====================================================
+           EGRESOS - SOLO VENTAS
+           ==================================================== */
+
+        egresosSnap.forEach(
+            docSnap => {
+
+                const e =
+                    docSnap.data();
+
+
+                /*
+                 * IMPORTANTE:
+                 *
+                 * Los demás egresos
+                 * no aparecen acá.
+                 *
+                 * Solo venta.
+                 */
+
+                if (
+                    e.tipoEgreso !==
+                    "venta"
+                ) {
+
+                    return;
+
+                }
+
+
+                const fecha =
+                    obtenerFecha(e);
+
+
+                actividades.push({
+
+                    id:
+                        docSnap.id,
+
+                    origen:
+                        "venta",
+
+                    fecha,
+
+                    cliente:
+                        e.clienteNombre ||
+                        "Cliente sin nombre",
+
+                    tipo:
+                        "Venta",
+
+                    productoNombre:
+                        e.productoNombre ||
+                        "Producto sin nombre",
+
+                    cantidad:
+                        e.cantidad,
+
+                    unidad:
+                        e.unidad ||
+                        "",
+
+                    lote:
+                        e.lote ||
+                        "Sin lote"
+
+                });
+
+            }
+        );
+
+
+        /* ====================================================
+           ORDENAR POR FECHA
+           MÁS RECIENTE PRIMERO
+           ==================================================== */
+
+        actividades.sort(
+            (a, b) => {
+
+                const fechaA =
+                    a.fecha
+                        ? a.fecha.getTime()
+                        : 0;
+
+                const fechaB =
+                    b.fecha
+                        ? b.fecha.getTime()
+                        : 0;
+
+                return fechaB - fechaA;
+
+            }
+        );
+
+
+        /*
+         * Mostrar solamente las últimas 5
+         */
+
+        const ultimas =
+            actividades.slice(
+                0,
+                5
+            );
+
+
+        lista.innerHTML = "";
+
+
+        if (
+            ultimas.length === 0
+        ) {
+
+            lista.innerHTML =
+                "<li>No hay actividades registradas.</li>";
+
+            return;
+
+        }
+
+
+        /* ====================================================
+           MOSTRAR
+           ==================================================== */
+
+        ultimas.forEach(
+            actividad => {
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+
+                /* =================================================
+                   VENTA
+                   ================================================= */
+
+                if (
+                    actividad.origen ===
+                    "venta"
+                ) {
+
+                    li.innerHTML = `
+
+                        <strong>
+                            ${actividad.cliente}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${mostrarFecha(
+                                actividad.fecha
+                            )}
+                        </small>
+
+                        <br>
+
+                        <span class="tag-visita tag-entrega">
+                            Venta
+                        </span>
+
+                        <div class="productos">
+
+                            📦
+                            ${actividad.productoNombre}
+
+                            <br>
+
+                            📊
+                            ${actividad.cantidad}
+                            ${actividad.unidad}
+
+                            <br>
+
+                            🏷️
+                            Lote:
+                            ${actividad.lote}
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =================================================
+                   VISITA / ENSAYO
+                   ================================================= */
+
+                else {
+
+                    let clase =
+                        "tag-visita";
+
+
+                    if (
+                        actividad.tipo ===
+                        "Visita comercial"
+                    ) {
+
+                        clase +=
+                            " tag-comercial";
+
+                    }
+
+
+                    else if (
+                        actividad.tipo ===
+                        "Ensayo"
+                    ) {
+
+                        clase +=
+                            " tag-ensayo";
+
+                    }
+
+
+                    else if (
+                        actividad.tipo ===
+                        "Entrega de productos"
+                    ) {
+
+                        clase +=
+                            " tag-entrega";
+
+                    }
+
+
+                    let productosHTML =
+                        "";
+
+
+                    if (
+                        actividad.productos &&
+                        actividad.productos.length
+                    ) {
+
+                        productosHTML =
+                            actividad.productos
+                                .map(
+                                    p => `
+
+                                        📦
+                                        ${p.nombre}
+
+                                        ${
+                                            p.cantidad
+                                                ? `(${p.cantidad})`
+                                                : ""
+                                        }
+
+                                    `
+                                )
+                                .join(
+                                    "<br>"
+                                );
+
+                    }
+
+
+                    li.innerHTML = `
+
+                        <strong>
+                            ${actividad.cliente}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${mostrarFecha(
+                                actividad.fecha
+                            )}
+                        </small>
+
+                        <br>
+
+                        <span
+                            class="${clase}">
+                            ${actividad.tipo}
+                        </span>
+
+                        ${
+                            productosHTML
+                                ? `
+                                    <div class="productos">
+                                        ${productosHTML}
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                    `;
+
+                }
+
+
+                lista.appendChild(
+                    li
+                );
+
+            }
+        );
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error cargando actividades:",
+            error
+        );
+
+
+        lista.innerHTML = `
+
+            <li>
+
+                <strong>
+                    No se pudieron cargar las actividades.
+                </strong>
+
+            </li>
+
+        `;
+
+    }
+
+}
+
+
+/* ============================================================
+   INICIAR
+   ============================================================ */
+
+cargarUltimasActividades();
+
+
+/* ============================================================
+   HISTORIAL COMPLETO
+   ============================================================ */
+
+document
+    .getElementById(
+        "abrir-historial"
+    )
+    .onclick = event => {
+
+        event.preventDefault();
+
+
+        window.open(
+            "historial.html",
+            "historial",
+            "width=420,height=700"
+        );
+
+    };
+
+</script>
+
+
 </body>
+
 </html>
