@@ -1,6 +1,6 @@
-/************************************************************
- * NUEVA COTIZACIÓN
- ************************************************************/
+/* ============================================================
+   NUEVA COTIZACIÓN
+============================================================ */
 
 import {
     initializeApp
@@ -15,9 +15,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-/************************************************************
- * FIREBASE
- ************************************************************/
+/* ============================================================
+   FIREBASE
+============================================================ */
 
 const firebaseConfig = {
 
@@ -41,55 +41,84 @@ const firebaseConfig = {
 
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db =
+    getFirestore(app);
 
 
-/************************************************************
- * ELEMENTOS
- ************************************************************/
+/* ============================================================
+   ELEMENTOS
+============================================================ */
 
 const form =
-    document.getElementById("formNuevaCotizacion");
+    document.getElementById(
+        "formNuevaCotizacion"
+    );
 
 const selectCliente =
-    document.getElementById("cliente");
+    document.getElementById(
+        "cliente"
+    );
 
 const fechaEl =
-    document.getElementById("fecha");
+    document.getElementById(
+        "fecha"
+    );
 
 const nombreCotizacionEl =
-    document.getElementById("nombreCotizacion");
+    document.getElementById(
+        "nombreCotizacion"
+    );
 
 const propuestaEl =
-    document.getElementById("propuesta");
+    document.getElementById(
+        "propuesta"
+    );
 
 const dosisEl =
-    document.getElementById("dosis");
+    document.getElementById(
+        "dosis"
+    );
 
 const observacionesEl =
-    document.getElementById("observaciones");
+    document.getElementById(
+        "observaciones"
+    );
 
 const listaProductosEl =
-    document.getElementById("listaProductosCotizacion");
+    document.getElementById(
+        "listaProductosCotizacion"
+    );
 
 const btnAgregarProducto =
     document.getElementById(
         "btnAgregarProductoCotizacion"
     );
 
+const selectListaPrecios =
+    document.getElementById(
+        "listaPrecios"
+    );
 
-/************************************************************
- * PRODUCTOS
- ************************************************************/
+
+/* ============================================================
+   VARIABLES
+============================================================ */
+
+let productos = [];
+
+let listasPrecios = [];
+
+let listaPreciosSeleccionada = null;
 
 let productosCotizacion = [];
 
 
-/************************************************************
- * CARGAR CLIENTES
- ************************************************************/
+/* ============================================================
+   CARGAR CLIENTES
+============================================================ */
 
 async function cargarClientes() {
 
@@ -97,7 +126,10 @@ async function cargarClientes() {
 
         const snap =
             await getDocs(
-                collection(db, "clientes")
+                collection(
+                    db,
+                    "clientes"
+                )
             );
 
 
@@ -108,7 +140,9 @@ async function cargarClientes() {
 
 
             const option =
-                document.createElement("option");
+                document.createElement(
+                    "option"
+                );
 
 
             option.value =
@@ -124,11 +158,15 @@ async function cargarClientes() {
                 cliente.nombre || "";
 
 
-            selectCliente.appendChild(option);
+            selectCliente.appendChild(
+                option
+            );
 
         });
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error cargando clientes:",
@@ -144,31 +182,269 @@ async function cargarClientes() {
 }
 
 
-/************************************************************
- * AGREGAR PRODUCTO
- ************************************************************/
+/* ============================================================
+   CARGAR PRODUCTOS
+============================================================ */
 
-btnAgregarProducto.addEventListener(
-    "click",
-    () => {
+async function cargarProductos() {
 
-        const producto = {
+    try {
 
-            id: Date.now(),
-
-            nombre: "",
-
-            moneda: "USD",
-
-            precio: ""
-
-        };
+        const snap =
+            await getDocs(
+                collection(
+                    db,
+                    "productos"
+                )
+            );
 
 
-        productosCotizacion.push(
-            producto
+        productos = [];
+
+
+        snap.forEach(docu => {
+
+            const datos =
+                docu.data();
+
+
+            /*
+             * Solo productos activos
+             */
+
+            if (
+                datos.activo === false
+            ) {
+
+                return;
+
+            }
+
+
+            productos.push({
+
+                id:
+                    docu.id,
+
+                codigo:
+                    datos.codigo ||
+                    "",
+
+                descripcion:
+                    datos.descripcion ||
+                    "Producto sin nombre",
+
+                unidad:
+                    datos.unidad ||
+                    ""
+
+            });
+
+        });
+
+
+        /*
+         * Orden alfabético
+         */
+
+        productos.sort(
+            (a, b) =>
+                a.descripcion.localeCompare(
+                    b.descripcion,
+                    "es",
+                    {
+                        sensitivity: "base"
+                    }
+                )
         );
 
+
+        console.log(
+            "Productos cargados:",
+            productos.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error cargando productos:",
+            error
+        );
+
+        alert(
+            "No se pudieron cargar los productos."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CARGAR LISTAS DE PRECIOS
+============================================================ */
+
+async function cargarListasPrecios() {
+
+    try {
+
+        const snap =
+            await getDocs(
+                collection(
+                    db,
+                    "listaprecios"
+                )
+            );
+
+
+        listasPrecios = [];
+
+
+        snap.forEach(docu => {
+
+            const datos =
+                docu.data();
+
+
+            listasPrecios.push({
+
+                id:
+                    docu.id,
+
+                nombre:
+                    datos.nombre ||
+                    "Lista sin nombre",
+
+                fecha:
+                    datos.fecha ||
+                    null,
+
+                productos:
+                    Array.isArray(
+                        datos.productos
+                    )
+                        ? datos.productos
+                        : []
+
+            });
+
+        });
+
+
+        /*
+         * Ordenar por fecha más reciente
+         */
+
+        listasPrecios.sort(
+            (a, b) => {
+
+                const fechaA =
+                    a.fecha &&
+                    typeof a.fecha.toDate === "function"
+                        ? a.fecha.toDate().getTime()
+                        : 0;
+
+
+                const fechaB =
+                    b.fecha &&
+                    typeof b.fecha.toDate === "function"
+                        ? b.fecha.toDate().getTime()
+                        : 0;
+
+
+                return fechaB - fechaA;
+
+            }
+        );
+
+
+        /*
+         * Limpiar selector
+         */
+
+        selectListaPrecios.innerHTML = `
+
+            <option value="">
+                Seleccionar lista de precios
+            </option>
+
+        `;
+
+
+        /*
+         * Agregar listas
+         */
+
+        listasPrecios.forEach(lista => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                lista.id;
+
+
+            option.textContent =
+                lista.nombre;
+
+
+            selectListaPrecios.appendChild(
+                option
+            );
+
+        });
+
+
+        console.log(
+            "Listas de precios cargadas:",
+            listasPrecios.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error cargando listas de precios:",
+            error
+        );
+
+        alert(
+            "No se pudieron cargar las listas de precios."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CAMBIAR LISTA DE PRECIOS
+============================================================ */
+
+selectListaPrecios.addEventListener(
+    "change",
+    () => {
+
+        const id =
+            selectListaPrecios.value;
+
+
+        listaPreciosSeleccionada =
+            listasPrecios.find(
+                lista =>
+                    lista.id === id
+            ) || null;
+
+
+        /*
+         * Actualizar precios sugeridos
+         */
 
         renderProductos();
 
@@ -176,177 +452,1037 @@ btnAgregarProducto.addEventListener(
 );
 
 
-/************************************************************
- * MOSTRAR PRODUCTOS
- ************************************************************/
+/* ============================================================
+   BUSCADOR DE PRODUCTO
+============================================================ */
 
-function renderProductos() {
+function crearBuscadorProducto(
+    contenedor,
+    productoSeleccionado
+) {
 
-    listaProductosEl.innerHTML = "";
+    /*
+     * INPUT
+     */
 
-
-    productosCotizacion.forEach(
-        producto => {
-
-            const tarjeta =
-                document.createElement("div");
-
-
-            tarjeta.className =
-                "producto-cotizacion";
-
-
-            tarjeta.innerHTML = `
-
-                <div class="producto-cotizacion-cabecera">
-
-                    <strong>
-                        Producto
-                    </strong>
-
-                    <button
-                        type="button"
-                        class="btn-eliminar-producto"
-                        data-id="${producto.id}"
-                    >
-                        🗑️
-                    </button>
-
-                </div>
+    const buscador =
+        document.createElement(
+            "input"
+        );
 
 
-                <input
-                    type="text"
-                    class="producto-nombre"
-                    placeholder="Nombre del producto"
-                    value="${producto.nombre}"
-                >
+    buscador.type =
+        "text";
 
 
-                <div class="producto-precio">
-
-                    <select class="producto-moneda">
-
-                        <option value="USD"
-                            ${producto.moneda === "USD" ? "selected" : ""}>
-                            USD
-                        </option>
-
-                        <option value="ARS"
-                            ${producto.moneda === "ARS" ? "selected" : ""}>
-                            ARS
-                        </option>
-
-                    </select>
+    buscador.placeholder =
+        "Buscar producto por nombre o código...";
 
 
-                    <input
-                        type="number"
-                        class="producto-precio-unitario"
-                        placeholder="Precio unitario"
-                        min="0"
-                        step="0.01"
-                        value="${producto.precio}"
-                    >
-
-                </div>
-
-            `;
+    buscador.autocomplete =
+        "off";
 
 
-            /************************************************
-             * NOMBRE
-             ************************************************/
-
-            const nombreInput =
-                tarjeta.querySelector(
-                    ".producto-nombre"
-                );
+    buscador.className =
+        "producto-nombre";
 
 
-            nombreInput.addEventListener(
-                "input",
-                () => {
+    /*
+     * RESULTADOS
+     */
 
-                    producto.nombre =
-                        nombreInput.value;
+    const resultados =
+        document.createElement(
+            "div"
+        );
+
+
+    resultados.className =
+        "resultados-productos";
+
+
+    resultados.hidden =
+        true;
+
+
+    contenedor.appendChild(
+        buscador
+    );
+
+
+    contenedor.appendChild(
+        resultados
+    );
+
+
+    /*
+     * Producto existente
+     */
+
+    if (
+        productoSeleccionado
+    ) {
+
+        buscador.value =
+            productoSeleccionado.nombre ||
+            productoSeleccionado.descripcion ||
+            "";
+
+    }
+
+
+    /*
+     * BUSCAR
+     */
+
+    buscador.addEventListener(
+        "input",
+        () => {
+
+            const texto =
+                buscador.value
+                    .toLowerCase()
+                    .trim();
+
+
+            resultados.innerHTML =
+                "";
+
+
+            if (
+                texto === ""
+            ) {
+
+                resultados.hidden =
+                    true;
+
+                return;
+
+            }
+
+
+            const encontrados =
+                productos
+                    .filter(
+                        producto => {
+
+                            const nombre =
+                                (
+                                    producto.descripcion ||
+                                    ""
+                                ).toLowerCase();
+
+
+                            const codigo =
+                                (
+                                    producto.codigo ||
+                                    ""
+                                ).toLowerCase();
+
+
+                            return (
+                                nombre.includes(
+                                    texto
+                                ) ||
+                                codigo.includes(
+                                    texto
+                                )
+                            );
+
+                        }
+                    )
+                    .slice(
+                        0,
+                        15
+                    );
+
+
+            if (
+                encontrados.length === 0
+            ) {
+
+                resultados.innerHTML = `
+
+                    <div class="sin-resultados">
+                        No se encontraron productos.
+                    </div>
+
+                `;
+
+
+                resultados.hidden =
+                    false;
+
+                return;
+
+            }
+
+
+            encontrados.forEach(
+                producto => {
+
+                    const opcion =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    opcion.className =
+                        "resultado-producto";
+
+
+                    opcion.innerHTML = `
+
+                        <strong>
+                            ${producto.descripcion}
+                        </strong>
+
+                        <small>
+                            ${
+                                producto.codigo
+                                    ? `Código: ${producto.codigo}`
+                                    : ""
+                            }
+
+                            ${
+                                producto.unidad
+                                    ? ` · ${producto.unidad}`
+                                    : ""
+                            }
+                        </small>
+
+                    `;
+
+
+                    opcion.addEventListener(
+                        "click",
+                        () => {
+
+                            seleccionarProducto(
+                                producto,
+                                buscador,
+                                resultados,
+                                contenedor
+                            );
+
+                        }
+                    );
+
+
+                    resultados.appendChild(
+                        opcion
+                    );
 
                 }
             );
 
 
-            /************************************************
-             * MONEDA
-             ************************************************/
+            resultados.hidden =
+                false;
 
-            const monedaSelect =
-                tarjeta.querySelector(
+        }
+    );
+
+
+    /*
+     * Cerrar al hacer click afuera
+     */
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            if (
+                !contenedor.contains(
+                    event.target
+                )
+            ) {
+
+                resultados.hidden =
+                    true;
+
+            }
+
+        }
+    );
+
+
+    return buscador;
+
+}
+
+
+/* ============================================================
+   BUSCAR PRECIO SUGERIDO
+============================================================ */
+
+function obtenerPrecioSugerido(
+    productoId
+) {
+
+    if (
+        !listaPreciosSeleccionada
+    ) {
+
+        return null;
+
+    }
+
+
+    const producto =
+        listaPreciosSeleccionada.productos.find(
+            p =>
+                p.productoId === productoId
+        );
+
+
+    if (
+        !producto
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        precio:
+            Number(
+                producto.precio || 0
+            ),
+
+        moneda:
+            producto.moneda ||
+            "ARS"
+
+    };
+
+}
+
+
+/* ============================================================
+   SELECCIONAR PRODUCTO
+============================================================ */
+
+function seleccionarProducto(
+    producto,
+    buscador,
+    resultados,
+    contenedor
+) {
+
+    /*
+     * Evitar duplicados
+     */
+
+    const fila =
+        contenedor.closest(
+            ".producto-cotizacion"
+        );
+
+
+    const productoActual =
+        fila &&
+        fila.dataset.productoId ===
+        producto.id;
+
+
+    const yaExiste =
+        productosCotizacion.some(
+            p =>
+                p.productoId ===
+                producto.id
+        );
+
+
+    if (
+        yaExiste &&
+        !productoActual
+    ) {
+
+        alert(
+            "⚠️ Este producto ya está agregado a la cotización."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * Guardar producto en la fila
+     */
+
+    if (
+        fila
+    ) {
+
+        fila.dataset.productoId =
+            producto.id;
+
+
+        fila.dataset.codigo =
+            producto.codigo;
+
+
+        fila.dataset.unidad =
+            producto.unidad;
+
+
+        fila.dataset.descripcion =
+            producto.descripcion;
+
+
+        /*
+         * Buscar precio sugerido
+         */
+
+        const sugerido =
+            obtenerPrecioSugerido(
+                producto.id
+            );
+
+
+        const moneda =
+            fila.querySelector(
+                ".producto-moneda"
+            );
+
+
+        const precioInput =
+            fila.querySelector(
+                ".producto-precio-unitario"
+            );
+
+
+        const precioSugerido =
+            fila.querySelector(
+                ".precio-sugerido"
+            );
+
+
+        /*
+         * Moneda de la lista
+         */
+
+        if (
+            sugerido &&
+            moneda
+        ) {
+
+            moneda.value =
+                sugerido.moneda;
+
+        }
+
+
+        /*
+         * Precio sugerido
+         */
+
+        if (
+            sugerido &&
+            precioSugerido
+        ) {
+
+            precioSugerido.textContent =
+                `Precio sugerido: ${formatearPrecio(
+                    sugerido.precio,
+                    sugerido.moneda
+                )}`;
+
+            precioSugerido.style.display =
+                "block";
+
+        }
+
+        else if (
+            precioSugerido
+        ) {
+
+            precioSugerido.textContent =
+                listaPreciosSeleccionada
+                    ? "Producto sin precio en esta lista"
+                    : "Seleccioná una lista de precios";
+
+            precioSugerido.style.display =
+                "block";
+
+        }
+
+
+        /*
+         * IMPORTANTE:
+         *
+         * No ponemos el precio sugerido
+         * dentro del input.
+         *
+         * El usuario puede escribir
+         * libremente su precio.
+         */
+
+        if (
+            precioInput
+        ) {
+
+            precioInput.value =
+                "";
+
+        }
+
+
+        buscador.value =
+            producto.descripcion;
+
+
+        resultados.innerHTML =
+            "";
+
+
+        resultados.hidden =
+            true;
+
+
+        actualizarProductosCotizacion();
+
+    }
+
+}
+
+
+/* ============================================================
+   FORMATEAR PRECIO
+============================================================ */
+
+function formatearPrecio(
+    precio,
+    moneda
+) {
+
+    const simbolo =
+        moneda === "USD"
+            ? "USD "
+            : moneda === "EUR"
+                ? "EUR "
+                : "$ ";
+
+
+    return (
+        simbolo +
+        Number(
+            precio || 0
+        ).toLocaleString(
+            "es-AR",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        )
+    );
+
+}
+
+
+/* ============================================================
+   CREAR FILA PRODUCTO
+============================================================ */
+
+function agregarFilaProducto(
+    productoInicial = null
+) {
+
+    const tarjeta =
+        document.createElement(
+            "div"
+        );
+
+
+    tarjeta.className =
+        "producto-cotizacion";
+
+
+    /*
+     * ID temporal
+     */
+
+    tarjeta.dataset.productoId =
+        productoInicial
+            ? productoInicial.productoId || ""
+            : "";
+
+
+    /*
+     * CABECERA
+     */
+
+    const cabecera =
+        document.createElement(
+            "div"
+        );
+
+
+    cabecera.className =
+        "producto-cotizacion-cabecera";
+
+
+    const titulo =
+        document.createElement(
+            "strong"
+        );
+
+
+    titulo.textContent =
+        "Producto";
+
+
+    const btnEliminar =
+        document.createElement(
+            "button"
+        );
+
+
+    btnEliminar.type =
+        "button";
+
+
+    btnEliminar.className =
+        "btn-eliminar-producto";
+
+
+    btnEliminar.textContent =
+        "🗑️";
+
+
+    btnEliminar.addEventListener(
+        "click",
+        () => {
+
+            const productoId =
+                tarjeta.dataset.productoId;
+
+
+            productosCotizacion =
+                productosCotizacion.filter(
+                    p =>
+                        p.id !==
+                        tarjeta.dataset.id
+                );
+
+
+            tarjeta.remove();
+
+
+            actualizarProductosCotizacion();
+
+        }
+    );
+
+
+    cabecera.appendChild(
+        titulo
+    );
+
+
+    cabecera.appendChild(
+        btnEliminar
+    );
+
+
+    tarjeta.appendChild(
+        cabecera
+    );
+
+
+    /*
+     * CONTENEDOR BUSCADOR
+     */
+
+    const contenedorBuscador =
+        document.createElement(
+            "div"
+        );
+
+
+    contenedorBuscador.className =
+        "contenedor-buscador-producto";
+
+
+    tarjeta.appendChild(
+        contenedorBuscador
+    );
+
+
+    /*
+     * ID INTERNO DE LA FILA
+     */
+
+    tarjeta.dataset.id =
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2);
+
+
+    /*
+     * BUSCADOR
+     */
+
+    crearBuscadorProducto(
+        contenedorBuscador,
+        productoInicial
+    );
+
+
+    /*
+     * UNIDAD
+     */
+
+    const unidad =
+        document.createElement(
+            "span"
+        );
+
+
+    unidad.className =
+        "unidad-producto";
+
+
+    unidad.textContent =
+        productoInicial
+            ? (
+                productoInicial.unidad ||
+                "Sin unidad"
+            )
+            : "Sin producto";
+
+
+    tarjeta.appendChild(
+        unidad
+    );
+
+
+    /*
+     * PRECIO
+     */
+
+    const bloquePrecio =
+        document.createElement(
+            "div"
+        );
+
+
+    bloquePrecio.className =
+        "producto-precio";
+
+
+    /*
+     * MONEDA
+     */
+
+    const moneda =
+        document.createElement(
+            "select"
+        );
+
+
+    moneda.className =
+        "producto-moneda";
+
+
+    moneda.innerHTML = `
+
+        <option value="USD">
+            USD
+        </option>
+
+        <option value="ARS">
+            ARS
+        </option>
+
+        <option value="EUR">
+            EUR
+        </option>
+
+    `;
+
+
+    /*
+     * Precio editable
+     */
+
+    const precioInput =
+        document.createElement(
+            "input"
+        );
+
+
+    precioInput.type =
+        "number";
+
+
+    precioInput.className =
+        "producto-precio-unitario";
+
+
+    precioInput.placeholder =
+        "Precio unitario";
+
+
+    precioInput.min =
+        "0";
+
+
+    precioInput.step =
+        "0.01";
+
+
+    /*
+     * Precio sugerido
+     */
+
+    const precioSugerido =
+        document.createElement(
+            "small"
+        );
+
+
+    precioSugerido.className =
+        "precio-sugerido";
+
+
+    precioSugerido.style.color =
+        "#9ca3af";
+
+
+    precioSugerido.style.fontSize =
+        "13px";
+
+
+    precioSugerido.style.display =
+        "block";
+
+
+    precioSugerido.textContent =
+        listaPreciosSeleccionada
+            ? "Seleccioná el producto"
+            : "Seleccioná una lista de precios";
+
+
+    /*
+     * Recuperar producto inicial
+     */
+
+    if (
+        productoInicial
+    ) {
+
+        if (
+            productoInicial.moneda
+        ) {
+
+            moneda.value =
+                productoInicial.moneda;
+
+        }
+
+
+        if (
+            productoInicial.precioUnitario !== undefined
+        ) {
+
+            precioInput.value =
+                productoInicial.precioUnitario;
+
+        }
+
+
+        const sugerido =
+            obtenerPrecioSugerido(
+                productoInicial.productoId
+            );
+
+
+        if (
+            sugerido
+        ) {
+
+            precioSugerido.textContent =
+                `Precio sugerido: ${formatearPrecio(
+                    sugerido.precio,
+                    sugerido.moneda
+                )}`;
+
+        }
+
+    }
+
+
+    /*
+     * CAMBIO MONEDA
+     */
+
+    moneda.addEventListener(
+        "change",
+        () => {
+
+            actualizarProductosCotizacion();
+
+        }
+    );
+
+
+    /*
+     * CAMBIO PRECIO
+     */
+
+    precioInput.addEventListener(
+        "input",
+        () => {
+
+            actualizarProductosCotizacion();
+
+        }
+    );
+
+
+    /*
+     * ARMAR BLOQUE PRECIO
+     */
+
+    bloquePrecio.appendChild(
+        moneda
+    );
+
+
+    bloquePrecio.appendChild(
+        precioInput
+    );
+
+
+    bloquePrecio.appendChild(
+        precioSugerido
+    );
+
+
+    tarjeta.appendChild(
+        bloquePrecio
+    );
+
+
+    /*
+     * AGREGAR A LA PÁGINA
+     */
+
+    listaProductosEl.appendChild(
+        tarjeta
+    );
+
+
+    /*
+     * Enfocar nueva fila
+     */
+
+    if (
+        !productoInicial
+    ) {
+
+        const input =
+            tarjeta.querySelector(
+                ".producto-nombre"
+            );
+
+
+        if (
+            input
+        ) {
+
+            input.focus();
+
+        }
+
+    }
+
+
+    actualizarProductosCotizacion();
+
+}
+
+
+/* ============================================================
+   ACTUALIZAR PRODUCTOS
+============================================================ */
+
+function actualizarProductosCotizacion() {
+
+    productosCotizacion = [];
+
+
+    const filas =
+        listaProductosEl.querySelectorAll(
+            ".producto-cotizacion"
+        );
+
+
+    filas.forEach(
+        fila => {
+
+            const productoId =
+                fila.dataset.productoId;
+
+
+            if (
+                !productoId
+            ) {
+
+                return;
+
+            }
+
+
+            const moneda =
+                fila.querySelector(
                     ".producto-moneda"
                 );
 
 
-            monedaSelect.addEventListener(
-                "change",
-                () => {
-
-                    producto.moneda =
-                        monedaSelect.value;
-
-                }
-            );
-
-
-            /************************************************
-             * PRECIO
-             ************************************************/
-
-            const precioInput =
-                tarjeta.querySelector(
+            const precio =
+                fila.querySelector(
                     ".producto-precio-unitario"
                 );
 
 
-            precioInput.addEventListener(
-                "input",
-                () => {
+            productosCotizacion.push({
 
-                    producto.precio =
-                        precioInput.value;
+                id:
+                    fila.dataset.id,
 
-                }
-            );
+                productoId:
+                    productoId,
 
+                nombre:
+                    fila.dataset.descripcion ||
+                    "",
 
-            /************************************************
-             * ELIMINAR
-             ************************************************/
+                codigo:
+                    fila.dataset.codigo ||
+                    "",
 
-            const btnEliminar =
-                tarjeta.querySelector(
-                    ".btn-eliminar-producto"
-                );
+                unidad:
+                    fila.dataset.unidad ||
+                    "",
 
+                moneda:
+                    moneda
+                        ? moneda.value
+                        : "ARS",
 
-            btnEliminar.addEventListener(
-                "click",
-                () => {
+                precio:
+                    precio
+                        ? precio.value
+                        : ""
 
-                    productosCotizacion =
-                        productosCotizacion.filter(
-                            p =>
-                                p.id !== producto.id
-                        );
-
-
-                    renderProductos();
-
-                }
-            );
-
-
-            listaProductosEl.appendChild(
-                tarjeta
-            );
+            });
 
         }
     );
@@ -354,14 +1490,32 @@ function renderProductos() {
 }
 
 
-/************************************************************
- * FECHA ACTUAL
- ************************************************************/
+/* ============================================================
+   BOTÓN AGREGAR PRODUCTO
+============================================================ */
+
+btnAgregarProducto.addEventListener(
+    "click",
+    () => {
+
+        agregarFilaProducto();
+
+    }
+);
+
+
+/* ============================================================
+   FECHA ACTUAL
+============================================================ */
 
 function establecerFechaActual() {
 
-    if (fechaEl.value) {
+    if (
+        fechaEl.value
+    ) {
+
         return;
+
     }
 
 
@@ -376,13 +1530,19 @@ function establecerFechaActual() {
     const mes =
         String(
             hoy.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
 
     const dia =
         String(
             hoy.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
 
     fechaEl.value =
@@ -391,9 +1551,9 @@ function establecerFechaActual() {
 }
 
 
-/************************************************************
- * GUARDAR COTIZACIÓN
- ************************************************************/
+/* ============================================================
+   GUARDAR COTIZACIÓN
+============================================================ */
 
 form.addEventListener(
     "submit",
@@ -404,11 +1564,13 @@ form.addEventListener(
 
         try {
 
-            /************************************************
+            /*
              * CLIENTE
-             ************************************************/
+             */
 
-            if (!selectCliente.value) {
+            if (
+                !selectCliente.value
+            ) {
 
                 alert(
                     "Seleccioná un cliente."
@@ -427,11 +1589,13 @@ form.addEventListener(
                 ];
 
 
-            /************************************************
+            /*
              * FECHA
-             ************************************************/
+             */
 
-            if (!fechaEl.value) {
+            if (
+                !fechaEl.value
+            ) {
 
                 alert(
                     "Seleccioná una fecha."
@@ -444,15 +1608,17 @@ form.addEventListener(
             }
 
 
-            /************************************************
+            /*
              * NOMBRE
-             ************************************************/
+             */
 
             const nombreCotizacion =
                 nombreCotizacionEl.value.trim();
 
 
-            if (!nombreCotizacion) {
+            if (
+                !nombreCotizacion
+            ) {
 
                 alert(
                     "Ingresá el nombre de la cotización."
@@ -465,9 +1631,16 @@ form.addEventListener(
             }
 
 
-            /************************************************
+            /*
+             * ACTUALIZAR PRODUCTOS
+             */
+
+            actualizarProductosCotizacion();
+
+
+            /*
              * PRODUCTOS
-             ************************************************/
+             */
 
             if (
                 productosCotizacion.length === 0
@@ -482,9 +1655,9 @@ form.addEventListener(
             }
 
 
-            /************************************************
+            /*
              * VALIDAR PRODUCTOS
-             ************************************************/
+             */
 
             for (
                 const producto
@@ -506,7 +1679,14 @@ form.addEventListener(
 
                 if (
                     producto.precio === "" ||
-                    Number(producto.precio) < 0
+                    !Number.isFinite(
+                        Number(
+                            producto.precio
+                        )
+                    ) ||
+                    Number(
+                        producto.precio
+                    ) < 0
                 ) {
 
                     alert(
@@ -520,9 +1700,9 @@ form.addEventListener(
             }
 
 
-            /************************************************
+            /*
              * FECHA FIREBASE
-             ************************************************/
+             */
 
             const partes =
                 fechaEl.value.split("-");
@@ -539,19 +1719,25 @@ form.addEventListener(
                 );
 
 
-            /************************************************
-             * DATOS DE LOS PRODUCTOS
-             *
-             * Sacamos el id interno porque solamente
-             * sirve para manejar la pantalla.
-             ************************************************/
+            /*
+             * DATOS PRODUCTOS
+             */
 
-            const productos =
+            const productosFinales =
                 productosCotizacion.map(
                     producto => ({
 
+                        productoId:
+                            producto.productoId,
+
                         nombre:
                             producto.nombre.trim(),
+
+                        codigo:
+                            producto.codigo,
+
+                        unidad:
+                            producto.unidad,
 
                         moneda:
                             producto.moneda,
@@ -565,9 +1751,35 @@ form.addEventListener(
                 );
 
 
-            /************************************************
+            /*
+             * DATOS LISTA DE PRECIOS
+             */
+
+            const datosLista =
+                listaPreciosSeleccionada
+                    ? {
+
+                        listaPreciosId:
+                            listaPreciosSeleccionada.id,
+
+                        listaPreciosNombre:
+                            listaPreciosSeleccionada.nombre
+
+                    }
+                    : {
+
+                        listaPreciosId:
+                            "",
+
+                        listaPreciosNombre:
+                            ""
+
+                    };
+
+
+            /*
              * OBJETO FINAL
-             ************************************************/
+             */
 
             const nuevaCotizacion = {
 
@@ -587,16 +1799,25 @@ form.addEventListener(
                     ),
 
                 propuesta:
-                    propuestaEl.value || "",
+                    propuestaEl.value ||
+                    "",
 
                 dosis:
-                    dosisEl.value || "",
+                    dosisEl.value ||
+                    "",
+
+                listaPreciosId:
+                    datosLista.listaPreciosId,
+
+                listaPreciosNombre:
+                    datosLista.listaPreciosNombre,
 
                 productos:
-                    productos,
+                    productosFinales,
 
                 observaciones:
-                    observacionesEl.value || "",
+                    observacionesEl.value ||
+                    "",
 
                 creadoEn:
                     Timestamp.now()
@@ -604,9 +1825,9 @@ form.addEventListener(
             };
 
 
-            /************************************************
+            /*
              * BOTÓN GUARDAR
-             ************************************************/
+             */
 
             const botonGuardar =
                 form.querySelector(
@@ -614,7 +1835,9 @@ form.addEventListener(
                 );
 
 
-            if (botonGuardar) {
+            if (
+                botonGuardar
+            ) {
 
                 botonGuardar.disabled =
                     true;
@@ -625,9 +1848,9 @@ form.addEventListener(
             }
 
 
-            /************************************************
+            /*
              * FIRESTORE
-             ************************************************/
+             */
 
             const docRef =
                 await addDoc(
@@ -639,9 +1862,9 @@ form.addEventListener(
                 );
 
 
-            /************************************************
-             * IR A LA COTIZACIÓN
-             ************************************************/
+            /*
+             * IR A COTIZACIÓN
+             */
 
             window.location.href =
                 `cotizacion.html?id=${docRef.id}`;
@@ -668,7 +1891,9 @@ form.addEventListener(
                 );
 
 
-            if (botonGuardar) {
+            if (
+                botonGuardar
+            ) {
 
                 botonGuardar.disabled =
                     false;
@@ -684,15 +1909,29 @@ form.addEventListener(
 );
 
 
-/************************************************************
- * INICIO
- ************************************************************/
+/* ============================================================
+   INICIO
+============================================================ */
 
 async function iniciar() {
 
     establecerFechaActual();
 
-    await cargarClientes();
+
+    /*
+     * Cargar todo antes de permitir
+     * trabajar con productos.
+     */
+
+    await Promise.all([
+
+        cargarClientes(),
+
+        cargarProductos(),
+
+        cargarListasPrecios()
+
+    ]);
 
 }
 
