@@ -38,7 +38,6 @@ const firebaseConfig = {
 
     appId:
         "1:143868382036:web:b5af0e4faced7e880216c1"
-
 };
 
 
@@ -90,83 +89,6 @@ const listaProductos =
 let productos = [];
 
 let productosAgregados = [];
-
-
-/* ============================================================
-   BOTÓN AGREGAR PRODUCTO INFERIOR
-============================================================ */
-
-/*
- * Creamos un segundo botón dinámicamente.
- *
- * De esta manera no hace falta modificar
- * el HTML que ya tenés funcionando.
- */
-
-const btnAgregarProductoInferior =
-    document.createElement(
-        "button"
-    );
-
-
-btnAgregarProductoInferior.type =
-    "button";
-
-
-btnAgregarProductoInferior.className =
-    "btn-agregar btn-agregar-inferior";
-
-
-btnAgregarProductoInferior.textContent =
-    "➕ Agregar producto";
-
-
-/*
- * Lo agregamos inicialmente al final
- * del contenedor de productos.
- */
-
-listaProductos.appendChild(
-    btnAgregarProductoInferior
-);
-
-
-/*
- * Función que mantiene el botón
- * siempre debajo de la última fila.
- */
-
-function actualizarBotonAgregarInferior() {
-
-    /*
-     * Lo sacamos temporalmente
-     * del contenedor.
-     */
-
-    if (
-        btnAgregarProductoInferior.parentElement ===
-        listaProductos
-    ) {
-
-        listaProductos.removeChild(
-            btnAgregarProductoInferior
-        );
-
-    }
-
-
-    /*
-     * Lo volvemos a poner al final.
-     *
-     * Así siempre queda debajo
-     * del último producto.
-     */
-
-    listaProductos.appendChild(
-        btnAgregarProductoInferior
-    );
-
-}
 
 
 /* ============================================================
@@ -253,7 +175,6 @@ async function cargarProductos() {
             "Productos cargados:",
             productos.length
         );
-
 
     }
 
@@ -460,7 +381,6 @@ function crearBuscadorProducto(
                         </strong>
 
                         <small>
-
                             ${
                                 producto.codigo
                                     ? `Código: ${producto.codigo}`
@@ -472,7 +392,6 @@ function crearBuscadorProducto(
                                     ? ` · ${producto.unidad}`
                                     : ""
                             }
-
                         </small>
 
                     `;
@@ -810,17 +729,7 @@ function agregarFilaProducto() {
 
             fila.remove();
 
-
             actualizarProductosAgregados();
-
-
-            /*
-             * Aseguramos que el botón
-             * inferior quede nuevamente
-             * debajo del último producto.
-             */
-
-            actualizarBotonAgregarInferior();
 
         }
     );
@@ -856,13 +765,17 @@ function agregarFilaProducto() {
 
 
     /*
-     * Insertamos la fila antes
-     * del botón inferior.
+     * Agregar la fila al contenedor.
+     *
+     * El botón "Agregar producto"
+     * está FUERA de este contenedor
+     * en el HTML, por lo tanto queda
+     * automáticamente debajo de todas
+     * las filas.
      */
 
-    listaProductos.insertBefore(
-        fila,
-        btnAgregarProductoInferior
+    listaProductos.appendChild(
+        fila
     );
 
 
@@ -871,14 +784,6 @@ function agregarFilaProducto() {
      */
 
     actualizarProductosAgregados();
-
-
-    /*
-     * Mantener botón inferior
-     * al final.
-     */
-
-    actualizarBotonAgregarInferior();
 
 
     /*
@@ -983,24 +888,10 @@ function actualizarProductosAgregados() {
 
 
 /* ============================================================
-   AGREGAR PRODUCTO — BOTÓN SUPERIOR
+   AGREGAR PRODUCTO — ÚNICO BOTÓN DEL HTML
 ============================================================ */
 
 btnAgregarProducto.addEventListener(
-    "click",
-    () => {
-
-        agregarFilaProducto();
-
-    }
-);
-
-
-/* ============================================================
-   AGREGAR PRODUCTO — BOTÓN INFERIOR
-============================================================ */
-
-btnAgregarProductoInferior.addEventListener(
     "click",
     () => {
 
