@@ -238,16 +238,21 @@ hr{
    DESKTOP
 ================================ */
 @media (min-width: 768px) {
-  .acciones-form {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 14px;
-  }
 
-  .btn-guardar,
-  .btn-cancelar {
-    flex: 0 0 220px;
-    width: 220px;
-  }
+    .acciones-form {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .btn-guardar,
+    .btn-cancelar {
+        flex: 0 0 auto;
+        width: 220px;
+    }
+
+}
+.btn-guardar,
+.btn-cancelar {
+    height: 58px;
 }
