@@ -16,7 +16,7 @@ import {
 
 
 /************************************************************
- * CONFIG FIREBASE
+ * FIREBASE
  ************************************************************/
 
 const firebaseConfig = {
@@ -41,57 +41,50 @@ const firebaseConfig = {
 
 };
 
+const app = initializeApp(firebaseConfig);
 
-const app =
-    initializeApp(firebaseConfig);
-
-const db =
-    getFirestore(app);
+const db = getFirestore(app);
 
 
 /************************************************************
- * ELEMENTOS DOM
+ * ELEMENTOS
  ************************************************************/
 
 const form =
-    document.getElementById(
-        "formNuevaCotizacion"
-    );
+    document.getElementById("formNuevaCotizacion");
 
 const selectCliente =
-    document.getElementById(
-        "cliente"
-    );
+    document.getElementById("cliente");
 
 const fechaEl =
-    document.getElementById(
-        "fecha"
-    );
+    document.getElementById("fecha");
 
 const nombreCotizacionEl =
-    document.getElementById(
-        "nombreCotizacion"
-    );
+    document.getElementById("nombreCotizacion");
 
 const propuestaEl =
-    document.getElementById(
-        "propuesta"
-    );
+    document.getElementById("propuesta");
 
 const dosisEl =
-    document.getElementById(
-        "dosis"
-    );
-
-const cotizacionEl =
-    document.getElementById(
-        "cotizacion"
-    );
+    document.getElementById("dosis");
 
 const observacionesEl =
+    document.getElementById("observaciones");
+
+const listaProductosEl =
+    document.getElementById("listaProductosCotizacion");
+
+const btnAgregarProducto =
     document.getElementById(
-        "observaciones"
+        "btnAgregarProductoCotizacion"
     );
+
+
+/************************************************************
+ * PRODUCTOS
+ ************************************************************/
+
+let productosCotizacion = [];
 
 
 /************************************************************
@@ -104,62 +97,296 @@ async function cargarClientes() {
 
         const snap =
             await getDocs(
-                collection(
-                    db,
-                    "clientes"
-                )
+                collection(db, "clientes")
             );
 
 
-        snap.forEach(
-            docu => {
+        snap.forEach(docu => {
 
-                const cliente =
-                    docu.data();
-
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
+            const cliente =
+                docu.data();
 
 
-                option.value =
-                    docu.id;
+            const option =
+                document.createElement("option");
 
 
-                option.textContent =
-                    cliente.nombre ||
-                    "Cliente sin nombre";
+            option.value =
+                docu.id;
 
 
-                option.dataset.nombre =
-                    cliente.nombre ||
-                    "";
+            option.textContent =
+                cliente.nombre ||
+                "Cliente sin nombre";
 
 
-                selectCliente.appendChild(
-                    option
-                );
+            option.dataset.nombre =
+                cliente.nombre || "";
 
-            }
-        );
 
-    }
+            selectCliente.appendChild(option);
 
-    catch (error) {
+        });
+
+    } catch (error) {
 
         console.error(
             "Error cargando clientes:",
             error
         );
 
-
         alert(
             "No se pudieron cargar los clientes."
         );
 
     }
+
+}
+
+
+/************************************************************
+ * AGREGAR PRODUCTO
+ ************************************************************/
+
+btnAgregarProducto.addEventListener(
+    "click",
+    () => {
+
+        const producto = {
+
+            id: Date.now(),
+
+            nombre: "",
+
+            moneda: "USD",
+
+            precio: ""
+
+        };
+
+
+        productosCotizacion.push(
+            producto
+        );
+
+
+        renderProductos();
+
+    }
+);
+
+
+/************************************************************
+ * MOSTRAR PRODUCTOS
+ ************************************************************/
+
+function renderProductos() {
+
+    listaProductosEl.innerHTML = "";
+
+
+    productosCotizacion.forEach(
+        producto => {
+
+            const tarjeta =
+                document.createElement("div");
+
+
+            tarjeta.className =
+                "producto-cotizacion";
+
+
+            tarjeta.innerHTML = `
+
+                <div class="producto-cotizacion-cabecera">
+
+                    <strong>
+                        Producto
+                    </strong>
+
+                    <button
+                        type="button"
+                        class="btn-eliminar-producto"
+                        data-id="${producto.id}"
+                    >
+                        🗑️
+                    </button>
+
+                </div>
+
+
+                <input
+                    type="text"
+                    class="producto-nombre"
+                    placeholder="Nombre del producto"
+                    value="${producto.nombre}"
+                >
+
+
+                <div class="producto-precio">
+
+                    <select class="producto-moneda">
+
+                        <option value="USD"
+                            ${producto.moneda === "USD" ? "selected" : ""}>
+                            USD
+                        </option>
+
+                        <option value="ARS"
+                            ${producto.moneda === "ARS" ? "selected" : ""}>
+                            ARS
+                        </option>
+
+                    </select>
+
+
+                    <input
+                        type="number"
+                        class="producto-precio-unitario"
+                        placeholder="Precio unitario"
+                        min="0"
+                        step="0.01"
+                        value="${producto.precio}"
+                    >
+
+                </div>
+
+            `;
+
+
+            /************************************************
+             * NOMBRE
+             ************************************************/
+
+            const nombreInput =
+                tarjeta.querySelector(
+                    ".producto-nombre"
+                );
+
+
+            nombreInput.addEventListener(
+                "input",
+                () => {
+
+                    producto.nombre =
+                        nombreInput.value;
+
+                }
+            );
+
+
+            /************************************************
+             * MONEDA
+             ************************************************/
+
+            const monedaSelect =
+                tarjeta.querySelector(
+                    ".producto-moneda"
+                );
+
+
+            monedaSelect.addEventListener(
+                "change",
+                () => {
+
+                    producto.moneda =
+                        monedaSelect.value;
+
+                }
+            );
+
+
+            /************************************************
+             * PRECIO
+             ************************************************/
+
+            const precioInput =
+                tarjeta.querySelector(
+                    ".producto-precio-unitario"
+                );
+
+
+            precioInput.addEventListener(
+                "input",
+                () => {
+
+                    producto.precio =
+                        precioInput.value;
+
+                }
+            );
+
+
+            /************************************************
+             * ELIMINAR
+             ************************************************/
+
+            const btnEliminar =
+                tarjeta.querySelector(
+                    ".btn-eliminar-producto"
+                );
+
+
+            btnEliminar.addEventListener(
+                "click",
+                () => {
+
+                    productosCotizacion =
+                        productosCotizacion.filter(
+                            p =>
+                                p.id !== producto.id
+                        );
+
+
+                    renderProductos();
+
+                }
+            );
+
+
+            listaProductosEl.appendChild(
+                tarjeta
+            );
+
+        }
+    );
+
+}
+
+
+/************************************************************
+ * FECHA ACTUAL
+ ************************************************************/
+
+function establecerFechaActual() {
+
+    if (fechaEl.value) {
+        return;
+    }
+
+
+    const hoy =
+        new Date();
+
+
+    const año =
+        hoy.getFullYear();
+
+
+    const mes =
+        String(
+            hoy.getMonth() + 1
+        ).padStart(2, "0");
+
+
+    const dia =
+        String(
+            hoy.getDate()
+        ).padStart(2, "0");
+
+
+    fechaEl.value =
+        `${año}-${mes}-${dia}`;
 
 }
 
@@ -181,15 +408,7 @@ form.addEventListener(
              * CLIENTE
              ************************************************/
 
-            const clienteOption =
-                selectCliente.options[
-                    selectCliente.selectedIndex
-                ];
-
-
-            if (
-                !selectCliente.value
-            ) {
+            if (!selectCliente.value) {
 
                 alert(
                     "Seleccioná un cliente."
@@ -202,13 +421,17 @@ form.addEventListener(
             }
 
 
+            const clienteOption =
+                selectCliente.options[
+                    selectCliente.selectedIndex
+                ];
+
+
             /************************************************
              * FECHA
              ************************************************/
 
-            if (
-                !fechaEl.value
-            ) {
+            if (!fechaEl.value) {
 
                 alert(
                     "Seleccioná una fecha."
@@ -226,13 +449,10 @@ form.addEventListener(
              ************************************************/
 
             const nombreCotizacion =
-                nombreCotizacionEl.value
-                    .trim();
+                nombreCotizacionEl.value.trim();
 
 
-            if (
-                !nombreCotizacion
-            ) {
+            if (!nombreCotizacion) {
 
                 alert(
                     "Ingresá el nombre de la cotización."
@@ -246,25 +466,56 @@ form.addEventListener(
 
 
             /************************************************
-             * COTIZACIÓN
+             * PRODUCTOS
              ************************************************/
 
-            const cotizacion =
-                cotizacionEl.value
-                    .trim();
-
-
             if (
-                !cotizacion
+                productosCotizacion.length === 0
             ) {
 
                 alert(
-                    "Ingresá los productos y precios de la cotización."
+                    "Agregá al menos un producto."
                 );
 
-                cotizacionEl.focus();
-
                 return;
+
+            }
+
+
+            /************************************************
+             * VALIDAR PRODUCTOS
+             ************************************************/
+
+            for (
+                const producto
+                of productosCotizacion
+            ) {
+
+                if (
+                    !producto.nombre.trim()
+                ) {
+
+                    alert(
+                        "Completá el nombre de todos los productos."
+                    );
+
+                    return;
+
+                }
+
+
+                if (
+                    producto.precio === "" ||
+                    Number(producto.precio) < 0
+                ) {
+
+                    alert(
+                        `Ingresá el precio del producto "${producto.nombre}".`
+                    );
+
+                    return;
+
+                }
 
             }
 
@@ -277,29 +528,11 @@ form.addEventListener(
                 fechaEl.value.split("-");
 
 
-            const año =
-                Number(
-                    partes[0]
-                );
-
-
-            const mes =
-                Number(
-                    partes[1]
-                ) - 1;
-
-
-            const dia =
-                Number(
-                    partes[2]
-                );
-
-
             const fechaCotizacion =
                 new Date(
-                    año,
-                    mes,
-                    dia,
+                    Number(partes[0]),
+                    Number(partes[1]) - 1,
+                    Number(partes[2]),
                     12,
                     0,
                     0
@@ -307,7 +540,33 @@ form.addEventListener(
 
 
             /************************************************
-             * DATOS
+             * DATOS DE LOS PRODUCTOS
+             *
+             * Sacamos el id interno porque solamente
+             * sirve para manejar la pantalla.
+             ************************************************/
+
+            const productos =
+                productosCotizacion.map(
+                    producto => ({
+
+                        nombre:
+                            producto.nombre.trim(),
+
+                        moneda:
+                            producto.moneda,
+
+                        precioUnitario:
+                            Number(
+                                producto.precio
+                            )
+
+                    })
+                );
+
+
+            /************************************************
+             * OBJETO FINAL
              ************************************************/
 
             const nuevaCotizacion = {
@@ -328,19 +587,16 @@ form.addEventListener(
                     ),
 
                 propuesta:
-                    propuestaEl.value ||
-                    "",
+                    propuestaEl.value || "",
 
                 dosis:
-                    dosisEl.value ||
-                    "",
+                    dosisEl.value || "",
 
-                cotizacion:
-                    cotizacion,
+                productos:
+                    productos,
 
                 observaciones:
-                    observacionesEl.value ||
-                    "",
+                    observacionesEl.value || "",
 
                 creadoEn:
                     Timestamp.now()
@@ -370,7 +626,7 @@ form.addEventListener(
 
 
             /************************************************
-             * GUARDAR EN FIRESTORE
+             * FIRESTORE
              ************************************************/
 
             const docRef =
@@ -426,53 +682,6 @@ form.addEventListener(
 
     }
 );
-
-
-/************************************************************
- * FECHA POR DEFECTO
- ************************************************************/
-
-function establecerFechaActual() {
-
-    if (
-        fechaEl.value
-    ) {
-
-        return;
-
-    }
-
-
-    const hoy =
-        new Date();
-
-
-    const año =
-        hoy.getFullYear();
-
-
-    const mes =
-        String(
-            hoy.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const dia =
-        String(
-            hoy.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    fechaEl.value =
-        `${año}-${mes}-${dia}`;
-
-}
 
 
 /************************************************************
