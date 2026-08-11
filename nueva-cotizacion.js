@@ -913,13 +913,9 @@ function seleccionarProducto(
 
 
         /*
-         * IMPORTANTE:
-         *
-         * No ponemos el precio sugerido
-         * dentro del input.
-         *
+         * El precio editable queda vacío.
          * El usuario puede escribir
-         * libremente su precio.
+         * cualquier precio.
          */
 
         if (
@@ -1003,7 +999,7 @@ function agregarFilaProducto(
 
 
     /*
-     * ID temporal
+     * ID temporal de la fila
      */
 
     tarjeta.dataset.productoId =
@@ -1012,9 +1008,16 @@ function agregarFilaProducto(
             : "";
 
 
-    /*
-     * CABECERA
-     */
+    tarjeta.dataset.id =
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2);
+
+
+    /* ========================================================
+       CABECERA DEL PRODUCTO
+    ======================================================== */
 
     const cabecera =
         document.createElement(
@@ -1036,6 +1039,13 @@ function agregarFilaProducto(
         "Producto";
 
 
+    /*
+     * BOTÓN ELIMINAR
+     *
+     * Ahora usamos una X en lugar
+     * del tachito.
+     */
+
     const btnEliminar =
         document.createElement(
             "button"
@@ -1051,33 +1061,36 @@ function agregarFilaProducto(
 
 
     btnEliminar.textContent =
-        "🗑️";
+        "✕";
+
+
+    btnEliminar.title =
+        "Eliminar producto";
+
+
+    btnEliminar.setAttribute(
+        "aria-label",
+        "Eliminar producto"
+    );
 
 
     btnEliminar.addEventListener(
         "click",
         () => {
 
-            const productoId =
-                tarjeta.dataset.productoId;
-
-
-            productosCotizacion =
-                productosCotizacion.filter(
-                    p =>
-                        p.id !==
-                        tarjeta.dataset.id
-                );
-
-
             tarjeta.remove();
-
 
             actualizarProductosCotizacion();
 
         }
     );
 
+
+    /*
+     * Encabezado:
+     *
+     * Producto                         ✕
+     */
 
     cabecera.appendChild(
         titulo
@@ -1094,9 +1107,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * CONTENEDOR BUSCADOR
-     */
+    /* ========================================================
+       CONTENEDOR BUSCADOR
+    ======================================================== */
 
     const contenedorBuscador =
         document.createElement(
@@ -1113,20 +1126,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * ID INTERNO DE LA FILA
-     */
-
-    tarjeta.dataset.id =
-        Date.now().toString() +
-        Math.random()
-            .toString(36)
-            .substring(2);
-
-
-    /*
-     * BUSCADOR
-     */
+    /* ========================================================
+       BUSCADOR
+    ======================================================== */
 
     crearBuscadorProducto(
         contenedorBuscador,
@@ -1134,9 +1136,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * UNIDAD
-     */
+    /* ========================================================
+       UNIDAD
+    ======================================================== */
 
     const unidad =
         document.createElement(
@@ -1162,9 +1164,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * PRECIO
-     */
+    /* ========================================================
+       BLOQUE PRECIO
+    ======================================================== */
 
     const bloquePrecio =
         document.createElement(
@@ -1176,9 +1178,9 @@ function agregarFilaProducto(
         "producto-precio";
 
 
-    /*
-     * MONEDA
-     */
+    /* ========================================================
+       MONEDA
+    ======================================================== */
 
     const moneda =
         document.createElement(
@@ -1207,9 +1209,9 @@ function agregarFilaProducto(
     `;
 
 
-    /*
-     * Precio editable
-     */
+    /* ========================================================
+       PRECIO EDITABLE
+    ======================================================== */
 
     const precioInput =
         document.createElement(
@@ -1238,8 +1240,16 @@ function agregarFilaProducto(
 
 
     /*
-     * Precio sugerido
+     * El precio sugerido NO se coloca
+     * dentro del input.
+     *
+     * El usuario puede escribir
+     * libremente otro precio.
      */
+
+    /* ========================================================
+       PRECIO SUGERIDO
+    ======================================================== */
 
     const precioSugerido =
         document.createElement(
@@ -1269,9 +1279,9 @@ function agregarFilaProducto(
             : "Seleccioná una lista de precios";
 
 
-    /*
-     * Recuperar producto inicial
-     */
+    /* ========================================================
+       RECUPERAR PRODUCTO INICIAL
+    ======================================================== */
 
     if (
         productoInicial
@@ -1318,9 +1328,9 @@ function agregarFilaProducto(
     }
 
 
-    /*
-     * CAMBIO MONEDA
-     */
+    /* ========================================================
+       CAMBIO MONEDA
+    ======================================================== */
 
     moneda.addEventListener(
         "change",
@@ -1332,9 +1342,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * CAMBIO PRECIO
-     */
+    /* ========================================================
+       CAMBIO PRECIO
+    ======================================================== */
 
     precioInput.addEventListener(
         "input",
@@ -1346,9 +1356,9 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * ARMAR BLOQUE PRECIO
-     */
+    /* ========================================================
+       ARMAR BLOQUE PRECIO
+    ======================================================== */
 
     bloquePrecio.appendChild(
         moneda
@@ -1370,18 +1380,18 @@ function agregarFilaProducto(
     );
 
 
-    /*
-     * AGREGAR A LA PÁGINA
-     */
+    /* ========================================================
+       AGREGAR A LA PÁGINA
+    ======================================================== */
 
     listaProductosEl.appendChild(
         tarjeta
     );
 
 
-    /*
-     * Enfocar nueva fila
-     */
+    /* ========================================================
+       ENFOCAR NUEVA FILA
+    ======================================================== */
 
     if (
         !productoInicial
