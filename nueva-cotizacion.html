@@ -1,144 +1,239 @@
-<meta name="description" content="INLACT - Nueva cotización">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="es">
 
-<!-- CSS -->
-<link rel="stylesheet" href="index.css">
-<link rel="stylesheet" href="nueva-cotizacion.css">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="INLACT - Nueva cotización"
+    >
+
+    <title>Nueva cotización · INLACT</title>
+
+    <!-- CSS BASE -->
+    <link
+        rel="stylesheet"
+        href="index.css"
+    >
+
+    <!-- CSS ESPECÍFICO -->
+    <link
+        rel="stylesheet"
+        href="nueva-cotizacion.css"
+    >
 
 </head>
 
+
 <body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header>
+
+    <h2>
+        NICOLÁS PAJARES
+    </h2>
+
+</header>
+
+
+<!-- =========================================================
+     CONTENIDO
+========================================================= -->
 
 <main>
 
 <section class="card-formulario">
 
-<h1>Crear nueva cotización</h1>
-
-<form id="formNuevaCotizacion">
-
-    <!-- CLIENTE -->
-
-    <label for="cliente">
-        Cliente
-    </label>
-
-    <select id="cliente" required>
-        <option value="">
-            Seleccionar cliente
-        </option>
-    </select>
+    <h1>
+        Nueva cotización
+    </h1>
 
 
-    <!-- FECHA -->
-
-    <label for="fecha">
-        Fecha de cotización
-    </label>
-
-    <input
-        type="date"
-        id="fecha"
-        required
-    >
+    <form id="formNuevaCotizacion">
 
 
-    <!-- NOMBRE -->
+        <!-- =================================================
+             CLIENTE
+        ================================================== -->
 
-    <label for="nombreCotizacion">
-        Nombre de la cotización
-    </label>
+        <label for="cliente">
+            Cliente
+        </label>
 
-    <input
-        type="text"
-        id="nombreCotizacion"
-        placeholder="Ej.: Cotización Cultivos Agosto 2026"
-        required
-    >
-
-
-    <!-- PROPUESTA -->
-
-    <label for="propuesta">
-        Propuesta
-    </label>
-
-    <textarea
-        id="propuesta"
-        placeholder="Detalle de la propuesta..."
-    ></textarea>
-
-
-    <!-- DOSIS -->
-
-    <label for="dosis">
-        Dosis
-    </label>
-
-    <textarea
-        id="dosis"
-        placeholder="Indicar dosis o recomendaciones de uso..."
-    ></textarea>
-
-
-    <!-- COTIZACIÓN -->
-
-    <hr>
-
-    <h2>
-        Cotización
-    </h2>
-
-    <div id="listaProductosCotizacion"></div>
-
-    <button
-        type="button"
-        id="btnAgregarProductoCotizacion"
-        class="btn-agregar"
-    >
-        ➕ Agregar producto
-    </button>
-
-
-    <!-- OBSERVACIONES -->
-
-    <label for="observaciones">
-        Observaciones
-    </label>
-
-    <textarea
-        id="observaciones"
-        placeholder="Condiciones de pago, anticipación del pedido, validez de la cotización, etc."
-    ></textarea>
-
-
-    <!-- BOTONES -->
-
-    <div class="acciones-form">
-
-        <button
-            type="submit"
-            class="btn-guardar"
+        <select
+            id="cliente"
+            required
         >
-            💾 Guardar cotización
-        </button>
+
+            <option value="">
+                Seleccionar cliente
+            </option>
+
+        </select>
+
+
+        <!-- =================================================
+             FECHA
+        ================================================== -->
+
+        <label for="fecha">
+            Fecha de cotización
+        </label>
+
+        <input
+            type="date"
+            id="fecha"
+            required
+        >
+
+
+        <!-- =================================================
+             NOMBRE
+        ================================================== -->
+
+        <label for="nombreCotizacion">
+            Nombre de la cotización
+        </label>
+
+        <input
+            type="text"
+            id="nombreCotizacion"
+            placeholder="Ej.: Cotización Cultivos Agosto 2026"
+            required
+        >
+
+
+        <!-- =================================================
+             PROPUESTA
+        ================================================== -->
+
+        <label for="propuesta">
+            Propuesta
+        </label>
+
+        <textarea
+            id="propuesta"
+            placeholder="Detalle de la propuesta..."
+        ></textarea>
+
+
+        <!-- =================================================
+             DOSIS
+        ================================================== -->
+
+        <label for="dosis">
+            Dosis
+        </label>
+
+        <textarea
+            id="dosis"
+            placeholder="Indicar dosis o recomendaciones de uso..."
+        ></textarea>
+
+
+        <!-- =================================================
+             LISTA DE PRECIOS
+        ================================================== -->
+
+        <label for="listaPrecios">
+            Lista de precios
+        </label>
+
+        <select
+            id="listaPrecios"
+        >
+
+            <option value="">
+                Seleccionar lista de precios
+            </option>
+
+        </select>
+
+
+        <!-- =================================================
+             COTIZACIÓN
+        ================================================== -->
+
+        <hr>
+
+        <h2>
+            Cotización
+        </h2>
+
+
+        <div id="listaProductosCotizacion"></div>
+
 
         <button
             type="button"
-            class="btn-cancelar"
-            onclick="location.href='precios.html'"
+            id="btnAgregarProductoCotizacion"
+            class="btn-agregar"
         >
-            ✖ Cancelar
+            ➕ Agregar producto
         </button>
 
-    </div>
 
-</form>
+        <!-- =================================================
+             OBSERVACIONES
+        ================================================== -->
+
+        <label for="observaciones">
+            Observaciones
+        </label>
+
+        <textarea
+            id="observaciones"
+            placeholder="Condiciones de pago, anticipación del pedido, validez de la cotización, etc."
+        ></textarea>
+
+
+        <!-- =================================================
+             ACCIONES
+        ================================================== -->
+
+        <div class="acciones-form">
+
+            <button
+                type="submit"
+                class="btn-guardar"
+            >
+                💾 Guardar cotización
+            </button>
+
+
+            <button
+                type="button"
+                class="btn-cancelar"
+                onclick="location.href='precios.html'"
+            >
+                ✖ Cancelar
+            </button>
+
+        </div>
+
+
+    </form>
 
 </section>
 
 </main>
 
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
 
 <footer>
 
@@ -152,12 +247,15 @@
 </footer>
 
 
-<!-- JS -->
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
 
 <script
     type="module"
     src="nueva-cotizacion.js"
 ></script>
+
 
 </body>
 
