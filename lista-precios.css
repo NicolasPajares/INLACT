@@ -221,3 +221,81 @@ main button:last-of-type:hover {
   }
 
 }
+/* ============================================================
+   MENÚ DE TRES PUNTITOS
+============================================================ */
+
+.acciones-lista {
+    position: relative;
+    margin-left: auto;
+}
+
+/* El menú está oculto por defecto */
+.menu-lista {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 0;
+
+    background: white;
+    border-radius: 10px;
+
+    padding: 6px;
+
+    box-shadow: 0 6px 18px rgba(0,0,0,.15);
+
+    min-width: 150px;
+
+    z-index: 100;
+}
+
+/* Cuando se toca ⋮ */
+.menu-lista.mostrar {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botones del menú */
+.menu-lista button {
+    width: 100%;
+
+    border: none;
+    background: white;
+
+    padding: 10px 12px;
+
+    text-align: left;
+
+    font-size: 15px;
+
+    color: #1f4e8c;
+
+    cursor: pointer;
+
+    border-radius: 7px;
+}
+
+.menu-lista button:hover {
+    background: #eef5ff;
+}
+
+/* Botón de los tres puntitos */
+.btn-menu-lista {
+    width: 45px !important;
+    height: 45px;
+
+    padding: 0 !important;
+
+    border: 2px solid #1f4e8c !important;
+    border-radius: 10px !important;
+
+    background: white !important;
+
+    color: #1f4e8c !important;
+
+    font-size: 24px !important;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
