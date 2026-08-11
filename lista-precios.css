@@ -299,3 +299,24 @@ main button:last-of-type:hover {
 
     cursor: pointer;
 }
+/* ============================================================
+   FILA DE LISTA DE PRECIOS
+============================================================ */
+
+.precio-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Información ocupa el espacio disponible */
+.precio-info {
+    flex: 1;
+}
+
+/* Tres puntitos al extremo derecho */
+.acciones-lista {
+    margin-left: auto;
+    position: relative;
+    flex-shrink: 0;
+}
