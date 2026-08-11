@@ -1,5 +1,5 @@
 /* ============================================================
-   NUEVA LISTA DE PRECIOS
+   NUEVA / EDITAR LISTA DE PRECIOS
 ============================================================ */
 
 import {
@@ -10,7 +10,10 @@ import {
     getFirestore,
     collection,
     getDocs,
+    getDoc,
     addDoc,
+    updateDoc,
+    doc,
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -57,29 +60,49 @@ const form =
         "formNuevaLista"
     );
 
-
 const nombreLista =
     document.getElementById(
         "nombreLista"
     );
-
 
 const fecha =
     document.getElementById(
         "fecha"
     );
 
-
 const btnAgregarProducto =
     document.getElementById(
         "btnAgregarProducto"
     );
 
-
 const listaProductos =
     document.getElementById(
         "listaProductos"
     );
+
+
+/* ============================================================
+   MODO EDICIÓN
+============================================================ */
+
+/*
+ * Si la página se abre así:
+ *
+ * nueva-lista-precios.html?id=ABC123
+ *
+ * estamos editando una lista existente.
+ */
+
+const parametros =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const listaId =
+    parametros.get("id");
+
+const modoEdicion =
+    Boolean(listaId);
 
 
 /* ============================================================
@@ -273,7 +296,7 @@ function crearBuscadorProducto(
 
 
     /*
-     * BUSCAR
+     * BUSCAR PRODUCTOS
      */
 
     buscador.addEventListener(
@@ -307,33 +330,34 @@ function crearBuscadorProducto(
              */
 
             const encontrados =
-                productos.filter(
-                    producto => {
+                productos
+                    .filter(
+                        producto => {
 
-                        const nombre =
-                            producto.descripcion
-                                .toLowerCase();
+                            const nombre =
+                                producto.descripcion
+                                    .toLowerCase();
 
-                        const codigo =
-                            producto.codigo
-                                .toLowerCase();
+                            const codigo =
+                                producto.codigo
+                                    .toLowerCase();
 
 
-                        return (
-                            nombre.includes(
-                                texto
-                            ) ||
-                            codigo.includes(
-                                texto
-                            )
-                        );
+                            return (
+                                nombre.includes(
+                                    texto
+                                ) ||
+                                codigo.includes(
+                                    texto
+                                )
+                            );
 
-                    }
-                )
-                .slice(
-                    0,
-                    15
-                );
+                        }
+                    )
+                    .slice(
+                        0,
+                        15
+                    );
 
 
             if (
@@ -428,8 +452,7 @@ function crearBuscadorProducto(
 
 
     /*
-     * Cerrar resultados
-     * cuando se hace click afuera
+     * Cerrar resultados al hacer click afuera
      */
 
     document.addEventListener(
@@ -479,11 +502,6 @@ function seleccionarProducto(
         );
 
 
-    /*
-     * Si ya existe y no pertenece
-     * a esta misma fila
-     */
-
     const fila =
         contenedor.closest(
             ".producto-lista"
@@ -504,7 +522,6 @@ function seleccionarProducto(
         alert(
             "⚠️ Este producto ya está agregado a la lista."
         );
-
 
         return;
 
@@ -568,10 +585,6 @@ function seleccionarProducto(
         }
 
 
-        /*
-         * Actualizar lista interna
-         */
-
         actualizarProductosAgregados();
 
     }
@@ -583,7 +596,9 @@ function seleccionarProducto(
    CREAR FILA PRODUCTO
 ============================================================ */
 
-function agregarFilaProducto() {
+function agregarFilaProducto(
+    productoInicial = null
+) {
 
     const fila =
         document.createElement(
@@ -593,6 +608,34 @@ function agregarFilaProducto() {
 
     fila.className =
         "producto-lista";
+
+
+    /*
+     * Si estamos cargando una lista existente,
+     * guardar los datos del producto en la fila.
+     */
+
+    if (
+        productoInicial
+    ) {
+
+        fila.dataset.productoId =
+            productoInicial.productoId ||
+            "";
+
+        fila.dataset.descripcion =
+            productoInicial.productoNombre ||
+            "";
+
+        fila.dataset.codigo =
+            productoInicial.codigo ||
+            "";
+
+        fila.dataset.unidad =
+            productoInicial.unidad ||
+            "";
+
+    }
 
 
     /*
@@ -614,7 +657,14 @@ function agregarFilaProducto() {
      */
 
     crearBuscadorProducto(
-        contenedorBuscador
+        contenedorBuscador,
+        productoInicial
+            ? {
+                descripcion:
+                    productoInicial.productoNombre ||
+                    ""
+            }
+            : null
     );
 
 
@@ -633,7 +683,12 @@ function agregarFilaProducto() {
 
 
     unidad.textContent =
-        "Sin producto";
+        productoInicial
+            ? (
+                productoInicial.unidad ||
+                "Sin unidad"
+            )
+            : "Sin producto";
 
 
     /*
@@ -668,6 +723,21 @@ function agregarFilaProducto() {
 
 
     /*
+     * Recuperar moneda existente
+     */
+
+    if (
+        productoInicial &&
+        productoInicial.moneda
+    ) {
+
+        moneda.value =
+            productoInicial.moneda;
+
+    }
+
+
+    /*
      * PRECIO
      */
 
@@ -695,6 +765,21 @@ function agregarFilaProducto() {
 
     precio.placeholder =
         "Precio";
+
+
+    /*
+     * Recuperar precio existente
+     */
+
+    if (
+        productoInicial &&
+        productoInicial.precio !== undefined
+    ) {
+
+        precio.value =
+            productoInicial.precio;
+
+    }
 
 
     /*
@@ -765,13 +850,7 @@ function agregarFilaProducto() {
 
 
     /*
-     * Agregar la fila al contenedor.
-     *
-     * El botón "Agregar producto"
-     * está FUERA de este contenedor
-     * en el HTML, por lo tanto queda
-     * automáticamente debajo de todas
-     * las filas.
+     * Agregar al contenedor
      */
 
     listaProductos.appendChild(
@@ -787,20 +866,27 @@ function agregarFilaProducto() {
 
 
     /*
-     * Enfocar buscador
+     * Si es una fila nueva,
+     * enfocar buscador.
      */
 
-    const input =
-        fila.querySelector(
-            ".buscador-producto"
-        );
-
-
     if (
-        input
+        !productoInicial
     ) {
 
-        input.focus();
+        const input =
+            fila.querySelector(
+                ".buscador-producto"
+            );
+
+
+        if (
+            input
+        ) {
+
+            input.focus();
+
+        }
 
     }
 
@@ -888,7 +974,7 @@ function actualizarProductosAgregados() {
 
 
 /* ============================================================
-   AGREGAR PRODUCTO — ÚNICO BOTÓN DEL HTML
+   AGREGAR PRODUCTO
 ============================================================ */
 
 btnAgregarProducto.addEventListener(
@@ -902,7 +988,209 @@ btnAgregarProducto.addEventListener(
 
 
 /* ============================================================
-   GUARDAR LISTA
+   CARGAR LISTA PARA EDITAR
+============================================================ */
+
+async function cargarListaParaEditar() {
+
+    if (
+        !modoEdicion
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const referencia =
+            doc(
+                db,
+                "listaprecios",
+                listaId
+            );
+
+
+        const snapshot =
+            await getDoc(
+                referencia
+            );
+
+
+        if (
+            !snapshot.exists()
+        ) {
+
+            alert(
+                "No se encontró la lista de precios."
+            );
+
+
+            window.location.href =
+                "lista-precios.html";
+
+
+            return;
+
+        }
+
+
+        const datos =
+            snapshot.data();
+
+
+        /*
+         * Nombre
+         */
+
+        nombreLista.value =
+            datos.nombre ||
+            "";
+
+
+        /*
+         * Fecha
+         */
+
+        if (
+            datos.fecha &&
+            typeof datos.fecha.toDate === "function"
+        ) {
+
+            const fechaLista =
+                datos.fecha.toDate();
+
+
+            const año =
+                fechaLista.getFullYear();
+
+
+            const mes =
+                String(
+                    fechaLista.getMonth() + 1
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            const dia =
+                String(
+                    fechaLista.getDate()
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            fecha.value =
+                `${año}-${mes}-${dia}`;
+
+        }
+
+
+        /*
+         * Limpiar productos actuales
+         */
+
+        listaProductos.innerHTML =
+            "";
+
+
+        /*
+         * Cargar productos guardados
+         */
+
+        const listaGuardada =
+            Array.isArray(
+                datos.productos
+            )
+                ? datos.productos
+                : [];
+
+
+        listaGuardada.forEach(
+            producto => {
+
+                agregarFilaProducto(
+                    producto
+                );
+
+            }
+        );
+
+
+        /*
+         * Cambiar texto del botón
+         */
+
+        const botonGuardar =
+            form.querySelector(
+                ".btn-guardar"
+            );
+
+
+        if (
+            botonGuardar
+        ) {
+
+            botonGuardar.textContent =
+                "💾 Actualizar lista de precios";
+
+        }
+
+
+        /*
+         * Cambiar título
+         */
+
+        const titulo =
+            document.querySelector(
+                "h1"
+            );
+
+
+        if (
+            titulo
+        ) {
+
+            titulo.textContent =
+                "Editar lista de precios";
+
+        }
+
+
+        console.log(
+            "Lista cargada para editar:",
+            listaId
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error cargando lista:",
+            error
+        );
+
+
+        alert(
+            "No se pudo cargar la lista de precios."
+        );
+
+
+        window.location.href =
+            "lista-precios.html";
+
+    }
+
+}
+
+
+/* ============================================================
+   GUARDAR / ACTUALIZAR LISTA
 ============================================================ */
 
 form.addEventListener(
@@ -966,7 +1254,7 @@ form.addEventListener(
 
 
         /*
-         * Verificar que haya productos
+         * Verificar productos
          */
 
         if (
@@ -1013,9 +1301,6 @@ form.addEventListener(
 
         /*
          * Convertir fecha
-         *
-         * Input date:
-         * YYYY-MM-DD
          */
 
         const partes =
@@ -1052,7 +1337,7 @@ form.addEventListener(
 
 
         /*
-         * Datos a guardar
+         * Datos de la lista
          */
 
         const datosLista = {
@@ -1066,16 +1351,13 @@ form.addEventListener(
                 ),
 
             productos:
-                productosAgregados,
-
-            creadoEn:
-                Timestamp.now()
+                productosAgregados
 
         };
 
 
         /*
-         * Evitar doble click
+         * Botón guardar
          */
 
         const botonGuardar =
@@ -1092,25 +1374,87 @@ form.addEventListener(
                 true;
 
             botonGuardar.textContent =
-                "Guardando...";
+                modoEdicion
+                    ? "Actualizando..."
+                    : "Guardando...";
 
         }
 
 
         try {
 
-            await addDoc(
-                collection(
-                    db,
-                    "listaprecios"
-                ),
-                datosLista
-            );
+            /*
+             * MODO EDICIÓN
+             */
+
+            if (
+                modoEdicion
+            ) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "listaprecios",
+                        listaId
+                    ),
+                    {
+
+                        nombre:
+                            datosLista.nombre,
+
+                        fecha:
+                            datosLista.fecha,
+
+                        productos:
+                            datosLista.productos,
+
+                        actualizadoEn:
+                            Timestamp.now()
+
+                    }
+                );
 
 
-            alert(
-                "Lista de precios guardada ✔"
-            );
+                alert(
+                    "Lista de precios actualizada ✔"
+                );
+
+            }
+
+            /*
+             * MODO NUEVA LISTA
+             */
+
+            else {
+
+                await addDoc(
+                    collection(
+                        db,
+                        "listaprecios"
+                    ),
+                    {
+
+                        nombre:
+                            datosLista.nombre,
+
+                        fecha:
+                            datosLista.fecha,
+
+                        productos:
+                            datosLista.productos,
+
+                        creadoEn:
+                            Timestamp.now()
+
+                    }
+                );
+
+
+                alert(
+                    "Lista de precios guardada ✔"
+                );
+
+            }
 
 
             /*
@@ -1131,7 +1475,9 @@ form.addEventListener(
 
 
             alert(
-                "No se pudo guardar la lista de precios."
+                modoEdicion
+                    ? "No se pudo actualizar la lista de precios."
+                    : "No se pudo guardar la lista de precios."
             );
 
 
@@ -1143,7 +1489,9 @@ form.addEventListener(
                     false;
 
                 botonGuardar.textContent =
-                    "💾 Guardar lista de precios";
+                    modoEdicion
+                        ? "💾 Actualizar lista de precios"
+                        : "💾 Guardar lista de precios";
 
             }
 
@@ -1158,6 +1506,21 @@ form.addEventListener(
 ============================================================ */
 
 function establecerFechaActual() {
+
+    /*
+     * Si estamos editando, no ponemos
+     * la fecha actual porque la lista
+     * va a traer su propia fecha.
+     */
+
+    if (
+        modoEdicion
+    ) {
+
+        return;
+
+    }
+
 
     if (
         fecha.value
@@ -1206,9 +1569,33 @@ function establecerFechaActual() {
 
 async function iniciar() {
 
-    establecerFechaActual();
+    /*
+     * Primero cargamos los productos.
+     */
 
     await cargarProductos();
+
+
+    /*
+     * Si es una nueva lista,
+     * poner fecha actual.
+     */
+
+    establecerFechaActual();
+
+
+    /*
+     * Si es edición,
+     * cargar la lista existente.
+     */
+
+    if (
+        modoEdicion
+    ) {
+
+        await cargarListaParaEditar();
+
+    }
 
 }
 
