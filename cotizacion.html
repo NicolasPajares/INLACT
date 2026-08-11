@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Cotización INLACT</title>
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <!-- CSS GENERAL -->
+  <link
+    rel="stylesheet"
+    href="index.css"
+  >
+
+  <!-- CSS COTIZACIÓN -->
+  <link
+    rel="stylesheet"
+    href="cotizacion.css"
+  >
+
+</head>
+
+
+<body>
+
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+
+  <header>
+
+    <figure>
+
+      <img
+        src="img/logo.jpg"
+        alt="INLACT"
+      >
+
+    </figure>
+
+    <h2>
+      NICOLÁS PAJARES
+    </h2>
+
+  </header>
+
+
+
+  <!-- =========================================================
+       CONTENEDOR PRINCIPAL
+  ========================================================== -->
+
+  <main class="contenedor-cotizacion">
+
+
+    <!-- =======================================================
+         MENÚ LATERAL
+    ======================================================== -->
+
+    <aside class="menu-cotizacion">
+
+      <div class="menu-sticky">
+
+        <button
+          data-seccion="propuesta"
+        >
+          Propuesta
+        </button>
+
+
+        <button
+          data-seccion="dosis"
+        >
+          Dosis
+        </button>
+
+
+        <button
+          data-seccion="cotizacion"
+        >
+          Cotización
+        </button>
+
+
+        <button
+          data-seccion="observaciones"
+        >
+          Observaciones
+        </button>
+
+      </div>
+
+    </aside>
+
+
+
+    <!-- =======================================================
+         CONTENIDO
+    ======================================================== -->
+
+    <section class="contenido-blanco">
+
+
+      <!-- =====================================================
+           PORTADA
+      ====================================================== -->
+
+      <section class="encabezado-cotizacion">
+
+        <h1 id="empresa">
+          INLACT
+        </h1>
+
+
+        <p id="fecha">
+        </p>
+
+
+        <h2 id="nombre-cotizacion">
+        </h2>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           PROPUESTA
+      ====================================================== -->
+
+      <section
+        id="propuesta"
+        class="bloque"
+      >
+
+        <h2>
+          Propuesta
+        </h2>
+
+        <div
+          id="contenido-propuesta"
+          class="contenido-seccion"
+        >
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           DOSIS
+      ====================================================== -->
+
+      <section
+        id="dosis"
+        class="bloque"
+      >
+
+        <h2>
+          Dosis
+        </h2>
+
+        <div
+          id="contenido-dosis"
+          class="contenido-seccion"
+        >
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           COTIZACIÓN
+      ====================================================== -->
+
+      <section
+        id="cotizacion"
+        class="bloque"
+      >
+
+        <h2>
+          Cotización
+        </h2>
+
+
+        <div
+          id="lista-productos"
+          class="lista-productos"
+        >
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           OBSERVACIONES
+      ====================================================== -->
+
+      <section
+        id="observaciones"
+        class="bloque"
+      >
+
+        <h2>
+          Observaciones
+        </h2>
+
+
+        <div
+          id="contenido-observaciones"
+          class="contenido-seccion"
+        >
+        </div>
+
+      </section>
+
+
+    </section>
+
+  </main>
+
+
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+
+  <footer>
+
+    <p>
+
+      © INLACT ·
+
+      <a href="aviso-legal.html">
+        Aviso Legal
+      </a>
+
+    </p>
+
+  </footer>
+
+
+
+  <!-- =========================================================
+       JAVASCRIPT
+  ========================================================== -->
+
+  <script
+    type="module"
+    src="cotizacion.js"
+  ></script>
+
+
+</body>
+
+</html>
