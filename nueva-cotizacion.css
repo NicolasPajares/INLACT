@@ -175,23 +175,78 @@
 
 .producto-cotizacion-cabecera {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   width: 100%;
 
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+
+.producto-cotizacion-cabecera strong {
+  font-size: 18px;
+
+  color: #374151;
+
+  font-weight: 700;
 }
 
 
 /* ===============================
-   TÍTULO PRODUCTO
+   BOTÓN ELIMINAR PRODUCTO
 ================================ */
 
-.producto-cotizacion-cabecera strong {
-  color: #374151;
-  font-size: 18px;
-  font-weight: 700;
+.btn-eliminar-producto {
+  width: 30px;
+  height: 30px;
+
+  margin: 0;
+
+  padding: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: transparent;
+
+  color: #b91c1c;
+
+  border: none;
+
+  border-radius: 50%;
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  font-weight: 400;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.1s ease;
+}
+
+
+.btn-eliminar-producto:hover {
+  background: #fef2f2;
+
+  color: #991b1b;
+}
+
+
+.btn-eliminar-producto:active {
+  transform: scale(0.90);
 }
 
 
@@ -224,6 +279,7 @@
 
 .contenedor-buscador-producto {
   position: relative;
+
   width: 100%;
 }
 
@@ -306,56 +362,6 @@
 .moneda-producto,
 .precio-producto {
   width: 100%;
-}
-
-
-/* ===============================
-   BOTÓN ELIMINAR PRODUCTO
-================================ */
-
-.btn-eliminar-producto {
-  width: 30px !important;
-  height: 30px !important;
-
-  min-width: 30px !important;
-  max-width: 30px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  display: flex !important;
-
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
-
-  background: transparent !important;
-
-  color: #b91c1c;
-
-  border: none !important;
-
-  border-radius: 50%;
-
-  font-size: 27px;
-
-  font-weight: 400;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-
-.btn-eliminar-producto:hover {
-  background: #fef2f2 !important;
-
-  color: #991b1b;
 }
 
 
@@ -521,11 +527,23 @@
 
   .card-formulario {
     margin: 20px 12px;
+
     padding: 22px;
   }
 
   .card-formulario h1 {
     font-size: 25px;
+  }
+
+  .producto-cotizacion-cabecera strong {
+    font-size: 18px;
+  }
+
+  .btn-eliminar-producto {
+    width: 28px;
+    height: 28px;
+
+    font-size: 21px;
   }
 
 }
