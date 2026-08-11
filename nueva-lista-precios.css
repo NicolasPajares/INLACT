@@ -192,131 +192,136 @@ hr{
     box-shadow:0 6px 18px rgba(0,0,0,.08);
 
 }
+
 /* ===============================
-ACCIONES FINALES
+   ACCIONES
 ================================ */
+.acciones-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+/* ===============================
+   BOTON GUARDAR
+================================ */
+.btn-guardar{
+
+    flex:1;
+
+    background:linear-gradient(135deg,#1f4e8c,#3b82f6);
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:16px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.btn-guardar:hover{
+
+    transform:scale(1.02);
+
+}
+
+/* ===============================
+   BOTON CANCELAR
+================================ */
+.btn-cancelar{
+
+    flex:1;
+
+    background:white;
+
+    border:2px solid #1f4e8c;
+
+    color:#1f4e8c;
+
+    border-radius:12px;
+
+    padding:16px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.btn-cancelar:hover{
+
+    background:#1f4e8c;
+
+    color:white;
+
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media(max-width:768px){
+
+    .acciones-form{
+
+        flex-direction:column;
+
+    }
+
+}
+/* ============================================================
+   BOTONES FINALES - CENTRADOS
+============================================================ */
 
 #formNuevaLista .acciones-form {
-    display: flex !important;
-
-    flex-direction: row !important;
-
-    justify-content: center !important;
-
-    align-items: center !important;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
     gap: 15px;
-
-    width: 100% !important;
-
-    margin: 30px auto 0 auto !important;
-
-    padding: 0 !important;
-
-    text-align: center;
+    width: 100%;
+    max-width: 700px;
+    margin: 30px auto 0 auto;
 }
 
-
-/* ===============================
-BOTÓN GUARDAR
-================================ */
-
-#formNuevaLista .acciones-form .btn-guardar {
-
-    flex: 0 0 220px !important;
-
-    width: 220px !important;
-
-    margin: 0 !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            #1f4e8c,
-            #3b82f6
-        );
-
-    color: white;
-
-    border: none;
-
-    border-radius: 12px;
-
-    padding: 16px;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: .2s;
-}
-
-#formNuevaLista .acciones-form .btn-guardar:hover {
-    transform: scale(1.02);
-}
-
-
-/* ===============================
-BOTÓN CANCELAR
-================================ */
-
+/* Los botones no ocupan todo el ancho */
+#formNuevaLista .acciones-form .btn-guardar,
 #formNuevaLista .acciones-form .btn-cancelar {
-
-    flex: 0 0 220px !important;
-
-    width: 220px !important;
-
-    margin: 0 !important;
-
-    background: white;
-
-    border: 2px solid #1f4e8c;
-
-    color: #1f4e8c;
-
-    border-radius: 12px;
-
-    padding: 16px;
-
-    font-size: 18px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: .2s;
+    flex: 0 0 auto;
+    width: 220px;
+    max-width: 220px;
 }
 
-#formNuevaLista .acciones-form .btn-cancelar:hover {
-    background: #1f4e8c;
+/* ============================================================
+   MOBILE
+============================================================ */
 
-    color: white;
-}
-
-
-/* ===============================
-MOBILE
-================================ */
-
-@media (max-width: 768px) {
+@media (max-width: 600px) {
 
     #formNuevaLista .acciones-form {
-
-        flex-direction: column !important;
-
+        flex-direction: column;
+        width: 100%;
     }
 
     #formNuevaLista .acciones-form .btn-guardar,
     #formNuevaLista .acciones-form .btn-cancelar {
-
-        width: 100% !important;
-
+        width: 100%;
         max-width: 350px;
-
-        flex: 0 0 auto !important;
-
     }
 
 }
