@@ -170,6 +170,32 @@
 
 
 /* ===============================
+   CABECERA PRODUCTO
+================================ */
+
+.producto-cotizacion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+
+  margin-bottom: 10px;
+}
+
+
+/* ===============================
+   TÍTULO PRODUCTO
+================================ */
+
+.producto-cotizacion-cabecera strong {
+  color: #374151;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+
+/* ===============================
    CAMPOS DEL PRODUCTO
 ================================ */
 
@@ -288,32 +314,48 @@
 ================================ */
 
 .btn-eliminar-producto {
-  width: 100%;
+  width: 30px !important;
+  height: 30px !important;
 
-  margin-top: 14px;
+  min-width: 30px !important;
+  max-width: 30px !important;
 
-  padding: 11px;
+  margin: 0 !important;
+  padding: 0 !important;
 
-  background: #ffffff;
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: transparent !important;
 
   color: #b91c1c;
 
-  border: 1px solid #fca5a5;
+  border: none !important;
 
-  border-radius: 10px;
+  border-radius: 50%;
 
-  font-size: 15px;
+  font-size: 27px;
 
-  font-weight: 600;
+  font-weight: 400;
+
+  line-height: 1;
 
   cursor: pointer;
 
-  transition: background 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 
 .btn-eliminar-producto:hover {
-  background: #fef2f2;
+  background: #fef2f2 !important;
+
+  color: #991b1b;
 }
 
 
