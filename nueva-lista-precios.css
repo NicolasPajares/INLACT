@@ -193,25 +193,41 @@ hr{
 
 }
 /* ===============================
-ACCIONES
+ACCIONES FINALES
 ================================ */
 
-.acciones-form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#formNuevaLista .acciones-form {
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
     gap: 15px;
-    margin: 30px auto 0 auto;
-    width: 100%;
+
+    width: 100% !important;
+
+    margin: 30px auto 0 auto !important;
+
+    padding: 0 !important;
+
+    text-align: center;
 }
 
 
 /* ===============================
-BOTON GUARDAR
+BOTÓN GUARDAR
 ================================ */
 
-.btn-guardar {
-    width: 220px;
+#formNuevaLista .acciones-form .btn-guardar {
+
+    flex: 0 0 220px !important;
+
+    width: 220px !important;
+
+    margin: 0 !important;
 
     background:
         linear-gradient(
@@ -237,17 +253,22 @@ BOTON GUARDAR
     transition: .2s;
 }
 
-.btn-guardar:hover {
+#formNuevaLista .acciones-form .btn-guardar:hover {
     transform: scale(1.02);
 }
 
 
 /* ===============================
-BOTON CANCELAR
+BOTÓN CANCELAR
 ================================ */
 
-.btn-cancelar {
-    width: 220px;
+#formNuevaLista .acciones-form .btn-cancelar {
+
+    flex: 0 0 220px !important;
+
+    width: 220px !important;
+
+    margin: 0 !important;
 
     background: white;
 
@@ -268,8 +289,9 @@ BOTON CANCELAR
     transition: .2s;
 }
 
-.btn-cancelar:hover {
+#formNuevaLista .acciones-form .btn-cancelar:hover {
     background: #1f4e8c;
+
     color: white;
 }
 
@@ -280,15 +302,21 @@ MOBILE
 
 @media (max-width: 768px) {
 
-    .acciones-form {
-        flex-direction: column;
+    #formNuevaLista .acciones-form {
+
+        flex-direction: column !important;
+
     }
 
-    .btn-guardar,
-    .btn-cancelar {
-        width: 100%;
+    #formNuevaLista .acciones-form .btn-guardar,
+    #formNuevaLista .acciones-form .btn-cancelar {
+
+        width: 100% !important;
+
         max-width: 350px;
+
+        flex: 0 0 auto !important;
+
     }
 
 }
-
