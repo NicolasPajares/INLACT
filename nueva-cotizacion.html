@@ -1,0 +1,164 @@
+<meta name="description" content="INLACT - Nueva cotización">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- CSS -->
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="nueva-cotizacion.css">
+
+</head>
+
+<body>
+
+<main>
+
+<section class="card-formulario">
+
+<h1>Crear nueva cotización</h1>
+
+<form id="formNuevaCotizacion">
+
+    <!-- CLIENTE -->
+
+    <label for="cliente">
+        Cliente
+    </label>
+
+    <select id="cliente" required>
+        <option value="">
+            Seleccionar cliente
+        </option>
+    </select>
+
+
+    <!-- FECHA -->
+
+    <label for="fecha">
+        Fecha de cotización
+    </label>
+
+    <input
+        type="date"
+        id="fecha"
+        required
+    >
+
+
+    <!-- NOMBRE -->
+
+    <label for="nombreCotizacion">
+        Nombre de la cotización
+    </label>
+
+    <input
+        type="text"
+        id="nombreCotizacion"
+        placeholder="Ej.: Cotización Cultivos Agosto 2026"
+        required
+    >
+
+
+    <!-- PROPUESTA -->
+
+    <label for="propuesta">
+        Propuesta
+    </label>
+
+    <textarea
+        id="propuesta"
+        placeholder="Detalle de la propuesta..."
+    ></textarea>
+
+
+    <!-- DOSIS -->
+
+    <label for="dosis">
+        Dosis
+    </label>
+
+    <textarea
+        id="dosis"
+        placeholder="Indicar dosis o recomendaciones de uso..."
+    ></textarea>
+
+
+    <!-- COTIZACIÓN -->
+
+    <hr>
+
+    <h2>
+        Cotización
+    </h2>
+
+    <div id="listaProductosCotizacion"></div>
+
+    <button
+        type="button"
+        id="btnAgregarProductoCotizacion"
+        class="btn-agregar"
+    >
+        ➕ Agregar producto
+    </button>
+
+
+    <!-- OBSERVACIONES -->
+
+    <label for="observaciones">
+        Observaciones
+    </label>
+
+    <textarea
+        id="observaciones"
+        placeholder="Condiciones de pago, anticipación del pedido, validez de la cotización, etc."
+    ></textarea>
+
+
+    <!-- BOTONES -->
+
+    <div class="acciones-form">
+
+        <button
+            type="submit"
+            class="btn-guardar"
+        >
+            💾 Guardar cotización
+        </button>
+
+        <button
+            type="button"
+            class="btn-cancelar"
+            onclick="location.href='precios.html'"
+        >
+            ✖ Cancelar
+        </button>
+
+    </div>
+
+</form>
+
+</section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        © INLACT ·
+        <a href="aviso-legal.html">
+            Aviso Legal
+        </a>
+    </p>
+
+</footer>
+
+
+<!-- JS -->
+
+<script
+    type="module"
+    src="nueva-cotizacion.js"
+></script>
+
+</body>
+
+</html>
