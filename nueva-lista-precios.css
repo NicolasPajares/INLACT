@@ -192,9 +192,8 @@ hr{
     box-shadow:0 6px 18px rgba(0,0,0,.08);
 
 }
-
 /* ===============================
-   ACCIONES
+   BOTONES
 ================================ */
 .acciones-form {
   display: flex;
@@ -203,71 +202,48 @@ hr{
   margin-top: 20px;
 }
 
+.btn-guardar {
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
+
+  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+  color: #ffffff;
+
+  border: none;
+  border-radius: 14px;
+
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.btn-guardar:hover {
+  opacity: 0.95;
+}
+
+.btn-cancelar {
+  padding: 16px;
+  font-size: 18px;
+
+  background: #ffffff;
+  color: #1f4e8c;
+
+  border: 2px solid #1f4e8c;
+  border-radius: 14px;
+
+  cursor: pointer;
+}
+
 /* ===============================
-   BOTON GUARDAR
+   DESKTOP
 ================================ */
-.btn-guardar{
+@media (min-width: 768px) {
+  .acciones-form {
+    flex-direction: row;
+  }
 
-    flex:1;
-
-    background:linear-gradient(135deg,#1f4e8c,#3b82f6);
-
-    color:white;
-
-    border:none;
-
-    border-radius:12px;
-
-    padding:16px;
-
-    font-size:18px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.2s;
-
+  .btn-guardar,
+  .btn-cancelar {
+    flex: 1;
+  }
 }
-
-.btn-guardar:hover{
-
-    transform:scale(1.02);
-
-}
-
-/* ===============================
-   BOTON CANCELAR
-================================ */
-.btn-cancelar{
-
-    flex:1;
-
-    background:white;
-
-    border:2px solid #1f4e8c;
-
-    color:#1f4e8c;
-
-    border-radius:12px;
-
-    padding:16px;
-
-    font-size:18px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.btn-cancelar:hover{
-
-    background:#1f4e8c;
-
-    color:white;
-
-}
-
