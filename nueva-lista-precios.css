@@ -240,10 +240,14 @@ hr{
 @media (min-width: 768px) {
   .acciones-form {
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
   }
 
   .btn-guardar,
   .btn-cancelar {
-    flex: 1;
+    flex: 0 0 220px;
+    width: 220px;
   }
 }
