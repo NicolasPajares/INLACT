@@ -17,6 +17,11 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 
 /* ============================================================
    CONFIGURACIÓN FIREBASE
@@ -48,9 +53,11 @@ const firebaseConfig = {
 const app =
   initializeApp(firebaseConfig);
 
-
 const db =
   getFirestore(app);
+
+const auth =
+  getAuth(app);
 
 
 /* ============================================================
@@ -58,72 +65,47 @@ const db =
 ============================================================ */
 
 const empresaEl =
-  document.getElementById(
-    "empresa"
-  );
-
+  document.getElementById("empresa");
 
 const fechaEl =
-  document.getElementById(
-    "fecha"
-  );
-
+  document.getElementById("fecha");
 
 const nombreCotizacionEl =
-  document.getElementById(
-    "nombre-cotizacion"
-  );
-
+  document.getElementById("nombre-cotizacion");
 
 const clienteEl =
-  document.getElementById(
-    "cliente"
-  );
-
+  document.getElementById("cliente");
 
 const propuestaEl =
-  document.getElementById(
-    "contenido-propuesta"
-  );
-
+  document.getElementById("contenido-propuesta");
 
 const dosisEl =
-  document.getElementById(
-    "contenido-dosis"
-  );
-
+  document.getElementById("contenido-dosis");
 
 const listaProductosEl =
-  document.getElementById(
-    "lista-productos-cotizacion"
-  );
-
-const totalEl =
-  document.getElementById(
-    "total-cotizacion"
-  );
+  document.getElementById("lista-productos-cotizacion");
 
 const observacionesEl =
-  document.getElementById(
-    "contenido-observaciones"
-  );
+  document.getElementById("contenido-observaciones");
+
+const linkPublicoEl =
+  document.getElementById("link-publico-cotizacion");
 
 
 /* ============================================================
-   OBTENER ID DE LA COTIZACIÓN
+   URL
 ============================================================ */
 
-function obtenerIdCotizacion() {
+const parametros =
+  new URLSearchParams(
+    window.location.search
+  );
 
-  const parametros =
-    new URLSearchParams(
-      window.location.search
-    );
+const cotizacionId =
+  parametros.get("id");
 
-
-  return parametros.get("id");
-
-}
+const esPublico =
+  parametros.get("publico") === "1";
 
 
 /* ============================================================
@@ -133,18 +115,13 @@ function obtenerIdCotizacion() {
 function formatearFecha(fecha) {
 
   if (!fecha) {
-
     return "";
-
   }
 
+  let fechaReal = null;
 
-  let fechaReal;
 
-
-  /*
-   * Firebase Timestamp
-   */
+  /* Firebase Timestamp */
 
   if (
     typeof fecha.toDate === "function"
@@ -156,9 +133,7 @@ function formatearFecha(fecha) {
   }
 
 
-  /*
-   * Date
-   */
+  /* Date */
 
   else if (
     fecha instanceof Date
@@ -170,9 +145,7 @@ function formatearFecha(fecha) {
   }
 
 
-  /*
-   * String
-   */
+  /* String */
 
   else if (
     typeof fecha === "string"
@@ -221,12 +194,17 @@ function formatearPrecio(
     Number(precio || 0);
 
 
-  const simbolo =
-    moneda === "USD"
-      ? "USD "
-      : moneda === "EUR"
-        ? "EUR "
-        : "$ ";
+  let simbolo =
+    "$ ";
+
+
+  if (moneda === "USD") {
+    simbolo = "USD ";
+  }
+
+  else if (moneda === "EUR") {
+    simbolo = "EUR ";
+  }
 
 
   return (
@@ -244,6 +222,24 @@ function formatearPrecio(
 
 
 /* ============================================================
+   ESCAPAR HTML
+============================================================ */
+
+function escaparHTML(texto) {
+
+  return String(
+    texto || ""
+  )
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* ============================================================
    MOSTRAR TEXTO
 ============================================================ */
 
@@ -253,11 +249,8 @@ function mostrarTexto(
 ) {
 
   if (!elemento) {
-
     return;
-
   }
-
 
   elemento.textContent =
     texto || "";
@@ -273,15 +266,7 @@ async function cargarCotizacion() {
 
   try {
 
-    const id =
-      obtenerIdCotizacion();
-
-
-    /*
-     * No hay ID
-     */
-
-    if (!id) {
+    if (!cotizacionId) {
 
       mostrarError(
         "No se encontró el identificador de la cotización."
@@ -292,15 +277,15 @@ async function cargarCotizacion() {
     }
 
 
-    /*
-     * Buscar documento
-     */
+    /* --------------------------------------------------------
+       BUSCAR DOCUMENTO
+    -------------------------------------------------------- */
 
     const referencia =
       doc(
         db,
         "cotizaciones",
-        id
+        cotizacionId
       );
 
 
@@ -310,9 +295,9 @@ async function cargarCotizacion() {
       );
 
 
-    /*
-     * No existe
-     */
+    /* --------------------------------------------------------
+       VERIFICAR EXISTENCIA
+    -------------------------------------------------------- */
 
     if (!snap.exists()) {
 
@@ -325,9 +310,9 @@ async function cargarCotizacion() {
     }
 
 
-    /*
-     * Datos
-     */
+    /* --------------------------------------------------------
+       DATOS
+    -------------------------------------------------------- */
 
     const cotizacion =
       snap.data();
@@ -339,50 +324,58 @@ async function cargarCotizacion() {
     );
 
 
-    /*
-     * PORTADA
-     */
+    /* --------------------------------------------------------
+       PORTADA
+    -------------------------------------------------------- */
 
     cargarPortada(
       cotizacion
     );
 
 
-    /*
-     * PROPUESTA
-     */
+    /* --------------------------------------------------------
+       PROPUESTA
+    -------------------------------------------------------- */
 
     cargarPropuesta(
       cotizacion
     );
 
 
-    /*
-     * DOSIS
-     */
+    /* --------------------------------------------------------
+       DOSIS
+    -------------------------------------------------------- */
 
     cargarDosis(
       cotizacion
     );
 
 
-    /*
-     * PRODUCTOS
-     */
+    /* --------------------------------------------------------
+       PRODUCTOS
+    -------------------------------------------------------- */
 
     cargarProductos(
       cotizacion
     );
 
 
-    /*
-     * OBSERVACIONES
-     */
+    /* --------------------------------------------------------
+       OBSERVACIONES
+    -------------------------------------------------------- */
 
     cargarObservaciones(
       cotizacion
     );
 
+
+    /* --------------------------------------------------------
+       LINK PÚBLICO
+    -------------------------------------------------------- */
+
+    cargarLinkPublico(
+      cotizacionId
+    );
 
   }
 
@@ -408,49 +401,64 @@ async function cargarCotizacion() {
 ============================================================ */
 
 function cargarPortada(
-    cotizacion
+  cotizacion
 ) {
 
-    /*
-     * Empresa / Cliente
-     */
+  /* ----------------------------------------------------------
+     EMPRESA
+  ---------------------------------------------------------- */
 
-    if (empresaEl) {
+  if (empresaEl) {
 
-        empresaEl.textContent =
-            cotizacion.clienteNombre ||
-            "Cliente sin nombre";
+    empresaEl.textContent =
+      cotizacion.clienteNombre ||
+      "Cliente sin nombre";
 
-    }
-
-
-    /*
-     * Fecha
-     */
-
-    if (fechaEl) {
-
-        fechaEl.textContent =
-            formatearFecha(
-                cotizacion.fecha
-            );
-
-    }
+  }
 
 
-    /*
-     * Nombre de la cotización
-     */
+  /* ----------------------------------------------------------
+     CLIENTE
+     Se mantiene por compatibilidad si existe en el HTML.
+  ---------------------------------------------------------- */
 
-    if (nombreCotizacionEl) {
+  if (clienteEl) {
 
-        nombreCotizacionEl.textContent =
-            cotizacion.nombreCotizacion ||
-            "Cotización";
+    clienteEl.textContent =
+      cotizacion.clienteNombre ||
+      "Cliente sin nombre";
 
-    }
+  }
+
+
+  /* ----------------------------------------------------------
+     FECHA
+  ---------------------------------------------------------- */
+
+  if (fechaEl) {
+
+    fechaEl.textContent =
+      formatearFecha(
+        cotizacion.fecha
+      );
+
+  }
+
+
+  /* ----------------------------------------------------------
+     NOMBRE DE LA COTIZACIÓN
+  ---------------------------------------------------------- */
+
+  if (nombreCotizacionEl) {
+
+    nombreCotizacionEl.textContent =
+      cotizacion.nombreCotizacion ||
+      "Cotización";
+
+  }
 
 }
+
 
 /* ============================================================
    PROPUESTA
@@ -501,7 +509,7 @@ function cargarObservaciones(
 
 
 /* ============================================================
-   CARGAR PRODUCTOS
+   PRODUCTOS
 ============================================================ */
 
 function cargarProductos(
@@ -509,9 +517,7 @@ function cargarProductos(
 ) {
 
   if (!listaProductosEl) {
-
     return;
-
   }
 
 
@@ -527,29 +533,22 @@ function cargarProductos(
       : [];
 
 
-  /*
-   * Sin productos
-   */
+  /* ----------------------------------------------------------
+     SIN PRODUCTOS
+  ---------------------------------------------------------- */
 
   if (
     productos.length === 0
   ) {
-
-    if (totalEl) {
-
-      totalEl.textContent =
-        "";
-
-    }
 
     return;
 
   }
 
 
-  /*
-   * CABECERA
-   */
+  /* ----------------------------------------------------------
+     CABECERA
+  ---------------------------------------------------------- */
 
   const cabecera =
     document.createElement(
@@ -587,18 +586,9 @@ function cargarProductos(
   );
 
 
-  /*
-   * Totales por moneda
-   *
-   * No mezclamos USD, EUR y ARS.
-   */
-
-  const totales = {};
-
-
-  /*
-   * PRODUCTOS
-   */
+  /* ----------------------------------------------------------
+     PRODUCTOS
+  ---------------------------------------------------------- */
 
   productos.forEach(
     producto => {
@@ -664,145 +654,136 @@ function cargarProductos(
         tarjeta
       );
 
+    }
+  );
 
-      /*
-       * Acumular total
-       */
-
-      if (
-        !totales[moneda]
-      ) {
-
-        totales[moneda] =
-          0;
-
-      }
+}
 
 
-      totales[moneda] +=
-        precio;
+/* ============================================================
+   LINK PÚBLICO PARA EL CLIENTE
+============================================================ */
+
+function cargarLinkPublico(
+  idCotizacion
+) {
+
+  const contenedor =
+    document.querySelector(
+      ".link-publico-cotizacion"
+    );
+
+
+  const input =
+    document.getElementById(
+      "link-publico-cotizacion"
+    );
+
+
+  /*
+   * Si el cliente está viendo la versión pública,
+   * no mostramos el bloque para compartir.
+   */
+
+  if (esPublico) {
+
+    if (contenedor) {
+
+      contenedor.style.display =
+        "none";
 
     }
+
+    return;
+
+  }
+
+
+  /*
+   * Verificar que exista el campo.
+   */
+
+  if (!input) {
+
+    console.warn(
+      "No se encontró el elemento #link-publico-cotizacion"
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Crear URL pública.
+   */
+
+  const urlPublica =
+    new URL(
+      window.location.href
+    );
+
+
+  /*
+   * Aseguramos que apunte a cotizacion.html.
+   */
+
+  urlPublica.pathname =
+    "/INLACT/cotizacion.html";
+
+
+  /*
+   * Eliminamos parámetros anteriores.
+   */
+
+  urlPublica.search =
+    "";
+
+
+  /*
+   * Agregamos ID de la cotización.
+   */
+
+  urlPublica.searchParams.set(
+    "id",
+    idCotizacion
   );
 
 
   /*
-   * MOSTRAR TOTALES
+   * Indicamos que es versión pública.
    */
 
-  mostrarTotales(
-    totales
+  urlPublica.searchParams.set(
+    "publico",
+    "1"
   );
 
-}
+
+  /*
+   * Mostrar link.
+   */
+
+  input.value =
+    urlPublica.toString();
 
 
-/* ============================================================
-   MOSTRAR TOTALES
-============================================================ */
+  /*
+   * Asegurar que sea visible.
+   */
 
-function mostrarTotales(
-  totales
-) {
+  if (contenedor) {
 
-  if (!totalEl) {
-
-    return;
+    contenedor.style.display =
+      "block";
 
   }
 
 
-  totalEl.innerHTML =
-    "";
-
-
-  const monedas =
-    Object.keys(
-      totales
-    );
-
-
-  if (
-    monedas.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  const titulo =
-    document.createElement(
-      "span"
-    );
-
-
-  titulo.textContent =
-    "Total:";
-
-
-  totalEl.appendChild(
-    titulo
+  console.log(
+    "Link público:",
+    input.value
   );
-
-
-  monedas.forEach(
-    moneda => {
-
-      const valor =
-        document.createElement(
-          "strong"
-        );
-
-
-      valor.textContent =
-        formatearPrecio(
-          totales[moneda],
-          moneda
-        );
-
-
-      totalEl.appendChild(
-        valor
-      );
-
-    }
-  );
-
-}
-
-
-/* ============================================================
-   ESCAPAR HTML
-============================================================ */
-
-function escaparHTML(
-  texto
-) {
-
-  return String(
-    texto || ""
-  )
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
 
 }
 
@@ -822,9 +803,7 @@ function mostrarError(
 
 
   if (!contenido) {
-
     return;
-
   }
 
 
@@ -883,9 +862,7 @@ function configurarMenu() {
 
 
           if (!seccion) {
-
             return;
-
           }
 
 
@@ -896,14 +873,17 @@ function configurarMenu() {
 
 
           /*
-           * Marcar botón activo
+           * Marcar botón activo.
            */
 
           botones.forEach(
-            b =>
+            b => {
+
               b.classList.remove(
                 "activo"
-              )
+              );
+
+            }
           );
 
 
@@ -934,7 +914,33 @@ async function iniciar() {
 
 
 /* ============================================================
-   EJECUTAR
+   AUTENTICACIÓN
 ============================================================ */
 
-iniciar();
+signInAnonymously(auth)
+
+  .then(
+    () => {
+
+      iniciar();
+
+    }
+  )
+
+  .catch(
+    error => {
+
+      console.warn(
+        "No se pudo iniciar sesión anónima:",
+        error
+      );
+
+
+      /*
+       * Intentamos cargar igualmente.
+       */
+
+      iniciar();
+
+    }
+  );
