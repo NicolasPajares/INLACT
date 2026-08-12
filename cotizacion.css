@@ -803,3 +803,10 @@ footer a:hover {
   }
 
 }
+/* ============================================================
+   OCULTAR TOTAL DE LA COTIZACIÓN
+============================================================ */
+
+#total-cotizacion {
+  display: none !important;
+}
