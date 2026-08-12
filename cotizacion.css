@@ -868,3 +868,9 @@ footer a:hover {
   outline: none;
   box-shadow: none;
 }
+.contenedor-cotizacion {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+}
