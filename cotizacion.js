@@ -410,62 +410,49 @@ async function cargarCotizacion() {
 ============================================================ */
 
 function cargarPortada(
-  cotizacion
+    cotizacion
 ) {
 
-  /*
-   * Empresa
-   */
+    /*
+     * Empresa / Cliente
+     */
 
-  if (empresaEl) {
+    if (empresaEl) {
 
-    empresaEl.textContent =
-      "INLACT";
+        empresaEl.textContent =
+            cotizacion.clienteNombre ||
+            "Cliente sin nombre";
 
-  }
-
-
-  /*
-   * Cliente
-   */
-
-  if (clienteEl) {
-
-    clienteEl.textContent =
-      cotizacion.clienteNombre ||
-      "Cliente sin nombre";
-
-  }
+    }
 
 
-  /*
-   * Fecha
-   */
+    /*
+     * Fecha
+     */
 
-  if (fechaEl) {
+    if (fechaEl) {
 
-    fechaEl.textContent =
-      formatearFecha(
-        cotizacion.fecha
-      );
+        fechaEl.textContent =
+            formatearFecha(
+                cotizacion.fecha
+            );
 
-  }
+    }
 
 
-  /*
-   * Nombre
-   */
+    /*
+     * Nombre de la cotización
+     */
 
-  if (nombreCotizacionEl) {
+    if (nombreCotizacionEl) {
 
-    nombreCotizacionEl.textContent =
-      cotizacion.nombreCotizacion ||
-      "Cotización";
+        nombreCotizacionEl.textContent =
+            cotizacion.nombreCotizacion ||
+            "Cotización";
 
-  }
+    }
 
 }
-
 
 /* ============================================================
    PROPUESTA
