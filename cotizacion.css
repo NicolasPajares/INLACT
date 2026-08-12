@@ -1,21 +1,12 @@
 /* ============================================================
-   COTIZACIÓN INLACT
-   ESTILO HERMANO DE ENSAYO
-============================================================ */
-
-
-/* ============================================================
    LAYOUT GENERAL
 ============================================================ */
 
 .contenedor-cotizacion {
-
   display: flex;
-
   align-items: stretch;
 
   min-height: calc(100vh - 120px);
-
 }
 
 
@@ -24,7 +15,6 @@
 ============================================================ */
 
 .menu-cotizacion {
-
   width: 240px;
 
   background: #1f4e8c;
@@ -32,13 +22,11 @@
   padding: 20px;
 
   display: flex;
-
   flex-direction: column;
 
   gap: 12px;
 
   align-self: stretch;
-
 }
 
 
@@ -47,17 +35,14 @@
 ============================================================ */
 
 .menu-sticky-cotizacion {
-
   position: sticky;
 
   top: 20px;
 
   display: flex;
-
   flex-direction: column;
 
   gap: 12px;
-
 }
 
 
@@ -66,41 +51,34 @@
 ============================================================ */
 
 .menu-cotizacion button {
+  width: 100%;
 
   background: none;
 
   border: none;
 
+  padding: 0;
+
+  margin: 0;
+
   text-align: left;
+
+  font-family: "Segoe UI", Arial, sans-serif;
 
   font-size: 20px;
 
   font-weight: 500;
 
-  cursor: pointer;
+  line-height: 1.5;
 
   color: #ffffff;
 
-  padding: 0;
-
+  cursor: pointer;
 }
 
 
 .menu-cotizacion button:hover {
-
   text-decoration: underline;
-
-}
-
-
-/* ============================================================
-   BOTÓN ACTIVO
-============================================================ */
-
-.menu-cotizacion button.activo {
-
-  font-weight: 700;
-
 }
 
 
@@ -108,27 +86,24 @@
    COLUMNA BLANCA
 ============================================================ */
 
-.contenido-blanco-cotizacion {
-
+.contenido-cotizacion {
   flex: 1;
 
-  background: white;
+  background: #ffffff;
 
   padding: 40px;
 
   display: flex;
-
   flex-direction: column;
-
 }
 
 
 /* ============================================================
-   PORTADA
+   PORTADA DE LA COTIZACIÓN
+   MISMO ESTILO VISUAL QUE ENSAYO
 ============================================================ */
 
 .encabezado-cotizacion {
-
   min-height: 85vh;
 
   display: flex;
@@ -142,16 +117,15 @@
   text-align: center;
 
   scroll-margin-top: 120px;
-
 }
 
 
 /* ============================================================
-   TÍTULO INLACT
+   NOMBRE DE LA EMPRESA
+   MISMO ESTILO QUE #empresa EN ENSAYO
 ============================================================ */
 
 .encabezado-cotizacion h1 {
-
   font-size: 36px;
 
   font-weight: 700;
@@ -159,24 +133,6 @@
   color: #1f4e8c;
 
   margin: 0;
-
-}
-
-
-/* ============================================================
-   CLIENTE
-============================================================ */
-
-.encabezado-cotizacion .cliente {
-
-  font-size: 28px;
-
-  font-weight: 600;
-
-  color: #1f4e8c;
-
-  margin: 12px 0 0 0;
-
 }
 
 
@@ -184,23 +140,21 @@
    FECHA
 ============================================================ */
 
-.encabezado-cotizacion .fecha {
-
+.encabezado-cotizacion .fecha-cotizacion {
   font-size: 14px;
 
   color: #4b5563;
 
   margin: 8px 0 12px 0;
-
 }
 
 
 /* ============================================================
    NOMBRE DE LA COTIZACIÓN
+   MISMO ESTILO QUE NOMBRE DEL ENSAYO
 ============================================================ */
 
-.encabezado-cotizacion .nombre-cotizacion {
-
+.encabezado-cotizacion h2 {
   font-size: 26px;
 
   font-weight: 600;
@@ -208,16 +162,14 @@
   color: #1f4e8c;
 
   margin: 0;
-
 }
 
 
 /* ============================================================
-   BLOQUES GENERALES
+   BLOQUES
 ============================================================ */
 
 .bloque-cotizacion {
-
   min-height: 85vh;
 
   padding-top: 60px;
@@ -227,160 +179,65 @@
   margin-bottom: 0;
 
   scroll-margin-top: 120px;
-
 }
 
 
 /* ============================================================
-   TÍTULOS DE SECCIÓN
+   TÍTULOS DE LOS BLOQUES
 ============================================================ */
 
 .bloque-cotizacion h3 {
-
   font-size: 22px;
+
+  color: #1f4e8c;
 
   margin-top: 0;
 
   margin-bottom: 24px;
-
-  color: #1f4e8c;
-
 }
 
 
 /* ============================================================
-   TEXTO DE LAS SECCIONES
+   CONTENIDO DE LOS BLOQUES
 ============================================================ */
 
-.contenido-seccion-cotizacion {
-
+.bloque-cotizacion p {
   font-size: 16px;
 
-  line-height: 1.7;
+  line-height: 1.6;
 
   color: #374151;
-
-  white-space: pre-wrap;
-
 }
 
 
 /* ============================================================
-   PROPUESTA
+   PRODUCTOS DE LA COTIZACIÓN
 ============================================================ */
 
-#propuesta {
-
-  scroll-margin-top: 120px;
-
-}
-
-
-/* ============================================================
-   DOSIS
-============================================================ */
-
-#dosis {
-
-  scroll-margin-top: 120px;
-
-}
-
-
-/* ============================================================
-   COTIZACIÓN
-============================================================ */
-
-#cotizacion {
-
-  scroll-margin-top: 120px;
-
-}
-
-
-/* ============================================================
-   OBSERVACIONES
-============================================================ */
-
-#observaciones {
-
-  scroll-margin-top: 120px;
-
-}
-
-
-/* ============================================================
-   LISTA DE PRODUCTOS
-============================================================ */
-
-#lista-productos-cotizacion {
-
-  width: 100%;
-
+.productos-cotizacion {
   display: flex;
 
   flex-direction: column;
 
-  gap: 0;
-
+  gap: 16px;
 }
 
 
 /* ============================================================
-   CABECERA DE PRODUCTOS
-============================================================ */
-
-.cabecera-productos-cotizacion {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    120px
-    100px
-    150px;
-
-  gap: 20px;
-
-  padding: 12px 0;
-
-  border-bottom: 2px solid #1f4e8c;
-
-  color: #1f4e8c;
-
-  font-size: 14px;
-
-  font-weight: 700;
-
-}
-
-
-/* ============================================================
-   PRODUCTO
+   TARJETA PRODUCTO
 ============================================================ */
 
 .producto-cotizacion {
+  background: #f8fafc;
 
-  display: grid;
+  border: 1px solid #dbe4ef;
 
-  grid-template-columns:
-    minmax(0, 1fr)
-    120px
-    100px
-    150px;
+  border-radius: 16px;
 
-  gap: 20px;
+  padding: 20px;
 
-  align-items: center;
-
-  padding: 18px 0;
-
-  border-bottom: 1px solid #dbe4ef;
-
-  color: #374151;
-
-  font-size: 15px;
-
+  box-shadow:
+    0 5px 15px rgba(0,0,0,0.05);
 }
 
 
@@ -388,36 +245,27 @@
    NOMBRE PRODUCTO
 ============================================================ */
 
-.producto-cotizacion .producto-nombre {
+.producto-cotizacion-nombre {
+  font-size: 18px;
 
   font-weight: 600;
 
   color: #1f4e8c;
 
+  margin-bottom: 8px;
 }
 
 
 /* ============================================================
-   UNIDAD
+   DATOS PRODUCTO
 ============================================================ */
 
-.producto-cotizacion .producto-unidad {
+.producto-cotizacion-dato {
+  font-size: 15px;
 
   color: #4b5563;
 
-}
-
-
-/* ============================================================
-   MONEDA
-============================================================ */
-
-.producto-cotizacion .producto-moneda {
-
-  color: #4b5563;
-
-  font-weight: 600;
-
+  margin: 4px 0;
 }
 
 
@@ -425,63 +273,101 @@
    PRECIO
 ============================================================ */
 
-.producto-cotizacion .producto-precio {
-
-  text-align: right;
-
-  font-weight: 600;
-
-  color: #1f4e8c;
-
-}
-
-
-/* ============================================================
-   TOTAL
-============================================================ */
-
-#total-cotizacion {
-
-  display: flex;
-
-  justify-content: flex-end;
-
-  align-items: center;
-
-  gap: 20px;
-
-  padding-top: 24px;
+.producto-cotizacion-precio {
+  margin-top: 12px;
 
   font-size: 18px;
 
-  color: #374151;
-
-}
-
-
-/* ============================================================
-   TEXTO "TOTAL"
-============================================================ */
-
-#total-cotizacion span {
-
   font-weight: 600;
 
-  color: #374151;
-
+  color: #1f4e8c;
 }
 
 
 /* ============================================================
-   VALORES DEL TOTAL
+   OBSERVACIONES
 ============================================================ */
 
-#total-cotizacion strong {
+.observaciones-cotizacion {
+  font-size: 16px;
+
+  line-height: 1.7;
+
+  color: #374151;
+
+  white-space: pre-line;
+}
+
+
+/* ============================================================
+   LINK PÚBLICO
+============================================================ */
+
+.link-publico-cotizacion {
+  margin-top: 30px;
+
+  padding: 18px 20px;
+
+  background: #f8fafc;
+
+  border: 1px solid #dbe4ef;
+
+  border-radius: 14px;
+
+  text-align: center;
+}
+
+
+.link-publico-cotizacion h4 {
+  margin: 0 0 10px 0;
 
   color: #1f4e8c;
 
-  font-size: 20px;
+  font-size: 17px;
 
+  font-weight: 600;
+}
+
+
+.link-publico-cotizacion a {
+  color: #2563eb;
+
+  font-size: 14px;
+
+  text-decoration: none;
+
+  word-break: break-all;
+}
+
+
+.link-publico-cotizacion a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   IMÁGENES
+============================================================ */
+
+.fotos-cotizacion {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(200px, 1fr)
+    );
+
+  gap: 12px;
+}
+
+
+.fotos-cotizacion img {
+  width: 100%;
+
+  border-radius: 12px;
+
+  display: block;
 }
 
 
@@ -489,54 +375,15 @@
    SEPARADORES
 ============================================================ */
 
-.bloque-cotizacion + .bloque-cotizacion {
+.contenido-cotizacion hr {
+  width: 100%;
 
-  border-top: 1px solid #dbe4ef;
+  margin: 12px 0 4px 0;
 
-}
+  border: none;
 
-
-/* ============================================================
-   ENLACES / TEXTO
-============================================================ */
-
-.contenido-blanco-cotizacion a {
-
-  color: #1f4e8c;
-
-}
-
-
-/* ============================================================
-   FOOTER
-============================================================ */
-
-footer {
-
-  text-align: center;
-
-  padding: 20px;
-
-  color: #6b7280;
-
-  font-size: 14px;
-
-}
-
-
-footer a {
-
-  color: #1f4e8c;
-
-  text-decoration: none;
-
-}
-
-
-footer a:hover {
-
-  text-decoration: underline;
-
+  border-top:
+    1px solid #dbe4ef;
 }
 
 
@@ -546,39 +393,8 @@ footer a:hover {
 
 @media (min-width: 768px) {
 
-  .menu-cotizacion {
-
-    width: 240px;
-
-  }
-
-}
-
-
-/* ============================================================
-   TABLET
-============================================================ */
-
-@media (max-width: 900px) {
-
-  .contenido-blanco-cotizacion {
-
-    padding: 30px;
-
-  }
-
-
-  .cabecera-productos-cotizacion,
-  .producto-cotizacion {
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      90px
-      80px
-      120px;
-
-    gap: 12px;
-
+  .contenido-cotizacion {
+    padding: 40px;
   }
 
 }
@@ -591,222 +407,55 @@ footer a:hover {
 @media (max-width: 767px) {
 
   .contenedor-cotizacion {
-
     flex-direction: column;
-
-    min-height: auto;
-
   }
 
 
-  /* -----------------------------------------
-     MENÚ
-  ----------------------------------------- */
-
   .menu-cotizacion {
-
     width: 100%;
 
-    padding: 15px 20px;
-
-    flex-direction: row;
-
-    overflow-x: auto;
-
-    gap: 18px;
-
+    padding: 16px 20px;
   }
 
 
   .menu-sticky-cotizacion {
-
     position: static;
 
-    flex-direction: row;
-
-    gap: 18px;
-
-    width: max-content;
-
+    gap: 8px;
   }
 
 
   .menu-cotizacion button {
-
-    font-size: 16px;
-
-    white-space: nowrap;
-
+    font-size: 18px;
   }
 
 
-  /* -----------------------------------------
-     CONTENIDO
-  ----------------------------------------- */
-
-  .contenido-blanco-cotizacion {
-
+  .contenido-cotizacion {
     padding: 22px;
-
   }
 
-
-  /* -----------------------------------------
-     PORTADA
-  ----------------------------------------- */
 
   .encabezado-cotizacion {
-
-    min-height: 70vh;
-
+    min-height: 75vh;
   }
 
 
   .encabezado-cotizacion h1 {
-
     font-size: 30px;
-
   }
 
 
-  .encabezado-cotizacion .cliente {
-
-    font-size: 24px;
-
-  }
-
-
-  .encabezado-cotizacion .nombre-cotizacion {
-
-    font-size: 22px;
-
-  }
-
-
-  /* -----------------------------------------
-     BLOQUES
-  ----------------------------------------- */
-
-  .bloque-cotizacion {
-
-    min-height: 70vh;
-
-    padding-top: 40px;
-
-    padding-bottom: 40px;
-
-  }
-
-
-  .bloque-cotizacion h3 {
-
-    font-size: 21px;
-
-  }
-
-
-  /* -----------------------------------------
-     PRODUCTOS
-  ----------------------------------------- */
-
-  .cabecera-productos-cotizacion {
-
-    display: none;
-
-  }
-
-
-  .producto-cotizacion {
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: flex-start;
-
-    gap: 6px;
-
-    padding: 18px 0;
-
-  }
-
-
-  .producto-cotizacion .producto-precio {
-
-    text-align: left;
-
-    margin-top: 4px;
-
-  }
-
-
-  /* -----------------------------------------
-     TOTAL
-  ----------------------------------------- */
-
-  #total-cotizacion {
-
-    justify-content: space-between;
-
-    flex-wrap: wrap;
-
-    gap: 10px;
-
-  }
-
-}
-
-
-/* ============================================================
-   IMPRESIÓN
-============================================================ */
-
-@media print {
-
-  .menu-cotizacion {
-
-    display: none;
-
-  }
-
-
-  .contenedor-cotizacion {
-
-    display: block;
-
-    min-height: auto;
-
-  }
-
-
-  .contenido-blanco-cotizacion {
-
-    padding: 20px;
-
-  }
-
-
-  .encabezado-cotizacion,
-  .bloque-cotizacion {
-
-    min-height: auto;
-
-    page-break-inside: avoid;
-
+  .encabezado-cotizacion h2 {
+    font-size: 23px;
   }
 
 
   .bloque-cotizacion {
+    min-height: 75vh;
 
-    page-break-before: auto;
+    padding-top: 50px;
 
-  }
-
-
-  footer {
-
-    display: none;
-
+    padding-bottom: 50px;
   }
 
 }
