@@ -30,272 +30,292 @@
 <body>
 
 
-  <!-- =========================================================
-       HEADER
-  ========================================================== -->
+<!-- =========================================================
+     HEADER IGUAL AL INDEX / ENSAYO
+========================================================= -->
 
-  <header>
+<header>
 
-    <figure>
+  <figure>
 
-      <img
-        src="img/logo.jpg"
-        alt="INLACT"
+    <img
+      src="img/logo.jpg"
+      alt="INLACT"
+    >
+
+  </figure>
+
+  <h2>
+    NICOLÁS PAJARES
+  </h2>
+
+</header>
+
+
+
+<!-- =========================================================
+     CONTENEDOR PRINCIPAL
+========================================================= -->
+
+<main class="contenedor-cotizacion">
+
+
+  <!-- =======================================================
+       MENÚ IZQUIERDO
+  ======================================================== -->
+
+  <aside class="menu-cotizacion">
+
+    <div class="menu-sticky-cotizacion">
+
+      <button
+        type="button"
+        data-seccion="propuesta"
       >
-
-    </figure>
-
-    <h2>
-      NICOLÁS PAJARES
-    </h2>
-
-  </header>
+        Propuesta
+      </button>
 
 
-
-  <!-- =========================================================
-       CONTENEDOR PRINCIPAL
-  ========================================================== -->
-
-  <main class="contenedor-cotizacion">
-
-
-    <!-- =======================================================
-         COLUMNA IZQUIERDA
-    ======================================================== -->
-
-    <aside class="menu-cotizacion">
-
-      <div class="menu-sticky">
-
-
-        <button
-          type="button"
-          data-seccion="propuesta"
-        >
-          Propuesta
-        </button>
-
-
-        <button
-          type="button"
-          data-seccion="dosis"
-        >
-          Dosis
-        </button>
-
-
-        <button
-          type="button"
-          data-seccion="cotizacion"
-        >
-          Cotización
-        </button>
-
-
-        <button
-          type="button"
-          data-seccion="observaciones"
-        >
-          Observaciones
-        </button>
-
-
-      </div>
-
-    </aside>
-
-
-
-    <!-- =======================================================
-         CONTENIDO PRINCIPAL
-    ======================================================== -->
-
-    <section class="contenido-blanco-cotizacion">
-
-
-
-      <!-- =====================================================
-           PORTADA
-      ====================================================== -->
-
-      <section class="encabezado-cotizacion">
-
-        <h1 id="empresa">
-          INLACT
-        </h1>
-
-
-        <p
-          id="fecha"
-          class="fecha-cotizacion"
-        >
-        </p>
-
-
-        <h2
-          id="nombre-cotizacion"
-        >
-        </h2>
-
-
-        <div class="datos-cliente-cotizacion">
-
-          <span class="etiqueta-cliente">
-            Cliente
-          </span>
-
-
-          <strong
-            id="cliente"
-          >
-          </strong>
-
-        </div>
-
-      </section>
-
-
-
-      <!-- =====================================================
-           PROPUESTA
-      ====================================================== -->
-
-      <section
-        id="propuesta"
-        class="bloque-cotizacion"
+      <button
+        type="button"
+        data-seccion="dosis"
       >
-
-        <h2>
-          Propuesta
-        </h2>
+        Dosis
+      </button>
 
 
-        <div
-          id="contenido-propuesta"
-          class="contenido-seccion-cotizacion"
-        >
-        </div>
-
-      </section>
-
-
-
-      <!-- =====================================================
-           DOSIS
-      ====================================================== -->
-
-      <section
-        id="dosis"
-        class="bloque-cotizacion"
+      <button
+        type="button"
+        data-seccion="cotizacion"
       >
-
-        <h2>
-          Dosis
-        </h2>
+        Cotización
+      </button>
 
 
-        <div
-          id="contenido-dosis"
-          class="contenido-seccion-cotizacion"
-        >
-        </div>
-
-      </section>
-
-
-
-      <!-- =====================================================
-           COTIZACIÓN
-      ====================================================== -->
-
-      <section
-        id="cotizacion"
-        class="bloque-cotizacion"
+      <button
+        type="button"
+        data-seccion="observaciones"
       >
+        Observaciones
+      </button>
 
-        <h2>
-          Cotización
-        </h2>
+    </div>
 
-
-        <div
-          id="lista-productos-cotizacion"
-          class="lista-productos-cotizacion"
-        >
-        </div>
-
-
-        <!-- TOTAL -->
-        <div
-          id="total-cotizacion"
-          class="total-cotizacion"
-        >
-        </div>
-
-      </section>
+  </aside>
 
 
 
-      <!-- =====================================================
-           OBSERVACIONES
-      ====================================================== -->
+  <!-- =======================================================
+       COLUMNA BLANCA
+  ======================================================== -->
 
-      <section
-        id="observaciones"
-        class="bloque-cotizacion"
-      >
-
-        <h2>
-          Observaciones
-        </h2>
+  <section class="contenido-blanco-cotizacion">
 
 
-        <div
-          id="contenido-observaciones"
-          class="contenido-seccion-cotizacion"
-        >
-        </div>
+    <!-- =====================================================
+         PORTADA
+    ====================================================== -->
 
-      </section>
+    <section
+      class="encabezado-cotizacion"
+      id="inicio"
+    >
 
+      <!--
+        Acá el JS colocará solamente
+        el nombre de la empresa.
+      -->
+
+      <h1 id="empresa"></h1>
+
+
+      <!--
+        Fecha de la cotización.
+      -->
+
+      <p id="fecha"></p>
+
+
+      <!--
+        Nombre de la cotización.
+      -->
+
+      <h2 id="nombre-cotizacion"></h2>
 
     </section>
 
-  </main>
+
+
+    <!-- =====================================================
+         PROPUESTA
+    ====================================================== -->
+
+    <section
+      id="propuesta"
+      class="bloque-cotizacion"
+    >
+
+      <h3>
+        Propuesta
+      </h3>
+
+      <div
+        id="contenido-propuesta"
+        class="contenido-seccion-cotizacion"
+      ></div>
+
+    </section>
 
 
 
-  <!-- =========================================================
-       FOOTER
-  ========================================================== -->
+    <!-- =====================================================
+         DOSIS
+    ====================================================== -->
 
-  <footer>
+    <section
+      id="dosis"
+      class="bloque-cotizacion"
+    >
 
-    <p>
+      <h3>
+        Dosis
+      </h3>
 
-      © INLACT ·
+      <div
+        id="contenido-dosis"
+        class="contenido-seccion-cotizacion"
+      ></div>
 
-      <a
-        href="aviso-legal.html"
-      >
-        Aviso Legal
-      </a>
-
-    </p>
-
-  </footer>
+    </section>
 
 
 
-  <!-- =========================================================
-       JAVASCRIPT
-  ========================================================== -->
+    <!-- =====================================================
+         COTIZACIÓN
+    ====================================================== -->
 
-  <script
-    type="module"
-    src="cotizacion.js"
-  ></script>
+    <section
+      id="cotizacion"
+      class="bloque-cotizacion"
+    >
+
+      <h3>
+        Cotización
+      </h3>
+
+
+      <!--
+        Lista de productos.
+        El JS la completa desde Firestore.
+      -->
+
+      <div
+        id="lista-productos-cotizacion"
+      ></div>
+
+
+      <!--
+        Total.
+        El JS lo completará.
+      -->
+
+      <div
+        id="total-cotizacion"
+      ></div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         OBSERVACIONES
+    ====================================================== -->
+
+    <section
+      id="observaciones"
+      class="bloque-cotizacion"
+    >
+
+      <h3>
+        Observaciones
+      </h3>
+
+      <div
+        id="contenido-observaciones"
+        class="contenido-seccion-cotizacion"
+      ></div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         LINK PÚBLICO
+    ====================================================== -->
+
+    <section
+      id="link-publico"
+      class="bloque-cotizacion bloque-link-publico"
+    >
+
+      <h3>
+        Link público
+      </h3>
+
+
+      <div class="contenedor-link-publico">
+
+        <a
+          id="url-publica"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+        ></a>
+
+
+        <button
+          type="button"
+          id="btn-copiar-link"
+        >
+          📋 Copiar link
+        </button>
+
+      </div>
+
+    </section>
+
+
+  </section>
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+  <p>
+    © INLACT ·
+    <a href="aviso-legal.html">
+      Aviso Legal
+    </a>
+  </p>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script
+  type="module"
+  src="cotizacion.js"
+></script>
 
 
 </body>
