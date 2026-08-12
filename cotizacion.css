@@ -850,3 +850,21 @@ footer a:hover {
 .campo-link-publico:focus {
   border-color: #3b82f6;
 }
+/* ============================================================
+   ELIMINAR CONTORNO CELESTE DE LA HOJA
+   IGUALAR VISUALMENTE A ENSAYO
+============================================================ */
+
+.contenedor-cotizacion {
+  margin: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.contenido-blanco-cotizacion {
+  margin: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
