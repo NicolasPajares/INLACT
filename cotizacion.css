@@ -810,3 +810,43 @@ footer a:hover {
 #total-cotizacion {
   display: none !important;
 }
+/* ============================================================
+   LINK PÚBLICO PARA LOS CLIENTES
+============================================================ */
+
+.link-publico-cotizacion {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.link-publico-cotizacion h4 {
+  color: #1f4e8c;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+}
+
+.campo-link-publico {
+  display: block;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 14px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  font-size: 14px;
+  font-family: "Segoe UI", Arial, sans-serif;
+
+  outline: none;
+}
+
+.campo-link-publico:focus {
+  border-color: #3b82f6;
+}
