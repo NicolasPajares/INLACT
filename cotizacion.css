@@ -1,37 +1,44 @@
 /* ============================================================
    COTIZACIÓN INLACT
-   Diseño basado en ensayo.html
+   ESTILO HERMANO DE ENSAYO
 ============================================================ */
 
 
 /* ============================================================
-   CONTENEDOR PRINCIPAL
+   LAYOUT GENERAL
 ============================================================ */
 
 .contenedor-cotizacion {
-  width: 100%;
-  max-width: 1200px;
 
-  margin: 32px auto;
+  display: flex;
 
-  display: grid;
+  align-items: stretch;
 
-  grid-template-columns: 220px 1fr;
+  min-height: calc(100vh - 120px);
 
-  gap: 30px;
-
-  padding: 0 20px;
-
-  box-sizing: border-box;
 }
 
 
 /* ============================================================
-   MENÚ LATERAL
+   MENÚ IZQUIERDO
 ============================================================ */
 
 .menu-cotizacion {
-  width: 100%;
+
+  width: 240px;
+
+  background: #1f4e8c;
+
+  padding: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  align-self: stretch;
+
 }
 
 
@@ -39,7 +46,7 @@
    MENÚ STICKY
 ============================================================ */
 
-.menu-cotizacion .menu-sticky {
+.menu-sticky-cotizacion {
 
   position: sticky;
 
@@ -49,7 +56,7 @@
 
   flex-direction: column;
 
-  gap: 10px;
+  gap: 12px;
 
 }
 
@@ -58,115 +65,117 @@
    BOTONES DEL MENÚ
 ============================================================ */
 
-.menu-cotizacion .menu-sticky button {
+.menu-cotizacion button {
 
-  width: 100%;
-
-  padding: 14px 16px;
+  background: none;
 
   border: none;
 
-  border-radius: 12px;
-
-  background: #eef5ff;
-
-  color: #1f4e8c;
-
-  font-family: "Segoe UI", Arial, sans-serif;
-
-  font-size: 15px;
-
-  font-weight: 600;
-
   text-align: left;
+
+  font-size: 20px;
+
+  font-weight: 500;
 
   cursor: pointer;
 
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.1s ease;
-
-}
-
-
-/* HOVER */
-
-.menu-cotizacion .menu-sticky button:hover {
-
-  background: #dbeafe;
-
-}
-
-
-/* ACTIVE */
-
-.menu-cotizacion .menu-sticky button.activo {
-
-  background: #1f4e8c;
-
   color: #ffffff;
 
+  padding: 0;
+
 }
 
 
-/* CLICK */
+.menu-cotizacion button:hover {
 
-.menu-cotizacion .menu-sticky button:active {
-
-  transform: scale(0.98);
+  text-decoration: underline;
 
 }
 
 
 /* ============================================================
-   CONTENIDO BLANCO
+   BOTÓN ACTIVO
+============================================================ */
+
+.menu-cotizacion button.activo {
+
+  font-weight: 700;
+
+}
+
+
+/* ============================================================
+   COLUMNA BLANCA
 ============================================================ */
 
 .contenido-blanco-cotizacion {
 
-  background: #ffffff;
+  flex: 1;
 
-  border-radius: 20px;
+  background: white;
 
-  padding: 38px;
+  padding: 40px;
 
-  box-shadow:
-    0 12px 30px rgba(0,0,0,0.08);
+  display: flex;
 
-  min-width: 0;
+  flex-direction: column;
 
 }
 
 
 /* ============================================================
-   PORTADA / ENCABEZADO
+   PORTADA
 ============================================================ */
 
 .encabezado-cotizacion {
 
+  min-height: 85vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
   text-align: center;
 
-  padding-bottom: 30px;
-
-  border-bottom: 1px solid #dbe4ef;
+  scroll-margin-top: 120px;
 
 }
 
 
 /* ============================================================
-   EMPRESA
+   TÍTULO INLACT
 ============================================================ */
 
 .encabezado-cotizacion h1 {
 
-  margin: 0;
+  font-size: 36px;
+
+  font-weight: 700;
 
   color: #1f4e8c;
 
-  font-size: 30px;
+  margin: 0;
 
-  font-weight: 700;
+}
+
+
+/* ============================================================
+   CLIENTE
+============================================================ */
+
+.encabezado-cotizacion .cliente {
+
+  font-size: 28px;
+
+  font-weight: 600;
+
+  color: #1f4e8c;
+
+  margin: 12px 0 0 0;
 
 }
 
@@ -175,95 +184,49 @@
    FECHA
 ============================================================ */
 
-.fecha-cotizacion {
-
-  margin: 10px 0;
-
-  color: #6b7280;
-
-  font-size: 15px;
-
-}
-
-
-/* ============================================================
-   NOMBRE COTIZACIÓN
-============================================================ */
-
-.encabezado-cotizacion h2 {
-
-  margin: 8px 0 20px;
-
-  color: #374151;
-
-  font-size: 23px;
-
-  font-weight: 600;
-
-}
-
-
-/* ============================================================
-   DATOS CLIENTE
-============================================================ */
-
-.datos-cliente-cotizacion {
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 8px;
-
-  padding: 10px 18px;
-
-  background: #f8fafc;
-
-  border: 1px solid #dbe4ef;
-
-  border-radius: 12px;
-
-}
-
-
-.etiqueta-cliente {
-
-  color: #6b7280;
+.encabezado-cotizacion .fecha {
 
   font-size: 14px;
 
-}
+  color: #4b5563;
 
-
-.datos-cliente-cotizacion strong {
-
-  color: #1f4e8c;
-
-  font-size: 15px;
+  margin: 8px 0 12px 0;
 
 }
 
 
 /* ============================================================
-   BLOQUES
+   NOMBRE DE LA COTIZACIÓN
+============================================================ */
+
+.encabezado-cotizacion .nombre-cotizacion {
+
+  font-size: 26px;
+
+  font-weight: 600;
+
+  color: #1f4e8c;
+
+  margin: 0;
+
+}
+
+
+/* ============================================================
+   BLOQUES GENERALES
 ============================================================ */
 
 .bloque-cotizacion {
 
-  padding: 34px 0;
+  min-height: 85vh;
 
-  border-bottom: 1px solid #dbe4ef;
+  padding-top: 60px;
 
-  scroll-margin-top: 25px;
+  padding-bottom: 60px;
 
-}
+  margin-bottom: 0;
 
-
-.bloque-cotizacion:last-child {
-
-  border-bottom: none;
+  scroll-margin-top: 120px;
 
 }
 
@@ -272,32 +235,76 @@
    TÍTULOS DE SECCIÓN
 ============================================================ */
 
-.bloque-cotizacion h2 {
-
-  margin: 0 0 18px;
-
-  color: #1f4e8c;
+.bloque-cotizacion h3 {
 
   font-size: 22px;
 
-  font-weight: 700;
+  margin-top: 0;
+
+  margin-bottom: 24px;
+
+  color: #1f4e8c;
 
 }
 
 
 /* ============================================================
-   CONTENIDO DE SECCIONES
+   TEXTO DE LAS SECCIONES
 ============================================================ */
 
 .contenido-seccion-cotizacion {
-
-  color: #374151;
 
   font-size: 16px;
 
   line-height: 1.7;
 
-  white-space: pre-line;
+  color: #374151;
+
+  white-space: pre-wrap;
+
+}
+
+
+/* ============================================================
+   PROPUESTA
+============================================================ */
+
+#propuesta {
+
+  scroll-margin-top: 120px;
+
+}
+
+
+/* ============================================================
+   DOSIS
+============================================================ */
+
+#dosis {
+
+  scroll-margin-top: 120px;
+
+}
+
+
+/* ============================================================
+   COTIZACIÓN
+============================================================ */
+
+#cotizacion {
+
+  scroll-margin-top: 120px;
+
+}
+
+
+/* ============================================================
+   OBSERVACIONES
+============================================================ */
+
+#observaciones {
+
+  scroll-margin-top: 120px;
 
 }
 
@@ -306,15 +313,44 @@
    LISTA DE PRODUCTOS
 ============================================================ */
 
-.lista-productos-cotizacion {
+#lista-productos-cotizacion {
+
+  width: 100%;
 
   display: flex;
 
   flex-direction: column;
 
-  gap: 12px;
+  gap: 0;
 
-  width: 100%;
+}
+
+
+/* ============================================================
+   CABECERA DE PRODUCTOS
+============================================================ */
+
+.cabecera-productos-cotizacion {
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    120px
+    100px
+    150px;
+
+  gap: 20px;
+
+  padding: 12px 0;
+
+  border-bottom: 2px solid #1f4e8c;
+
+  color: #1f4e8c;
+
+  font-size: 14px;
+
+  font-weight: 700;
 
 }
 
@@ -328,24 +364,22 @@
   display: grid;
 
   grid-template-columns:
-    minmax(180px, 1fr)
+    minmax(0, 1fr)
+    120px
     100px
-    100px
-    140px;
+    150px;
+
+  gap: 20px;
 
   align-items: center;
 
-  gap: 12px;
+  padding: 18px 0;
 
-  padding: 16px 18px;
+  border-bottom: 1px solid #dbe4ef;
 
-  background: #f8fafc;
+  color: #374151;
 
-  border: 1px solid #dbe4ef;
-
-  border-radius: 14px;
-
-  box-sizing: border-box;
+  font-size: 15px;
 
 }
 
@@ -356,11 +390,9 @@
 
 .producto-cotizacion .producto-nombre {
 
-  color: #1f4e8c;
-
-  font-size: 15px;
-
   font-weight: 600;
+
+  color: #1f4e8c;
 
 }
 
@@ -371,11 +403,7 @@
 
 .producto-cotizacion .producto-unidad {
 
-  color: #6b7280;
-
-  font-size: 14px;
-
-  text-align: center;
+  color: #4b5563;
 
 }
 
@@ -386,11 +414,9 @@
 
 .producto-cotizacion .producto-moneda {
 
-  color: #374151;
+  color: #4b5563;
 
-  font-size: 14px;
-
-  text-align: center;
+  font-weight: 600;
 
 }
 
@@ -401,54 +427,11 @@
 
 .producto-cotizacion .producto-precio {
 
-  color: #1f4e8c;
-
-  font-size: 16px;
-
-  font-weight: 700;
-
   text-align: right;
-
-}
-
-
-/* ============================================================
-   CABECERA TABLA
-============================================================ */
-
-.cabecera-productos-cotizacion {
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(180px, 1fr)
-    100px
-    100px
-    140px;
-
-  gap: 12px;
-
-  padding: 0 18px 8px;
-
-  color: #6b7280;
-
-  font-size: 13px;
 
   font-weight: 600;
 
-}
-
-
-.cabecera-productos-cotizacion span:not(:first-child) {
-
-  text-align: center;
-
-}
-
-
-.cabecera-productos-cotizacion span:last-child {
-
-  text-align: right;
+  color: #1f4e8c;
 
 }
 
@@ -457,7 +440,7 @@
    TOTAL
 ============================================================ */
 
-.total-cotizacion {
+#total-cotizacion {
 
   display: flex;
 
@@ -465,46 +448,61 @@
 
   align-items: center;
 
-  gap: 15px;
+  gap: 20px;
 
-  margin-top: 20px;
+  padding-top: 24px;
 
-  padding: 18px 20px;
+  font-size: 18px;
 
-  background: #eef5ff;
-
-  border-radius: 14px;
-
-  color: #1f4e8c;
-
-  font-size: 19px;
-
-  font-weight: 700;
+  color: #374151;
 
 }
 
 
 /* ============================================================
-   CUANDO NO HAY PRODUCTOS
+   TEXTO "TOTAL"
 ============================================================ */
 
-.lista-productos-cotizacion:empty::after {
+#total-cotizacion span {
 
-  content: "No hay productos en esta cotización.";
+  font-weight: 600;
 
-  display: block;
+  color: #374151;
 
-  padding: 25px;
+}
 
-  background: #f8fafc;
 
-  border: 1px dashed #cbd5e1;
+/* ============================================================
+   VALORES DEL TOTAL
+============================================================ */
 
-  border-radius: 14px;
+#total-cotizacion strong {
 
-  color: #6b7280;
+  color: #1f4e8c;
 
-  text-align: center;
+  font-size: 20px;
+
+}
+
+
+/* ============================================================
+   SEPARADORES
+============================================================ */
+
+.bloque-cotizacion + .bloque-cotizacion {
+
+  border-top: 1px solid #dbe4ef;
+
+}
+
+
+/* ============================================================
+   ENLACES / TEXTO
+============================================================ */
+
+.contenido-blanco-cotizacion a {
+
+  color: #1f4e8c;
 
 }
 
@@ -515,11 +513,9 @@
 
 footer {
 
-  margin-top: 40px;
-
-  padding: 25px 20px;
-
   text-align: center;
+
+  padding: 20px;
 
   color: #6b7280;
 
@@ -534,8 +530,6 @@ footer a {
 
   text-decoration: none;
 
-  font-weight: 600;
-
 }
 
 
@@ -547,16 +541,14 @@ footer a:hover {
 
 
 /* ============================================================
-   DESKTOP GRANDE
+   DESKTOP
 ============================================================ */
 
-@media (min-width: 1000px) {
+@media (min-width: 768px) {
 
-  .contenedor-cotizacion {
+  .menu-cotizacion {
 
-    grid-template-columns: 220px minmax(0, 820px);
-
-    justify-content: center;
+    width: 240px;
 
   }
 
@@ -569,30 +561,23 @@ footer a:hover {
 
 @media (max-width: 900px) {
 
-  .contenedor-cotizacion {
-
-    grid-template-columns: 180px 1fr;
-
-    gap: 20px;
-
-  }
-
-
   .contenido-blanco-cotizacion {
 
-    padding: 28px;
+    padding: 30px;
 
   }
 
 
-  .producto-cotizacion,
-  .cabecera-productos-cotizacion {
+  .cabecera-productos-cotizacion,
+  .producto-cotizacion {
 
     grid-template-columns:
-      minmax(140px, 1fr)
-      80px
+      minmax(0, 1fr)
+      90px
       80px
       120px;
+
+    gap: 12px;
 
   }
 
@@ -607,110 +592,122 @@ footer a:hover {
 
   .contenedor-cotizacion {
 
-    display: flex;
-
     flex-direction: column;
 
-    gap: 15px;
-
-    margin: 20px auto;
-
-    padding: 0 12px;
+    min-height: auto;
 
   }
 
 
-  /* ----------------------------------------------------------
-     MENÚ MOBILE
-  ---------------------------------------------------------- */
+  /* -----------------------------------------
+     MENÚ
+  ----------------------------------------- */
 
-  .menu-cotizacion .menu-sticky {
+  .menu-cotizacion {
 
-    position: relative;
+    width: 100%;
 
-    top: auto;
+    padding: 15px 20px;
 
-    display: grid;
+    flex-direction: row;
 
-    grid-template-columns: 1fr 1fr;
+    overflow-x: auto;
 
-    gap: 8px;
-
-  }
-
-
-  .menu-cotizacion .menu-sticky button {
-
-    padding: 11px 12px;
-
-    font-size: 14px;
-
-    text-align: center;
+    gap: 18px;
 
   }
 
 
-  /* ----------------------------------------------------------
+  .menu-sticky-cotizacion {
+
+    position: static;
+
+    flex-direction: row;
+
+    gap: 18px;
+
+    width: max-content;
+
+  }
+
+
+  .menu-cotizacion button {
+
+    font-size: 16px;
+
+    white-space: nowrap;
+
+  }
+
+
+  /* -----------------------------------------
      CONTENIDO
-  ---------------------------------------------------------- */
+  ----------------------------------------- */
 
   .contenido-blanco-cotizacion {
 
     padding: 22px;
 
-    border-radius: 16px;
-
   }
 
 
-  /* ----------------------------------------------------------
+  /* -----------------------------------------
      PORTADA
-  ---------------------------------------------------------- */
+  ----------------------------------------- */
+
+  .encabezado-cotizacion {
+
+    min-height: 70vh;
+
+  }
+
 
   .encabezado-cotizacion h1 {
 
-    font-size: 26px;
+    font-size: 30px;
 
   }
 
 
-  .encabezado-cotizacion h2 {
+  .encabezado-cotizacion .cliente {
 
-    font-size: 20px;
-
-  }
-
-
-  .datos-cliente-cotizacion {
-
-    width: 100%;
-
-    box-sizing: border-box;
+    font-size: 24px;
 
   }
 
 
-  /* ----------------------------------------------------------
-     SECCIONES
-  ---------------------------------------------------------- */
+  .encabezado-cotizacion .nombre-cotizacion {
+
+    font-size: 22px;
+
+  }
+
+
+  /* -----------------------------------------
+     BLOQUES
+  ----------------------------------------- */
 
   .bloque-cotizacion {
 
-    padding: 28px 0;
+    min-height: 70vh;
+
+    padding-top: 40px;
+
+    padding-bottom: 40px;
 
   }
 
 
-  .bloque-cotizacion h2 {
+  .bloque-cotizacion h3 {
 
-    font-size: 20px;
+    font-size: 21px;
 
   }
 
 
-  /* ----------------------------------------------------------
+  /* -----------------------------------------
      PRODUCTOS
-  ---------------------------------------------------------- */
+  ----------------------------------------- */
 
   .cabecera-productos-cotizacion {
 
@@ -721,60 +718,39 @@ footer a:hover {
 
   .producto-cotizacion {
 
-    display: grid;
+    display: flex;
 
-    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
 
-    gap: 8px 12px;
+    align-items: flex-start;
 
-    padding: 16px;
+    gap: 6px;
 
-  }
-
-
-  .producto-cotizacion .producto-nombre {
-
-    grid-column: 1 / -1;
-
-  }
-
-
-  .producto-cotizacion .producto-unidad {
-
-    text-align: left;
-
-  }
-
-
-  .producto-cotizacion .producto-moneda {
-
-    text-align: right;
+    padding: 18px 0;
 
   }
 
 
   .producto-cotizacion .producto-precio {
 
-    grid-column: 1 / -1;
+    text-align: left;
 
-    text-align: right;
-
-    padding-top: 8px;
-
-    border-top: 1px solid #e5e7eb;
+    margin-top: 4px;
 
   }
 
 
-  /* ----------------------------------------------------------
+  /* -----------------------------------------
      TOTAL
-  ---------------------------------------------------------- */
+  ----------------------------------------- */
 
-  .total-cotizacion {
+  #total-cotizacion {
 
     justify-content: space-between;
 
-    font-size: 17px;
+    flex-wrap: wrap;
+
+    gap: 10px;
 
   }
 
@@ -782,35 +758,54 @@ footer a:hover {
 
 
 /* ============================================================
-   MOBILE PEQUEÑO
+   IMPRESIÓN
 ============================================================ */
 
-@media (max-width: 420px) {
+@media print {
+
+  .menu-cotizacion {
+
+    display: none;
+
+  }
+
+
+  .contenedor-cotizacion {
+
+    display: block;
+
+    min-height: auto;
+
+  }
+
 
   .contenido-blanco-cotizacion {
 
-    padding: 18px;
+    padding: 20px;
 
   }
 
 
-  .menu-cotizacion .menu-sticky {
+  .encabezado-cotizacion,
+  .bloque-cotizacion {
 
-    grid-template-columns: 1fr;
+    min-height: auto;
 
-  }
-
-
-  .encabezado-cotizacion h1 {
-
-    font-size: 24px;
+    page-break-inside: avoid;
 
   }
 
 
-  .producto-cotizacion {
+  .bloque-cotizacion {
 
-    padding: 14px;
+    page-break-before: auto;
+
+  }
+
+
+  footer {
+
+    display: none;
 
   }
 
