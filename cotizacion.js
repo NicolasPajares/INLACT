@@ -99,10 +99,6 @@ const listaProductosEl =
   );
 
 
-const totalEl =
-  document.getElementById(
-    "total-cotizacion"
-  );
 
 
 const observacionesEl =
@@ -699,6 +695,79 @@ function cargarProductos(
 }
 
 
+/* ============================================================
+   MOSTRAR TOTALES
+============================================================ */
+
+function mostrarTotales(
+  totales
+) {
+
+  if (!totalEl) {
+
+    return;
+
+  }
+
+
+  totalEl.innerHTML =
+    "";
+
+
+  const monedas =
+    Object.keys(
+      totales
+    );
+
+
+  if (
+    monedas.length === 0
+  ) {
+
+    return;
+
+  }
+
+
+  const titulo =
+    document.createElement(
+      "span"
+    );
+
+
+  titulo.textContent =
+    "Total:";
+
+
+  totalEl.appendChild(
+    titulo
+  );
+
+
+  monedas.forEach(
+    moneda => {
+
+      const valor =
+        document.createElement(
+          "strong"
+        );
+
+
+      valor.textContent =
+        formatearPrecio(
+          totales[moneda],
+          moneda
+        );
+
+
+      totalEl.appendChild(
+        valor
+      );
+
+    }
+  );
+
+}
 
 
 /* ============================================================
