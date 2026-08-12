@@ -195,7 +195,7 @@
    NOMBRE DE LA COTIZACIÓN
 ============================================================ */
 
-.encabezado-cotizacion .nombre-cotizacion {
+.encabezado-cotizacion #nombre-cotizacion {
 
   font-size: 26px;
   font-weight: 600;
