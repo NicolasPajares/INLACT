@@ -48,6 +48,7 @@ const firebaseConfig = {
 const app =
   initializeApp(firebaseConfig);
 
+
 const db =
   getFirestore(app);
 
@@ -57,31 +58,57 @@ const db =
 ============================================================ */
 
 const empresaEl =
-  document.getElementById("empresa");
+  document.getElementById(
+    "empresa"
+  );
+
 
 const fechaEl =
-  document.getElementById("fecha");
+  document.getElementById(
+    "fecha"
+  );
+
 
 const nombreCotizacionEl =
-  document.getElementById("nombre-cotizacion");
+  document.getElementById(
+    "nombre-cotizacion"
+  );
+
 
 const clienteEl =
-  document.getElementById("cliente");
+  document.getElementById(
+    "cliente"
+  );
+
 
 const propuestaEl =
-  document.getElementById("contenido-propuesta");
+  document.getElementById(
+    "contenido-propuesta"
+  );
+
 
 const dosisEl =
-  document.getElementById("contenido-dosis");
+  document.getElementById(
+    "contenido-dosis"
+  );
+
 
 const listaProductosEl =
-  document.getElementById("lista-productos-cotizacion");
+  document.getElementById(
+    "lista-productos-cotizacion"
+  );
+
 
 const totalEl =
-  document.getElementById("total-cotizacion");
+  document.getElementById(
+    "total-cotizacion"
+  );
+
 
 const observacionesEl =
-  document.getElementById("contenido-observaciones");
+  document.getElementById(
+    "contenido-observaciones"
+  );
 
 
 /* ============================================================
@@ -101,30 +128,17 @@ function obtenerIdCotizacion() {
 
 
 /* ============================================================
-   SABER SI ES PÚBLICA
-============================================================ */
-
-function esCotizacionPublica() {
-
-  const parametros =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  return parametros.get("publico") === "1";
-
-}
-
-
-/* ============================================================
    FORMATEAR FECHA
 ============================================================ */
 
 function formatearFecha(fecha) {
 
   if (!fecha) {
+
     return "";
+
   }
+
 
   let fechaReal;
 
@@ -199,7 +213,10 @@ function formatearPrecio(
 ) {
 
   const valor =
-    Number(precio || 0);
+    Number(
+      precio || 0
+    );
+
 
   const simbolo =
     moneda === "USD"
@@ -207,6 +224,7 @@ function formatearPrecio(
       : moneda === "EUR"
         ? "EUR "
         : "$ ";
+
 
   return (
     simbolo +
@@ -232,8 +250,11 @@ function mostrarTexto(
 ) {
 
   if (!elemento) {
+
     return;
+
   }
+
 
   elemento.textContent =
     texto || "";
@@ -253,7 +274,9 @@ async function cargarCotizacion() {
       obtenerIdCotizacion();
 
 
-    /* No hay ID */
+    /*
+     * No hay ID
+     */
 
     if (!id) {
 
@@ -266,7 +289,9 @@ async function cargarCotizacion() {
     }
 
 
-    /* Buscar documento */
+    /*
+     * Buscar documento
+     */
 
     const referencia =
       doc(
@@ -282,7 +307,9 @@ async function cargarCotizacion() {
       );
 
 
-    /* No existe */
+    /*
+     * No existe
+     */
 
     if (!snap.exists()) {
 
@@ -295,7 +322,9 @@ async function cargarCotizacion() {
     }
 
 
-    /* Datos */
+    /*
+     * Datos
+     */
 
     const cotizacion =
       snap.data();
@@ -307,42 +336,54 @@ async function cargarCotizacion() {
     );
 
 
-    /* PORTADA */
+    /*
+     * PORTADA
+     */
 
     cargarPortada(
       cotizacion
     );
 
 
-    /* PROPUESTA */
+    /*
+     * PROPUESTA
+     */
 
     cargarPropuesta(
       cotizacion
     );
 
 
-    /* DOSIS */
+    /*
+     * DOSIS
+     */
 
     cargarDosis(
       cotizacion
     );
 
 
-    /* PRODUCTOS */
+    /*
+     * PRODUCTOS
+     */
 
     cargarProductos(
       cotizacion
     );
 
 
-    /* OBSERVACIONES */
+    /*
+     * OBSERVACIONES
+     */
 
     cargarObservaciones(
       cotizacion
     );
 
 
-    /* LINK PÚBLICO */
+    /*
+     * LINK PÚBLICO
+     */
 
     cargarLinkPublico(
       id
@@ -375,19 +416,22 @@ function cargarPortada(
   cotizacion
 ) {
 
-
-  /* Empresa */
+  /*
+   * Empresa
+   */
 
   if (empresaEl) {
 
     empresaEl.textContent =
       cotizacion.clienteNombre ||
-      "Cliente sin nombre";
+      "";
 
   }
 
 
-  /* Cliente */
+  /*
+   * Cliente
+   */
 
   if (clienteEl) {
 
@@ -398,7 +442,9 @@ function cargarPortada(
   }
 
 
-  /* Fecha */
+  /*
+   * Fecha
+   */
 
   if (fechaEl) {
 
@@ -410,7 +456,9 @@ function cargarPortada(
   }
 
 
-  /* Nombre */
+  /*
+   * Nombre de la cotización
+   */
 
   if (nombreCotizacionEl) {
 
@@ -480,7 +528,9 @@ function cargarProductos(
 ) {
 
   if (!listaProductosEl) {
+
     return;
+
   }
 
 
@@ -496,33 +546,32 @@ function cargarProductos(
       : [];
 
 
-  /* Sin productos */
+  /*
+   * Sin productos
+   */
 
   if (
     productos.length === 0
   ) {
-
-    if (totalEl) {
-
-      totalEl.textContent =
-        "";
-
-    }
 
     return;
 
   }
 
 
-  /* CABECERA */
+  /*
+   * CABECERA
+   */
 
   const cabecera =
     document.createElement(
       "div"
     );
 
+
   cabecera.className =
     "cabecera-productos-cotizacion";
+
 
   cabecera.innerHTML = `
 
@@ -550,12 +599,16 @@ function cargarProductos(
   );
 
 
-  /* Totales por moneda */
+  /*
+   * Totales por moneda
+   */
 
   const totales = {};
 
 
-  /* PRODUCTOS */
+  /*
+   * PRODUCTOS
+   */
 
   productos.forEach(
     producto => {
@@ -622,7 +675,9 @@ function cargarProductos(
       );
 
 
-      /* Acumular total */
+      /*
+       * Acumular total
+       */
 
       if (
         !totales[moneda]
@@ -638,85 +693,18 @@ function cargarProductos(
         precio;
 
     }
+
   );
 
 
-  mostrarTotales(
-    totales
-  );
-
-}
-
-
-/* ============================================================
-   MOSTRAR TOTALES
-============================================================ */
-
-function mostrarTotales(
-  totales
-) {
-
-  if (!totalEl) {
-    return;
-  }
-
-
-  totalEl.innerHTML =
-    "";
-
-
-  const monedas =
-    Object.keys(
-      totales
-    );
-
-
-  if (
-    monedas.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  const titulo =
-    document.createElement(
-      "span"
-    );
-
-
-  titulo.textContent =
-    "Total:";
-
-
-  totalEl.appendChild(
-    titulo
-  );
-
-
-  monedas.forEach(
-    moneda => {
-
-      const valor =
-        document.createElement(
-          "strong"
-        );
-
-
-      valor.textContent =
-        formatearPrecio(
-          totales[moneda],
-          moneda
-        );
-
-
-      totalEl.appendChild(
-        valor
-      );
-
-    }
-  );
+  /*
+   * IMPORTANTE:
+   * No mostramos el total.
+   *
+   * Se mantiene el cálculo interno
+   * para no modificar el funcionamiento
+   * existente.
+   */
 
 }
 
@@ -726,59 +714,27 @@ function mostrarTotales(
 ============================================================ */
 
 function cargarLinkPublico(
-  id
+  idCotizacion
 ) {
 
-  const linkInput =
+  const input =
     document.getElementById(
       "link-publico-cotizacion"
     );
 
 
-  if (!linkInput) {
-    return;
-  }
-
-
-  /*
-   * Si estamos viendo la cotización
-   * como cliente, ocultamos el link.
-   */
-
-  if (
-    esCotizacionPublica()
-  ) {
-
-    const contenedor =
-      linkInput.closest(
-        ".link-publico-cotizacion"
-      );
-
-
-    if (contenedor) {
-      contenedor.style.display =
-        "none";
-    }
-
+  if (!input) {
 
     return;
 
   }
 
-
-  /*
-   * Generar URL pública
-   */
 
   const linkPublico =
-    `${window.location.origin}/INLACT/cotizacion.html?id=${encodeURIComponent(id)}&publico=1`;
+    `${window.location.origin}/INLACT/cotizacion.html?id=${idCotizacion}&publico=1`;
 
 
-  /*
-   * Colocar URL en el input
-   */
-
-  linkInput.value =
+  input.value =
     linkPublico;
 
 }
@@ -834,7 +790,9 @@ function mostrarError(
 
 
   if (!contenido) {
+
     return;
+
   }
 
 
@@ -893,7 +851,9 @@ function configurarMenu() {
 
 
           if (!seccion) {
+
             return;
+
           }
 
 
