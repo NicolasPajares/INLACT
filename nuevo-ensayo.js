@@ -49,6 +49,7 @@ const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
 
+
 /**********************
  * CARGAR CLIENTES
  **********************/
