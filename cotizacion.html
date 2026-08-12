@@ -61,14 +61,16 @@
 
 
     <!-- =======================================================
-         MENÚ LATERAL
+         COLUMNA IZQUIERDA
     ======================================================== -->
 
     <aside class="menu-cotizacion">
 
       <div class="menu-sticky">
 
+
         <button
+          type="button"
           data-seccion="propuesta"
         >
           Propuesta
@@ -76,6 +78,7 @@
 
 
         <button
+          type="button"
           data-seccion="dosis"
         >
           Dosis
@@ -83,6 +86,7 @@
 
 
         <button
+          type="button"
           data-seccion="cotizacion"
         >
           Cotización
@@ -90,10 +94,12 @@
 
 
         <button
+          type="button"
           data-seccion="observaciones"
         >
           Observaciones
         </button>
+
 
       </div>
 
@@ -102,10 +108,11 @@
 
 
     <!-- =======================================================
-         CONTENIDO
+         CONTENIDO PRINCIPAL
     ======================================================== -->
 
-    <section class="contenido-blanco">
+    <section class="contenido-blanco-cotizacion">
+
 
 
       <!-- =====================================================
@@ -119,12 +126,32 @@
         </h1>
 
 
-        <p id="fecha">
+        <p
+          id="fecha"
+          class="fecha-cotizacion"
+        >
         </p>
 
 
-        <h2 id="nombre-cotizacion">
+        <h2
+          id="nombre-cotizacion"
+        >
         </h2>
+
+
+        <div class="datos-cliente-cotizacion">
+
+          <span class="etiqueta-cliente">
+            Cliente
+          </span>
+
+
+          <strong
+            id="cliente"
+          >
+          </strong>
+
+        </div>
 
       </section>
 
@@ -136,16 +163,17 @@
 
       <section
         id="propuesta"
-        class="bloque"
+        class="bloque-cotizacion"
       >
 
         <h2>
           Propuesta
         </h2>
 
+
         <div
           id="contenido-propuesta"
-          class="contenido-seccion"
+          class="contenido-seccion-cotizacion"
         >
         </div>
 
@@ -159,16 +187,17 @@
 
       <section
         id="dosis"
-        class="bloque"
+        class="bloque-cotizacion"
       >
 
         <h2>
           Dosis
         </h2>
 
+
         <div
           id="contenido-dosis"
-          class="contenido-seccion"
+          class="contenido-seccion-cotizacion"
         >
         </div>
 
@@ -182,7 +211,7 @@
 
       <section
         id="cotizacion"
-        class="bloque"
+        class="bloque-cotizacion"
       >
 
         <h2>
@@ -191,8 +220,16 @@
 
 
         <div
-          id="lista-productos"
-          class="lista-productos"
+          id="lista-productos-cotizacion"
+          class="lista-productos-cotizacion"
+        >
+        </div>
+
+
+        <!-- TOTAL -->
+        <div
+          id="total-cotizacion"
+          class="total-cotizacion"
         >
         </div>
 
@@ -206,7 +243,7 @@
 
       <section
         id="observaciones"
-        class="bloque"
+        class="bloque-cotizacion"
       >
 
         <h2>
@@ -216,7 +253,7 @@
 
         <div
           id="contenido-observaciones"
-          class="contenido-seccion"
+          class="contenido-seccion-cotizacion"
         >
         </div>
 
@@ -239,7 +276,9 @@
 
       © INLACT ·
 
-      <a href="aviso-legal.html">
+      <a
+        href="aviso-legal.html"
+      >
         Aviso Legal
       </a>
 
