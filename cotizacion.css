@@ -596,32 +596,42 @@ footer a:hover {
      MENÚ
   ----------------------------------------- */
 
-  .menu-cotizacion {
+ .menu-cotizacion {
 
-    width: 100%;
+  width: 100%;
 
-    padding: 15px 20px;
+  padding: 15px 20px;
 
-    flex-direction: row;
+  flex-direction: row;
 
-    overflow-x: auto;
+  overflow-x: auto;
 
-    gap: 18px;
+  gap: 18px;
 
-  }
+  position: sticky;
+
+  top: 0;
+
+  z-index: 1000;
+
+  box-sizing: border-box;
+
+  background: #1f4e8c;
+
+}
 
 
-  .menu-sticky-cotizacion {
+.menu-sticky-cotizacion {
 
-    position: static;
+  position: static;
 
-    flex-direction: row;
+  flex-direction: row;
 
-    gap: 18px;
+  gap: 18px;
 
-    width: max-content;
+  width: max-content;
 
-  }
+}
 
 
   .menu-cotizacion button {
