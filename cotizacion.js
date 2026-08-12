@@ -98,8 +98,10 @@ const listaProductosEl =
     "lista-productos-cotizacion"
   );
 
-
-
+const totalEl =
+  document.getElementById(
+    "total-cotizacion"
+  );
 
 const observacionesEl =
   document.getElementById(
