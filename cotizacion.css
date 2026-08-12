@@ -9,15 +9,11 @@
 ============================================================ */
 
 .contenedor-cotizacion {
-
-  display: flex;
-
-  align-items: stretch;
-
-  min-height: calc(100vh - 120px);
-
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
 }
-
 
 /* ============================================================
    MENÚ IZQUIERDO
