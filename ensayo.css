@@ -308,3 +308,206 @@
   }
 
 }
+/* ============================================================
+   ENSAYO - VISTA MOBILE
+   NO MODIFICA LA VISTA DE COMPUTADORA
+============================================================ */
+
+@media screen and (max-width: 767px) {
+
+    /* CONTENEDOR */
+    .contenedor-ensayo {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+    /* ========================================================
+       BARRA AZUL SUPERIOR
+    ======================================================== */
+
+    .menu-ensayo {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+
+        box-sizing: border-box !important;
+
+        background: #1f4e8c !important;
+
+        padding: 15px 20px !important;
+
+        margin: 0 !important;
+
+        display: flex !important;
+        flex-direction: row !important;
+
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+
+        gap: 18px !important;
+
+        /* queda visible al hacer scroll */
+        position: sticky !important;
+        top: 0 !important;
+
+        z-index: 9999 !important;
+
+        align-self: auto !important;
+    }
+
+
+    /* ========================================================
+       CONTENEDOR DE BOTONES
+    ======================================================== */
+
+    .menu-sticky {
+        position: static !important;
+
+        display: flex !important;
+        flex-direction: row !important;
+
+        gap: 18px !important;
+
+        width: max-content !important;
+        min-width: max-content !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+    /* ========================================================
+       BOTONES
+    ======================================================== */
+
+    .menu-ensayo button {
+        flex: 0 0 auto !important;
+
+        width: auto !important;
+
+        white-space: nowrap !important;
+
+        font-size: 16px !important;
+        font-weight: 500 !important;
+
+        color: #ffffff !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        background: none !important;
+        border: none !important;
+    }
+
+
+    /* ========================================================
+       CONTENIDO
+    ======================================================== */
+
+    .contenido-blanco {
+        width: 100% !important;
+        max-width: none !important;
+
+        box-sizing: border-box !important;
+
+        padding: 22px !important;
+
+        margin: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+
+    /* ========================================================
+       PORTADA
+    ======================================================== */
+
+    .encabezado-ensayo {
+        width: 100% !important;
+
+        min-height: 70vh !important;
+
+        margin: 0 !important;
+
+        padding: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        justify-content: center !important;
+        align-items: center !important;
+
+        text-align: center !important;
+
+        scroll-margin-top: 70px !important;
+    }
+
+
+    .encabezado-ensayo h1 {
+        font-size: 30px !important;
+        line-height: 1.2 !important;
+    }
+
+
+    .encabezado-ensayo p {
+        font-size: 14px !important;
+    }
+
+
+    .encabezado-ensayo h2 {
+        font-size: 22px !important;
+        line-height: 1.25 !important;
+    }
+
+
+    /* ========================================================
+       BLOQUES
+    ======================================================== */
+
+    .bloque {
+        width: 100% !important;
+        box-sizing: border-box !important;
+
+        min-height: 70vh !important;
+
+        padding-top: 40px !important;
+        padding-bottom: 40px !important;
+
+        margin-bottom: 0 !important;
+
+        scroll-margin-top: 70px !important;
+    }
+
+
+    .bloque h3 {
+        font-size: 21px !important;
+    }
+
+
+    /* ========================================================
+       FOTOS
+    ======================================================== */
+
+    .fotos {
+        width: 100% !important;
+
+        display: grid !important;
+
+        grid-template-columns: 1fr !important;
+
+        gap: 12px !important;
+    }
+
+
+    .fotos img {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+}
