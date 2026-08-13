@@ -148,4 +148,163 @@
     flex-direction:column;
     gap:12px;
 }
+/* ============================================================
+   MOBILE
+   MISMO COMPORTAMIENTO QUE COTIZACIÓN
+   NO MODIFICA LA VISTA DE COMPUTADORA
+============================================================ */
 
+@media (max-width: 767px) {
+
+  /* -----------------------------------------
+     CONTENEDOR
+  ----------------------------------------- */
+
+  .contenedor-ensayo {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+
+  /* -----------------------------------------
+     MENÚ AZUL SUPERIOR
+  ----------------------------------------- */
+
+  .menu-ensayo {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 15px 20px;
+
+    flex-direction: row;
+
+    overflow-x: auto;
+
+    gap: 18px;
+
+    /* IMPORTANTE:
+       el menú queda visible mientras se hace scroll */
+    position: sticky;
+    top: 0;
+
+    z-index: 1000;
+  }
+
+
+  /* -----------------------------------------
+     MENÚ STICKY
+  ----------------------------------------- */
+
+  .menu-sticky {
+
+    position: static;
+
+    display: flex;
+
+    flex-direction: row;
+
+    gap: 18px;
+
+    width: max-content;
+
+  }
+
+
+  /* -----------------------------------------
+     BOTONES
+  ----------------------------------------- */
+
+  .menu-ensayo button {
+
+    font-size: 16px;
+
+    white-space: nowrap;
+
+    flex-shrink: 0;
+
+  }
+
+
+  /* -----------------------------------------
+     CONTENIDO BLANCO
+  ----------------------------------------- */
+
+  .contenido-blanco {
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 22px;
+
+  }
+
+
+  /* -----------------------------------------
+     PORTADA
+  ----------------------------------------- */
+
+  .encabezado-ensayo {
+
+    min-height: 70vh;
+
+    scroll-margin-top: 70px;
+
+  }
+
+
+  .encabezado-ensayo h1 {
+
+    font-size: 30px;
+
+  }
+
+
+  .encabezado-ensayo p {
+
+    font-size: 14px;
+
+  }
+
+
+  .encabezado-ensayo h2 {
+
+    font-size: 22px;
+
+  }
+
+
+  /* -----------------------------------------
+     BLOQUES
+  ----------------------------------------- */
+
+  .bloque {
+
+    min-height: 70vh;
+
+    padding-top: 40px;
+
+    padding-bottom: 40px;
+
+    scroll-margin-top: 70px;
+
+  }
+
+
+  .bloque h3 {
+
+    font-size: 21px;
+
+  }
+
+
+  /* -----------------------------------------
+     FOTOS
+  ----------------------------------------- */
+
+  .fotos {
+
+    grid-template-columns: 1fr;
+
+  }
+
+}
