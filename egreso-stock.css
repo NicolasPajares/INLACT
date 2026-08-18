@@ -668,3 +668,7 @@ main > p a {
     }
 
 }
+/* Ocultar disponibilidad cuando está vacía */
+.disponibilidad-lote:empty {
+    display: none;
+}
