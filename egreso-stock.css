@@ -1,6 +1,6 @@
-/* ============================================================
+/* ===============================
    RESET
-============================================================ */
+================================ */
 
 * {
     margin: 0;
@@ -9,9 +9,9 @@
 }
 
 
-/* ============================================================
+/* ===============================
    BODY
-============================================================ */
+================================ */
 
 body {
     font-family: "Segoe UI", Arial, sans-serif;
@@ -20,38 +20,29 @@ body {
 }
 
 
-/* ============================================================
-   HEADER
-============================================================ */
-
-header {
-    width: 100%;
-}
-
-
-/* ============================================================
+/* ===============================
    MAIN
-============================================================ */
+================================ */
 
 main {
-    max-width: 900px;
+    max-width: 1100px;
     margin: auto;
     padding: 20px;
 }
 
 
-/* ============================================================
-   CARD FORMULARIO
-============================================================ */
+/* ===============================
+   FORMULARIO
+================================ */
 
-.card-formulario {
+#formEgresoStock {
     width: 100%;
 }
 
 
-/* ============================================================
+/* ===============================
    TITULO
-============================================================ */
+================================ */
 
 #formEgresoStock h1 {
     font-size: 28px;
@@ -61,20 +52,20 @@ main {
 }
 
 
-/* ============================================================
-   TITULOS DE CADA PRODUCTO
-============================================================ */
+/* ===============================
+   TITULOS DE ARTICULOS
+================================ */
 
 .articulo-egreso h3 {
-    font-size: 20px;
-    margin: 20px 0 20px;
     color: #1f4e8c;
+    margin: 20px 0 20px;
+    font-size: 20px;
 }
 
 
-/* ============================================================
-   SEPARADOR ENTRE PRODUCTOS
-============================================================ */
+/* ===============================
+   SEPARADOR
+================================ */
 
 .articulo-egreso hr {
     border: none;
@@ -83,26 +74,22 @@ main {
 }
 
 
-/* ============================================================
+/* ===============================
    LABELS
-============================================================ */
+================================ */
 
 #formEgresoStock label {
     display: block;
-
     margin-bottom: 7px;
-
     color: #2c3e50;
-
     font-size: 16px;
-
     font-weight: 600;
 }
 
 
-/* ============================================================
+/* ===============================
    INPUTS / SELECTS / TEXTAREA
-============================================================ */
+================================ */
 
 #formEgresoStock input,
 #formEgresoStock select,
@@ -132,9 +119,9 @@ main {
 }
 
 
-/* ============================================================
+/* ===============================
    FOCUS
-============================================================ */
+================================ */
 
 #formEgresoStock input:focus,
 #formEgresoStock select:focus,
@@ -147,11 +134,12 @@ main {
 }
 
 
-/* ============================================================
+/* ===============================
    LISTA PRODUCTOS
-============================================================ */
+================================ */
 
-.listaProductos {
+.listaProductos,
+#listaProductos {
 
     width: 100%;
 
@@ -169,18 +157,15 @@ main {
 
     box-shadow:
         0 6px 15px rgba(0, 0, 0, .08);
-
-    position: relative;
-
-    z-index: 20;
 }
 
 
-/* ============================================================
-   RESULTADOS PRODUCTOS
-============================================================ */
+/* ===============================
+   OPCIONES PRODUCTOS
+================================ */
 
-.listaProductos div {
+.listaProductos div,
+#listaProductos div {
 
     padding: 12px 15px;
 
@@ -196,12 +181,14 @@ main {
 }
 
 
-.listaProductos div:last-child {
+.listaProductos div:last-child,
+#listaProductos div:last-child {
     border-bottom: none;
 }
 
 
-.listaProductos div:hover {
+.listaProductos div:hover,
+#listaProductos div:hover {
 
     background: #f3f7fb;
 
@@ -209,9 +196,9 @@ main {
 }
 
 
-/* ============================================================
+/* ===============================
    LISTA CLIENTES
-============================================================ */
+================================ */
 
 #listaClientes {
 
@@ -231,16 +218,12 @@ main {
 
     box-shadow:
         0 6px 15px rgba(0, 0, 0, .08);
-
-    position: relative;
-
-    z-index: 20;
 }
 
 
-/* ============================================================
-   RESULTADOS CLIENTES
-============================================================ */
+/* ===============================
+   OPCIONES CLIENTES
+================================ */
 
 #listaClientes div {
 
@@ -271,122 +254,229 @@ main {
 }
 
 
-/* ============================================================
-   RESUMEN EGRESO
-============================================================ */
+/* ===============================
+   AGREGAR OTRO PRODUCTO
+================================ */
+
+#btnAgregarArticulo {
+
+    width: 100%;
+
+    display: block;
+
+    padding: 14px 20px;
+
+    margin-top: 10px;
+    margin-bottom: 25px;
+
+    background: #fff;
+
+    color: #1f4e8c;
+
+    border: 2px dashed #3b82f6;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-align: center;
+
+    transition: .20s;
+}
+
+
+#btnAgregarArticulo:hover {
+
+    background: #f3f7fb;
+
+    border-color: #1f4e8c;
+
+    transform: translateY(-1px);
+}
+
+
+/* ===============================
+   BOTON QUITAR PRODUCTO
+================================ */
+
+.btn-eliminar-articulo {
+
+    width: 100%;
+
+    padding: 11px 15px;
+
+    margin-top: 5px;
+    margin-bottom: 20px;
+
+    background: #fff;
+
+    color: #b42318;
+
+    border: 1px solid #d92d20;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .20s;
+}
+
+
+.btn-eliminar-articulo:hover {
+
+    background: #d92d20;
+
+    color: #fff;
+}
+
+
+/* ===============================
+   DISPONIBILIDAD DEL LOTE
+================================ */
+
+.disponibilidad-lote {
+
+    margin-top: -10px;
+
+    margin-bottom: 18px;
+
+    padding: 9px 12px;
+
+    background: #eef6ff;
+
+    border-left: 4px solid #3b82f6;
+
+    border-radius: 7px;
+
+    color: #1f4e8c;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
+   RESUMEN
+================================ */
 
 #resumenEgreso {
 
-    margin-top: 25px;
+    width: 100%;
 
-    padding: 20px;
+    margin-top: 30px;
+
+    padding: 25px;
 
     background: #f8fafc;
+
+    border: 1px solid #d8e1eb;
+
+    border-radius: 14px;
+}
+
+
+/* ===============================
+   TITULO RESUMEN
+================================ */
+
+#resumenEgreso h2 {
+
+    color: #1f4e8c;
+
+    font-size: 24px;
+
+    margin-bottom: 20px;
+}
+
+
+/* ===============================
+   LISTA RESUMEN
+================================ */
+
+#listaResumenEgreso {
+
+    width: 100%;
+}
+
+
+/* ===============================
+   ITEM RESUMEN
+================================ */
+
+.item-resumen-egreso {
+
+    background: #fff;
 
     border: 1px solid #dbe3ec;
 
     border-radius: 12px;
-}
 
+    padding: 20px;
 
-/* ============================================================
-   TITULO RESUMEN
-============================================================ */
-
-#resumenEgreso h2 {
-
-    margin-bottom: 15px;
-
-    color: #1f4e8c;
-
-    font-size: 20px;
-}
-
-
-/* ============================================================
-   LISTA RESUMEN
-============================================================ */
-
-#listaResumenEgreso {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 12px;
-}
-
-
-/* ============================================================
-   ITEM RESUMEN
-============================================================ */
-
-.item-resumen-egreso {
-
-    padding: 14px 16px;
-
-    background: #fff;
-
-    border: 1px solid #e1e7ee;
-
-    border-radius: 10px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
+    margin-bottom: 12px;
 
     box-shadow:
-        0 2px 7px rgba(0, 0, 0, .04);
+        0 4px 10px rgba(0, 0, 0, .05);
 }
 
-
-/* ============================================================
-   PRODUCTO EN RESUMEN
-============================================================ */
 
 .item-resumen-egreso strong {
 
+    display: block;
+
     color: #1f4e8c;
 
-    font-size: 16px;
+    font-size: 17px;
 
-    margin-bottom: 3px;
+    margin-bottom: 10px;
 }
 
-
-/* ============================================================
-   DATOS DEL RESUMEN
-============================================================ */
 
 .item-resumen-egreso span {
 
-    color: #5f6b78;
+    display: block;
 
-    font-size: 14px;
+    color: #64748b;
 
-    line-height: 1.4;
+    font-size: 15px;
+
+    margin-bottom: 6px;
 }
 
 
-/* ============================================================
-   BOTONES DE ACCIONES
-============================================================ */
+.item-resumen-egreso span:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ===============================
+   ACCIONES
+================================ */
 
 .acciones-form {
 
     display: flex;
 
-    gap: 12px;
+    gap: 15px;
 
-    margin-top: 25px;
+    margin-top: 30px;
+
+    width: 100%;
 }
 
 
-/* ============================================================
+/* ===============================
    BOTON GUARDAR
-============================================================ */
+================================ */
 
 .btn-guardar {
 
@@ -429,9 +519,9 @@ main {
 }
 
 
-/* ============================================================
+/* ===============================
    BOTON CANCELAR
-============================================================ */
+================================ */
 
 .btn-cancelar {
 
@@ -465,103 +555,13 @@ main {
 }
 
 
-/* ============================================================
-   BOTON AGREGAR ARTICULO
-============================================================ */
-
-#btnAgregarArticulo {
-
-    width: 100%;
-
-    padding: 13px 20px;
-
-    margin-top: 10px;
-
-    margin-bottom: 10px;
-
-    background: #fff;
-
-    color: #1f4e8c;
-
-    border: 2px dashed #3b82f6;
-
-    border-radius: 10px;
-
-    font-size: 16px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: .20s;
-}
-
-
-#btnAgregarArticulo:hover {
-
-    background: #f3f7fb;
-
-    border-color: #1f4e8c;
-}
-
-
-/* ============================================================
-   BOTON ELIMINAR ARTICULO
-============================================================ */
-
-.btn-eliminar-articulo {
-
-    width: 100%;
-
-    padding: 11px 15px;
-
-    margin-top: 0;
-
-    margin-bottom: 20px;
-
-    background: #fff;
-
-    color: #b42318;
-
-    border: 1px solid #e3a6a0;
-
-    border-radius: 10px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: .20s;
-}
-
-
-.btn-eliminar-articulo:hover {
-
-    background: #fff4f2;
-
-    border-color: #b42318;
-}
-
-
-/* ============================================================
-   TEXTAREA
-============================================================ */
-
-#formEgresoStock textarea {
-
-    resize: vertical;
-
-    min-height: 100px;
-}
-
-
-/* ============================================================
+/* ===============================
    FOOTER
-============================================================ */
+================================ */
 
 footer {
+
+    width: 100%;
 
     text-align: center;
 
@@ -583,22 +583,41 @@ footer a {
 }
 
 
-/* ============================================================
-   LINEA DE DISPONIBILIDAD
-   Se mantiene por compatibilidad,
-   aunque ahora la cantidad aparece
-   directamente junto al lote.
-============================================================ */
+/* ===============================
+   FOOTER - P DEL HTML
+   Por si el texto está directamente
+   dentro de MAIN y no en FOOTER
+================================ */
 
-.disponibilidad-lote {
+main > p {
 
-    display: none;
+    width: 100%;
+
+    text-align: center;
+
+    margin-top: 25px;
+
+    padding: 0 20px;
+
+    color: #6b7280;
+
+    font-size: 14px;
 }
 
 
-/* ============================================================
+main > p a {
+
+    color: #1f4e8c;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+
+/* ===============================
    DESKTOP
-============================================================ */
+================================ */
 
 @media (min-width: 768px) {
 
@@ -606,60 +625,36 @@ footer a {
         font-size: 32px;
     }
 
-
     .acciones-form {
 
-        max-width: 600px;
+        max-width: 750px;
 
         margin-left: auto;
-
         margin-right: auto;
     }
-
-
-    #btnAgregarArticulo {
-
-        max-width: 600px;
-
-        margin-left: auto;
-
-        margin-right: auto;
-    }
-
-
-    .btn-eliminar-articulo {
-
-        max-width: 300px;
-    }
-
 }
 
 
-/* ============================================================
+/* ===============================
    MOBILE
-============================================================ */
+================================ */
 
 @media (max-width: 600px) {
 
     main {
-
         padding: 15px;
     }
 
-
-    #formEgresoStock h1 {
-
-        font-size: 25px;
-
-        margin-bottom: 20px;
+    #resumenEgreso {
+        padding: 18px;
     }
-
 
     .acciones-form {
 
         flex-direction: column;
-    }
 
+        max-width: none;
+    }
 
     .btn-guardar,
     .btn-cancelar {
@@ -667,16 +662,10 @@ footer a {
         width: 100%;
     }
 
+    #btnAgregarArticulo {
 
-    .articulo-egreso h3 {
+        width: 100%;
 
-        font-size: 18px;
-    }
-
-
-    #resumenEgreso {
-
-        padding: 15px;
     }
 
 }
