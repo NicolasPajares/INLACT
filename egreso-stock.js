@@ -1131,7 +1131,7 @@ function configurarArticulo(
 
 
                     option.textContent =
-                        item.lote;
+    `${item.lote} · ${item.cantidad} ${item.unidad}`;
 
 
                     lote.appendChild(
