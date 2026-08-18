@@ -24,11 +24,10 @@ body {
    MAIN
 ================================ */
 
-main {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
-}
+.card-formulario {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 30px;
 
 
 /* ===============================
