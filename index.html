@@ -30,6 +30,87 @@
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
+
+    <!-- ============================================================
+         VENTAS
+         VISTA COMPUTADORA + VISTA CELULAR
+         ============================================================ -->
+
+    <style>
+
+        /* ============================================================
+           COMPUTADORA
+           ============================================================ */
+
+        .producto-venta {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+            padding: 7px 0;
+
+        }
+
+
+        .dato-producto {
+
+            flex: 1;
+
+        }
+
+
+        .dato-cantidad {
+
+            min-width: 100px;
+
+        }
+
+
+        .dato-lote {
+
+            min-width: 130px;
+
+        }
+
+
+        /* ============================================================
+           CELULAR
+           ============================================================ */
+
+        @media (max-width: 700px) {
+
+            .producto-venta {
+
+                display: flex;
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 3px;
+
+                padding: 7px 0;
+
+            }
+
+
+            .dato-producto,
+            .dato-cantidad,
+            .dato-lote {
+
+                min-width: 0;
+
+                width: 100%;
+
+            }
+
+        }
+
+    </style>
+
 </head>
 
 
@@ -56,11 +137,12 @@
 <main>
 
 
-<!-- =========================================================
+<!-- ============================================================
      ACCESOS RÁPIDOS
-     ========================================================= -->
+     ============================================================ -->
 
 <section class="quick-actions">
+
 
     <a
         href="clientes.html"
@@ -72,9 +154,12 @@
             alt="Clientes"
         >
 
-        <span>Clientes</span>
+        <span>
+            Clientes
+        </span>
 
     </a>
+
 
 
     <a
@@ -87,9 +172,12 @@
             alt="Stock"
         >
 
-        <span>Stock</span>
+        <span>
+            Stock
+        </span>
 
     </a>
+
 
 
     <a
@@ -102,9 +190,12 @@
             alt="Ensayos"
         >
 
-        <span>Ensayos</span>
+        <span>
+            Ensayos
+        </span>
 
     </a>
+
 
 
     <a
@@ -117,21 +208,26 @@
             alt="Precios"
         >
 
-        <span>Precios</span>
+        <span>
+            Precios
+        </span>
 
     </a>
+
 
 </section>
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      MAPA
-     ========================================================= -->
+     ============================================================ -->
 
 <section class="card">
 
-    <h2>Mapa de clientes</h2>
+    <h2>
+        Mapa de clientes
+    </h2>
 
     <div id="map"></div>
 
@@ -139,13 +235,15 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      VISITAS CERCANAS
-     ========================================================= -->
+     ============================================================ -->
 
 <section class="card">
 
-    <h2>Visitas cercanas</h2>
+    <h2>
+        Visitas cercanas
+    </h2>
 
     <p id="estado">
         Buscando fábricas...
@@ -160,13 +258,15 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      ÚLTIMAS VISITAS
-     ========================================================= -->
+     ============================================================ -->
 
 <section class="card">
 
-    <h3>Últimas visitas</h3>
+    <h3>
+        Últimas visitas
+    </h3>
 
     <ul id="listaVisitas"></ul>
 
@@ -184,9 +284,9 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      FOOTER
-     ========================================================= -->
+     ============================================================ -->
 
 <footer>
 
@@ -194,7 +294,9 @@
 
         © INLACT ·
 
-        <a href="aviso-legal.html">
+        <a
+            href="aviso-legal.html"
+        >
             Aviso Legal
         </a>
 
@@ -204,9 +306,9 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      LEAFLET
-     ========================================================= -->
+     ============================================================ -->
 
 <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -214,9 +316,9 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      APP PRINCIPAL
-     ========================================================= -->
+     ============================================================ -->
 
 <script
     type="module"
@@ -225,86 +327,100 @@
 
 
 
-<!-- =========================================================
+<!-- ============================================================
      ÚLTIMAS ACTIVIDADES
-     
      VISITAS + ENSAYOS + VENTAS
-     ========================================================= -->
+     ============================================================ -->
 
 <script type="module">
 
 
-/* ============================================================
-   FIREBASE
-   ============================================================ */
-
 import {
-    getApp,
-    getApps
+
+    getApps,
+
+    initializeApp
+
 }
 from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 
 import {
+
     getFirestore,
+
     collection,
+
     getDocs
+
 }
 from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
 
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+
+    authDomain:
+        "inlact.firebaseapp.com",
+
+    projectId:
+        "inlact",
+
+    storageBucket:
+        "inlact.appspot.com",
+
+    messagingSenderId:
+        "143868382036",
+
+    appId:
+        "1:143868382036:web:b5af0e4faced7e880216c1"
+
+};
+
+
 /*
- * app.js ya inicializa Firebase.
+ * IMPORTANTE
  *
- * Por eso NO volvemos a ejecutar initializeApp().
+ * app.js ya puede haber inicializado Firebase.
  *
- * Si app.js ya creó la aplicación:
- *     usamos esa misma.
+ * Por eso NO usamos directamente:
  *
- * Si por algún motivo todavía no existe:
- *     esperamos unos milisegundos y volvemos a intentar.
+ * initializeApp(firebaseConfig)
+ *
+ * porque produciría:
+ *
+ * FirebaseError:
+ * Firebase App named '[DEFAULT]' already exists
+ *
+ * Usamos la aplicación existente si ya está creada.
  */
 
-let app = null;
-
-let db = null;
-
-
-
-function obtenerFirebase() {
-
-    const apps =
-        getApps();
+const app =
+    getApps().length
+        ? getApps()[0]
+        : initializeApp(
+            firebaseConfig
+        );
 
 
-    if (
-        apps.length > 0
-    ) {
-
-        app =
-            getApp();
-
-        db =
-            getFirestore(
-                app
-            );
-
-        return true;
-
-    }
-
-
-    return false;
-
-}
+const db =
+    getFirestore(
+        app
+    );
 
 
 
 /* ============================================================
-   ELEMENTO
+   ELEMENTOS
    ============================================================ */
 
 const lista =
@@ -365,13 +481,16 @@ function obtenerFecha(
 
 
     /*
-     * FIREBASE TIMESTAMP
+     * Firebase Timestamp
      */
 
     if (
+
         item.fecha &&
+
         typeof item.fecha.toDate ===
-            "function"
+        "function"
+
     ) {
 
         return item.fecha.toDate();
@@ -381,25 +500,30 @@ function obtenerFecha(
 
 
     /*
-     * FECHA YYYY-MM-DD
+     * Fecha guardada como YYYY-MM-DD
      */
 
     if (
-        typeof item.fecha ===
-            "string" &&
 
-        item.fecha.trim() !==
-            ""
+        typeof item.fecha ===
+        "string" &&
+
+        item.fecha.trim() !== ""
+
     ) {
+
 
         const partes =
             item.fecha.split("-");
 
 
         if (
+
             partes.length ===
             3
+
         ) {
+
 
             const año =
                 Number(
@@ -420,13 +544,22 @@ function obtenerFecha(
 
 
             return new Date(
+
                 año,
+
                 mes,
+
                 dia
+
             );
 
         }
 
+
+
+        /*
+         * Intento alternativo
+         */
 
         const fecha =
             new Date(
@@ -435,9 +568,11 @@ function obtenerFecha(
 
 
         if (
+
             !isNaN(
                 fecha.getTime()
             )
+
         ) {
 
             return fecha;
@@ -461,9 +596,8 @@ function mostrarFecha(
     fecha
 ) {
 
-    if (
-        !fecha
-    ) {
+
+    if (!fecha) {
 
         return "";
 
@@ -471,7 +605,9 @@ function mostrarFecha(
 
 
     return fecha.toLocaleString(
+
         "es-AR",
+
         {
 
             day:
@@ -490,70 +626,8 @@ function mostrarFecha(
                 "2-digit"
 
         }
+
     );
-
-}
-
-
-
-/* ============================================================
-   NORMALIZAR PRODUCTOS
-   ============================================================ */
-
-function normalizarProducto(
-    producto
-) {
-
-    if (
-        !producto
-    ) {
-
-        return {
-
-            nombre:
-                "Producto sin nombre",
-
-            cantidad:
-                "",
-
-            unidad:
-                "",
-
-            lote:
-                ""
-
-        };
-
-    }
-
-
-    return {
-
-        nombre:
-            producto.nombre ||
-
-            producto.productoNombre ||
-
-            producto.descripcion ||
-
-            "Producto sin nombre",
-
-
-        cantidad:
-            producto.cantidad ??
-            "",
-
-
-        unidad:
-            producto.unidad ||
-            "",
-
-
-        lote:
-            producto.lote ||
-            ""
-
-    };
 
 }
 
@@ -570,53 +644,48 @@ async function cargarUltimasActividades() {
         "<li>Cargando...</li>";
 
 
-    /*
-     * Firebase debe estar disponible
-     */
-
-    if (
-        !obtenerFirebase()
-    ) {
-
-        /*
-         * app.js todavía puede estar
-         * terminando de inicializar.
-         */
-
-        setTimeout(
-            cargarUltimasActividades,
-            200
-        );
-
-        return;
-
-    }
-
-
     try {
 
 
-        /* ====================================================
-           CARGAR VISITAS Y EGRESOS
-           ==================================================== */
+        /*
+         * Cargamos simultáneamente:
+         *
+         * visitas
+         * egresos
+         */
 
         const [
+
             visitasSnap,
+
             egresosSnap
+
         ] = await Promise.all([
 
-            getDocs(
-                collection(
-                    db,
-                    "visitas"
-                )
-            ),
 
             getDocs(
+
                 collection(
+
                     db,
-                    "egresos"
+
+                    "visitas"
+
                 )
+
+            ),
+
+
+            getDocs(
+
+                collection(
+
+                    db,
+
+                    "egresos"
+
+                )
+
             )
 
         ]);
@@ -627,12 +696,13 @@ async function cargarUltimasActividades() {
            GUARDAR EGRESOS
            ==================================================== */
 
-        const egresos =
-            [];
+        const egresos = [];
 
 
         egresosSnap.forEach(
+
             docSnap => {
+
 
                 egresos.push({
 
@@ -644,6 +714,7 @@ async function cargarUltimasActividades() {
                 });
 
             }
+
         );
 
 
@@ -657,7 +728,9 @@ async function cargarUltimasActividades() {
 
 
         egresos.forEach(
+
             egreso => {
+
 
                 egresosPorId.set(
 
@@ -668,90 +741,7 @@ async function cargarUltimasActividades() {
                 );
 
             }
-        );
 
-
-
-        /* ====================================================
-           EGRESOS QUE PERTENECEN A VENTAS AGRUPADAS
-           ==================================================== */
-
-        const egresosVentaAgrupados =
-            new Set();
-
-
-
-        visitasSnap.forEach(
-            docSnap => {
-
-                const visita =
-                    docSnap.data();
-
-
-                if (
-                    visita.tipoVisita !==
-                    "Venta"
-                ) {
-
-                    return;
-
-                }
-
-
-                let ids =
-                    visita.egresoId;
-
-
-
-                /*
-                 * Las ventas nuevas
-                 * tienen egresoId como ARRAY.
-                 *
-                 * Las antiguas pueden tener
-                 * un solo ID.
-                 */
-
-                if (
-                    !Array.isArray(
-                        ids
-                    )
-                ) {
-
-                    if (
-                        ids
-                    ) {
-
-                        ids = [
-                            ids
-                        ];
-
-                    } else {
-
-                        ids = [];
-
-                    }
-
-                }
-
-
-
-                ids.forEach(
-                    id => {
-
-                        if (
-                            id
-                        ) {
-
-                            egresosVentaAgrupados.add(
-                                id
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
         );
 
 
@@ -760,189 +750,379 @@ async function cargarUltimasActividades() {
            ACTIVIDADES
            ==================================================== */
 
-        const actividades =
-            [];
+        const actividades = [];
 
 
 
         /* ====================================================
-           VISITAS
+           VENTAS AGRUPADAS
            ==================================================== */
 
+        const ventasAgrupadas =
+            new Map();
+
+
+
+        /*
+         * Primero recorremos VISITAS.
+         *
+         * Las visitas de tipo "Venta"
+         * se convierten en una sola actividad.
+         *
+         * Si contienen varios egresoId,
+         * todos los productos aparecen
+         * dentro de la misma venta.
+         */
+
         visitasSnap.forEach(
+
             docSnap => {
 
-                const visita =
+
+                const v =
                     docSnap.data();
 
 
 
                 /* =================================================
-                   VENTA AGRUPADA
+                   VENTA
                    ================================================= */
 
                 if (
-                    visita.tipoVisita ===
+
+                    v.tipoVisita ===
                     "Venta"
+
                 ) {
 
 
                     let ids =
-                        visita.egresoId;
+                        v.egresoId;
 
 
 
                     /*
-                     * Convertir ID individual
-                     * en array si hace falta.
+                     * Compatibilidad con registros
+                     * antiguos que tengan un único ID.
                      */
 
                     if (
+
                         !Array.isArray(
                             ids
                         )
+
                     ) {
 
-                        if (
+                        ids =
                             ids
-                        ) {
-
-                            ids = [
-                                ids
-                            ];
-
-                        } else {
-
-                            ids = [];
-
-                        }
+                                ? [ids]
+                                : [];
 
                     }
 
 
 
+                    /* =================================================
+                       PRODUCTOS DE LA VENTA
+                       ================================================= */
+
+                    let productos = [];
+
+
+                    ids.forEach(
+
+                        id => {
+
+
+                            const egreso =
+                                egresosPorId.get(
+                                    id
+                                );
+
+
+                            if (
+
+                                egreso &&
+
+                                egreso.tipoEgreso ===
+                                "venta"
+
+                            ) {
+
+
+                                productos.push({
+
+                                    nombre:
+                                        egreso.productoNombre ||
+                                        "Producto sin nombre",
+
+                                    cantidad:
+                                        egreso.cantidad,
+
+                                    unidad:
+                                        egreso.unidad ||
+                                        "",
+
+                                    lote:
+                                        egreso.lote ||
+                                        ""
+
+                                });
+
+                            }
+
+                        }
+
+                    );
+
+
+
                     /*
-                     * BUSCAR LOS EGRESOS
+                     * Si no encontramos los egresos,
+                     * usamos los productos guardados
+                     * en la visita.
                      */
 
-                    const productosVenta =
-                        ids
+                    if (
 
-                            .map(
-                                id =>
+                        productos.length ===
+                        0 &&
 
-                                    egresosPorId.get(
-                                        id
-                                    )
+                        Array.isArray(
+                            v.productos
+                        )
 
-                            )
+                    ) {
 
-                            .filter(
-                                egreso =>
 
-                                    egreso &&
+                        productos =
+                            v.productos.map(
 
-                                    egreso.tipoEgreso ===
-                                    "venta"
+                                p => ({
 
-                            )
+                                    nombre:
+                                        p.nombre ||
+                                        "Producto sin nombre",
 
-                            .map(
-                                egreso =>
+                                    cantidad:
+                                        p.cantidad,
 
-                                    normalizarProducto({
+                                    unidad:
+                                        p.unidad ||
+                                        "",
 
-                                        nombre:
-                                            egreso.productoNombre,
+                                    lote:
+                                        p.lote ||
+                                        ""
 
-                                        cantidad:
-                                            egreso.cantidad,
-
-                                        unidad:
-                                            egreso.unidad,
-
-                                        lote:
-                                            egreso.lote
-
-                                    })
+                                })
 
                             );
 
+                    }
+
+
+
+                    const fecha =
+                        obtenerFecha(
+                            v
+                        );
+
+
+                    const cliente =
+                        v.clienteNombre ||
+                        v.cliente ||
+                        "Cliente sin nombre";
+
+
+
+                    /* =================================================
+                       CLAVE DE AGRUPACIÓN
+                       ================================================= */
+
+                    let clave;
+
 
 
                     /*
-                     * SI NO ENCUENTRA EGRESOS
-                     *
-                     * usamos lo guardado
-                     * directamente en visitas.
+                     * 1. Si existe ventaId,
+                     * usamos ventaId.
                      */
 
-                    let productosFinal =
-                        productosVenta;
-
-
-
                     if (
-                        productosFinal.length ===
-                        0
+                        v.ventaId
                     ) {
 
-                        if (
-                            Array.isArray(
-                                visita.productos
-                            )
-                        ) {
-
-                            productosFinal =
-                                visita.productos
-                                    .map(
-                                        normalizarProducto
-                                    );
-
-                        } else {
-
-                            productosFinal =
-                                [];
-
-                        }
+                        clave =
+                            "venta-" +
+                            v.ventaId;
 
                     }
 
 
 
                     /*
-                     * UNA SOLA ACTIVIDAD
-                     *
-                     * aunque tenga varios productos.
+                     * 2. Si existe un array
+                     * de egresoId,
+                     * usamos esos IDs.
                      */
 
-                    actividades.push({
+                    else if (
 
-                        id:
-                            docSnap.id,
+                        Array.isArray(
+                            v.egresoId
+                        ) &&
 
-                        origen:
-                            "venta",
+                        v.egresoId.length
 
-                        fecha:
-                            obtenerFecha(
-                                visita
-                            ),
+                    ) {
 
-                        cliente:
-                            visita.clienteNombre ||
 
-                            visita.cliente ||
+                        clave =
+                            "egresos-" +
 
-                            "Cliente sin nombre",
+                            [
+                                ...v.egresoId
+                            ]
 
-                        tipo:
-                            "Venta",
+                                .sort()
 
-                        productos:
-                            productosFinal
+                                .join("-");
 
-                    });
+                    }
+
+
+
+                    /*
+                     * 3. Compatibilidad con
+                     * registros anteriores.
+                     */
+
+                    else {
+
+
+                        const tiempo =
+                            fecha
+
+                                ? Math.floor(
+
+                                    fecha.getTime() /
+                                    60000
+
+                                )
+
+                                : 0;
+
+
+                        clave =
+                            "cliente-" +
+
+                            cliente +
+
+                            "-fecha-" +
+
+                            tiempo;
+
+                    }
+
+
+
+                    /* =================================================
+                       AGRUPAR
+                       ================================================= */
+
+                    if (
+
+                        ventasAgrupadas.has(
+                            clave
+                        )
+
+                    ) {
+
+
+                        const venta =
+                            ventasAgrupadas.get(
+                                clave
+                            );
+
+
+                        /*
+                         * Agregamos productos
+                         * sin repetir cliente,
+                         * fecha ni Venta.
+                         */
+
+                        productos.forEach(
+
+                            producto => {
+
+                                venta.productos.push(
+                                    producto
+                                );
+
+                            }
+
+                        );
+
+
+                        /*
+                         * Conservamos la fecha
+                         * más reciente.
+                         */
+
+                        if (
+
+                            fecha &&
+
+                            (
+
+                                !venta.fecha ||
+
+                                fecha >
+                                venta.fecha
+
+                            )
+
+                        ) {
+
+                            venta.fecha =
+                                fecha;
+
+                        }
+
+                    }
+
+
+                    else {
+
+
+                        ventasAgrupadas.set(
+
+                            clave,
+
+                            {
+
+                                id:
+                                    docSnap.id,
+
+                                origen:
+                                    "venta",
+
+                                fecha,
+
+                                cliente,
+
+                                tipo:
+                                    "Venta",
+
+                                productos
+
+                            }
+
+                        );
+
+                    }
 
 
                     return;
@@ -965,54 +1145,136 @@ async function cargarUltimasActividades() {
 
                     fecha:
                         obtenerFecha(
-                            visita
+                            v
                         ),
 
                     cliente:
-                        visita.cliente ||
-
-                        visita.clienteNombre ||
-
+                        v.cliente ||
+                        v.clienteNombre ||
                         "Cliente sin nombre",
 
                     tipo:
-                        visita.tipoVisita ||
-
+                        v.tipoVisita ||
                         "Sin tipo",
 
                     productos:
                         Array.isArray(
-                            visita.productos
+                            v.productos
                         )
-                            ? visita.productos
-                                .map(
-                                    normalizarProducto
-                                )
-
+                            ? v.productos
                             : []
 
                 });
 
             }
+
         );
 
 
 
         /* ====================================================
-           VENTAS ANTIGUAS / NO AGRUPADAS
+           AGREGAR VENTAS AGRUPADAS
+           ==================================================== */
+
+        ventasAgrupadas.forEach(
+
+            venta => {
+
+                actividades.push(
+                    venta
+                );
+
+            }
+
+        );
+
+
+
+        /* ====================================================
+           IDs RELACIONADOS CON VENTAS
+           ==================================================== */
+
+        const idsRelacionados =
+            new Set();
+
+
+        visitasSnap.forEach(
+
+            docSnap => {
+
+
+                const v =
+                    docSnap.data();
+
+
+                if (
+
+                    v.tipoVisita !==
+                    "Venta"
+
+                ) {
+
+                    return;
+
+                }
+
+
+                let ids =
+                    v.egresoId;
+
+
+                if (
+
+                    !Array.isArray(
+                        ids
+                    )
+
+                ) {
+
+                    ids =
+                        ids
+                            ? [ids]
+                            : [];
+
+                }
+
+
+                ids.forEach(
+
+                    id => {
+
+                        if (id) {
+
+                            idsRelacionados.add(
+                                id
+                            );
+
+                        }
+
+                    }
+
+                );
+
+            }
+
+        );
+
+
+
+        /* ====================================================
+           VENTAS ANTIGUAS SIN VISITA
            ==================================================== */
 
         egresos.forEach(
+
             egreso => {
 
 
-                /*
-                 * Solo ventas.
-                 */
-
                 if (
+
                     egreso.tipoEgreso !==
                     "venta"
+
                 ) {
 
                     return;
@@ -1022,15 +1284,17 @@ async function cargarUltimasActividades() {
 
 
                 /*
-                 * Si ya pertenece
-                 * a una venta agrupada,
-                 * NO mostrar nuevamente.
+                 * Si ya pertenece a una venta
+                 * mostrada anteriormente,
+                 * no lo volvemos a mostrar.
                  */
 
                 if (
-                    egresosVentaAgrupados.has(
+
+                    idsRelacionados.has(
                         egreso.id
                     )
+
                 ) {
 
                     return;
@@ -1040,7 +1304,7 @@ async function cargarUltimasActividades() {
 
 
                 /*
-                 * Venta antigua.
+                 * Venta antigua independiente.
                  */
 
                 actividades.push({
@@ -1058,7 +1322,6 @@ async function cargarUltimasActividades() {
 
                     cliente:
                         egreso.clienteNombre ||
-
                         "Cliente sin nombre",
 
                     tipo:
@@ -1066,71 +1329,88 @@ async function cargarUltimasActividades() {
 
                     productos: [
 
-                        normalizarProducto({
+                        {
 
                             nombre:
-                                egreso.productoNombre,
+                                egreso.productoNombre ||
+                                "Producto sin nombre",
 
                             cantidad:
                                 egreso.cantidad,
 
                             unidad:
-                                egreso.unidad,
+                                egreso.unidad ||
+                                "",
 
                             lote:
-                                egreso.lote
+                                egreso.lote ||
+                                ""
 
-                        })
+                        }
 
                     ]
 
                 });
 
             }
+
         );
 
 
 
         /* ====================================================
-           ORDENAR POR FECHA
+           ORDENAR
            ==================================================== */
 
         actividades.sort(
+
             (
                 a,
                 b
             ) => {
 
+
                 const fechaA =
                     a.fecha
+
                         ? a.fecha.getTime()
+
                         : 0;
 
 
                 const fechaB =
                     b.fecha
+
                         ? b.fecha.getTime()
+
                         : 0;
 
 
                 return (
+
                     fechaB -
+
                     fechaA
+
                 );
 
             }
+
         );
 
 
 
         /* ====================================================
-           ÚLTIMAS 5
+           ÚLTIMAS 5 ACTIVIDADES
            ==================================================== */
 
         const ultimas =
             actividades.slice(
+
                 0,
+
                 5
+
             );
 
 
@@ -1141,13 +1421,17 @@ async function cargarUltimasActividades() {
 
 
         if (
+
             ultimas.length ===
             0
+
         ) {
+
 
             lista.innerHTML =
 
                 "<li>No hay actividades registradas.</li>";
+
 
             return;
 
@@ -1160,6 +1444,7 @@ async function cargarUltimasActividades() {
            ==================================================== */
 
         ultimas.forEach(
+
             actividad => {
 
 
@@ -1175,8 +1460,10 @@ async function cargarUltimasActividades() {
                    ================================================= */
 
                 if (
+
                     actividad.origen ===
                     "venta"
+
                 ) {
 
 
@@ -1186,9 +1473,11 @@ async function cargarUltimasActividades() {
 
 
                     if (
+
                         actividad.productos &&
 
                         actividad.productos.length
+
                     ) {
 
 
@@ -1197,6 +1486,7 @@ async function cargarUltimasActividades() {
                             actividad.productos
 
                                 .map(
+
                                     producto => `
 
                                         <div class="producto-venta">
@@ -1215,12 +1505,11 @@ async function cargarUltimasActividades() {
 
                                                 ⚖️
                                                 ${escaparHTML(
-                                                    producto.cantidad
-                                                        ?? ""
+                                                    producto.cantidad ?? ""
                                                 )}
+
                                                 ${escaparHTML(
-                                                    producto.unidad
-                                                        || ""
+                                                    producto.unidad || ""
                                                 )}
 
                                             </span>
@@ -1230,8 +1519,7 @@ async function cargarUltimasActividades() {
 
                                                 🏷️
                                                 ${escaparHTML(
-                                                    producto.lote
-                                                        || ""
+                                                    producto.lote || ""
                                                 )}
 
                                             </span>
@@ -1239,6 +1527,7 @@ async function cargarUltimasActividades() {
                                         </div>
 
                                     `
+
                                 )
 
                                 .join(
@@ -1252,27 +1541,29 @@ async function cargarUltimasActividades() {
                     li.innerHTML = `
 
                         <strong>
+
                             ${escaparHTML(
                                 actividad.cliente
                             )}
-                        </strong>
 
+                        </strong>
 
                         <br>
 
-
                         <small>
+
                             ${mostrarFecha(
                                 actividad.fecha
                             )}
-                        </small>
 
+                        </small>
 
                         <br>
 
-
                         <span class="tag-visita tag-entrega">
+
                             Venta
+
                         </span>
 
 
@@ -1301,8 +1592,10 @@ async function cargarUltimasActividades() {
 
 
                     if (
+
                         actividad.tipo ===
                         "Visita comercial"
+
                     ) {
 
                         clase +=
@@ -1312,8 +1605,10 @@ async function cargarUltimasActividades() {
 
 
                     else if (
+
                         actividad.tipo ===
                         "Ensayo"
+
                     ) {
 
                         clase +=
@@ -1323,8 +1618,10 @@ async function cargarUltimasActividades() {
 
 
                     else if (
+
                         actividad.tipo ===
                         "Entrega de productos"
+
                     ) {
 
                         clase +=
@@ -1340,9 +1637,11 @@ async function cargarUltimasActividades() {
 
 
                     if (
+
                         actividad.productos &&
 
                         actividad.productos.length
+
                     ) {
 
 
@@ -1351,36 +1650,27 @@ async function cargarUltimasActividades() {
                             actividad.productos
 
                                 .map(
-                                    producto => `
 
-                                        <div class="producto-visita">
+                                    p => `
 
-                                            📦
-                                            ${escaparHTML(
-                                                producto.nombre
-                                            )}
+                                        📦
+                                        ${escaparHTML(
+                                            p.nombre
+                                        )}
 
-                                            ${
-                                                producto.cantidad !==
-                                                "" &&
-                                                producto.cantidad !==
-                                                null &&
-                                                producto.cantidad !==
-                                                undefined
+                                        ${
+                                            p.cantidad
 
-                                                    ? `(${escaparHTML(
-                                                        producto.cantidad
-                                                    )} ${escaparHTML(
-                                                        producto.unidad ||
-                                                        ""
-                                                    )})`
+                                                ? `(${escaparHTML(
+                                                    p.cantidad
+                                                )})`
 
-                                                    : ""
-                                            }
+                                                : ""
 
-                                        </div>
+                                        }
 
                                     `
+
                                 )
 
                                 .join(
@@ -1394,33 +1684,32 @@ async function cargarUltimasActividades() {
                     li.innerHTML = `
 
                         <strong>
+
                             ${escaparHTML(
                                 actividad.cliente
                             )}
-                        </strong>
 
+                        </strong>
 
                         <br>
 
-
                         <small>
+
                             ${mostrarFecha(
                                 actividad.fecha
                             )}
-                        </small>
 
+                        </small>
 
                         <br>
 
+                        <span class="${clase}">
 
-                        <span
-                            class="${clase}"
-                        >
                             ${escaparHTML(
                                 actividad.tipo
                             )}
-                        </span>
 
+                        </span>
 
                         ${
                             productosHTML
@@ -1450,19 +1739,21 @@ async function cargarUltimasActividades() {
                 );
 
             }
-        );
 
+        );
 
     }
 
-    catch (
-        error
-    ) {
+
+    catch (error) {
 
 
         console.error(
+
             "Error cargando actividades:",
+
             error
+
         );
 
 
@@ -1471,13 +1762,17 @@ async function cargarUltimasActividades() {
             <li>
 
                 <strong>
+
                     No se pudieron cargar las actividades.
+
                 </strong>
 
                 <br>
 
                 <small>
-                    Revisá la consola para ver el error.
+
+                    Revisá la consola para más información.
+
                 </small>
 
             </li>
@@ -1491,7 +1786,7 @@ async function cargarUltimasActividades() {
 
 
 /* ============================================================
-   INICIAR ACTIVIDADES
+   INICIAR
    ============================================================ */
 
 cargarUltimasActividades();
@@ -1502,35 +1797,29 @@ cargarUltimasActividades();
    HISTORIAL COMPLETO
    ============================================================ */
 
-const botonHistorial =
-    document.getElementById(
+document
+
+    .getElementById(
         "abrir-historial"
-    );
+    )
+
+    .onclick = event => {
 
 
-if (
-    botonHistorial
-) {
-
-    botonHistorial.onclick =
-        event => {
-
-            event.preventDefault();
+        event.preventDefault();
 
 
-            window.open(
+        window.open(
 
-                "historial.html",
+            "historial.html",
 
-                "historial",
+            "historial",
 
-                "width=420,height=700"
+            "width=420,height=700"
 
-            );
+        );
 
-        };
-
-}
+    };
 
 
 </script>
