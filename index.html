@@ -528,18 +528,30 @@ async function cargarUltimasActividades() {
                  * exactamente igual.
                  */
 
-                if (
-                    v.tipoVisita === "Venta" &&
-                    v.egresoId &&
-                    idsEgresosVenta.has(
-                        v.egresoId
-                    )
-                ) {
+            
+if (
+    v.tipoVisita === "Venta" &&
+    v.egresoId
+) {
 
-                    return;
+    const egresosRelacionados =
+        Array.isArray(v.egresoId)
+            ? v.egresoId
+            : [v.egresoId];
 
-                }
+    const esVentaYaRegistrada =
+        egresosRelacionados.some(
+            id =>
+                idsEgresosVenta.has(id)
+        );
 
+    if (esVentaYaRegistrada) {
+
+        return;
+
+    }
+
+}
 
 
                 const fecha =
