@@ -1563,7 +1563,6 @@ function colocarFechaActual() {
 
 
 /*
-/*
 ************************************************************
 * RESUMEN
 ************************************************************
@@ -1571,114 +1570,172 @@ function colocarFechaActual() {
 
 function actualizarResumen() {
 
-    if (!listaResumenEgreso) {
+    if (
+        !listaResumenEgreso
+    ) {
+
         return;
+
     }
 
-    listaResumenEgreso.innerHTML = "";
 
-    const articulos = obtenerArticulos();
+    listaResumenEgreso.innerHTML =
+        "";
 
-    let hayDatos = false;
 
-    articulos.forEach((articulo) => {
+    const articulos =
+        obtenerArticulos();
 
-        const buscador =
-            articulo.querySelector(".productoBuscador");
 
-        const lote =
-            articulo.querySelector(".lote");
+    let hayDatos =
+        false;
 
-        const cantidad =
-            articulo.querySelector(".cantidad");
 
-        const observacion =
-            articulo.querySelector(".observacion");
+    articulos.forEach(
+        (
+            articulo,
+            indice
+        ) => {
 
-        const producto =
-            buscador?.value.trim() || "";
+            const buscador =
+                articulo.querySelector(
+                    ".productoBuscador"
+                );
 
-        const loteTexto =
-            lote?.options[
-                lote.selectedIndex
-            ]?.textContent || "";
 
-        const cantidadTexto =
-            cantidad?.value || "";
+            const lote =
+                articulo.querySelector(
+                    ".lote"
+                );
 
-        const observacionTexto =
-            observacion?.value.trim() || "";
 
-        if (
-            producto ||
-            loteTexto ||
-            cantidadTexto ||
-            observacionTexto
-        ) {
+            const ubicacion =
+                articulo.querySelector(
+                    ".ubicacion"
+                );
 
-            hayDatos = true;
 
-            const fila =
-                document.createElement("div");
+            const cantidad =
+                articulo.querySelector(
+                    ".cantidad"
+                );
 
-            fila.className =
-                "item-resumen-egreso";
 
-            fila.innerHTML = `
+            const observacion =
+                articulo.querySelector(
+                    ".observacion"
+                );
 
-                <div class="resumen-producto">
+
+            const producto =
+                buscador?.value.trim() ||
+                "";
+
+
+            const loteTexto =
+                lote?.options[
+                    lote.selectedIndex
+                ]?.textContent ||
+                "";
+
+
+            const ubicacionTexto =
+                ubicacion?.options[
+                    ubicacion.selectedIndex
+                ]?.textContent ||
+                "";
+
+
+            const cantidadTexto =
+                cantidad?.value ||
+                "";
+
+
+            const observacionTexto =
+                observacion?.value.trim() ||
+                "";
+
+
+            if (
+                producto ||
+                loteTexto ||
+                cantidadTexto
+            ) {
+
+                hayDatos =
+                    true;
+
+
+                const fila =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                fila.className =
+                    "item-resumen-egreso";
+
+
+                fila.innerHTML = `
 
                     <strong>
                         ${escaparHTML(
-                            producto || "Producto"
+                            producto ||
+                            "Producto"
                         )}
                     </strong>
 
-                </div>
+                    <span>
+                        ${
+                            loteTexto
+                                ? `Lote: ${escaparHTML(loteTexto)}`
+                                : ""
+                        }
+                    </span>
 
+                    <span>
+                        ${
+                            ubicacionTexto
+                                ? `Ubicación: ${escaparHTML(ubicacionTexto)}`
+                                : ""
+                        }
+                    </span>
 
-                <div class="resumen-cantidad">
-
-                    ${
-                        cantidadTexto
-                            ? escaparHTML(cantidadTexto)
-                            : ""
-                    }
-
-                </div>
-
-
-                <div class="resumen-lote">
-
-                    ${
-                        loteTexto
-                            ? escaparHTML(loteTexto)
-                            : ""
-                    }
-
-                </div>
-
-
-                <div class="resumen-observacion">
+                    <span>
+                        ${
+                            cantidadTexto
+                                ? `Cantidad: ${escaparHTML(cantidadTexto)}`
+                                : ""
+                        }
+                    </span>
 
                     ${
                         observacionTexto
-                            ? escaparHTML(observacionTexto)
+                            ? `
+                                <span>
+                                    Observación:
+                                    ${escaparHTML(observacionTexto)}
+                                </span>
+                              `
                             : ""
                     }
 
-                </div>
+                `;
 
-            `;
 
-            listaResumenEgreso.appendChild(fila);
+                listaResumenEgreso.appendChild(
+                    fila
+                );
+
+            }
 
         }
+    );
 
-    });
 
-
-    if (!hayDatos) {
+    if (
+        !hayDatos
+    ) {
 
         listaResumenEgreso.innerHTML = `
             <p>
@@ -1689,6 +1746,9 @@ function actualizarResumen() {
     }
 
 }
+
+
+/*
 ************************************************************
 * ESCAPAR HTML
 ************************************************************
