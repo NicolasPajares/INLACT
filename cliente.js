@@ -324,21 +324,11 @@ document.addEventListener("DOMContentLoaded", async () => {
      * ORDEN NATURAL DE PRODUCTOS
      * ============================================================
      *
-     * Ejemplo:
-     *
      * FAST 01
      * FAST 02
-     * FAST 03
      * FAST 10
      *
-     * en lugar de:
-     *
-     * FAST 01
-     * FAST 10
-     * FAST 02
-     *
-     * También funciona con nombres que tengan
-     * números en distintas posiciones.
+     * El número se interpreta correctamente.
      * ============================================================
      */
 
@@ -369,7 +359,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /*
      * ============================================================
-     * FORMATEAR FECHA DE VISITA
+     * FECHA VISITA
      * ============================================================
      */
 
@@ -412,7 +402,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /*
      * ============================================================
-     * FORMATEAR FECHA DE VENTA
+     * FECHA VENTA
      * ============================================================
      */
 
@@ -574,7 +564,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * HISTORIAL GENERAL
+             * HISTORIAL
              * ==================================================
              */
 
@@ -596,10 +586,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     /*
-                     * Las ventas no se toman
-                     * desde visitas.
-                     *
-                     * Se toman desde egresos.
+                     * La venta se toma
+                     * solamente desde EGRESOS.
                      */
 
                     if (
@@ -639,7 +627,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * EGRESOS / VENTAS
+             * VENTAS
              * ==================================================
              */
 
@@ -676,7 +664,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                             docSnap.id,
 
                         fecha:
-
                             e.fecha ||
                             null,
 
@@ -697,11 +684,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             /*
              * ==================================================
              * AGRUPAR VENTAS POR FECHA
-             * ==================================================
-             *
-             * Todos los productos vendidos
-             * al mismo cliente en la misma fecha
-             * aparecen dentro de una sola venta.
              * ==================================================
              */
 
@@ -786,12 +768,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
 
 
-                    /*
-                     * Si encontramos una venta
-                     * con una fecha más precisa,
-                     * conservamos esa fecha.
-                     */
-
                     if (
                         venta.fechaOrden >
                         grupo.fechaOrden
@@ -808,16 +784,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * AGREGAR VENTAS AGRUPADAS
+             * AGREGAR VENTAS
              * ==================================================
              */
 
             ventasAgrupadas.forEach(
                 grupo => {
-
-                    /*
-                     * ORDEN ALFABÉTICO + NUMÉRICO
-                     */
 
                     grupo.productos.sort(
                         compararProductos
@@ -835,9 +807,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             /*
              * ==================================================
              * ORDENAR HISTORIAL
-             * ==================================================
-             *
-             * Lo más reciente primero.
              * ==================================================
              */
 
@@ -873,7 +842,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * MOSTRAR HISTORIAL
+             * MOSTRAR
              * ==================================================
              */
 
@@ -901,12 +870,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                             );
 
 
-                        const fechaTexto =
-                            mostrarFecha(
-                                fecha
-                            );
-
-
                         const tipo =
                             v.tipoVisita ||
                             "Visita comercial";
@@ -926,7 +889,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         }
 
-
                         else if (
                             tipo ===
                             "Ensayo"
@@ -936,7 +898,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                                 "ensayo";
 
                         }
-
 
                         else if (
                             tipo ===
@@ -1015,7 +976,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                             <div class="fecha">
 
-                                ${fechaTexto}
+                                ${mostrarFecha(
+                                    fecha
+                                )}
 
                             </div>
 
@@ -1057,10 +1020,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                         /*
-                         * Orden natural:
-                         * FAST 01
-                         * FAST 02
-                         * FAST 03
+                         * ORDEN ALFABÉTICO
+                         * + NUMÉRICO
                          */
 
                         productos.sort(
@@ -1068,44 +1029,62 @@ document.addEventListener("DOMContentLoaded", async () => {
                         );
 
 
+                        /*
+                         * ==================================================
+                         * IMPORTANTE:
+                         *
+                         * Cada producto es UNA SOLA FILA.
+                         *
+                         * PC:
+                         * Producto | Cantidad | Lote
+                         *
+                         * Celular:
+                         * el CSS podrá apilar las columnas.
+                         * ==================================================
+                         */
+
                         const productosHTML =
                             productos
                                 .map(
                                     producto => `
 
-                                        <div class="producto">
+                                        <div class="producto-venta">
 
-                                            📦
-                                            ${String(
-                                                producto.nombre ||
-                                                "Producto sin nombre"
-                                            )}
+                                            <span class="col-producto">
 
-                                        </div>
+                                                📦
+                                                ${String(
+                                                    producto.nombre ||
+                                                    "Producto sin nombre"
+                                                )}
 
-
-                                        <div class="producto">
-
-                                            ⚖️
-                                            ${String(
-                                                producto.cantidad ??
-                                                ""
-                                            )}
-                                            ${String(
-                                                producto.unidad ||
-                                                ""
-                                            )}
-
-                                        </div>
+                                            </span>
 
 
-                                        <div class="producto">
+                                            <span class="col-cantidad">
 
-                                            🏷️
-                                            ${String(
-                                                producto.lote ||
-                                                ""
-                                            )}
+                                                ⚖️
+                                                ${String(
+                                                    producto.cantidad ??
+                                                    ""
+                                                )}
+                                                ${String(
+                                                    producto.unidad ||
+                                                    ""
+                                                )}
+
+                                            </span>
+
+
+                                            <span class="col-lote">
+
+                                                🏷️
+                                                ${String(
+                                                    producto.lote ||
+                                                    ""
+                                                )}
+
+                                            </span>
 
                                         </div>
 
@@ -1117,10 +1096,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                         /*
-                         * La venta mantiene
-                         * el color verde.
-                         *
-                         * SIN emoji en el título.
+                         * VENTA EN VERDE
+                         * SIN EMOJI EN EL TÍTULO
                          */
 
                         const div =
