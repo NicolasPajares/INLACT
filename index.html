@@ -56,7 +56,9 @@
 <main>
 
 
-<!-- ACCESOS RÁPIDOS -->
+<!-- =========================================================
+     ACCESOS RÁPIDOS
+     ========================================================= -->
 
 <section class="quick-actions">
 
@@ -65,7 +67,10 @@
         class="action-card"
     >
 
-        <img src="img/icon-clientes.svg">
+        <img
+            src="img/icon-clientes.svg"
+            alt="Clientes"
+        >
 
         <span>Clientes</span>
 
@@ -77,7 +82,10 @@
         class="action-card"
     >
 
-        <img src="img/icon-stock.svg">
+        <img
+            src="img/icon-stock.svg"
+            alt="Stock"
+        >
 
         <span>Stock</span>
 
@@ -89,7 +97,10 @@
         class="action-card"
     >
 
-        <img src="img/icon-ensayos.svg">
+        <img
+            src="img/icon-ensayos.svg"
+            alt="Ensayos"
+        >
 
         <span>Ensayos</span>
 
@@ -101,7 +112,10 @@
         class="action-card"
     >
 
-        <img src="img/icon-precios.svg">
+        <img
+            src="img/icon-precios.svg"
+            alt="Precios"
+        >
 
         <span>Precios</span>
 
@@ -111,7 +125,9 @@
 
 
 
-<!-- MAPA -->
+<!-- =========================================================
+     MAPA
+     ========================================================= -->
 
 <section class="card">
 
@@ -123,7 +139,9 @@
 
 
 
-<!-- VISITAS CERCANAS -->
+<!-- =========================================================
+     VISITAS CERCANAS
+     ========================================================= -->
 
 <section class="card">
 
@@ -142,7 +160,9 @@
 
 
 
-<!-- ÚLTIMAS VISITAS -->
+<!-- =========================================================
+     ÚLTIMAS VISITAS
+     ========================================================= -->
 
 <section class="card">
 
@@ -164,6 +184,10 @@
 
 
 
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
 <footer>
 
     <p>
@@ -180,7 +204,9 @@
 
 
 
-<!-- Leaflet -->
+<!-- =========================================================
+     LEAFLET
+     ========================================================= -->
 
 <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -188,7 +214,9 @@
 
 
 
-<!-- App principal -->
+<!-- =========================================================
+     APP PRINCIPAL
+     ========================================================= -->
 
 <script
     type="module"
@@ -197,16 +225,22 @@
 
 
 
-<!-- ============================================================
+<!-- =========================================================
      ÚLTIMAS ACTIVIDADES
+     
      VISITAS + ENSAYOS + VENTAS
-     ============================================================ -->
+     ========================================================= -->
 
 <script type="module">
 
 
+/* ============================================================
+   FIREBASE
+   ============================================================ */
+
 import {
-    initializeApp
+    getApp,
+    getApps
 }
 from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -222,47 +256,56 @@ from
 
 
 
-/* ============================================================
-   FIREBASE
-   ============================================================ */
+/*
+ * app.js ya inicializa Firebase.
+ *
+ * Por eso NO volvemos a ejecutar initializeApp().
+ *
+ * Si app.js ya creó la aplicación:
+ *     usamos esa misma.
+ *
+ * Si por algún motivo todavía no existe:
+ *     esperamos unos milisegundos y volvemos a intentar.
+ */
+
+let app = null;
+
+let db = null;
 
 
-const firebaseConfig = {
 
-    apiKey:
-        "AIzaSyCpCO82XE8I990mW4Fe8EVwmUOAeLZdv4",
+function obtenerFirebase() {
 
-    authDomain:
-        "inlact.firebaseapp.com",
-
-    projectId:
-        "inlact",
-
-    storageBucket:
-        "inlact.appspot.com",
-
-    messagingSenderId:
-        "143868382036",
-
-    appId:
-        "1:143868382036:web:b5af0e4faced7e880216c1"
-
-};
+    const apps =
+        getApps();
 
 
-const app =
-    initializeApp(firebaseConfig);
+    if (
+        apps.length > 0
+    ) {
+
+        app =
+            getApp();
+
+        db =
+            getFirestore(
+                app
+            );
+
+        return true;
+
+    }
 
 
-const db =
-    getFirestore(app);
+    return false;
+
+}
 
 
 
 /* ============================================================
    ELEMENTO
    ============================================================ */
-
 
 const lista =
     document.getElementById(
@@ -274,7 +317,6 @@ const lista =
 /* ============================================================
    ESCAPAR HTML
    ============================================================ */
-
 
 function escaparHTML(
     texto
@@ -317,20 +359,19 @@ function escaparHTML(
    FECHA
    ============================================================ */
 
-
 function obtenerFecha(
     item
 ) {
 
 
     /*
-     * VISITAS
-     * Firebase Timestamp
+     * FIREBASE TIMESTAMP
      */
 
     if (
         item.fecha &&
-        typeof item.fecha.toDate === "function"
+        typeof item.fecha.toDate ===
+            "function"
     ) {
 
         return item.fecha.toDate();
@@ -340,13 +381,15 @@ function obtenerFecha(
 
 
     /*
-     * EGRESOS
-     * YYYY-MM-DD
+     * FECHA YYYY-MM-DD
      */
 
     if (
-        typeof item.fecha === "string" &&
-        item.fecha.trim() !== ""
+        typeof item.fecha ===
+            "string" &&
+
+        item.fecha.trim() !==
+            ""
     ) {
 
         const partes =
@@ -354,7 +397,8 @@ function obtenerFecha(
 
 
         if (
-            partes.length === 3
+            partes.length ===
+            3
         ) {
 
             const año =
@@ -410,9 +454,8 @@ function obtenerFecha(
 
 
 /* ============================================================
-   FORMATEAR FECHA
+   MOSTRAR FECHA
    ============================================================ */
-
 
 function mostrarFecha(
     fecha
@@ -454,9 +497,71 @@ function mostrarFecha(
 
 
 /* ============================================================
-   CARGAR ACTIVIDADES
+   NORMALIZAR PRODUCTOS
    ============================================================ */
 
+function normalizarProducto(
+    producto
+) {
+
+    if (
+        !producto
+    ) {
+
+        return {
+
+            nombre:
+                "Producto sin nombre",
+
+            cantidad:
+                "",
+
+            unidad:
+                "",
+
+            lote:
+                ""
+
+        };
+
+    }
+
+
+    return {
+
+        nombre:
+            producto.nombre ||
+
+            producto.productoNombre ||
+
+            producto.descripcion ||
+
+            "Producto sin nombre",
+
+
+        cantidad:
+            producto.cantidad ??
+            "",
+
+
+        unidad:
+            producto.unidad ||
+            "",
+
+
+        lote:
+            producto.lote ||
+            ""
+
+    };
+
+}
+
+
+
+/* ============================================================
+   CARGAR ACTIVIDADES
+   ============================================================ */
 
 async function cargarUltimasActividades() {
 
@@ -465,15 +570,35 @@ async function cargarUltimasActividades() {
         "<li>Cargando...</li>";
 
 
+    /*
+     * Firebase debe estar disponible
+     */
+
+    if (
+        !obtenerFirebase()
+    ) {
+
+        /*
+         * app.js todavía puede estar
+         * terminando de inicializar.
+         */
+
+        setTimeout(
+            cargarUltimasActividades,
+            200
+        );
+
+        return;
+
+    }
+
+
     try {
 
 
-        /*
-         * Cargamos:
-         *
-         * visitas
-         * egresos
-         */
+        /* ====================================================
+           CARGAR VISITAS Y EGRESOS
+           ==================================================== */
 
         const [
             visitasSnap,
@@ -497,11 +622,13 @@ async function cargarUltimasActividades() {
         ]);
 
 
+
         /* ====================================================
            GUARDAR EGRESOS
            ==================================================== */
 
-        const egresos = [];
+        const egresos =
+            [];
 
 
         egresosSnap.forEach(
@@ -520,6 +647,7 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
            MAPA DE EGRESOS
            ==================================================== */
@@ -532,20 +660,25 @@ async function cargarUltimasActividades() {
             egreso => {
 
                 egresosPorId.set(
+
                     egreso.id,
+
                     egreso
+
                 );
 
             }
         );
 
 
+
         /* ====================================================
-           IDENTIFICAR VENTAS AGRUPADAS
+           EGRESOS QUE PERTENECEN A VENTAS AGRUPADAS
            ==================================================== */
 
         const egresosVentaAgrupados =
             new Set();
+
 
 
         visitasSnap.forEach(
@@ -569,16 +702,19 @@ async function cargarUltimasActividades() {
                     visita.egresoId;
 
 
+
                 /*
-                 * El egreso-stock.js actual
-                 * guarda egresoId como ARRAY.
+                 * Las ventas nuevas
+                 * tienen egresoId como ARRAY.
                  *
-                 * También soportamos el formato
-                 * anterior donde era un solo ID.
+                 * Las antiguas pueden tener
+                 * un solo ID.
                  */
 
                 if (
-                    !Array.isArray(ids)
+                    !Array.isArray(
+                        ids
+                    )
                 ) {
 
                     if (
@@ -596,6 +732,7 @@ async function cargarUltimasActividades() {
                     }
 
                 }
+
 
 
                 ids.forEach(
@@ -618,11 +755,14 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
            ACTIVIDADES
            ==================================================== */
 
-        const actividades = [];
+        const actividades =
+            [];
+
 
 
         /* ====================================================
@@ -632,8 +772,9 @@ async function cargarUltimasActividades() {
         visitasSnap.forEach(
             docSnap => {
 
-                const v =
+                const visita =
                     docSnap.data();
+
 
 
                 /* =================================================
@@ -641,16 +782,25 @@ async function cargarUltimasActividades() {
                    ================================================= */
 
                 if (
-                    v.tipoVisita ===
+                    visita.tipoVisita ===
                     "Venta"
                 ) {
 
-                    let ids =
-                        v.egresoId;
 
+                    let ids =
+                        visita.egresoId;
+
+
+
+                    /*
+                     * Convertir ID individual
+                     * en array si hace falta.
+                     */
 
                     if (
-                        !Array.isArray(ids)
+                        !Array.isArray(
+                            ids
+                        )
                     ) {
 
                         if (
@@ -670,9 +820,9 @@ async function cargarUltimasActividades() {
                     }
 
 
+
                     /*
-                     * Buscamos todos los egresos
-                     * que pertenecen a esta venta.
+                     * BUSCAR LOS EGRESOS
                      */
 
                     const productosVenta =
@@ -680,80 +830,90 @@ async function cargarUltimasActividades() {
 
                             .map(
                                 id =>
+
                                     egresosPorId.get(
                                         id
                                     )
+
                             )
 
                             .filter(
                                 egreso =>
+
                                     egreso &&
+
                                     egreso.tipoEgreso ===
                                     "venta"
+
                             )
 
                             .map(
-                                egreso => ({
+                                egreso =>
 
-                                    nombre:
-                                        egreso.productoNombre ||
-                                        "Producto sin nombre",
+                                    normalizarProducto({
 
-                                    cantidad:
-                                        egreso.cantidad,
+                                        nombre:
+                                            egreso.productoNombre,
 
-                                    unidad:
-                                        egreso.unidad ||
-                                        "",
+                                        cantidad:
+                                            egreso.cantidad,
 
-                                    lote:
-                                        egreso.lote ||
-                                        ""
+                                        unidad:
+                                            egreso.unidad,
 
-                                })
+                                        lote:
+                                            egreso.lote
+
+                                    })
+
                             );
 
 
+
                     /*
-                     * Si no encontramos los egresos,
-                     * usamos los productos guardados
+                     * SI NO ENCUENTRA EGRESOS
+                     *
+                     * usamos lo guardado
                      * directamente en visitas.
                      */
 
-                    const productosFinal =
-                        productosVenta.length
-                            ? productosVenta
-                            : (
-                                Array.isArray(
-                                    v.productos
-                                )
-                                    ? v.productos.map(
-                                        p => ({
+                    let productosFinal =
+                        productosVenta;
 
-                                            nombre:
-                                                p.nombre ||
-                                                "Producto sin nombre",
 
-                                            cantidad:
-                                                p.cantidad,
 
-                                            unidad:
-                                                p.unidad ||
-                                                "",
+                    if (
+                        productosFinal.length ===
+                        0
+                    ) {
 
-                                            lote:
-                                                p.lote ||
-                                                ""
+                        if (
+                            Array.isArray(
+                                visita.productos
+                            )
+                        ) {
 
-                                        })
-                                    )
-                                    : []
-                            );
+                            productosFinal =
+                                visita.productos
+                                    .map(
+                                        normalizarProducto
+                                    );
+
+                        } else {
+
+                            productosFinal =
+                                [];
+
+                        }
+
+                    }
+
 
 
                     /*
-                     * Una sola actividad
-                     * para toda la venta.
+                     * UNA SOLA ACTIVIDAD
+                     *
+                     * aunque tenga varios productos.
                      */
 
                     actividades.push({
@@ -766,12 +926,14 @@ async function cargarUltimasActividades() {
 
                         fecha:
                             obtenerFecha(
-                                v
+                                visita
                             ),
 
                         cliente:
-                            v.clienteNombre ||
-                            v.cliente ||
+                            visita.clienteNombre ||
+
+                            visita.cliente ||
+
                             "Cliente sin nombre",
 
                         tipo:
@@ -788,8 +950,9 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 /* =================================================
-                   VISITAS NORMALES
+                   VISITA NORMAL
                    ================================================= */
 
                 actividades.push({
@@ -802,23 +965,30 @@ async function cargarUltimasActividades() {
 
                     fecha:
                         obtenerFecha(
-                            v
+                            visita
                         ),
 
                     cliente:
-                        v.cliente ||
-                        v.clienteNombre ||
+                        visita.cliente ||
+
+                        visita.clienteNombre ||
+
                         "Cliente sin nombre",
 
                     tipo:
-                        v.tipoVisita ||
+                        visita.tipoVisita ||
+
                         "Sin tipo",
 
                     productos:
                         Array.isArray(
-                            v.productos
+                            visita.productos
                         )
-                            ? v.productos
+                            ? visita.productos
+                                .map(
+                                    normalizarProducto
+                                )
+
                             : []
 
                 });
@@ -827,12 +997,18 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
-           EGRESOS DE VENTA NO AGRUPADOS
+           VENTAS ANTIGUAS / NO AGRUPADAS
            ==================================================== */
 
         egresos.forEach(
             egreso => {
+
+
+                /*
+                 * Solo ventas.
+                 */
 
                 if (
                     egreso.tipoEgreso !==
@@ -844,9 +1020,11 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 /*
-                 * Si ya pertenece a una venta
-                 * agrupada, no lo mostramos otra vez.
+                 * Si ya pertenece
+                 * a una venta agrupada,
+                 * NO mostrar nuevamente.
                  */
 
                 if (
@@ -860,9 +1038,9 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 /*
-                 * Ventas antiguas que no tienen
-                 * visita asociada.
+                 * Venta antigua.
                  */
 
                 actividades.push({
@@ -880,6 +1058,7 @@ async function cargarUltimasActividades() {
 
                     cliente:
                         egreso.clienteNombre ||
+
                         "Cliente sin nombre",
 
                     tipo:
@@ -887,24 +1066,21 @@ async function cargarUltimasActividades() {
 
                     productos: [
 
-                        {
+                        normalizarProducto({
 
                             nombre:
-                                egreso.productoNombre ||
-                                "Producto sin nombre",
+                                egreso.productoNombre,
 
                             cantidad:
                                 egreso.cantidad,
 
                             unidad:
-                                egreso.unidad ||
-                                "",
+                                egreso.unidad,
 
                             lote:
-                                egreso.lote ||
-                                ""
+                                egreso.lote
 
-                        }
+                        })
 
                     ]
 
@@ -912,6 +1088,7 @@ async function cargarUltimasActividades() {
 
             }
         );
+
 
 
         /* ====================================================
@@ -945,8 +1122,9 @@ async function cargarUltimasActividades() {
         );
 
 
+
         /* ====================================================
-           MOSTRAR ÚLTIMAS 5
+           ÚLTIMAS 5
            ==================================================== */
 
         const ultimas =
@@ -956,15 +1134,19 @@ async function cargarUltimasActividades() {
             );
 
 
+
         lista.innerHTML =
             "";
 
 
+
         if (
-            ultimas.length === 0
+            ultimas.length ===
+            0
         ) {
 
             lista.innerHTML =
+
                 "<li>No hay actividades registradas.</li>";
 
             return;
@@ -972,17 +1154,20 @@ async function cargarUltimasActividades() {
         }
 
 
+
         /* ====================================================
-           MOSTRAR
+           MOSTRAR ACTIVIDADES
            ==================================================== */
 
         ultimas.forEach(
             actividad => {
 
+
                 const li =
                     document.createElement(
                         "li"
                     );
+
 
 
                 /* =================================================
@@ -994,17 +1179,23 @@ async function cargarUltimasActividades() {
                     "venta"
                 ) {
 
+
                     let productosHTML =
                         "";
 
 
+
                     if (
                         actividad.productos &&
+
                         actividad.productos.length
                     ) {
 
+
                         productosHTML =
+
                             actividad.productos
+
                                 .map(
                                     producto => `
 
@@ -1024,10 +1215,12 @@ async function cargarUltimasActividades() {
 
                                                 ⚖️
                                                 ${escaparHTML(
-                                                    producto.cantidad ?? ""
+                                                    producto.cantidad
+                                                        ?? ""
                                                 )}
                                                 ${escaparHTML(
-                                                    producto.unidad || ""
+                                                    producto.unidad
+                                                        || ""
                                                 )}
 
                                             </span>
@@ -1037,7 +1230,8 @@ async function cargarUltimasActividades() {
 
                                                 🏷️
                                                 ${escaparHTML(
-                                                    producto.lote || ""
+                                                    producto.lote
+                                                        || ""
                                                 )}
 
                                             </span>
@@ -1046,11 +1240,13 @@ async function cargarUltimasActividades() {
 
                                     `
                                 )
+
                                 .join(
                                     ""
                                 );
 
                     }
+
 
 
                     li.innerHTML = `
@@ -1061,7 +1257,9 @@ async function cargarUltimasActividades() {
                             )}
                         </strong>
 
+
                         <br>
+
 
                         <small>
                             ${mostrarFecha(
@@ -1069,7 +1267,9 @@ async function cargarUltimasActividades() {
                             )}
                         </small>
 
+
                         <br>
+
 
                         <span class="tag-visita tag-entrega">
                             Venta
@@ -1087,14 +1287,17 @@ async function cargarUltimasActividades() {
                 }
 
 
+
                 /* =================================================
                    VISITA / ENSAYO
                    ================================================= */
 
                 else {
 
+
                     let clase =
                         "tag-visita";
+
 
 
                     if (
@@ -1130,32 +1333,52 @@ async function cargarUltimasActividades() {
                     }
 
 
+
                     let productosHTML =
                         "";
 
 
+
                     if (
                         actividad.productos &&
+
                         actividad.productos.length
                     ) {
 
+
                         productosHTML =
+
                             actividad.productos
 
                                 .map(
-                                    p => `
+                                    producto => `
 
-                                        📦
-                                        ${escaparHTML(
-                                            p.nombre ||
-                                            "Producto sin nombre"
-                                        )}
+                                        <div class="producto-visita">
 
-                                        ${
-                                            p.cantidad
-                                                ? `(${escaparHTML(p.cantidad)})`
-                                                : ""
-                                        }
+                                            📦
+                                            ${escaparHTML(
+                                                producto.nombre
+                                            )}
+
+                                            ${
+                                                producto.cantidad !==
+                                                "" &&
+                                                producto.cantidad !==
+                                                null &&
+                                                producto.cantidad !==
+                                                undefined
+
+                                                    ? `(${escaparHTML(
+                                                        producto.cantidad
+                                                    )} ${escaparHTML(
+                                                        producto.unidad ||
+                                                        ""
+                                                    )})`
+
+                                                    : ""
+                                            }
+
+                                        </div>
 
                                     `
                                 )
@@ -1167,6 +1390,7 @@ async function cargarUltimasActividades() {
                     }
 
 
+
                     li.innerHTML = `
 
                         <strong>
@@ -1175,7 +1399,9 @@ async function cargarUltimasActividades() {
                             )}
                         </strong>
 
+
                         <br>
+
 
                         <small>
                             ${mostrarFecha(
@@ -1183,28 +1409,40 @@ async function cargarUltimasActividades() {
                             )}
                         </small>
 
+
                         <br>
 
+
                         <span
-                            class="${clase}">
+                            class="${clase}"
+                        >
                             ${escaparHTML(
                                 actividad.tipo
                             )}
                         </span>
 
+
                         ${
                             productosHTML
+
                                 ? `
+
                                     <div class="productos">
+
                                         ${productosHTML}
+
                                     </div>
+
                                   `
+
                                 : ""
+
                         }
 
                     `;
 
                 }
+
 
 
                 lista.appendChild(
@@ -1217,10 +1455,10 @@ async function cargarUltimasActividades() {
 
     }
 
-
     catch (
         error
     ) {
+
 
         console.error(
             "Error cargando actividades:",
@@ -1236,6 +1474,12 @@ async function cargarUltimasActividades() {
                     No se pudieron cargar las actividades.
                 </strong>
 
+                <br>
+
+                <small>
+                    Revisá la consola para ver el error.
+                </small>
+
             </li>
 
         `;
@@ -1247,9 +1491,8 @@ async function cargarUltimasActividades() {
 
 
 /* ============================================================
-   INICIAR
+   INICIAR ACTIVIDADES
    ============================================================ */
-
 
 cargarUltimasActividades();
 
@@ -1259,24 +1502,40 @@ cargarUltimasActividades();
    HISTORIAL COMPLETO
    ============================================================ */
 
-
-document
-    .getElementById(
+const botonHistorial =
+    document.getElementById(
         "abrir-historial"
-    )
-    .onclick = event => {
+    );
 
 
-        event.preventDefault();
+if (
+    botonHistorial
+) {
+
+    botonHistorial.onclick =
+        event => {
+
+            event.preventDefault();
 
 
-        window.open(
-            "historial.html",
-            "historial",
-            "width=420,height=700"
-        );
+            window.open(
 
-    };
+                "historial.html",
+
+                "historial",
+
+                "width=420,height=700"
+
+            );
+
+        };
+
+}
 
 
 </script>
+
+
+</body>
+
+</html>
