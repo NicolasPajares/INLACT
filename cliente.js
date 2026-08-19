@@ -211,9 +211,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             emailInput,
             observacionesInput
 
-        ].forEach(i => {
+        ].forEach(input => {
 
-            i.hidden = !editable;
+            input.hidden = !editable;
 
         });
 
@@ -225,9 +225,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             emailTxt,
             observacionesTxt
 
-        ].forEach(t => {
+        ].forEach(texto => {
 
-            t.hidden = editable;
+            texto.hidden = editable;
 
         });
 
@@ -321,63 +321,119 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /*
      * ============================================================
-     * FECHA PARA ORDENAR
+     * ORDEN NATURAL DE PRODUCTOS
+     * ============================================================
+     *
+     * Ejemplo:
+     *
+     * FAST 01
+     * FAST 02
+     * FAST 03
+     * FAST 10
+     *
+     * en lugar de:
+     *
+     * FAST 01
+     * FAST 10
+     * FAST 02
+     *
+     * También funciona con nombres que tengan
+     * números en distintas posiciones.
      * ============================================================
      */
 
-    function obtenerFechaOrden(item) {
+    function compararProductos(a, b) {
+
+        const nombreA =
+            String(
+                a.nombre || ""
+            ).trim();
+
+        const nombreB =
+            String(
+                b.nombre || ""
+            ).trim();
+
+
+        return nombreA.localeCompare(
+            nombreB,
+            "es",
+            {
+                numeric: true,
+                sensitivity: "base"
+            }
+        );
+
+    }
+
+
+    /*
+     * ============================================================
+     * FORMATEAR FECHA DE VISITA
+     * ============================================================
+     */
+
+    function obtenerFechaVisita(v) {
 
         if (
-            item.fecha &&
-            typeof item.fecha.toDate ===
+            v.fecha &&
+            typeof v.fecha.toDate ===
             "function"
         ) {
 
-            return item.fecha.toDate();
+            return v.fecha.toDate();
 
         }
 
 
-        if (
-            typeof item.fecha === "string" &&
-            item.fecha.trim() !== ""
-        ) {
+        if (v.fecha) {
 
-            /*
-             * Formato YYYY-MM-DD
-             */
-
-            const partes =
-                item.fecha.split("-");
+            const fecha =
+                new Date(v.fecha);
 
 
             if (
-                partes.length === 3 &&
-                partes[0].length === 4
+                !isNaN(
+                    fecha.getTime()
+                )
             ) {
 
-                const año =
-                    Number(partes[0]);
-
-                const mes =
-                    Number(partes[1]) - 1;
-
-                const dia =
-                    Number(partes[2]);
-
-
-                return new Date(
-                    año,
-                    mes,
-                    dia
-                );
+                return fecha;
 
             }
 
+        }
+
+
+        return null;
+
+    }
+
+
+    /*
+     * ============================================================
+     * FORMATEAR FECHA DE VENTA
+     * ============================================================
+     */
+
+    function obtenerFechaVenta(e) {
+
+        if (
+            e.fecha &&
+            typeof e.fecha.toDate ===
+            "function"
+        ) {
+
+            return e.fecha.toDate();
+
+        }
+
+
+        if (e.fecha) {
 
             const fecha =
                 new Date(
-                    item.fecha
+                    `${e.fecha}T00:00:00`
                 );
 
 
@@ -394,17 +450,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
 
-        /*
-         * creadoEn como respaldo
-         */
-
         if (
-            item.creadoEn &&
-            typeof item.creadoEn.toDate ===
+            e.creadoEn &&
+            typeof e.creadoEn.toDate ===
             "function"
         ) {
 
-            return item.creadoEn.toDate();
+            return e.creadoEn.toDate();
 
         }
 
@@ -416,7 +468,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /*
      * ============================================================
-     * FECHA PARA MOSTRAR
+     * MOSTRAR FECHA
      * ============================================================
      */
 
@@ -456,84 +508,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     /*
      * ============================================================
-     * ESCAPAR HTML
-     * ============================================================
-     */
-
-    function escaparHTML(texto) {
-
-        return String(
-            texto ?? ""
-        )
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-    }
-
-
-    /*
-     * ============================================================
-     * NORMALIZAR EGRESO
-     * ============================================================
-     */
-
-    function convertirEgresoAProducto(egreso) {
-
-        return {
-
-            nombre:
-                egreso.productoNombre ||
-                "Producto sin nombre",
-
-            cantidad:
-                egreso.cantidad ??
-                "",
-
-            unidad:
-                egreso.unidad ||
-                "",
-
-            lote:
-                egreso.lote ||
-                ""
-
-        };
-
-    }
-
-
-    /*
-     * ============================================================
-     * CARGAR HISTORIAL DEL CLIENTE
-     *
-     * VISITAS
-     * VENTAS
-     *
-     * Las ventas se agrupan cuando pertenecen
-     * a la misma entrega.
+     * CARGAR HISTORIAL
      * ============================================================
      */
 
@@ -603,7 +578,8 @@ document.addEventListener("DOMContentLoaded", async () => {
              * ==================================================
              */
 
-            const historial = [];
+            const historial =
+                [];
 
 
             /*
@@ -620,10 +596,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     /*
-                     * Las ventas NO se toman desde visitas.
+                     * Las ventas no se toman
+                     * desde visitas.
                      *
-                     * La venta verdadera se obtiene
-                     * desde egresos.
+                     * Se toman desde egresos.
                      */
 
                     if (
@@ -637,7 +613,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     const fecha =
-                        obtenerFechaOrden(v);
+                        obtenerFechaVisita(
+                            v
+                        );
 
 
                     historial.push({
@@ -661,13 +639,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * VENTAS
-             *
-             * AGRUPAR POR ENTREGA
+             * EGRESOS / VENTAS
              * ==================================================
              */
 
-            const ventas = [];
+            const ventas =
+                [];
 
 
             snapEgresos.forEach(
@@ -688,7 +665,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     const fecha =
-                        obtenerFechaOrden(e);
+                        obtenerFechaVenta(
+                            e
+                        );
 
 
                     ventas.push({
@@ -697,7 +676,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                             docSnap.id,
 
                         fecha:
-                            fecha,
+
+                            e.fecha ||
+                            null,
 
                         fechaOrden:
                             fecha
@@ -715,22 +696,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * AGRUPAR VENTAS
+             * AGRUPAR VENTAS POR FECHA
+             * ==================================================
              *
-             * Primero intentamos utilizar
-             * un identificador de agrupación
-             * si existe.
-             *
-             * Si no existe, usamos:
-             *
-             * cliente + fecha
-             *
-             * Esto permite que las ventas
-             * antiguas sigan funcionando.
+             * Todos los productos vendidos
+             * al mismo cliente en la misma fecha
+             * aparecen dentro de una sola venta.
              * ==================================================
              */
 
-            const gruposVentas =
+            const ventasAgrupadas =
                 new Map();
 
 
@@ -741,57 +716,29 @@ document.addEventListener("DOMContentLoaded", async () => {
                         venta.datos;
 
 
-                    /*
-                     * Posibles identificadores
-                     * utilizados por distintas
-                     * versiones de egreso-stock.
-                     */
-
-                    const grupoId =
-                        e.ventaId ||
-                        e.egresoGrupoId ||
-                        e.entregaId ||
-                        e.grupoVentaId ||
-                        e.ventaGrupoId;
-
-
-                    let clave;
-
-
-                    if (
-                        grupoId
-                    ) {
-
-                        clave =
-                            `grupo-${grupoId}`;
-
-                    }
-
-                    else {
-
-                        /*
-                         * Para ventas sin identificador:
-                         * agrupamos por fecha de entrega.
-                         */
-
-                        const fecha =
-                            e.fecha ||
-                            "";
-
-
-                        clave =
-                            `fecha-${fecha}`;
-
-                    }
+                    const clave =
+                        e.fecha ||
+                        (
+                            venta.fechaOrden
+                                ? new Date(
+                                    venta.fechaOrden
+                                )
+                                    .toISOString()
+                                    .slice(
+                                        0,
+                                        10
+                                    )
+                                : "sin-fecha"
+                        );
 
 
                     if (
-                        !gruposVentas.has(
+                        !ventasAgrupadas.has(
                             clave
                         )
                     ) {
 
-                        gruposVentas.set(
+                        ventasAgrupadas.set(
                             clave,
                             {
 
@@ -802,7 +749,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     venta.fechaOrden,
 
                                 fecha:
-                                    venta.fecha,
+                                    e.fecha,
 
                                 productos:
                                     []
@@ -814,15 +761,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     const grupo =
-                        gruposVentas.get(
+                        ventasAgrupadas.get(
                             clave
                         );
 
 
+                    grupo.productos.push({
+
+                        nombre:
+                            e.productoNombre ||
+                            "Producto sin nombre",
+
+                        cantidad:
+                            e.cantidad,
+
+                        unidad:
+                            e.unidad ||
+                            "",
+
+                        lote:
+                            e.lote ||
+                            ""
+
+                    });
+
+
                     /*
                      * Si encontramos una venta
-                     * con fecha más precisa,
-                     * usamos esa fecha.
+                     * con una fecha más precisa,
+                     * conservamos esa fecha.
                      */
 
                     if (
@@ -833,17 +800,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         grupo.fechaOrden =
                             venta.fechaOrden;
 
-                        grupo.fecha =
-                            venta.fecha;
-
                     }
-
-
-                    grupo.productos.push(
-                        convertirEgresoAProducto(
-                            e
-                        )
-                    );
 
                 }
             );
@@ -851,13 +808,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * PASAR LAS VENTAS AGRUPADAS
-             * AL HISTORIAL
+             * AGREGAR VENTAS AGRUPADAS
              * ==================================================
              */
 
-            gruposVentas.forEach(
+            ventasAgrupadas.forEach(
                 grupo => {
+
+                    /*
+                     * ORDEN ALFABÉTICO + NUMÉRICO
+                     */
+
+                    grupo.productos.sort(
+                        compararProductos
+                    );
+
 
                     historial.push(
                         grupo
@@ -869,7 +834,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * ORDENAR TODO
+             * ORDENAR HISTORIAL
+             * ==================================================
+             *
+             * Lo más reciente primero.
              * ==================================================
              */
 
@@ -891,7 +859,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             if (
-                historial.length === 0
+                historial.length ===
+                0
             ) {
 
                 visitasEl.innerHTML =
@@ -904,7 +873,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * MOSTRAR
+             * MOSTRAR HISTORIAL
              * ==================================================
              */
 
@@ -913,14 +882,124 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     /*
                      * ==========================================
-                     * VENTA
+                     * VISITA / ENSAYO
                      * ==========================================
                      */
 
                     if (
                         registro.tipo ===
-                        "venta"
+                        "visita"
                     ) {
+
+                        const v =
+                            registro.datos;
+
+
+                        const fecha =
+                            obtenerFechaVisita(
+                                v
+                            );
+
+
+                        const fechaTexto =
+                            mostrarFecha(
+                                fecha
+                            );
+
+
+                        const tipo =
+                            v.tipoVisita ||
+                            "Visita comercial";
+
+
+                        let clase =
+                            "";
+
+
+                        if (
+                            tipo ===
+                            "Visita comercial"
+                        ) {
+
+                            clase =
+                                "comercial";
+
+                        }
+
+
+                        else if (
+                            tipo ===
+                            "Ensayo"
+                        ) {
+
+                            clase =
+                                "ensayo";
+
+                        }
+
+
+                        else if (
+                            tipo ===
+                            "Entrega de productos"
+                        ) {
+
+                            clase =
+                                "entrega";
+
+                        }
+
+
+                        let productosHTML =
+                            "";
+
+
+                        if (
+                            Array.isArray(
+                                v.productos
+                            ) &&
+                            v.productos.length
+                        ) {
+
+                            const productos =
+                                [
+                                    ...v.productos
+                                ];
+
+
+                            productos.sort(
+                                compararProductos
+                            );
+
+
+                            productosHTML =
+                                productos
+                                    .map(
+                                        producto => `
+
+                                            <div class="producto">
+
+                                                📦
+                                                ${String(
+                                                    producto.nombre ||
+                                                    "Producto sin nombre"
+                                                )}
+
+                                                ${
+                                                    producto.cantidad
+                                                        ? `(${producto.cantidad})`
+                                                        : ""
+                                                }
+
+                                            </div>
+
+                                        `
+                                    )
+                                    .join(
+                                        ""
+                                    );
+
+                        }
+
 
                         const div =
                             document.createElement(
@@ -932,61 +1011,174 @@ document.addEventListener("DOMContentLoaded", async () => {
                             "visita";
 
 
-                        let productosHTML =
-                            "";
+                        div.innerHTML = `
+
+                            <div class="fecha">
+
+                                ${fechaTexto}
+
+                            </div>
 
 
-                        registro.productos.forEach(
-                            producto => {
+                            <span class="badge ${clase}">
 
-                                productosHTML += `
+                                ${tipo}
 
-                                    <div class="producto-venta">
+                            </span>
 
-                                        <span class="dato-producto">
+
+                            ${productosHTML}
+
+                        `;
+
+
+                        visitasEl.appendChild(
+                            div
+                        );
+
+                    }
+
+
+                    /*
+                     * ==========================================
+                     * VENTA
+                     * ==========================================
+                     */
+
+                    else if (
+                        registro.tipo ===
+                        "venta"
+                    ) {
+
+                        const productos =
+                            [
+                                ...registro.productos
+                            ];
+
+
+                        /*
+                         * Orden natural:
+                         * FAST 01
+                         * FAST 02
+                         * FAST 03
+                         */
+
+                        productos.sort(
+                            compararProductos
+                        );
+
+
+                        const productosHTML =
+                            productos
+                                .map(
+                                    producto => `
+
+                                        <div class="producto">
+
                                             📦
-                                            ${escaparHTML(
-                                                producto.nombre
+                                            ${String(
+                                                producto.nombre ||
+                                                "Producto sin nombre"
                                             )}
-                                        </span>
 
-                                        <span class="dato-cantidad">
+                                        </div>
+
+
+                                        <div class="producto">
+
                                             ⚖️
-                                            ${escaparHTML(
-                                                producto.cantidad
+                                            ${String(
+                                                producto.cantidad ??
+                                                ""
                                             )}
-                                            ${escaparHTML(
-                                                producto.unidad
+                                            ${String(
+                                                producto.unidad ||
+                                                ""
                                             )}
-                                        </span>
 
-                                        <span class="dato-lote">
+                                        </div>
+
+
+                                        <div class="producto">
+
                                             🏷️
-                                            ${escaparHTML(
+                                            ${String(
                                                 producto.lote ||
-                                                "Sin lote"
+                                                ""
                                             )}
-                                        </span>
 
-                                    </div>
+                                        </div>
 
-                                `;
+                                    `
+                                )
+                                .join(
+                                    ""
+                                );
+
+
+                        /*
+                         * La venta mantiene
+                         * el color verde.
+                         *
+                         * SIN emoji en el título.
+                         */
+
+                        const div =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        div.className =
+                            "visita";
+
+
+                        let fechaTexto =
+                            "Sin fecha";
+
+
+                        if (
+                            registro.fecha
+                        ) {
+
+                            const fecha =
+                                new Date(
+                                    registro.fecha +
+                                    "T00:00:00"
+                                );
+
+
+                            if (
+                                !isNaN(
+                                    fecha.getTime()
+                                )
+                            ) {
+
+                                fechaTexto =
+                                    fecha.toLocaleDateString(
+                                        "es-AR"
+                                    );
 
                             }
-                        );
+
+                        }
 
 
                         div.innerHTML = `
 
                             <div class="fecha">
-                                ${mostrarFecha(
-                                    registro.fecha
-                                )}
+
+                                ${fechaTexto}
+
                             </div>
 
+
                             <span class="badge entrega">
-                                🏷️ Venta
+
+                                Venta
+
                             </span>
+
 
                             <div class="productos-venta">
 
@@ -1001,144 +1193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             div
                         );
 
-
-                        return;
-
                     }
-
-
-                    /*
-                     * ==========================================
-                     * VISITA / ENSAYO / ENTREGA
-                     * ==========================================
-                     */
-
-                    const v =
-                        registro.datos;
-
-
-                    const fecha =
-                        obtenerFechaOrden(v);
-
-
-                    const fechaTexto =
-                        mostrarFecha(
-                            fecha
-                        );
-
-
-                    const tipo =
-                        v.tipoVisita ||
-                        "Visita comercial";
-
-
-                    let clase =
-                        "";
-
-
-                    if (
-                        tipo ===
-                        "Visita comercial"
-                    ) {
-
-                        clase =
-                            "comercial";
-
-                    }
-
-                    else if (
-                        tipo ===
-                        "Ensayo"
-                    ) {
-
-                        clase =
-                            "ensayo";
-
-                    }
-
-                    else if (
-                        tipo ===
-                        "Entrega de productos"
-                    ) {
-
-                        clase =
-                            "entrega";
-
-                    }
-
-
-                    let productosHTML =
-                        "";
-
-
-                    if (
-                        tipo ===
-                        "Entrega de productos" &&
-                        Array.isArray(
-                            v.productos
-                        )
-                    ) {
-
-                        productosHTML =
-                            v.productos
-                                .map(
-                                    p => `
-
-                                        <div class="producto">
-                                            📦
-                                            ${escaparHTML(
-                                                p.nombre
-                                            )}
-
-                                            ${
-                                                p.cantidad
-                                                    ? `⚖️ ${escaparHTML(
-                                                        p.cantidad
-                                                    )}`
-                                                    : ""
-                                            }
-
-                                        </div>
-
-                                    `
-                                )
-                                .join(
-                                    ""
-                                );
-
-                    }
-
-
-                    const div =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    div.className =
-                        "visita";
-
-
-                    div.innerHTML = `
-
-                        <div class="fecha">
-                            ${fechaTexto}
-                        </div>
-
-                        <span class="badge ${clase}">
-                            ${escaparHTML(
-                                tipo
-                            )}
-                        </span>
-
-                        ${productosHTML}
-
-                    `;
-
-
-                    visitasEl.appendChild(
-                        div
-                    );
 
                 }
             );
@@ -1161,4 +1216,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     }
 
-}); 
+});
