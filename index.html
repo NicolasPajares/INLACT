@@ -195,6 +195,8 @@
     src="app.js"
 ></script>
 
+
+
 <!-- ============================================================
      ÚLTIMAS ACTIVIDADES
      VISITAS + ENSAYOS + VENTAS
@@ -202,27 +204,33 @@
 
 <script type="module">
 
+
 import {
     initializeApp
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 
 import {
     getFirestore,
     collection,
     getDocs
-} from
+}
+from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 
 /* ============================================================
    FIREBASE
    ============================================================ */
 
+
 const firebaseConfig = {
 
     apiKey:
-        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+        "AIzaSyCpCO82XE8I990mW4Fe8EVwmUOAeLZdv4",
 
     authDomain:
         "inlact.firebaseapp.com",
@@ -245,13 +253,16 @@ const firebaseConfig = {
 const app =
     initializeApp(firebaseConfig);
 
+
 const db =
     getFirestore(app);
 
 
+
 /* ============================================================
-   ELEMENTOS
+   ELEMENTO
    ============================================================ */
+
 
 const lista =
     document.getElementById(
@@ -259,11 +270,15 @@ const lista =
     );
 
 
+
 /* ============================================================
    ESCAPAR HTML
    ============================================================ */
 
-function escaparHTML(texto) {
+
+function escaparHTML(
+    texto
+) {
 
     return String(
         texto ?? ""
@@ -297,11 +312,21 @@ function escaparHTML(texto) {
 }
 
 
+
 /* ============================================================
    FECHA
    ============================================================ */
 
-function obtenerFecha(item) {
+
+function obtenerFecha(
+    item
+) {
+
+
+    /*
+     * VISITAS
+     * Firebase Timestamp
+     */
 
     if (
         item.fecha &&
@@ -312,6 +337,12 @@ function obtenerFecha(item) {
 
     }
 
+
+
+    /*
+     * EGRESOS
+     * YYYY-MM-DD
+     */
 
     if (
         typeof item.fecha === "string" &&
@@ -327,13 +358,21 @@ function obtenerFecha(item) {
         ) {
 
             const año =
-                Number(partes[0]);
+                Number(
+                    partes[0]
+                );
+
 
             const mes =
-                Number(partes[1]) - 1;
+                Number(
+                    partes[1]
+                ) - 1;
+
 
             const dia =
-                Number(partes[2]);
+                Number(
+                    partes[2]
+                );
 
 
             return new Date(
@@ -346,7 +385,9 @@ function obtenerFecha(item) {
 
 
         const fecha =
-            new Date(item.fecha);
+            new Date(
+                item.fecha
+            );
 
 
         if (
@@ -367,13 +408,19 @@ function obtenerFecha(item) {
 }
 
 
+
 /* ============================================================
-   MOSTRAR FECHA
+   FORMATEAR FECHA
    ============================================================ */
 
-function mostrarFecha(fecha) {
 
-    if (!fecha) {
+function mostrarFecha(
+    fecha
+) {
+
+    if (
+        !fecha
+    ) {
 
         return "";
 
@@ -405,17 +452,28 @@ function mostrarFecha(fecha) {
 }
 
 
+
 /* ============================================================
    CARGAR ACTIVIDADES
    ============================================================ */
 
+
 async function cargarUltimasActividades() {
+
 
     lista.innerHTML =
         "<li>Cargando...</li>";
 
 
     try {
+
+
+        /*
+         * Cargamos:
+         *
+         * visitas
+         * egresos
+         */
 
         const [
             visitasSnap,
@@ -483,7 +541,7 @@ async function cargarUltimasActividades() {
 
 
         /* ====================================================
-           ID DE EGRESOS QUE PERTENECEN A UNA VENTA AGRUPADA
+           IDENTIFICAR VENTAS AGRUPADAS
            ==================================================== */
 
         const egresosVentaAgrupados =
@@ -512,8 +570,11 @@ async function cargarUltimasActividades() {
 
 
                 /*
-                 * egreso-stock.js actualmente
+                 * El egreso-stock.js actual
                  * guarda egresoId como ARRAY.
+                 *
+                 * También soportamos el formato
+                 * anterior donde era un solo ID.
                  */
 
                 if (
@@ -540,7 +601,9 @@ async function cargarUltimasActividades() {
                 ids.forEach(
                     id => {
 
-                        if (id) {
+                        if (
+                            id
+                        ) {
 
                             egresosVentaAgrupados.add(
                                 id
@@ -609,7 +672,7 @@ async function cargarUltimasActividades() {
 
                     /*
                      * Buscamos todos los egresos
-                     * pertenecientes a esta venta.
+                     * que pertenecen a esta venta.
                      */
 
                     const productosVenta =
@@ -652,10 +715,9 @@ async function cargarUltimasActividades() {
 
 
                     /*
-                     * Si por algún motivo no
-                     * encontramos los egresos,
-                     * usamos los productos que
-                     * ya están guardados en visitas.
+                     * Si no encontramos los egresos,
+                     * usamos los productos guardados
+                     * directamente en visitas.
                      */
 
                     const productosFinal =
@@ -690,7 +752,7 @@ async function cargarUltimasActividades() {
 
 
                     /*
-                     * UNA SOLA ACTIVIDAD
+                     * Una sola actividad
                      * para toda la venta.
                      */
 
@@ -703,7 +765,9 @@ async function cargarUltimasActividades() {
                             "venta",
 
                         fecha:
-                            obtenerFecha(v),
+                            obtenerFecha(
+                                v
+                            ),
 
                         cliente:
                             v.clienteNombre ||
@@ -737,7 +801,9 @@ async function cargarUltimasActividades() {
                         "visita",
 
                     fecha:
-                        obtenerFecha(v),
+                        obtenerFecha(
+                            v
+                        ),
 
                     cliente:
                         v.cliente ||
@@ -762,7 +828,7 @@ async function cargarUltimasActividades() {
 
 
         /* ====================================================
-           EGRESOS DE VENTA ANTIGUOS / NO AGRUPADOS
+           EGRESOS DE VENTA NO AGRUPADOS
            ==================================================== */
 
         egresos.forEach(
@@ -779,9 +845,8 @@ async function cargarUltimasActividades() {
 
 
                 /*
-                 * Si este egreso ya pertenece
-                 * a una venta agrupada,
-                 * NO lo mostramos nuevamente.
+                 * Si ya pertenece a una venta
+                 * agrupada, no lo mostramos otra vez.
                  */
 
                 if (
@@ -798,8 +863,6 @@ async function cargarUltimasActividades() {
                 /*
                  * Ventas antiguas que no tienen
                  * visita asociada.
-                 *
-                 * Se muestran individualmente.
                  */
 
                 actividades.push({
@@ -852,7 +915,7 @@ async function cargarUltimasActividades() {
 
 
         /* ====================================================
-           ORDENAR
+           ORDENAR POR FECHA
            ==================================================== */
 
         actividades.sort(
@@ -883,7 +946,7 @@ async function cargarUltimasActividades() {
 
 
         /* ====================================================
-           ÚLTIMAS 5 ACTIVIDADES
+           MOSTRAR ÚLTIMAS 5
            ==================================================== */
 
         const ultimas =
@@ -963,7 +1026,6 @@ async function cargarUltimasActividades() {
                                                 ${escaparHTML(
                                                     producto.cantidad ?? ""
                                                 )}
-
                                                 ${escaparHTML(
                                                     producto.unidad || ""
                                                 )}
@@ -1084,9 +1146,137 @@ async function cargarUltimasActividades() {
                                     p => `
 
                                         📦
-                                        
-    
+                                        ${escaparHTML(
+                                            p.nombre ||
+                                            "Producto sin nombre"
+                                        )}
 
-</body>
+                                        ${
+                                            p.cantidad
+                                                ? `(${escaparHTML(p.cantidad)})`
+                                                : ""
+                                        }
 
-</html>
+                                    `
+                                )
+
+                                .join(
+                                    "<br>"
+                                );
+
+                    }
+
+
+                    li.innerHTML = `
+
+                        <strong>
+                            ${escaparHTML(
+                                actividad.cliente
+                            )}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${mostrarFecha(
+                                actividad.fecha
+                            )}
+                        </small>
+
+                        <br>
+
+                        <span
+                            class="${clase}">
+                            ${escaparHTML(
+                                actividad.tipo
+                            )}
+                        </span>
+
+                        ${
+                            productosHTML
+                                ? `
+                                    <div class="productos">
+                                        ${productosHTML}
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                    `;
+
+                }
+
+
+                lista.appendChild(
+                    li
+                );
+
+            }
+        );
+
+
+    }
+
+
+    catch (
+        error
+    ) {
+
+        console.error(
+            "Error cargando actividades:",
+            error
+        );
+
+
+        lista.innerHTML = `
+
+            <li>
+
+                <strong>
+                    No se pudieron cargar las actividades.
+                </strong>
+
+            </li>
+
+        `;
+
+    }
+
+}
+
+
+
+/* ============================================================
+   INICIAR
+   ============================================================ */
+
+
+cargarUltimasActividades();
+
+
+
+/* ============================================================
+   HISTORIAL COMPLETO
+   ============================================================ */
+
+
+document
+    .getElementById(
+        "abrir-historial"
+    )
+    .onclick = event => {
+
+
+        event.preventDefault();
+
+
+        window.open(
+            "historial.html",
+            "historial",
+            "width=420,height=700"
+        );
+
+    };
+
+
+</script>
