@@ -1563,6 +1563,7 @@ function colocarFechaActual() {
 
 
 /*
+/*
 ************************************************************
 * RESUMEN
 ************************************************************
@@ -1570,172 +1571,114 @@ function colocarFechaActual() {
 
 function actualizarResumen() {
 
-    if (
-        !listaResumenEgreso
-    ) {
-
+    if (!listaResumenEgreso) {
         return;
-
     }
 
+    listaResumenEgreso.innerHTML = "";
 
-    listaResumenEgreso.innerHTML =
-        "";
+    const articulos = obtenerArticulos();
 
+    let hayDatos = false;
 
-    const articulos =
-        obtenerArticulos();
+    articulos.forEach((articulo) => {
 
+        const buscador =
+            articulo.querySelector(".productoBuscador");
 
-    let hayDatos =
-        false;
+        const lote =
+            articulo.querySelector(".lote");
 
+        const cantidad =
+            articulo.querySelector(".cantidad");
 
-    articulos.forEach(
-        (
-            articulo,
-            indice
-        ) => {
+        const observacion =
+            articulo.querySelector(".observacion");
 
-            const buscador =
-                articulo.querySelector(
-                    ".productoBuscador"
-                );
+        const producto =
+            buscador?.value.trim() || "";
 
+        const loteTexto =
+            lote?.options[
+                lote.selectedIndex
+            ]?.textContent || "";
 
-            const lote =
-                articulo.querySelector(
-                    ".lote"
-                );
+        const cantidadTexto =
+            cantidad?.value || "";
 
+        const observacionTexto =
+            observacion?.value.trim() || "";
 
-            const ubicacion =
-                articulo.querySelector(
-                    ".ubicacion"
-                );
+        if (
+            producto ||
+            loteTexto ||
+            cantidadTexto ||
+            observacionTexto
+        ) {
 
+            hayDatos = true;
 
-            const cantidad =
-                articulo.querySelector(
-                    ".cantidad"
-                );
+            const fila =
+                document.createElement("div");
 
+            fila.className =
+                "item-resumen-egreso";
 
-            const observacion =
-                articulo.querySelector(
-                    ".observacion"
-                );
+            fila.innerHTML = `
 
-
-            const producto =
-                buscador?.value.trim() ||
-                "";
-
-
-            const loteTexto =
-                lote?.options[
-                    lote.selectedIndex
-                ]?.textContent ||
-                "";
-
-
-            const ubicacionTexto =
-                ubicacion?.options[
-                    ubicacion.selectedIndex
-                ]?.textContent ||
-                "";
-
-
-            const cantidadTexto =
-                cantidad?.value ||
-                "";
-
-
-            const observacionTexto =
-                observacion?.value.trim() ||
-                "";
-
-
-            if (
-                producto ||
-                loteTexto ||
-                cantidadTexto
-            ) {
-
-                hayDatos =
-                    true;
-
-
-                const fila =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                fila.className =
-                    "item-resumen-egreso";
-
-
-                fila.innerHTML = `
+                <div class="resumen-producto">
 
                     <strong>
                         ${escaparHTML(
-                            producto ||
-                            "Producto"
+                            producto || "Producto"
                         )}
                     </strong>
 
-                    <span>
-                        ${
-                            loteTexto
-                                ? `Lote: ${escaparHTML(loteTexto)}`
-                                : ""
-                        }
-                    </span>
+                </div>
 
-                    <span>
-                        ${
-                            ubicacionTexto
-                                ? `Ubicación: ${escaparHTML(ubicacionTexto)}`
-                                : ""
-                        }
-                    </span>
 
-                    <span>
-                        ${
-                            cantidadTexto
-                                ? `Cantidad: ${escaparHTML(cantidadTexto)}`
-                                : ""
-                        }
-                    </span>
+                <div class="resumen-cantidad">
 
                     ${
-                        observacionTexto
-                            ? `
-                                <span>
-                                    Observación:
-                                    ${escaparHTML(observacionTexto)}
-                                </span>
-                              `
+                        cantidadTexto
+                            ? escaparHTML(cantidadTexto)
                             : ""
                     }
 
-                `;
+                </div>
 
 
-                listaResumenEgreso.appendChild(
-                    fila
-                );
+                <div class="resumen-lote">
 
-            }
+                    ${
+                        loteTexto
+                            ? escaparHTML(loteTexto)
+                            : ""
+                    }
+
+                </div>
+
+
+                <div class="resumen-observacion">
+
+                    ${
+                        observacionTexto
+                            ? escaparHTML(observacionTexto)
+                            : ""
+                    }
+
+                </div>
+
+            `;
+
+            listaResumenEgreso.appendChild(fila);
 
         }
-    );
+
+    });
 
 
-    if (
-        !hayDatos
-    ) {
+    if (!hayDatos) {
 
         listaResumenEgreso.innerHTML = `
             <p>
@@ -1746,9 +1689,6 @@ function actualizarResumen() {
     }
 
 }
-
-
-/*
 ************************************************************
 * ESCAPAR HTML
 ************************************************************
