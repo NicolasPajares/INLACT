@@ -744,3 +744,34 @@ main > p a {
 .disponibilidad-lote:empty {
     display: none;
 }
+/* ===============================
+   RESUMEN - MOBILE
+================================ */
+
+@media (max-width: 600px) {
+
+    .item-resumen-egreso {
+
+        grid-template-columns:
+            minmax(0, 1.7fr)
+            minmax(55px, .7fr)
+            minmax(90px, 1fr)
+            minmax(0, 1.3fr);
+
+        gap: 8px;
+
+        padding: 12px 10px;
+
+    }
+
+
+    .item-resumen-egreso .resumen-producto strong,
+    .item-resumen-egreso .resumen-cantidad,
+    .item-resumen-egreso .resumen-lote,
+    .item-resumen-egreso .resumen-observacion {
+
+        font-size: 13px;
+
+    }
+
+}
