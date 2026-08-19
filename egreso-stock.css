@@ -28,7 +28,7 @@ body {
   max-width: 700px;
   margin: 30px auto;
   padding: 30px;
-
+}
 
 /* ===============================
    FORMULARIO
@@ -413,49 +413,121 @@ body {
 
 .item-resumen-egreso {
 
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 2.5fr)
+        minmax(70px, 0.8fr)
+        minmax(120px, 1.2fr)
+        minmax(0, 1.8fr);
+
+    align-items: center;
+
+    gap: 14px;
+
+    width: 100%;
+
     background: #fff;
 
     border: 1px solid #dbe3ec;
 
     border-radius: 12px;
 
-    padding: 20px;
+    padding: 15px 18px;
 
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 
     box-shadow:
         0 4px 10px rgba(0, 0, 0, .05);
 }
 
 
-.item-resumen-egreso strong {
+/* ===============================
+   PRODUCTO
+================================ */
+
+.item-resumen-egreso .resumen-producto {
+
+    min-width: 0;
+
+    overflow: hidden;
+
+}
+
+
+.item-resumen-egreso .resumen-producto strong {
 
     display: block;
 
     color: #1f4e8c;
 
-    font-size: 17px;
+    font-size: 16px;
 
-    margin-bottom: 10px;
+    font-weight: 700;
+
+    margin: 0;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
 
-.item-resumen-egreso span {
+/* ===============================
+   CANTIDAD
+================================ */
 
-    display: block;
+.item-resumen-egreso .resumen-cantidad {
+
+    color: #475569;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+}
+
+
+/* ===============================
+   LOTE
+================================ */
+
+.item-resumen-egreso .resumen-lote {
+
+    color: #475569;
+
+    font-size: 15px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* ===============================
+   OBSERVACIÓN
+================================ */
+
+.item-resumen-egreso .resumen-observacion {
 
     color: #64748b;
 
     font-size: 15px;
 
-    margin-bottom: 6px;
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
 }
-
-
-.item-resumen-egreso span:last-child {
-    margin-bottom: 0;
-}
-
 
 /* ===============================
    ACCIONES
