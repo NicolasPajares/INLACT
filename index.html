@@ -775,24 +775,21 @@ if (
                             Venta
                         </span>
 
-                        <div class="productos">
+                        <div class="productos venta-producto">
 
-                            📦
-                            ${actividad.productoNombre}
+    <span class="venta-nombre">
+        📦 ${actividad.productoNombre}
+    </span>
 
-                            <br>
+    <span class="venta-cantidad">
+        ${actividad.cantidad} ${actividad.unidad}
+    </span>
 
-                            📊
-                            ${actividad.cantidad}
-                            ${actividad.unidad}
+    <span class="venta-lote">
+        🏷️ ${actividad.lote}
+    </span>
 
-                            <br>
-
-                            🏷️
-                            Lote:
-                            ${actividad.lote}
-
-                        </div>
+</div>
 
                     `;
 
