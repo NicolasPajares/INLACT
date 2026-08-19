@@ -1,140 +1,540 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
   <meta charset="UTF-8">
+
   <title>INLACT · Cliente</title>
 
   <!-- SEO / Mobile -->
-  <meta name="description" content="INLACT - Detalle de cliente">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="INLACT - Detalle de cliente"
+  >
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <!-- CSS base -->
-  <link rel="stylesheet" href="index.css">
+  <link
+    rel="stylesheet"
+    href="index.css"
+  >
 
   <!-- CSS específico cliente -->
-  <link rel="stylesheet" href="cliente.css">
+  <link
+    rel="stylesheet"
+    href="cliente.css"
+  >
+
 </head>
+
 
 <body>
 
+
 <header>
+
   <figure>
-    <img src="img/logo.jpg" alt="INLACT">
+
+    <img
+      src="img/logo.jpg"
+      alt="INLACT"
+    >
+
   </figure>
+
   <h2>NICOLÁS PAJARES</h2>
+
 </header>
+
+
 
 <main>
 
-<!-- ===============================
+
+<!-- =========================================================
      ACCESOS RÁPIDOS
-================================ -->
+========================================================= -->
+
 <section class="quick-actions">
-  <a href="clientes.html" class="action-card">
-    <img src="img/icon-clientes.svg" alt="">
+
+  <a
+    href="clientes.html"
+    class="action-card"
+  >
+
+    <img
+      src="img/icon-clientes.svg"
+      alt=""
+    >
+
     <span>Clientes</span>
+
   </a>
 
-  <a href="stock.html" class="action-card">
-    <img src="img/icon-stock.svg" alt="">
+
+  <a
+    href="stock.html"
+    class="action-card"
+  >
+
+    <img
+      src="img/icon-stock.svg"
+      alt=""
+    >
+
     <span>Stock</span>
+
   </a>
 
-  <a href="ensayos.html" class="action-card">
-    <img src="img/icon-ensayos.svg" alt="">
+
+  <a
+    href="ensayos.html"
+    class="action-card"
+  >
+
+    <img
+      src="img/icon-ensayos.svg"
+      alt=""
+    >
+
     <span>Ensayos</span>
+
   </a>
 
-  <a href="precios.html" class="action-card">
-    <img src="img/icon-precios.svg" alt="">
+
+  <a
+    href="precios.html"
+    class="action-card"
+  >
+
+    <img
+      src="img/icon-precios.svg"
+      alt=""
+    >
+
     <span>Precios</span>
+
   </a>
+
 </section>
 
-<!-- ===============================
+
+
+<!-- =========================================================
      DATOS DEL CLIENTE
-================================ -->
+========================================================= -->
+
 <section class="card cliente-card">
 
-  <h2 id="clienteNombre">Cargando cliente...</h2>
+  <div class="cliente-cabecera">
 
-  <div id="clienteDatos" class="cliente-datos">
+    <div class="cliente-nombre">
 
-    <div class="campo">
-      <label>Contacto</label>
-      <span id="contactoTxt"></span>
-      <input type="text" id="contactoInput" hidden>
+      <h2 id="clienteNombre">
+        Cargando cliente...
+      </h2>
+
     </div>
 
-    <div class="campo">
-      <label>Posición</label>
-      <span id="posicionTxt"></span>
-      <input type="text" id="posicionInput" hidden>
-    </div>
 
-    <div class="campo">
-      <label>Teléfono</label>
-      <span id="telefonoTxt"></span>
-      <a id="wspLink" target="_blank"></a>
-      <input type="text" id="telefonoInput" hidden>
-    </div>
+    <!-- =====================================================
+         DATOS GENERALES ACTUALES
+         Se mantienen para no romper clientes existentes.
+    ====================================================== -->
 
-    <div class="campo">
-      <label>Email</label>
-      <span id="emailTxt"></span>
-      <a id="mailLink" target="_blank"></a>
-      <input type="email" id="emailInput" hidden>
-    </div>
+    <div
+      id="clienteDatos"
+      class="cliente-datos"
+    >
 
-    <div class="campo">
-      <label>Observaciones</label>
-      <p id="observacionesTxt"></p>
-      <textarea id="observacionesInput" rows="4" hidden></textarea>
-    </div>
+      <div class="campo">
 
-    <div class="acciones-form">
-      <button id="editarBtn" class="btn-principal">
-        ✏️ Editar contacto
-      </button>
+        <label>
+          Contacto
+        </label>
 
-      <button id="guardarBtn" class="btn-secundario" hidden>
-        💾 Guardar cambios
-      </button>
+        <span id="contactoTxt"></span>
+
+        <input
+          type="text"
+          id="contactoInput"
+          hidden
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Posición
+        </label>
+
+        <span id="posicionTxt"></span>
+
+        <input
+          type="text"
+          id="posicionInput"
+          hidden
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Teléfono
+        </label>
+
+        <span id="telefonoTxt"></span>
+
+        <a
+          id="wspLink"
+          target="_blank"
+        ></a>
+
+        <input
+          type="text"
+          id="telefonoInput"
+          hidden
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Email
+        </label>
+
+        <span id="emailTxt"></span>
+
+        <a
+          id="mailLink"
+          target="_blank"
+        ></a>
+
+        <input
+          type="email"
+          id="emailInput"
+          hidden
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Observaciones
+        </label>
+
+        <p id="observacionesTxt"></p>
+
+        <textarea
+          id="observacionesInput"
+          rows="4"
+          hidden
+        ></textarea>
+
+      </div>
+
+
+      <div class="acciones-form">
+
+        <button
+          id="editarBtn"
+          class="btn-principal"
+        >
+          ✏️ Editar cliente
+        </button>
+
+
+        <button
+          id="guardarBtn"
+          class="btn-secundario"
+          hidden
+        >
+          💾 Guardar cambios
+        </button>
+
+      </div>
+
     </div>
 
   </div>
+
 </section>
 
-<!-- ===============================
+
+
+<!-- =========================================================
+     CONTACTOS DEL CLIENTE
+========================================================= -->
+
+<section class="card contactos-card">
+
+  <div class="contactos-titulo">
+
+    <div>
+
+      <h2>
+        Contactos
+      </h2>
+
+      <p>
+        Personas relacionadas con este cliente
+      </p>
+
+    </div>
+
+
+    <button
+      id="agregarContactoBtn"
+      class="btn-principal"
+      type="button"
+    >
+
+      ➕ Agregar contacto
+
+    </button>
+
+  </div>
+
+
+
+  <!-- =======================================================
+       FORMULARIO NUEVO / EDITAR CONTACTO
+  ======================================================== -->
+
+  <div
+    id="formContacto"
+    class="form-contacto"
+    hidden
+  >
+
+    <h3 id="tituloFormContacto">
+      Nuevo contacto
+    </h3>
+
+
+    <div class="contacto-form-grid">
+
+
+      <div class="campo">
+
+        <label>
+          Nombre
+        </label>
+
+        <input
+          type="text"
+          id="contactoNombreInput"
+          placeholder="Nombre y apellido"
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Posición / Cargo
+        </label>
+
+        <input
+          type="text"
+          id="contactoPosicionInput"
+          placeholder="Dueño, encargado, quesero..."
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Teléfono
+        </label>
+
+        <input
+          type="text"
+          id="contactoTelefonoInput"
+          placeholder="Teléfono"
+        >
+
+      </div>
+
+
+      <div class="campo">
+
+        <label>
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="contactoEmailInput"
+          placeholder="correo@ejemplo.com"
+        >
+
+      </div>
+
+
+      <div class="campo campo-observaciones">
+
+        <label>
+          Observaciones
+        </label>
+
+        <textarea
+          id="contactoObservacionesInput"
+          rows="3"
+          placeholder="Observaciones del contacto..."
+        ></textarea>
+
+      </div>
+
+    </div>
+
+
+    <div class="acciones-form">
+
+      <button
+        id="guardarContactoBtn"
+        class="btn-principal"
+        type="button"
+      >
+        💾 Guardar contacto
+      </button>
+
+
+      <button
+        id="cancelarContactoBtn"
+        class="btn-secundario"
+        type="button"
+      >
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =======================================================
+       LISTA DE CONTACTOS
+  ======================================================== -->
+
+  <div
+    id="listaContactos"
+    class="lista-contactos"
+  >
+
+    <p>
+      Cargando contactos...
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================================================
      HISTORIAL
-================================ -->
+========================================================= -->
+
 <section class="card historial-card">
-  <h2>Historial de visitas</h2>
 
-  <div id="listaVisitasCliente" class="lista-historial"></div>
+  <h2>
+    Historial de visitas
+  </h2>
 
-  <button id="verHistorialCompleto" class="btn-outline">
+
+  <div
+    id="listaVisitasCliente"
+    class="lista-historial"
+  ></div>
+
+
+  <button
+    id="verHistorialCompleto"
+    class="btn-outline"
+    type="button"
+  >
+
     📋 Ver historial completo
+
   </button>
+
 </section>
 
-<!-- ===============================
+
+
+<!-- =========================================================
      VOLVER
-================================ -->
-<section style="text-align:center; margin-top:20px;">
-  <button class="btn-volver" onclick="window.location.href='clientes.html'">
+========================================================= -->
+
+<section
+  style="
+    text-align:center;
+    margin-top:20px;
+  "
+>
+
+  <button
+    class="btn-volver"
+    onclick="window.location.href='clientes.html'"
+  >
+
     ⬅ Volver a clientes
+
   </button>
+
 </section>
+
 
 </main>
 
+
+
 <footer>
-  <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
+
+  <p>
+
+    © INLACT ·
+
+    <a href="aviso-legal.html">
+      Aviso Legal
+    </a>
+
+  </p>
+
 </footer>
 
-<!-- JS -->
-<script type="module" src="cliente.js"></script>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script
+  type="module"
+  src="cliente.js"
+></script>
+
 
 </body>
+
 </html>
+```
