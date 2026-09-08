@@ -137,6 +137,7 @@
     <!-- =====================================================
          MITAD IZQUIERDA
          SOLO NOMBRE DEL CLIENTE
+         CENTRADO EN ALTURA
     ====================================================== -->
 
     <div class="cliente-nombre">
@@ -151,7 +152,6 @@
 
     <!-- =====================================================
          MITAD DERECHA
-         DATOS DEL CLIENTE + CONTACTOS
     ====================================================== -->
 
     <div
@@ -161,14 +161,61 @@
 
 
       <!-- ===================================================
-           DATOS DEL CLIENTE
+           PRIMER CONTACTO / DATOS DEL CLIENTE
       ==================================================== -->
 
       <div class="bloque-datos-cliente">
 
-        <h2>
-          Datos del cliente
-        </h2>
+
+        <div class="titulo-datos-cliente">
+
+          <h2>
+            Datos del cliente
+          </h2>
+
+
+          <!-- ===============================================
+               MENÚ DE TRES PUNTOS
+          ================================================ -->
+
+          <div class="menu-contacto">
+
+            <button
+              id="menuContactoBtn"
+              class="btn-menu-contacto"
+              type="button"
+              aria-label="Opciones del contacto"
+            >
+              ⋮
+            </button>
+
+
+            <div
+              id="menuContactoOpciones"
+              class="menu-contacto-opciones"
+              hidden
+            >
+
+              <button
+                id="editarContactoPrincipalBtn"
+                type="button"
+              >
+                ✏️ Editar
+              </button>
+
+              <button
+                id="eliminarContactoPrincipalBtn"
+                type="button"
+              >
+                🗑️ Eliminar
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
 
 
         <div class="campo">
@@ -268,38 +315,15 @@
         </div>
 
 
-        <!-- =================================================
-             BOTÓN EDITAR CLIENTE
-        ================================================== -->
-
-        <div class="acciones-form">
-
-          <button
-            id="editarBtn"
-            class="btn-principal"
-            type="button"
-          >
-            ✏️ Editar cliente
-          </button>
-
-
-          <button
-            id="guardarBtn"
-            class="btn-secundario"
-            type="button"
-            hidden
-          >
-            💾 Guardar cambios
-          </button>
-
-        </div>
-
       </div>
 
 
 
       <!-- ===================================================
-           CONTACTOS
+           CONTACTOS ADICIONALES
+
+           Cada nuevo contacto aparecerá inmediatamente
+           debajo de "Datos del cliente".
       ==================================================== -->
 
       <div class="bloque-contactos">
@@ -314,15 +338,6 @@
         </div>
 
 
-
-        <!-- =================================================
-             LISTA DE CONTACTOS
-
-             IMPORTANTE:
-             No agregamos acá manualmente el contacto
-             principal. Esta lista queda para los contactos
-             adicionales que vayamos registrando.
-        ================================================== -->
 
         <div
           id="listaContactos"
@@ -359,8 +374,6 @@
 
         <!-- =================================================
              FORMULARIO NUEVO / EDITAR CONTACTO
-
-             Se mantiene preparado para el JS.
         ================================================== -->
 
         <div
@@ -454,7 +467,6 @@
           </div>
 
 
-
           <div class="acciones-form">
 
             <button
@@ -494,7 +506,7 @@
 
 <!-- =========================================================
      HISTORIAL
-     NO MODIFICADO
+     NO TOCAR
 ========================================================= -->
 
 <section class="card historial-card">
@@ -526,7 +538,7 @@
 
 <!-- =========================================================
      VOLVER
-     NO MODIFICADO
+     NO TOCAR
 ========================================================= -->
 
 <section
@@ -554,7 +566,7 @@
 
 <!-- =========================================================
      FOOTER
-     NO MODIFICADO
+     NO TOCAR
 ========================================================= -->
 
 <footer>
