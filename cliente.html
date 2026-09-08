@@ -2,513 +2,146 @@
 <html lang="es">
 
 <head>
-
   <meta charset="UTF-8">
-
   <title>INLACT · Cliente</title>
+  <meta name="description" content="INLACT - Detalle de cliente">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="description"
-    content="INLACT - Detalle de cliente"
-  >
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <!-- CSS base -->
-  <link
-    rel="stylesheet"
-    href="index.css"
-  >
-
-  <!-- CSS específico cliente -->
-  <link
-    rel="stylesheet"
-    href="cliente.css"
-  >
-
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="cliente.css">
 </head>
-
 
 <body>
 
-
 <header>
-
   <figure>
-
-    <img
-      src="img/logo.jpg"
-      alt="INLACT"
-    >
-
+    <img src="img/logo.jpg" alt="INLACT">
   </figure>
-
   <h2>NICOLÁS PAJARES</h2>
-
 </header>
-
-
 
 <main>
 
+  <section class="quick-actions">
 
-<!-- =========================================================
-     ACCESOS RÁPIDOS
-     NO TOCAR
-========================================================= -->
+    <a href="clientes.html" class="action-card">
+      <img src="img/icon-clientes.svg" alt="">
+      <span>Clientes</span>
+    </a>
 
-<section class="quick-actions">
+    <a href="stock.html" class="action-card">
+      <img src="img/icon-stock.svg" alt="">
+      <span>Stock</span>
+    </a>
 
-  <a
-    href="clientes.html"
-    class="action-card"
-  >
+    <a href="ensayos.html" class="action-card">
+      <img src="img/icon-ensayos.svg" alt="">
+      <span>Ensayos</span>
+    </a>
 
-    <img
-      src="img/icon-clientes.svg"
-      alt=""
-    >
+    <a href="precios.html" class="action-card">
+      <img src="img/icon-precios.svg" alt="">
+      <span>Precios</span>
+    </a>
 
-    <span>Clientes</span>
-
-  </a>
-
-
-  <a
-    href="stock.html"
-    class="action-card"
-  >
-
-    <img
-      src="img/icon-stock.svg"
-      alt=""
-    >
-
-    <span>Stock</span>
-
-  </a>
+  </section>
 
 
-  <a
-    href="ensayos.html"
-    class="action-card"
-  >
+  <section class="card cliente-card">
 
-    <img
-      src="img/icon-ensayos.svg"
-      alt=""
-    >
+    <div class="cliente-cabecera">
 
-    <span>Ensayos</span>
-
-  </a>
+      <div class="cliente-nombre">
+        <h2 id="clienteNombre">Cargando cliente...</h2>
+      </div>
 
 
-  <a
-    href="precios.html"
-    class="action-card"
-  >
+      <div id="clienteDatos" class="cliente-datos">
 
-    <img
-      src="img/icon-precios.svg"
-      alt=""
-    >
+        <div class="bloque-datos-cliente">
 
-    <span>Precios</span>
+          <div class="titulo-datos-cliente">
 
-  </a>
+            <h2>Datos del cliente</h2>
 
-</section>
-
-
-
-<!-- =========================================================
-     DATOS DEL CLIENTE
-========================================================= -->
-
-<section class="card cliente-card">
-
-
-  <div class="cliente-cabecera">
-
-
-    <!-- =====================================================
-         MITAD IZQUIERDA
-         SOLO NOMBRE DE LA EMPRESA
-    ====================================================== -->
-
-    <div class="cliente-nombre">
-
-      <h2 id="clienteNombre">
-        Cargando cliente...
-      </h2>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         MITAD DERECHA
-    ====================================================== -->
-
-    <div
-      id="clienteDatos"
-      class="cliente-datos"
-    >
-
-
-      <!-- ===================================================
-           FICHA PRINCIPAL
-      ==================================================== -->
-
-      <div class="bloque-datos-cliente">
-
-
-        <!-- TÍTULO + TRES PUNTOS -->
-
-        <div class="titulo-datos-cliente">
-
-          <h2>
-            Datos del cliente
-          </h2>
-
-
-          <div class="menu-contacto">
-
-            <button
-              id="menuContactoBtn"
-              class="btn-menu-contacto"
-              type="button"
-              aria-label="Opciones del contacto"
-            >
-              ⋮
-            </button>
-
-
-            <div
-              id="menuContactoOpciones"
-              class="menu-contacto-opciones"
-              hidden
-            >
-
+            <div class="menu-contacto">
               <button
-                id="editarContactoPrincipalBtn"
+                id="menuContactoBtn"
+                class="btn-menu-contacto"
                 type="button"
-              >
-                ✏️ Editar
+                aria-label="Opciones del cliente">
+                ⋮
               </button>
 
+              <div
+                id="menuContactoOpciones"
+                class="menu-contacto-opciones"
+                hidden>
 
-              <button
-                id="eliminarContactoPrincipalBtn"
-                type="button"
-              >
-                🗑️ Eliminar
-              </button>
+                <button id="editarClienteMenuBtn" type="button">
+                  ✏️ Editar
+                </button>
 
+                <button id="eliminarClienteMenuBtn" type="button">
+                  🗑️ Eliminar
+                </button>
+
+              </div>
             </div>
 
           </div>
 
-        </div>
-
-
-
-        <!-- DATOS -->
-
-        <div class="campo">
-
-          <label>
-            Contacto
-          </label>
-
-          <span id="contactoTxt"></span>
-
-          <input
-            type="text"
-            id="contactoInput"
-            hidden
-          >
-
-        </div>
-
-
-        <div class="campo">
-
-          <label>
-            Posición
-          </label>
-
-          <span id="posicionTxt"></span>
-
-          <input
-            type="text"
-            id="posicionInput"
-            hidden
-          >
-
-        </div>
-
-
-        <div class="campo">
-
-          <label>
-            Teléfono
-          </label>
-
-          <span id="telefonoTxt"></span>
-
-          <a
-            id="wspLink"
-            target="_blank"
-            rel="noopener"
-          ></a>
-
-          <input
-            type="text"
-            id="telefonoInput"
-            hidden
-          >
-
-        </div>
-
-
-        <div class="campo">
-
-          <label>
-            Email
-          </label>
-
-          <span id="emailTxt"></span>
-
-          <a
-            id="mailLink"
-            target="_blank"
-            rel="noopener"
-          ></a>
-
-          <input
-            type="email"
-            id="emailInput"
-            hidden
-          >
-
-        </div>
-
-
-        <div class="campo">
-
-          <label>
-            Observaciones
-          </label>
-
-          <p id="observacionesTxt"></p>
-
-          <textarea
-            id="observacionesInput"
-            rows="4"
-            hidden
-          ></textarea>
-
-        </div>
-
-
-        <!--
-          Se mantienen estos botones en el HTML porque
-          cliente.js actual los utiliza.
-
-          Más adelante los podemos reemplazar por el menú
-          de tres puntos sin romper la edición.
-        -->
-
-        <div
-          class="acciones-form"
-          hidden
-        >
-
-          <button
-            id="editarBtn"
-            class="btn-principal"
-            type="button"
-          >
-            ✏️ Editar cliente
-          </button>
-
-
-          <button
-            id="guardarBtn"
-            class="btn-secundario"
-            type="button"
-            hidden
-          >
-            💾 Guardar cambios
-          </button>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- ===================================================
-           CONTACTOS ADICIONALES
-
-           SIN TÍTULO "CONTACTOS"
-           SIN "CARGANDO CONTACTOS"
-
-           El JS podrá insertar las fichas directamente
-           acá, una debajo de otra.
-      ==================================================== -->
-
-      <div
-        id="listaContactos"
-        class="lista-contactos"
-      ></div>
-
-
-
-      <!-- ===================================================
-           BOTÓN AGREGAR CONTACTO
-      ==================================================== -->
-
-      <div class="acciones-contactos">
-
-        <button
-          id="agregarContactoBtn"
-          class="btn-principal"
-          type="button"
-        >
-
-          ➕ Agregar contacto
-
-        </button>
-
-      </div>
-
-
-
-      <!-- ===================================================
-           FORMULARIO NUEVO / EDITAR CONTACTO
-
-           Se mantiene para no romper cliente.js.
-      ==================================================== -->
-
-      <div
-        id="formContacto"
-        class="form-contacto"
-        hidden
-      >
-
-        <h3 id="tituloFormContacto">
-          Nuevo contacto
-        </h3>
-
-
-        <div class="contacto-form-grid">
-
 
           <div class="campo">
-
-            <label>
-              Nombre
-            </label>
-
-            <input
-              type="text"
-              id="contactoNombreInput"
-              placeholder="Nombre y apellido"
-            >
-
+            <label>Contacto</label>
+            <span id="contactoTxt"></span>
+            <input type="text" id="contactoInput" hidden>
           </div>
 
 
           <div class="campo">
-
-            <label>
-              Posición / Cargo
-            </label>
-
-            <input
-              type="text"
-              id="contactoPosicionInput"
-              placeholder="Dueño, encargado, quesero..."
-            >
-
+            <label>Posición</label>
+            <span id="posicionTxt"></span>
+            <input type="text" id="posicionInput" hidden>
           </div>
 
 
           <div class="campo">
-
-            <label>
-              Teléfono
-            </label>
-
-            <input
-              type="text"
-              id="contactoTelefonoInput"
-              placeholder="Teléfono"
-            >
-
+            <label>Teléfono</label>
+            <span id="telefonoTxt"></span>
+            <a id="wspLink" target="_blank"></a>
+            <input type="text" id="telefonoInput" hidden>
           </div>
 
 
           <div class="campo">
-
-            <label>
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="contactoEmailInput"
-              placeholder="correo@ejemplo.com"
-            >
-
+            <label>Email</label>
+            <span id="emailTxt"></span>
+            <a id="mailLink" target="_blank"></a>
+            <input type="email" id="emailInput" hidden>
           </div>
 
 
-          <div class="campo campo-observaciones">
-
-            <label>
-              Observaciones
-            </label>
-
+          <div class="campo">
+            <label>Observaciones</label>
+            <p id="observacionesTxt"></p>
             <textarea
-              id="contactoObservacionesInput"
-              rows="3"
-              placeholder="Observaciones del contacto..."
-            ></textarea>
-
+              id="observacionesInput"
+              rows="4"
+              hidden></textarea>
           </div>
 
-        </div>
 
+          <div class="acciones-form">
 
-        <div class="acciones-form">
+            <button
+              id="guardarBtn"
+              class="btn-secundario"
+              hidden>
+              💾 Guardar cambios
+            </button>
 
-          <button
-            id="guardarContactoBtn"
-            class="btn-principal"
-            type="button"
-          >
-
-            💾 Guardar contacto
-
-          </button>
-
-
-          <button
-            id="cancelarContactoBtn"
-            class="btn-secundario"
-            type="button"
-          >
-
-            Cancelar
-
-          </button>
+          </div>
 
         </div>
 
@@ -516,103 +149,161 @@
 
     </div>
 
-  </div>
-
-</section>
+  </section>
 
 
+  <section class="card contactos-card">
 
-<!-- =========================================================
-     HISTORIAL
-     NO TOCAR
-========================================================= -->
+    <div class="contactos-titulo">
 
-<section class="card historial-card">
+      <div>
+        <h2>Contactos</h2>
+        <p>Personas relacionadas con este cliente</p>
+      </div>
 
-  <h2>
-    Historial de visitas
-  </h2>
+      <button
+        id="agregarContactoBtn"
+        class="btn-principal"
+        type="button">
+        ➕ Agregar contacto
+      </button>
 
-
-  <div
-    id="listaVisitasCliente"
-    class="lista-historial"
-  ></div>
-
-
-  <button
-    id="verHistorialCompleto"
-    class="btn-outline"
-    type="button"
-  >
-
-    📋 Ver historial completo
-
-  </button>
-
-</section>
+    </div>
 
 
+    <div
+      id="formContacto"
+      class="form-contacto"
+      hidden>
 
-<!-- =========================================================
-     VOLVER
-     NO TOCAR
-========================================================= -->
+      <h3 id="tituloFormContacto">
+        Nuevo contacto
+      </h3>
 
-<section
-  style="
-    text-align:center;
-    margin-top:20px;
-  "
->
 
-  <button
-    class="btn-volver"
-    onclick="window.location.href='clientes.html'"
-  >
+      <div class="contacto-form-grid">
 
-    ⬅ Volver a clientes
+        <div class="campo">
+          <label>Nombre</label>
+          <input
+            type="text"
+            id="contactoNombreInput"
+            placeholder="Nombre y apellido">
+        </div>
 
-  </button>
 
-</section>
+        <div class="campo">
+          <label>Posición / Cargo</label>
+          <input
+            type="text"
+            id="contactoPosicionInput"
+            placeholder="Dueño, encargado, quesero...">
+        </div>
 
+
+        <div class="campo">
+          <label>Teléfono</label>
+          <input
+            type="text"
+            id="contactoTelefonoInput"
+            placeholder="Teléfono">
+        </div>
+
+
+        <div class="campo">
+          <label>Email</label>
+          <input
+            type="email"
+            id="contactoEmailInput"
+            placeholder="correo@ejemplo.com">
+        </div>
+
+
+        <div class="campo campo-observaciones">
+          <label>Observaciones</label>
+          <textarea
+            id="contactoObservacionesInput"
+            rows="3"
+            placeholder="Observaciones del contacto..."></textarea>
+        </div>
+
+      </div>
+
+
+      <div class="acciones-form">
+
+        <button
+          id="guardarContactoBtn"
+          class="btn-principal"
+          type="button">
+          💾 Guardar contacto
+        </button>
+
+        <button
+          id="cancelarContactoBtn"
+          class="btn-secundario"
+          type="button">
+          Cancelar
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="listaContactos"
+      class="lista-contactos">
+      <p>Cargando contactos...</p>
+    </div>
+
+  </section>
+
+
+  <section class="card historial-card">
+
+    <h2>Historial de visitas</h2>
+
+    <div
+      id="listaVisitasCliente"
+      class="lista-historial">
+    </div>
+
+    <button
+      id="verHistorialCompleto"
+      class="btn-outline"
+      type="button">
+      📋 Ver historial completo
+    </button>
+
+  </section>
+
+
+  <section style="text-align:center; margin-top:20px;">
+
+    <button
+      class="btn-volver"
+      onclick="window.location.href='clientes.html'">
+      ⬅ Volver a clientes
+    </button>
+
+  </section>
 
 </main>
 
 
-
-<!-- =========================================================
-     FOOTER
-     NO TOCAR
-========================================================= -->
-
 <footer>
-
   <p>
-
     © INLACT ·
-
-    <a href="aviso-legal.html">
-      Aviso Legal
-    </a>
-
+    <a href="aviso-legal.html">Aviso Legal</a>
   </p>
-
 </footer>
 
 
-
-<!-- =========================================================
-     JAVASCRIPT
-========================================================= -->
-
 <script
   type="module"
-  src="cliente.js"
-></script>
-
+  src="cliente.js">
+</script>
 
 </body>
-
 </html>
