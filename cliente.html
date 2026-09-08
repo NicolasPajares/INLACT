@@ -57,6 +57,7 @@
 
 <!-- =========================================================
      ACCESOS RÁPIDOS
+     NO TOCAR
 ========================================================= -->
 
 <section class="quick-actions">
@@ -125,7 +126,7 @@
 
 
 <!-- =========================================================
-     CLIENTE
+     DATOS DEL CLIENTE
 ========================================================= -->
 
 <section class="card cliente-card">
@@ -136,8 +137,7 @@
 
     <!-- =====================================================
          MITAD IZQUIERDA
-         SOLO NOMBRE DEL CLIENTE
-         CENTRADO EN ALTURA
+         SOLO NOMBRE DE LA EMPRESA
     ====================================================== -->
 
     <div class="cliente-nombre">
@@ -161,11 +161,13 @@
 
 
       <!-- ===================================================
-           PRIMER CONTACTO / DATOS DEL CLIENTE
+           FICHA PRINCIPAL
       ==================================================== -->
 
       <div class="bloque-datos-cliente">
 
+
+        <!-- TÍTULO + TRES PUNTOS -->
 
         <div class="titulo-datos-cliente">
 
@@ -173,10 +175,6 @@
             Datos del cliente
           </h2>
 
-
-          <!-- ===============================================
-               MENÚ DE TRES PUNTOS
-          ================================================ -->
 
           <div class="menu-contacto">
 
@@ -203,6 +201,7 @@
                 ✏️ Editar
               </button>
 
+
               <button
                 id="eliminarContactoPrincipalBtn"
                 type="button"
@@ -217,6 +216,8 @@
         </div>
 
 
+
+        <!-- DATOS -->
 
         <div class="campo">
 
@@ -315,6 +316,39 @@
         </div>
 
 
+        <!--
+          Se mantienen estos botones en el HTML porque
+          cliente.js actual los utiliza.
+
+          Más adelante los podemos reemplazar por el menú
+          de tres puntos sin romper la edición.
+        -->
+
+        <div
+          class="acciones-form"
+          hidden
+        >
+
+          <button
+            id="editarBtn"
+            class="btn-principal"
+            type="button"
+          >
+            ✏️ Editar cliente
+          </button>
+
+
+          <button
+            id="guardarBtn"
+            class="btn-secundario"
+            type="button"
+            hidden
+          >
+            💾 Guardar cambios
+          </button>
+
+        </div>
+
       </div>
 
 
@@ -322,175 +356,159 @@
       <!-- ===================================================
            CONTACTOS ADICIONALES
 
-           Cada nuevo contacto aparecerá inmediatamente
-           debajo de "Datos del cliente".
+           SIN TÍTULO "CONTACTOS"
+           SIN "CARGANDO CONTACTOS"
+
+           El JS podrá insertar las fichas directamente
+           acá, una debajo de otra.
       ==================================================== -->
 
-      <div class="bloque-contactos">
-
-
-        <div class="contactos-titulo">
-
-          <h2>
-            Contactos
-          </h2>
-
-        </div>
+      <div
+        id="listaContactos"
+        class="lista-contactos"
+      ></div>
 
 
 
-        <div
-          id="listaContactos"
-          class="lista-contactos"
+      <!-- ===================================================
+           BOTÓN AGREGAR CONTACTO
+      ==================================================== -->
+
+      <div class="acciones-contactos">
+
+        <button
+          id="agregarContactoBtn"
+          class="btn-principal"
+          type="button"
         >
 
-          <p>
-            Cargando contactos...
-          </p>
+          ➕ Agregar contacto
+
+        </button>
+
+      </div>
+
+
+
+      <!-- ===================================================
+           FORMULARIO NUEVO / EDITAR CONTACTO
+
+           Se mantiene para no romper cliente.js.
+      ==================================================== -->
+
+      <div
+        id="formContacto"
+        class="form-contacto"
+        hidden
+      >
+
+        <h3 id="tituloFormContacto">
+          Nuevo contacto
+        </h3>
+
+
+        <div class="contacto-form-grid">
+
+
+          <div class="campo">
+
+            <label>
+              Nombre
+            </label>
+
+            <input
+              type="text"
+              id="contactoNombreInput"
+              placeholder="Nombre y apellido"
+            >
+
+          </div>
+
+
+          <div class="campo">
+
+            <label>
+              Posición / Cargo
+            </label>
+
+            <input
+              type="text"
+              id="contactoPosicionInput"
+              placeholder="Dueño, encargado, quesero..."
+            >
+
+          </div>
+
+
+          <div class="campo">
+
+            <label>
+              Teléfono
+            </label>
+
+            <input
+              type="text"
+              id="contactoTelefonoInput"
+              placeholder="Teléfono"
+            >
+
+          </div>
+
+
+          <div class="campo">
+
+            <label>
+              Email
+            </label>
+
+            <input
+              type="email"
+              id="contactoEmailInput"
+              placeholder="correo@ejemplo.com"
+            >
+
+          </div>
+
+
+          <div class="campo campo-observaciones">
+
+            <label>
+              Observaciones
+            </label>
+
+            <textarea
+              id="contactoObservacionesInput"
+              rows="3"
+              placeholder="Observaciones del contacto..."
+            ></textarea>
+
+          </div>
 
         </div>
 
 
-
-        <!-- =================================================
-             BOTÓN AGREGAR CONTACTO
-        ================================================== -->
-
-        <div class="acciones-contactos">
+        <div class="acciones-form">
 
           <button
-            id="agregarContactoBtn"
+            id="guardarContactoBtn"
             class="btn-principal"
             type="button"
           >
 
-            ➕ Agregar contacto
+            💾 Guardar contacto
 
           </button>
 
-        </div>
 
+          <button
+            id="cancelarContactoBtn"
+            class="btn-secundario"
+            type="button"
+          >
 
+            Cancelar
 
-        <!-- =================================================
-             FORMULARIO NUEVO / EDITAR CONTACTO
-        ================================================== -->
-
-        <div
-          id="formContacto"
-          class="form-contacto"
-          hidden
-        >
-
-          <h3 id="tituloFormContacto">
-            Nuevo contacto
-          </h3>
-
-
-          <div class="contacto-form-grid">
-
-
-            <div class="campo">
-
-              <label>
-                Nombre
-              </label>
-
-              <input
-                type="text"
-                id="contactoNombreInput"
-                placeholder="Nombre y apellido"
-              >
-
-            </div>
-
-
-            <div class="campo">
-
-              <label>
-                Posición / Cargo
-              </label>
-
-              <input
-                type="text"
-                id="contactoPosicionInput"
-                placeholder="Dueño, encargado, quesero..."
-              >
-
-            </div>
-
-
-            <div class="campo">
-
-              <label>
-                Teléfono
-              </label>
-
-              <input
-                type="text"
-                id="contactoTelefonoInput"
-                placeholder="Teléfono"
-              >
-
-            </div>
-
-
-            <div class="campo">
-
-              <label>
-                Email
-              </label>
-
-              <input
-                type="email"
-                id="contactoEmailInput"
-                placeholder="correo@ejemplo.com"
-              >
-
-            </div>
-
-
-            <div class="campo campo-observaciones">
-
-              <label>
-                Observaciones
-              </label>
-
-              <textarea
-                id="contactoObservacionesInput"
-                rows="3"
-                placeholder="Observaciones del contacto..."
-              ></textarea>
-
-            </div>
-
-          </div>
-
-
-          <div class="acciones-form">
-
-            <button
-              id="guardarContactoBtn"
-              class="btn-principal"
-              type="button"
-            >
-
-              💾 Guardar contacto
-
-            </button>
-
-
-            <button
-              id="cancelarContactoBtn"
-              class="btn-secundario"
-              type="button"
-            >
-
-              Cancelar
-
-            </button>
-
-          </div>
+          </button>
 
         </div>
 
