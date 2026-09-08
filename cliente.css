@@ -109,7 +109,7 @@ main {
 .menu-contacto {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 20px;
 }
 
 .btn-menu-contacto {
@@ -119,9 +119,9 @@ main {
   padding: 0;
 
   background: #ffffff;
-  color: #1f4e8c;
+  color: #38bdf8;
 
-  border: 1px solid #d1d5db;
+  border: none;
   border-radius: 10px;
 
   font-size: 25px;
