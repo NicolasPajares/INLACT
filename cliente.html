@@ -93,14 +93,62 @@
     </div>
 
     <div class="acciones-form">
-      <button id="editarBtn" class="btn-principal">
-        ✏️ Editar contacto
-      </button>
+  <button id="agregarContactoBtn" class="btn-principal">
+    ➕ Agregar contacto
+  </button>
 
-      <button id="guardarBtn" class="btn-secundario" hidden>
-        💾 Guardar cambios
-      </button>
+  <button id="guardarBtn" class="btn-secundario" hidden>
+    💾 Guardar cambios
+  </button>
+</div>
+
+<!-- ===============================
+     NUEVO CONTACTO
+================================ -->
+<div id="nuevoContacto" class="form-contacto" hidden>
+
+  <div class="contacto-form-grid">
+
+    <div class="campo">
+      <label>Contacto</label>
+      <input type="text" id="nuevoContactoNombre">
     </div>
+
+    <div class="campo">
+      <label>Posición</label>
+      <input type="text" id="nuevoContactoPosicion">
+    </div>
+
+    <div class="campo">
+      <label>Teléfono</label>
+      <input type="text" id="nuevoContactoTelefono">
+    </div>
+
+    <div class="campo">
+      <label>Email</label>
+      <input type="email" id="nuevoContactoEmail">
+    </div>
+
+    <div class="campo campo-observaciones">
+      <label>Observaciones</label>
+      <textarea id="nuevoContactoObservaciones" rows="4"></textarea>
+    </div>
+
+  </div>
+
+  <div class="acciones-form">
+
+    <button type="button" id="guardarNuevoContactoBtn" class="btn-principal">
+      💾 Guardar contacto
+    </button>
+
+    <button type="button" id="cancelarNuevoContactoBtn" class="btn-secundario">
+      Cancelar
+    </button>
+
+  </div>
+
+</div>
 
   </div>
 </section>
