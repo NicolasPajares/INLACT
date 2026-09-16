@@ -4,6 +4,7 @@ import {
     doc,
     getDoc,
     updateDoc,
+    arrayUnion,
     collection,
     query,
     where,
@@ -17,9 +18,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         new URLSearchParams(window.location.search).get("id");
 
 
+    /*
+     * ============================================================
+     * ELEMENTOS CLIENTE
+     * ============================================================
+     */
+
     const nombreEl =
         document.getElementById("clienteNombre");
-
 
     const contactoTxt =
         document.getElementById("contactoTxt");
@@ -81,13 +87,12 @@ document.addEventListener("DOMContentLoaded", async () => {
      */
 
     await cargarCliente();
-
     await cargarVisitas();
 
 
     /*
      * ============================================================
-     * DATOS CLIENTE
+     * CARGAR DATOS DEL CLIENTE
      * ============================================================
      */
 
@@ -111,7 +116,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "Cliente no encontrado";
 
             return;
-
         }
 
 
@@ -123,42 +127,358 @@ document.addEventListener("DOMContentLoaded", async () => {
             c.nombre || "";
 
 
+        /*
+         * CONTACTO PRINCIPAL
+         *
+         * Se mantienen los campos que ya tenía
+         * el cliente.
+         */
+
+        const contactoPrincipal = {
+
+            nombre:
+                c.contacto || "",
+
+            posicion:
+                c.posicion || "",
+
+            telefono:
+                c.telefono || "",
+
+            email:
+                c.email || "",
+
+            observaciones:
+                c.observaciones || ""
+
+        };
+
+
         contactoTxt.textContent =
-            c.contacto || "-";
+            contactoPrincipal.nombre || "-";
 
         posicionTxt.textContent =
-            c.posicion || "-";
+            contactoPrincipal.posicion || "-";
 
         telefonoTxt.textContent =
-            c.telefono || "-";
+            contactoPrincipal.telefono || "-";
 
         emailTxt.textContent =
-            c.email || "-";
+            contactoPrincipal.email || "-";
 
         observacionesTxt.textContent =
-            c.observaciones || "-";
+            contactoPrincipal.observaciones || "-";
 
+
+        /*
+         * INPUTS DEL CONTACTO PRINCIPAL
+         */
 
         contactoInput.value =
-            c.contacto || "";
+            contactoPrincipal.nombre;
 
         posicionInput.value =
-            c.posicion || "";
+            contactoPrincipal.posicion;
 
         telefonoInput.value =
-            c.telefono || "";
+            contactoPrincipal.telefono;
 
         emailInput.value =
-            c.email || "";
+            contactoPrincipal.email;
 
         observacionesInput.value =
-            c.observaciones || "";
+            contactoPrincipal.observaciones;
 
 
         actualizarLinks();
 
         modoLectura();
 
+
+        /*
+         * CONTACTOS ADICIONALES
+         */
+
+        const contactos =
+            Array.isArray(c.contactos)
+                ? c.contactos
+                : [];
+
+
+        mostrarContactosGuardados(
+            contactos
+        );
+    }
+
+
+    /*
+     * ============================================================
+     * MOSTRAR CONTACTOS ADICIONALES
+     * ============================================================
+     */
+
+    function mostrarContactosGuardados(contactos) {
+
+        const anterior =
+            document.getElementById(
+                "contactosAdicionales"
+            );
+
+
+        anterior?.remove();
+
+
+        if (
+            !Array.isArray(contactos) ||
+            contactos.length === 0
+        ) {
+            return;
+        }
+
+
+        const contenedor =
+            document.createElement("div");
+
+
+        contenedor.id =
+            "contactosAdicionales";
+
+
+        contenedor.className =
+            "lista-contactos";
+
+
+        const titulo =
+            document.createElement("h3");
+
+
+        titulo.textContent =
+            "Otros contactos";
+
+
+        contenedor.appendChild(
+            titulo
+        );
+
+
+        contactos.forEach(
+            contacto => {
+
+                const tarjeta =
+                    document.createElement("div");
+
+
+                tarjeta.className =
+                    "contacto-card";
+
+
+                const nombre =
+                    contacto?.nombre ||
+                    "Contacto sin nombre";
+
+
+                const posicion =
+                    contacto?.posicion ||
+                    "";
+
+
+                const telefono =
+                    contacto?.telefono ||
+                    "";
+
+
+                const email =
+                    contacto?.email ||
+                    "";
+
+
+                const observaciones =
+                    contacto?.observaciones ||
+                    "";
+
+
+                /*
+                 * WHATSAPP
+                 */
+
+                const telefonoLimpio =
+                    String(telefono)
+                        .replace(/\D/g, "");
+
+
+                const telefonoHTML =
+                    telefono
+                        ? `
+                            <a
+                                href="https://wa.me/54${telefonoLimpio}"
+                                target="_blank"
+                                rel="noopener"
+                            >
+                                ${escaparHTML(telefono)}
+                            </a>
+                          `
+                        : "-";
+
+
+                /*
+                 * EMAIL
+                 */
+
+                const emailHTML =
+                    email
+                        ? `
+                            <a href="mailto:${escaparHTML(email)}">
+                                ${escaparHTML(email)}
+                            </a>
+                          `
+                        : "-";
+
+
+                tarjeta.innerHTML = `
+
+                    <div class="campo">
+
+                        <label>
+                            Contacto
+                        </label>
+
+                        <span>
+                            ${escaparHTML(nombre)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label>
+                            Posición
+                        </label>
+
+                        <span>
+                            ${escaparHTML(
+                                posicion || "-"
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label>
+                            Teléfono
+                        </label>
+
+                        <span>
+                            ${telefonoHTML}
+                        </span>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <span>
+                            ${emailHTML}
+                        </span>
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label>
+                            Observaciones
+                        </label>
+
+                        <p>
+                            ${escaparHTML(
+                                observaciones || "-"
+                            )}
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                contenedor.appendChild(
+                    tarjeta
+                );
+
+            }
+        );
+
+
+        const clienteCard =
+            document.querySelector(
+                ".cliente-card"
+            );
+
+
+        const formularioNuevo =
+            document.getElementById(
+                "nuevoContactoForm"
+            );
+
+
+        /*
+         * Si hay un formulario abierto,
+         * dejamos los contactos antes del formulario.
+         */
+
+        if (formularioNuevo) {
+
+            clienteCard?.insertBefore(
+                contenedor,
+                formularioNuevo
+            );
+
+        } else {
+
+            clienteCard?.appendChild(
+                contenedor
+            );
+
+        }
+
+    }
+
+
+    /*
+     * ============================================================
+     * ESCAPAR HTML
+     * ============================================================
+     */
+
+    function escaparHTML(valor) {
+
+        return String(valor ?? "")
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
     }
 
 
@@ -175,23 +495,476 @@ document.addEventListener("DOMContentLoaded", async () => {
         editarBtn.hidden = false;
 
         guardarBtn.hidden = true;
+    }
+
+
+    /*
+     * ============================================================
+     * NUEVO CONTACTO
+     * ============================================================
+     *
+     * IMPORTANTE:
+     *
+     * El botón "Agregar contacto" NO modifica
+     * el contacto principal.
+     *
+     * Abre un formulario nuevo.
+     *
+     * El nuevo contacto se guarda dentro del
+     * array "contactos" del cliente.
+     *
+     * Esto permite tener:
+     *
+     * - Dueño
+     * - Encargado de producción
+     * - Compras
+     * - Administración
+     * - Ventas
+     * - etc.
+     *
+     * ============================================================
+     */
+
+    function mostrarFormularioNuevoContacto() {
+
+        /*
+         * Si ya hay un formulario abierto,
+         * simplemente vamos hasta él.
+         */
+
+        const formularioExistente =
+            document.getElementById(
+                "nuevoContactoForm"
+            );
+
+
+        if (formularioExistente) {
+
+            formularioExistente.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            return;
+        }
+
+
+        /*
+         * Crear formulario
+         */
+
+        const formulario =
+            document.createElement("div");
+
+
+        formulario.id =
+            "nuevoContactoForm";
+
+
+        formulario.className =
+            "form-contacto";
+
+
+        formulario.innerHTML = `
+
+            <h3>
+                Nuevo contacto
+            </h3>
+
+
+            <div class="contacto-form-grid">
+
+
+                <div class="campo">
+
+                    <label>
+                        Nombre
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nuevoContactoNombre"
+                        placeholder="Nombre y apellido"
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Posición
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nuevoContactoPosicion"
+                        placeholder="Dueño, producción, compras, etc."
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nuevoContactoTelefono"
+                        placeholder="Teléfono / WhatsApp"
+                    >
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="nuevoContactoEmail"
+                        placeholder="correo@empresa.com"
+                    >
+
+                </div>
+
+
+                <div
+                    class="campo"
+                    style="grid-column: 1 / -1;"
+                >
+
+                    <label>
+                        Observaciones
+                    </label>
+
+                    <textarea
+                        id="nuevoContactoObservaciones"
+                        rows="3"
+                        placeholder="Información adicional del contacto"
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="acciones-form">
+
+
+                <button
+                    id="guardarNuevoContactoBtn"
+                    class="btn-principal"
+                    type="button"
+                >
+                    💾 Guardar contacto
+                </button>
+
+
+                <button
+                    id="cancelarNuevoContactoBtn"
+                    class="btn-secundario"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+
+
+            </div>
+
+        `;
+
+
+        const clienteCard =
+            document.querySelector(
+                ".cliente-card"
+            );
+
+
+        if (clienteCard) {
+
+            clienteCard.appendChild(
+                formulario
+            );
+
+        } else {
+
+            document
+                .getElementById(
+                    "clienteDatos"
+                )
+                ?.appendChild(
+                    formulario
+                );
+        }
+
+
+        /*
+         * CANCELAR
+         */
+
+        document
+            .getElementById(
+                "cancelarNuevoContactoBtn"
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    formulario.remove();
+
+                }
+            );
+
+
+        /*
+         * GUARDAR
+         */
+
+        document
+            .getElementById(
+                "guardarNuevoContactoBtn"
+            )
+            ?.addEventListener(
+                "click",
+                guardarNuevoContacto
+            );
+
+
+        /*
+         * Poner cursor en nombre
+         */
+
+        document
+            .getElementById(
+                "nuevoContactoNombre"
+            )
+            ?.focus();
+
+
+        /*
+         * Llevar hasta el formulario
+         */
+
+        formulario.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
 
     }
 
 
     /*
      * ============================================================
-     * MODO EDICIÓN
+     * GUARDAR NUEVO CONTACTO
      * ============================================================
      */
 
-    function modoEdicion() {
+    async function guardarNuevoContacto() {
 
-        toggleInputs(true);
+        const nombre =
+            document
+                .getElementById(
+                    "nuevoContactoNombre"
+                )
+                ?.value
+                .trim();
 
-        editarBtn.hidden = true;
 
-        guardarBtn.hidden = false;
+        const posicion =
+            document
+                .getElementById(
+                    "nuevoContactoPosicion"
+                )
+                ?.value
+                .trim();
+
+
+        const telefono =
+            document
+                .getElementById(
+                    "nuevoContactoTelefono"
+                )
+                ?.value
+                .trim();
+
+
+        const email =
+            document
+                .getElementById(
+                    "nuevoContactoEmail"
+                )
+                ?.value
+                .trim();
+
+
+        const observaciones =
+            document
+                .getElementById(
+                    "nuevoContactoObservaciones"
+                )
+                ?.value
+                .trim();
+
+
+        /*
+         * VALIDACIONES
+         */
+
+        if (!nombre) {
+
+            alert(
+                "Ingresá el nombre del contacto."
+            );
+
+            return;
+        }
+
+
+        if (!posicion) {
+
+            alert(
+                "Ingresá la posición del contacto."
+            );
+
+            return;
+        }
+
+
+        if (
+            !telefono &&
+            !email
+        ) {
+
+            alert(
+                "Ingresá al menos un teléfono o un email."
+            );
+
+            return;
+        }
+
+
+        /*
+         * OBJETO CONTACTO
+         */
+
+        const nuevoContacto = {
+
+            nombre:
+                nombre,
+
+            posicion:
+                posicion,
+
+            telefono:
+                telefono,
+
+            email:
+                email,
+
+            observaciones:
+                observaciones
+
+        };
+
+
+        const boton =
+            document.getElementById(
+                "guardarNuevoContactoBtn"
+            );
+
+
+        try {
+
+            /*
+             * Evitar doble clic
+             */
+
+            if (boton) {
+
+                boton.disabled =
+                    true;
+
+                boton.textContent =
+                    "Guardando...";
+            }
+
+
+            /*
+             * arrayUnion agrega el nuevo contacto
+             * sin borrar los anteriores.
+             */
+
+            await updateDoc(
+                clienteRef,
+                {
+                    contactos:
+                        arrayUnion(
+                            nuevoContacto
+                        )
+                }
+            );
+
+
+            /*
+             * Eliminar formulario
+             */
+
+            const formulario =
+                document.getElementById(
+                    "nuevoContactoForm"
+                );
+
+
+            formulario?.remove();
+
+
+            /*
+             * Recargar cliente
+             *
+             * Esto hace que el contacto
+             * aparezca inmediatamente.
+             */
+
+            await cargarCliente();
+
+
+            alert(
+                "Contacto guardado ✔"
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Error guardando nuevo contacto:",
+                error
+            );
+
+
+            if (boton) {
+
+                boton.disabled =
+                    false;
+
+                boton.textContent =
+                    "💾 Guardar contacto";
+            }
+
+
+            alert(
+                "No se pudo guardar el nuevo contacto."
+            );
+
+        }
 
     }
 
@@ -211,11 +984,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             emailInput,
             observacionesInput
 
-        ].forEach(input => {
+        ].forEach(
+            input => {
 
-            input.hidden = !editable;
+                input.hidden =
+                    !editable;
 
-        });
+            }
+        );
 
 
         [
@@ -225,57 +1001,102 @@ document.addEventListener("DOMContentLoaded", async () => {
             emailTxt,
             observacionesTxt
 
-        ].forEach(texto => {
+        ].forEach(
+            texto => {
 
-            texto.hidden = editable;
+                texto.hidden =
+                    editable;
 
-        });
+            }
+        );
 
     }
 
 
+    /*
+     * ============================================================
+     * BOTÓN AGREGAR CONTACTO
+     * ============================================================
+     *
+     * ANTES:
+     *
+     * editarBtn.onclick = modoEdicion
+     *
+     * Eso hacía que "Agregar contacto" editara
+     * el contacto principal.
+     *
+     * AHORA:
+     *
+     * abre un formulario para crear otro contacto.
+     *
+     * ============================================================
+     */
+
     editarBtn.onclick =
-        modoEdicion;
+        mostrarFormularioNuevoContacto;
 
 
     /*
      * ============================================================
-     * GUARDAR CAMBIOS CLIENTE
+     * GUARDAR CAMBIOS DEL CONTACTO PRINCIPAL
+     * ============================================================
+     *
+     * Esta función queda conservada para no romper
+     * la estructura existente.
+     *
      * ============================================================
      */
 
     guardarBtn.onclick =
         async () => {
 
-            await updateDoc(
-                clienteRef,
-                {
+            try {
 
-                    contacto:
-                        contactoInput.value,
+                await updateDoc(
+                    clienteRef,
+                    {
 
-                    posicion:
-                        posicionInput.value,
+                        contacto:
+                            contactoInput.value,
 
-                    telefono:
-                        telefonoInput.value,
+                        posicion:
+                            posicionInput.value,
 
-                    email:
-                        emailInput.value,
+                        telefono:
+                            telefonoInput.value,
 
-                    observaciones:
-                        observacionesInput.value
+                        email:
+                            emailInput.value,
 
-                }
-            );
+                        observaciones:
+                            observacionesInput.value
+
+                    }
+                );
 
 
-            await cargarCliente();
+                await cargarCliente();
 
 
-            alert(
-                "Cambios guardados ✔"
-            );
+                alert(
+                    "Cambios guardados ✔"
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Error guardando cambios:",
+                    error
+                );
+
+
+                alert(
+                    "No se pudieron guardar los cambios."
+                );
+
+            }
 
         };
 
@@ -290,7 +1111,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const tel =
             telefonoInput.value
-                .replace(/\D/g, "");
+                .replace(
+                    /\D/g,
+                    ""
+                );
 
 
         wspLink.textContent =
@@ -328,7 +1152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
      * FAST 02
      * FAST 10
      *
-     * El número se interpreta correctamente.
      * ============================================================
      */
 
@@ -338,6 +1161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             String(
                 a.nombre || ""
             ).trim();
+
 
         const nombreB =
             String(
@@ -368,7 +1192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (
             v.fecha &&
             typeof v.fecha.toDate ===
-            "function"
+                "function"
         ) {
 
             return v.fecha.toDate();
@@ -379,7 +1203,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (v.fecha) {
 
             const fecha =
-                new Date(v.fecha);
+                new Date(
+                    v.fecha
+                );
 
 
             if (
@@ -411,7 +1237,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (
             e.fecha &&
             typeof e.fecha.toDate ===
-            "function"
+                "function"
         ) {
 
             return e.fecha.toDate();
@@ -443,7 +1269,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (
             e.creadoEn &&
             typeof e.creadoEn.toDate ===
-            "function"
+                "function"
         ) {
 
             return e.creadoEn.toDate();
@@ -500,6 +1326,17 @@ document.addEventListener("DOMContentLoaded", async () => {
      * ============================================================
      * CARGAR HISTORIAL
      * ============================================================
+     *
+     * Se conserva la lógica actual:
+     *
+     * - Visitas
+     * - Ensayos
+     * - Entregas
+     * - Ventas
+     *
+     * Las ventas se toman de "egresos".
+     *
+     * ============================================================
      */
 
     async function cargarVisitas() {
@@ -512,7 +1349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * VISITAS
+             * BUSCAR VISITAS
              * ==================================================
              */
 
@@ -538,7 +1375,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * EGRESOS
+             * BUSCAR EGRESOS
              * ==================================================
              */
 
@@ -586,8 +1423,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     /*
-                     * La venta se toma
-                     * solamente desde EGRESOS.
+                     * Las ventas no se muestran
+                     * desde visitas.
                      */
 
                     if (
@@ -641,6 +1478,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const e =
                         docSnap.data();
 
+
+                    /*
+                     * Solamente egresos
+                     * de tipo venta.
+                     */
 
                     if (
                         e.tipoEgreso !==
@@ -784,7 +1626,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * AGREGAR VENTAS
+             * AGREGAR VENTAS AL HISTORIAL
              * ==================================================
              */
 
@@ -806,7 +1648,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * ORDENAR HISTORIAL
+             * ORDENAR TODO EL HISTORIAL
              * ==================================================
              */
 
@@ -842,7 +1684,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             /*
              * ==================================================
-             * MOSTRAR
+             * MOSTRAR HISTORIAL
              * ==================================================
              */
 
@@ -851,7 +1693,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     /*
                      * ==========================================
-                     * VISITA / ENSAYO
+                     * VISITA / ENSAYO / ENTREGA
                      * ==========================================
                      */
 
@@ -1019,28 +1861,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ];
 
 
-                        /*
-                         * ORDEN ALFABÉTICO
-                         * + NUMÉRICO
-                         */
-
                         productos.sort(
                             compararProductos
                         );
 
 
                         /*
-                         * ==================================================
-                         * IMPORTANTE:
-                         *
-                         * Cada producto es UNA SOLA FILA.
-                         *
-                         * PC:
-                         * Producto | Cantidad | Lote
-                         *
-                         * Celular:
-                         * el CSS podrá apilar las columnas.
-                         * ==================================================
+                         * Cada producto ocupa
+                         * una sola fila.
                          */
 
                         const productosHTML =
@@ -1050,9 +1878,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                                         <div class="producto-venta">
 
+
                                             <span class="col-producto">
 
                                                 📦
+
                                                 ${String(
                                                     producto.nombre ||
                                                     "Producto sin nombre"
@@ -1064,10 +1894,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                                             <span class="col-cantidad">
 
                                                 ⚖️
+
                                                 ${String(
                                                     producto.cantidad ??
                                                     ""
                                                 )}
+
                                                 ${String(
                                                     producto.unidad ||
                                                     ""
@@ -1079,12 +1911,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                                             <span class="col-lote">
 
                                                 🏷️
+
                                                 ${String(
                                                     producto.lote ||
                                                     ""
                                                 )}
 
                                             </span>
+
 
                                         </div>
 
@@ -1096,19 +1930,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                         /*
-                         * VENTA EN VERDE
-                         * SIN EMOJI EN EL TÍTULO
+                         * FECHA
                          */
-
-                        const div =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        div.className =
-                            "visita";
-
 
                         let fechaTexto =
                             "Sin fecha";
@@ -1139,6 +1962,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                             }
 
                         }
+
+
+                        /*
+                         * CREAR REGISTRO
+                         */
+
+                        const div =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        div.className =
+                            "visita";
 
 
                         div.innerHTML = `
@@ -1174,7 +2011,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 }
             );
-
 
         }
 
