@@ -211,7 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    /*
+        /*
      * ============================================================
      * MOSTRAR CONTACTOS ADICIONALES
      * ============================================================
@@ -248,21 +248,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             "lista-contactos";
 
 
-        const titulo =
-            document.createElement("h3");
-
-
-        titulo.textContent =
-            "Otros contactos";
-
-
-        contenedor.appendChild(
-            titulo
-        );
-
-
         contactos.forEach(
-            contacto => {
+            (contacto, indice) => {
 
                 const tarjeta =
                     document.createElement("div");
@@ -270,6 +257,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 tarjeta.className =
                     "contacto-card";
+
+
+                /*
+                 * Cada contacto adicional queda
+                 * separado del anterior por una línea.
+                 */
+
+                if (indice > 0) {
+
+                    tarjeta.style.borderTop =
+                        "1px solid #d9e8f2";
+
+                    tarjeta.style.marginTop =
+                        "18px";
+
+                    tarjeta.style.paddingTop =
+                        "18px";
+                }
 
 
                 const nombre =
@@ -299,6 +304,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 /*
                  * WHATSAPP
+                 *
+                 * Número visible + link WhatsApp
+                 * igual que el contacto principal.
                  */
 
                 const telefonoLimpio =
@@ -309,12 +317,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const telefonoHTML =
                     telefono
                         ? `
+                            <span>
+                                ${escaparHTML(telefono)}
+                            </span>
+
                             <a
                                 href="https://wa.me/54${telefonoLimpio}"
                                 target="_blank"
                                 rel="noopener"
                             >
-                                ${escaparHTML(telefono)}
+                                WhatsApp
                             </a>
                           `
                         : "-";
@@ -322,13 +334,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 /*
                  * EMAIL
+                 *
+                 * Correo visible + link Email
+                 * igual que el contacto principal.
                  */
 
                 const emailHTML =
                     email
                         ? `
-                            <a href="mailto:${escaparHTML(email)}">
+                            <span>
                                 ${escaparHTML(email)}
+                            </span>
+
+                            <a
+                                href="mailto:${encodeURIComponent(email)}"
+                            >
+                                Email
                             </a>
                           `
                         : "-";
@@ -448,7 +469,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
     }
-
 
     /*
      * ============================================================
