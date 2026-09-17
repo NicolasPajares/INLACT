@@ -549,8 +549,9 @@ main {
   top: 10px !important;
   right: 10px !important;
 
-  width: 18px !important;
+  width: 12px !important;
   height: 18px !important;
+   right: 5px !important;
 
   padding: 0 !important;
   margin: 0 !important;
