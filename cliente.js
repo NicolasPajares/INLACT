@@ -1837,6 +1837,426 @@ if (editandoPrincipal) {
 
 
     /*
+ * ============================================================
+ * NUEVA NOTA DEL CLIENTE
+ * ============================================================
+ */
+
+const nuevaNotaBtn =
+    document.getElementById("nuevaNotaBtn");
+
+
+if (nuevaNotaBtn) {
+
+    nuevaNotaBtn.addEventListener(
+        "click",
+        mostrarFormularioNuevaNota
+    );
+
+}
+
+
+function mostrarFormularioNuevaNota() {
+
+    /*
+     * Si ya existe un formulario,
+     * simplemente lo mostramos.
+     */
+
+    const formularioExistente =
+        document.getElementById(
+            "nuevaNotaForm"
+        );
+
+
+    if (formularioExistente) {
+
+        formularioExistente.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        return;
+
+    }
+
+
+    /*
+     * Crear formulario
+     */
+
+    const formulario =
+        document.createElement("div");
+
+
+    formulario.id =
+        "nuevaNotaForm";
+
+
+    formulario.className =
+        "form-contacto";
+
+
+    formulario.style.marginTop =
+        "20px";
+
+
+    formulario.innerHTML = `
+
+        <h3>
+            Nueva nota
+        </h3>
+
+
+        <div class="campo">
+
+            <label>
+                Cliente
+            </label>
+
+            <input
+                type="text"
+                value="${escaparHTML(
+                    nombreEl.textContent
+                )}"
+                disabled
+            >
+
+        </div>
+
+
+        <div class="campo">
+
+            <label>
+                Fecha
+            </label>
+
+            <input
+                type="text"
+                id="nuevaNotaFecha"
+                disabled
+            >
+
+        </div>
+
+
+        <div class="campo">
+
+            <label>
+                Hora
+            </label>
+
+            <input
+                type="text"
+                id="nuevaNotaHora"
+                disabled
+            >
+
+        </div>
+
+
+        <div class="campo">
+
+            <label>
+                Título
+            </label>
+
+            <input
+                type="text"
+                id="nuevaNotaTitulo"
+                placeholder="Título de la nota"
+            >
+
+        </div>
+
+
+        <div class="campo">
+
+            <label>
+                Nota
+            </label>
+
+            <textarea
+                id="nuevaNotaContenido"
+                rows="8"
+                placeholder="Escribí la información que quieras guardar sobre este cliente..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="acciones-form">
+
+            <button
+                id="guardarNuevaNotaBtn"
+                class="btn-principal"
+                type="button"
+            >
+                💾 Guardar nota
+            </button>
+
+
+            <button
+                id="cancelarNuevaNotaBtn"
+                class="btn-secundario"
+                type="button"
+            >
+                Cancelar
+            </button>
+
+        </div>
+
+    `;
+
+
+    /*
+     * Insertar formulario
+     */
+
+    const clienteCard =
+        document.querySelector(
+            ".cliente-card"
+        );
+
+
+    if (clienteCard) {
+
+        clienteCard.appendChild(
+            formulario
+        );
+
+    }
+
+
+    /*
+     * Fecha y hora actuales
+     */
+
+    const ahora =
+        new Date();
+
+
+    document.getElementById(
+        "nuevaNotaFecha"
+    ).value =
+        ahora.toLocaleDateString(
+            "es-AR"
+        );
+
+
+    document.getElementById(
+        "nuevaNotaHora"
+    ).value =
+        ahora.toLocaleTimeString(
+            "es-AR",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+
+    /*
+     * CANCELAR
+     */
+
+    document
+        .getElementById(
+            "cancelarNuevaNotaBtn"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                formulario.remove();
+
+            }
+        );
+
+
+    /*
+     * GUARDAR
+     */
+
+    document
+        .getElementById(
+            "guardarNuevaNotaBtn"
+        )
+        ?.addEventListener(
+            "click",
+            guardarNuevaNota
+        );
+
+
+    /*
+     * Llevar al formulario
+     */
+
+    formulario.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+
+    /*
+     * Cursor en título
+     */
+
+    document
+        .getElementById(
+            "nuevaNotaTitulo"
+        )
+        ?.focus();
+
+}
+
+
+/*
+ * ============================================================
+ * GUARDAR NOTA
+ * ============================================================
+ */
+
+async function guardarNuevaNota() {
+
+    const titulo =
+        document
+            .getElementById(
+                "nuevaNotaTitulo"
+            )
+            ?.value
+            .trim();
+
+
+    const contenido =
+        document
+            .getElementById(
+                "nuevaNotaContenido"
+            )
+            ?.value
+            .trim();
+
+
+    if (!titulo) {
+
+        alert(
+            "Ingresá un título para la nota."
+        );
+
+        return;
+
+    }
+
+
+    if (!contenido) {
+
+        alert(
+            "Ingresá el contenido de la nota."
+        );
+
+        return;
+
+    }
+
+
+    const boton =
+        document.getElementById(
+            "guardarNuevaNotaBtn"
+        );
+
+
+    try {
+
+        if (boton) {
+
+            boton.disabled =
+                true;
+
+            boton.textContent =
+                "Guardando...";
+
+        }
+
+
+        /*
+         * Guardar nota independiente
+         */
+
+        await addDoc(
+
+            collection(
+                db,
+                "notas"
+            ),
+
+            {
+
+                clienteId:
+                    clienteId,
+
+                cliente:
+                    nombreEl.textContent,
+
+                tipo:
+                    "Nota",
+
+                titulo:
+                    titulo,
+
+                nota:
+                    contenido,
+
+                fecha:
+                    serverTimestamp()
+
+            }
+
+        );
+
+
+        document
+            .getElementById(
+                "nuevaNotaForm"
+            )
+            ?.remove();
+
+
+        alert(
+            "Nota guardada ✔"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error guardando nota:",
+            error
+        );
+
+
+        if (boton) {
+
+            boton.disabled =
+                false;
+
+            boton.textContent =
+                "💾 Guardar nota";
+
+        }
+
+
+        alert(
+            "No se pudo guardar la nota."
+        );
+
+    }
+
+}
+    /*
      * ============================================================
      * GUARDAR CAMBIOS DEL CONTACTO PRINCIPAL
      * ============================================================
