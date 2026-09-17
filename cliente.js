@@ -264,7 +264,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 tarjeta.className =
                     "contacto-card";
+                const menuBtn = document.createElement("button");
 
+                menuBtn.type = "button";
+                menuBtn.className = "menu-contacto";
+                menuBtn.textContent = "⋮";
+
+                tarjeta.appendChild(menuBtn);
 
                 /*
                  * Cada contacto adicional queda
