@@ -613,136 +613,20 @@ if (menuPrincipalBtn) {
              * En el próximo paso hacemos
              * la edición completa.
              */
-
-           editarContactoBtn.addEventListener(
+editarContactoBtn.addEventListener(
     "click",
     () => {
-        menu.hidden = true;
 
-        const tarjeta = document.createElement("div");
-
-        tarjeta.className = "formulario-editar-contacto";
-
-        tarjeta.innerHTML = `
-            <input
-                type="text"
-                class="editar-nombre"
-                value="${escaparHTML(nombre)}"
-                placeholder="Nombre"
-            >
-
-            <input
-                type="text"
-                class="editar-posicion"
-                value="${escaparHTML(posicion)}"
-                placeholder="Posición"
-            >
-
-            <input
-                type="text"
-                class="editar-telefono"
-                value="${escaparHTML(telefono)}"
-                placeholder="Teléfono"
-            >
-
-            <input
-                type="email"
-                class="editar-email"
-                value="${escaparHTML(email)}"
-                placeholder="Email"
-            >
-
-            <textarea
-                class="editar-observaciones"
-                placeholder="Observaciones"
-            >${escaparHTML(observaciones)}</textarea>
-
-            <div class="botones-editar-contacto">
-                <button
-                    type="button"
-                    class="guardar-edicion-contacto"
-                >
-                    Guardar
-                </button>
-
-                <button
-                    type="button"
-                    class="cancelar-edicion-contacto"
-                >
-                    Cancelar
-                </button>
-            </div>
-        `;
-
-        const contenedor =
-            tarjeta.parentElement;
-
-        tarjeta.innerHTML = `
-            <div class="formulario-editar-contacto">
-                <input
-                    type="text"
-                    class="editar-nombre"
-                    value="${escaparHTML(nombre)}"
-                    placeholder="Nombre"
-                >
-
-                <input
-                    type="text"
-                    class="editar-posicion"
-                    value="${escaparHTML(posicion)}"
-                    placeholder="Posición"
-                >
-
-                <input
-                    type="text"
-                    class="editar-telefono"
-                    value="${escaparHTML(telefono)}"
-                    placeholder="Teléfono"
-                >
-
-                <input
-                    type="email"
-                    class="editar-email"
-                    value="${escaparHTML(email)}"
-                    placeholder="Email"
-                >
-
-                <textarea
-                    class="editar-observaciones"
-                    placeholder="Observaciones"
-                >${escaparHTML(observaciones)}</textarea>
-
-                <div class="botones-editar-contacto">
-                    <button
-                        type="button"
-                        class="guardar-edicion-contacto"
-                    >
-                        Guardar
-                    </button>
-
-                    <button
-                        type="button"
-                        class="cancelar-edicion-contacto"
-                    >
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        `;
-
-        const formulario =
-            tarjeta.querySelector(
-                ".formulario-editar-contacto"
-            );
+        menu.hidden =
+            true;
 
         alert(
-            "Formulario de edición preparado para: " +
+            "Vamos a editar el contacto: " +
             nombre
         );
+
     }
 );
-
-
             /*
              * ==========================================
              * ELIMINAR
