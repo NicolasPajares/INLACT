@@ -436,53 +436,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
 
 
-       const clienteDatos =
-    document.getElementById(
-        "clienteDatos"
-    );
-
-const formularioNuevo =
-    document.getElementById(
-        "nuevoContactoForm"
-    );
+        const clienteCard =
+            document.querySelector(
+                ".cliente-card"
+            );
 
 
-/*
- * Los contactos adicionales quedan
- * dentro de la columna derecha,
- * después del contacto principal.
- */
+        const formularioNuevo =
+            document.getElementById(
+                "nuevoContactoForm"
+            );
 
-if (formularioNuevo) {
 
-    clienteDatos?.insertBefore(
-        contenedor,
-        formularioNuevo
-    );
+        /*
+         * Si hay un formulario abierto,
+         * dejamos los contactos antes del formulario.
+         */
 
-} else {
+        if (formularioNuevo) {
 
-    const acciones =
-        clienteDatos?.querySelector(
-            ".acciones-form"
-        );
+            clienteCard?.insertBefore(
+                contenedor,
+                formularioNuevo
+            );
 
-    if (acciones) {
+        } else {
 
-        clienteDatos.insertBefore(
-            contenedor,
-            acciones
-        );
+            clienteCard?.appendChild(
+                contenedor
+            );
 
-    } else {
-
-        clienteDatos?.appendChild(
-            contenedor
-        );
+        }
 
     }
-
-}
 
     /*
      * ============================================================
