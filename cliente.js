@@ -1206,141 +1206,236 @@ function mostrarFormularioEditarContacto(
      * ============================================================
      */
 
-    async function guardarNuevoContacto() {
+   /*
+ * ============================================================
+ * GUARDAR NUEVO CONTACTO / GUARDAR EDICIÓN
+ * ============================================================
+ */
 
-        const nombre =
-            document
-                .getElementById(
-                    "nuevoContactoNombre"
-                )
-                ?.value
-                .trim();
+async function guardarNuevoContacto() {
 
-
-        const posicion =
-            document
-                .getElementById(
-                    "nuevoContactoPosicion"
-                )
-                ?.value
-                .trim();
+    const nombre =
+        document
+            .getElementById(
+                "nuevoContactoNombre"
+            )
+            ?.value
+            .trim();
 
 
-        const telefono =
-            document
-                .getElementById(
-                    "nuevoContactoTelefono"
-                )
-                ?.value
-                .trim();
+    const posicion =
+        document
+            .getElementById(
+                "nuevoContactoPosicion"
+            )
+            ?.value
+            .trim();
 
 
-        const email =
-            document
-                .getElementById(
-                    "nuevoContactoEmail"
-                )
-                ?.value
-                .trim();
+    const telefono =
+        document
+            .getElementById(
+                "nuevoContactoTelefono"
+            )
+            ?.value
+            .trim();
 
 
-        const observaciones =
-            document
-                .getElementById(
-                    "nuevoContactoObservaciones"
-                )
-                ?.value
-                .trim();
+    const email =
+        document
+            .getElementById(
+                "nuevoContactoEmail"
+            )
+            ?.value
+            .trim();
+
+
+    const observaciones =
+        document
+            .getElementById(
+                "nuevoContactoObservaciones"
+            )
+            ?.value
+            .trim();
+
+
+    /*
+     * ============================================================
+     * VALIDACIONES
+     * ============================================================
+     */
+
+    if (!nombre) {
+
+        alert(
+            "Ingresá el nombre del contacto."
+        );
+
+        return;
+    }
+
+
+    if (!posicion) {
+
+        alert(
+            "Ingresá la posición del contacto."
+        );
+
+        return;
+    }
+
+
+    if (
+        !telefono &&
+        !email
+    ) {
+
+        alert(
+            "Ingresá al menos un teléfono o un email."
+        );
+
+        return;
+    }
+
+
+    /*
+     * ============================================================
+     * OBJETO CONTACTO
+     * ============================================================
+     */
+
+    const nuevoContacto = {
+
+        nombre:
+            nombre,
+
+        posicion:
+            posicion,
+
+        telefono:
+            telefono,
+
+        email:
+            email,
+
+        observaciones:
+            observaciones
+
+    };
+
+
+    const boton =
+        document.getElementById(
+            "guardarNuevoContactoBtn"
+        );
+
+
+    /*
+     * ============================================================
+     * DETECTAR SI ESTAMOS EDITANDO
+     * ============================================================
+     */
+
+    const formulario =
+        document.getElementById(
+            "nuevoContactoForm"
+        );
+
+
+    const estaEditando =
+        formulario?.dataset.modo ===
+        "editar";
+
+
+    const indiceEditar =
+        formulario?.dataset.indice !== undefined
+            ? Number(
+                formulario.dataset.indice
+            )
+            : null;
+
+
+    try {
+
+        /*
+         * Evitar doble clic
+         */
+
+        if (boton) {
+
+            boton.disabled =
+                true;
+
+            boton.textContent =
+                "Guardando...";
+
+        }
 
 
         /*
-         * VALIDACIONES
+         * ========================================================
+         * EDITAR CONTACTO EXISTENTE
+         * ========================================================
          */
-
-        if (!nombre) {
-
-            alert(
-                "Ingresá el nombre del contacto."
-            );
-
-            return;
-        }
-
-
-        if (!posicion) {
-
-            alert(
-                "Ingresá la posición del contacto."
-            );
-
-            return;
-        }
-
 
         if (
-            !telefono &&
-            !email
+            estaEditando &&
+            indiceEditar !== null &&
+            !isNaN(indiceEditar)
         ) {
 
-            alert(
-                "Ingresá al menos un teléfono o un email."
-            );
-
-            return;
-        }
+            const snap =
+                await getDoc(
+                    clienteRef
+                );
 
 
-        /*
-         * OBJETO CONTACTO
-         */
+            if (!snap.exists()) {
 
-        const nuevoContacto = {
+                throw new Error(
+                    "El cliente no existe."
+                );
 
-            nombre:
-                nombre,
-
-            posicion:
-                posicion,
-
-            telefono:
-                telefono,
-
-            email:
-                email,
-
-            observaciones:
-                observaciones
-
-        };
+            }
 
 
-        const boton =
-            document.getElementById(
-                "guardarNuevoContactoBtn"
-            );
+            const datosCliente =
+                snap.data();
 
 
-        try {
+            const contactosActuales =
+                Array.isArray(
+                    datosCliente.contactos
+                )
+                    ? [
+                        ...datosCliente.contactos
+                    ]
+                    : [];
 
-            /*
-             * Evitar doble clic
-             */
 
-            if (boton) {
+            if (
+                indiceEditar < 0 ||
+                indiceEditar >=
+                    contactosActuales.length
+            ) {
 
-                boton.disabled =
-                    true;
-
-                boton.textContent =
-                    "Guardando...";
+                throw new Error(
+                    "No se encontró el contacto a editar."
+                );
 
             }
 
 
             /*
-             * arrayUnion agrega el nuevo contacto
-             * sin borrar los anteriores.
+             * Reemplazar solamente
+             * el contacto seleccionado.
              */
+
+            contactosActuales[
+                indiceEditar
+            ] =
+                nuevoContacto;
+
 
             await updateDoc(
 
@@ -1349,73 +1444,104 @@ function mostrarFormularioEditarContacto(
                 {
 
                     contactos:
-                        arrayUnion(
-                            nuevoContacto
-                        )
+                        contactosActuales
 
                 }
 
             );
 
 
-            /*
-             * Eliminar formulario
-             */
-
-            const formulario =
-                document.getElementById(
-                    "nuevoContactoForm"
-                );
-
-
             formulario?.remove();
 
-
-            /*
-             * Recargar cliente
-             *
-             * Esto hace que el contacto
-             * aparezca inmediatamente.
-             */
 
             await cargarCliente();
 
 
             alert(
-                "Contacto guardado ✔"
+                "Contacto actualizado ✔"
             );
+
+
+            return;
 
         }
 
 
-        catch (error) {
+        /*
+         * ========================================================
+         * AGREGAR CONTACTO NUEVO
+         * ========================================================
+         *
+         * Esta es la lógica que ya teníamos.
+         */
 
-            console.error(
-                "Error guardando nuevo contacto:",
-                error
-            );
+        await updateDoc(
 
+            clienteRef,
 
-            if (boton) {
+            {
 
-                boton.disabled =
-                    false;
-
-                boton.textContent =
-                    "💾 Guardar contacto";
+                contactos:
+                    arrayUnion(
+                        nuevoContacto
+                    )
 
             }
 
+        );
 
-            alert(
-                "No se pudo guardar el nuevo contacto."
-            );
 
-        }
+        /*
+         * Eliminar formulario
+         */
+
+        formulario?.remove();
+
+
+        /*
+         * Recargar cliente
+         */
+
+        await cargarCliente();
+
+
+        alert(
+            "Contacto guardado ✔"
+        );
 
     }
 
 
+    catch (error) {
+
+        console.error(
+            "Error guardando contacto:",
+            error
+        );
+
+
+        if (boton) {
+
+            boton.disabled =
+                false;
+
+            boton.textContent =
+                estaEditando
+                    ? "💾 Guardar cambios"
+                    : "💾 Guardar contacto";
+
+        }
+
+
+        alert(
+            estaEditando
+                ? "No se pudo actualizar el contacto."
+                : "No se pudo guardar el nuevo contacto."
+        );
+
+    }
+
+}
     /*
      * ============================================================
      * MOSTRAR / OCULTAR INPUTS
