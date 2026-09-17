@@ -1,5 +1,3 @@
-import { db } from "./firebase.js";
-
 import {
     doc,
     getDoc,
@@ -8,7 +6,9 @@ import {
     collection,
     query,
     where,
-    getDocs
+    getDocs,
+    addDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
