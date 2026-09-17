@@ -268,18 +268,21 @@ if (menuPrincipalBtn) {
                 menu.className =
                     "menu-opciones-contacto";
 
-                menu.innerHTML = `
-                    <button type="button">
-                        Editar
-                    </button>
+               menu.innerHTML = `
+    <button
+        type="button"
+        id="editarContactoPrincipalBtn"
+    >
+        Editar
+    </button>
 
-                    <button
-                        type="button"
-                        class="eliminar-contacto"
-                    >
-                        Eliminar
-                    </button>
-                `;
+    <button
+        type="button"
+        class="eliminar-contacto"
+    >
+        Eliminar
+    </button>
+`;
 
                 document
                     .querySelector(
