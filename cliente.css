@@ -590,7 +590,43 @@ main {
 .menu-opciones-contacto button:hover {
   background: #f3f7fb;
 }
+/* ===============================
+   MENÚ DE CONTACTOS ⋮
+================================ */
 
+.contacto-principal {
+    position: relative;
+}
+
+.lista-contactos > div {
+    position: relative;
+}
+
+.menu-contacto {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    width: 22px;
+    height: 22px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    background: transparent;
+
+    color: #1f4e8c;
+
+    font-size: 23px;
+    line-height: 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
 .menu-opciones-contacto .eliminar-contacto {
   color: #c62828;
 }
