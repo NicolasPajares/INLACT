@@ -959,7 +959,145 @@ function mostrarFormularioEditarContacto(
     nombreInput?.focus();
 
 }
-    
+
+
+    /*
+ * ============================================================
+ * EDITAR CONTACTO PRINCIPAL
+ * ============================================================
+ */
+
+function mostrarFormularioEditarContactoPrincipal() {
+
+    /*
+     * Usamos el mismo formulario que ya funciona
+     * para los contactos secundarios.
+     */
+
+    mostrarFormularioNuevoContacto();
+
+
+    const formulario =
+        document.getElementById(
+            "nuevoContactoForm"
+        );
+
+
+    if (!formulario) {
+        return;
+    }
+
+
+    /*
+     * Indicamos que se trata del contacto principal.
+     */
+
+    formulario.dataset.modo =
+        "editar-principal";
+
+
+    /*
+     * Cambiar título
+     */
+
+    const titulo =
+        formulario.querySelector("h3");
+
+
+    if (titulo) {
+
+        titulo.textContent =
+            "Editar contacto principal";
+
+    }
+
+
+    /*
+     * Cargar datos actuales
+     */
+
+    document
+        .getElementById(
+            "nuevoContactoNombre"
+        )
+        .value =
+            contactoInput.value || "";
+
+
+    document
+        .getElementById(
+            "nuevoContactoPosicion"
+        )
+        .value =
+            posicionInput.value || "";
+
+
+    document
+        .getElementById(
+            "nuevoContactoTelefono"
+        )
+        .value =
+            telefonoInput.value || "";
+
+
+    document
+        .getElementById(
+            "nuevoContactoEmail"
+        )
+        .value =
+            emailInput.value || "";
+
+
+    document
+        .getElementById(
+            "nuevoContactoObservaciones"
+        )
+        .value =
+            observacionesInput.value || "";
+
+
+    /*
+     * Cambiar texto del botón
+     */
+
+    const guardarContactoBtn =
+        document.getElementById(
+            "guardarNuevoContactoBtn"
+        );
+
+
+    if (guardarContactoBtn) {
+
+        guardarContactoBtn.textContent =
+            "💾 Guardar cambios";
+
+    }
+
+
+    /*
+     * Llevar el formulario al centro
+     */
+
+    formulario.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+
+    /*
+     * Cursor en nombre
+     */
+
+    document
+        .getElementById(
+            "nuevoContactoNombre"
+        )
+        ?.focus();
+
+}
     function mostrarFormularioNuevoContacto() {
 
         /*
