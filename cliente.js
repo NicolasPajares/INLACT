@@ -240,7 +240,62 @@ if (
         mostrarContactosGuardados(
             contactos
         );
+// MENÚ DEL CONTACTO PRINCIPAL
 
+const menuPrincipalBtn =
+    document.querySelector(
+        ".contacto-principal .menu-contacto"
+    );
+
+if (menuPrincipalBtn) {
+
+    menuPrincipalBtn.addEventListener(
+        "click",
+        (evento) => {
+
+            evento.stopPropagation();
+
+            let menu =
+                document.querySelector(
+                    ".contacto-principal .menu-opciones-contacto"
+                );
+
+            if (!menu) {
+
+                menu =
+                    document.createElement("div");
+
+                menu.className =
+                    "menu-opciones-contacto";
+
+                menu.innerHTML = `
+                    <button type="button">
+                        Editar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="eliminar-contacto"
+                    >
+                        Eliminar
+                    </button>
+                `;
+
+                document
+                    .querySelector(
+                        ".contacto-principal"
+                    )
+                    .appendChild(menu);
+
+            }
+
+            menu.hidden =
+                !menu.hidden;
+
+        }
+    );
+
+}
     }
 
 
