@@ -1503,9 +1503,14 @@ async function guardarNuevoContacto() {
         );
 
 
-    const estaEditando =
-        formulario?.dataset.modo ===
-        "editar";
+   const modoFormulario =
+    formulario?.dataset.modo || "";
+
+const estaEditando =
+    modoFormulario === "editar";
+
+const editandoPrincipal =
+    modoFormulario === "editar-principal";
 
 
     const indiceEditar =
