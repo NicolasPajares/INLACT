@@ -208,10 +208,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         mostrarContactosGuardados(
             contactos
         );
+
     }
 
 
-        /*
+    /*
      * ============================================================
      * MOSTRAR CONTACTOS ADICIONALES
      * ============================================================
@@ -219,13 +220,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function mostrarContactosGuardados(contactos) {
 
-        const anterior =
+        /*
+         * CAMBIO ÚNICO:
+         *
+         * Ahora utilizamos el contenedor que ya existe
+         * dentro de la columna derecha de la ficha.
+         *
+         * No lo eliminamos ni lo movemos.
+         */
+
+        const contenedor =
             document.getElementById(
                 "contactosAdicionales"
             );
 
 
-        anterior?.remove();
+        if (!contenedor) {
+            return;
+        }
+
+
+        contenedor.innerHTML = "";
+
+
+        contenedor.className =
+            "lista-contactos";
 
 
         if (
@@ -234,18 +253,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         ) {
             return;
         }
-
-
-        const contenedor =
-            document.createElement("div");
-
-
-        contenedor.id =
-            "contactosAdicionales";
-
-
-        contenedor.className =
-            "lista-contactos";
 
 
         contactos.forEach(
@@ -274,6 +281,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     tarjeta.style.paddingTop =
                         "18px";
+
                 }
 
 
@@ -436,39 +444,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
 
 
-        const clienteCard =
-            document.querySelector(
-                ".cliente-card"
-            );
-
-
-        const formularioNuevo =
-            document.getElementById(
-                "nuevoContactoForm"
-            );
-
-
         /*
-         * Si hay un formulario abierto,
-         * dejamos los contactos antes del formulario.
+         * El contenedor ya está dentro de la columna
+         * derecha de contactos.
+         * No se mueve al .cliente-card para conservar
+         * el diseño de la ficha.
          */
 
-        if (formularioNuevo) {
-
-            clienteCard?.insertBefore(
-                contenedor,
-                formularioNuevo
-            );
-
-        } else {
-
-            clienteCard?.appendChild(
-                contenedor
-            );
-
-        }
-
     }
+
 
     /*
      * ============================================================
@@ -479,26 +463,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     function escaparHTML(valor) {
 
         return String(valor ?? "")
+
             .replace(
                 /&/g,
                 "&amp;"
             )
+
             .replace(
                 /</g,
                 "&lt;"
             )
+
             .replace(
                 />/g,
                 "&gt;"
             )
+
             .replace(
                 /"/g,
                 "&quot;"
             )
+
             .replace(
                 /'/g,
                 "&#039;"
             );
+
     }
 
 
@@ -515,6 +505,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         editarBtn.hidden = false;
 
         guardarBtn.hidden = true;
+
     }
 
 
@@ -561,11 +552,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (formularioExistente) {
 
             formularioExistente.scrollIntoView({
+
                 behavior: "smooth",
+
                 block: "center"
+
             });
 
             return;
+
         }
 
 
@@ -678,7 +673,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             <div class="acciones-form">
 
-
                 <button
                     id="guardarNuevoContactoBtn"
                     class="btn-principal"
@@ -695,7 +689,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 >
                     Cancelar
                 </button>
-
 
             </div>
 
@@ -723,6 +716,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ?.appendChild(
                     formulario
                 );
+
         }
 
 
@@ -774,14 +768,15 @@ document.addEventListener("DOMContentLoaded", async () => {
          */
 
         formulario.scrollIntoView({
+
             behavior: "smooth",
+
             block: "center"
+
         });
 
     }
-
-
-    /*
+        /*
      * ============================================================
      * GUARDAR NUEVO CONTACTO
      * ============================================================
@@ -914,6 +909,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 boton.textContent =
                     "Guardando...";
+
             }
 
 
@@ -923,13 +919,18 @@ document.addEventListener("DOMContentLoaded", async () => {
              */
 
             await updateDoc(
+
                 clienteRef,
+
                 {
+
                     contactos:
                         arrayUnion(
                             nuevoContacto
                         )
+
                 }
+
             );
 
 
@@ -962,6 +963,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
 
+
         catch (error) {
 
             console.error(
@@ -977,6 +979,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 boton.textContent =
                     "💾 Guardar contacto";
+
             }
 
 
@@ -998,36 +1001,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     function toggleInputs(editable) {
 
         [
+
             contactoInput,
+
             posicionInput,
+
             telefonoInput,
+
             emailInput,
+
             observacionesInput
 
         ].forEach(
+
             input => {
 
                 input.hidden =
                     !editable;
 
             }
+
         );
 
 
         [
+
             contactoTxt,
+
             posicionTxt,
+
             telefonoTxt,
+
             emailTxt,
+
             observacionesTxt
 
         ].forEach(
+
             texto => {
 
                 texto.hidden =
                     editable;
 
             }
+
         );
 
     }
@@ -1073,7 +1090,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             try {
 
                 await updateDoc(
+
                     clienteRef,
+
                     {
 
                         contacto:
@@ -1092,6 +1111,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             observacionesInput.value
 
                     }
+
                 );
 
 
@@ -1103,6 +1123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 );
 
             }
+
 
             catch (error) {
 
@@ -1190,12 +1211,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
         return nombreA.localeCompare(
+
             nombreB,
+
             "es",
+
             {
-                numeric: true,
-                sensitivity: "base"
+
+                numeric:
+                    true,
+
+                sensitivity:
+                    "base"
+
             }
+
         );
 
     }
@@ -1210,9 +1240,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     function obtenerFechaVisita(v) {
 
         if (
+
             v.fecha &&
+
             typeof v.fecha.toDate ===
                 "function"
+
         ) {
 
             return v.fecha.toDate();
@@ -1229,9 +1262,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             if (
+
                 !isNaN(
                     fecha.getTime()
                 )
+
             ) {
 
                 return fecha;
@@ -1255,9 +1290,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     function obtenerFechaVenta(e) {
 
         if (
+
             e.fecha &&
+
             typeof e.fecha.toDate ===
                 "function"
+
         ) {
 
             return e.fecha.toDate();
@@ -1274,9 +1312,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             if (
+
                 !isNaN(
                     fecha.getTime()
                 )
+
             ) {
 
                 return fecha;
@@ -1287,9 +1327,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
         if (
+
             e.creadoEn &&
+
             typeof e.creadoEn.toDate ===
                 "function"
+
         ) {
 
             return e.creadoEn.toDate();
@@ -1318,7 +1361,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
         return fecha.toLocaleString(
+
             "es-AR",
+
             {
 
                 day:
@@ -1337,6 +1382,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     "2-digit"
 
             }
+
         );
 
     }
@@ -1375,15 +1421,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const qVisitas =
                 query(
+
                     collection(
                         db,
                         "visitas"
                     ),
+
                     where(
                         "clienteId",
                         "==",
                         clienteId
                     )
+
                 );
 
 
@@ -1401,15 +1450,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const qEgresos =
                 query(
+
                     collection(
                         db,
                         "egresos"
                     ),
+
                     where(
                         "clienteId",
                         "==",
                         clienteId
                     )
+
                 );
 
 
@@ -1436,6 +1488,7 @@ document.addEventListener("DOMContentLoaded", async () => {
              */
 
             snapVisitas.forEach(
+
                 docSnap => {
 
                     const v =
@@ -1448,8 +1501,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                      */
 
                     if (
+
                         v.tipoVisita ===
                         "Venta"
+
                     ) {
 
                         return;
@@ -1479,6 +1534,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
 
                 }
+
             );
 
 
@@ -1493,6 +1549,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             snapEgresos.forEach(
+
                 docSnap => {
 
                     const e =
@@ -1505,8 +1562,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                      */
 
                     if (
+
                         e.tipoEgreso !==
                         "venta"
+
                     ) {
 
                         return;
@@ -1540,6 +1599,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     });
 
                 }
+
             );
 
 
@@ -1554,6 +1614,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             ventas.forEach(
+
                 venta => {
 
                     const e =
@@ -1562,8 +1623,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                     const clave =
                         e.fecha ||
+
                         (
+
                             venta.fechaOrden
+
                                 ? new Date(
                                     venta.fechaOrden
                                 )
@@ -1572,18 +1636,24 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         0,
                                         10
                                     )
+
                                 : "sin-fecha"
+
                         );
 
 
                     if (
+
                         !ventasAgrupadas.has(
                             clave
                         )
+
                     ) {
 
                         ventasAgrupadas.set(
+
                             clave,
+
                             {
 
                                 tipo:
@@ -1599,6 +1669,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     []
 
                             }
+
                         );
 
                     }
@@ -1631,8 +1702,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                     if (
+
                         venta.fechaOrden >
                         grupo.fechaOrden
+
                     ) {
 
                         grupo.fechaOrden =
@@ -1641,6 +1714,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                 }
+
             );
 
 
@@ -1651,6 +1725,7 @@ document.addEventListener("DOMContentLoaded", async () => {
              */
 
             ventasAgrupadas.forEach(
+
                 grupo => {
 
                     grupo.productos.sort(
@@ -1663,6 +1738,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     );
 
                 }
+
             );
 
 
@@ -1673,9 +1749,12 @@ document.addEventListener("DOMContentLoaded", async () => {
              */
 
             historial.sort(
+
                 (a, b) =>
+
                     b.fechaOrden -
                     a.fechaOrden
+
             );
 
 
@@ -1690,8 +1769,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             if (
+
                 historial.length ===
                 0
+
             ) {
 
                 visitasEl.innerHTML =
@@ -1709,6 +1790,7 @@ document.addEventListener("DOMContentLoaded", async () => {
              */
 
             historial.forEach(
+
                 registro => {
 
                     /*
@@ -1718,8 +1800,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                      */
 
                     if (
+
                         registro.tipo ===
                         "visita"
+
                     ) {
 
                         const v =
@@ -1742,8 +1826,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                         if (
+
                             tipo ===
                             "Visita comercial"
+
                         ) {
 
                             clase =
@@ -1752,8 +1838,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
 
                         else if (
+
                             tipo ===
                             "Ensayo"
+
                         ) {
 
                             clase =
@@ -1762,8 +1850,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
 
                         else if (
+
                             tipo ===
                             "Entrega de productos"
+
                         ) {
 
                             clase =
@@ -1777,10 +1867,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                         if (
+
                             Array.isArray(
                                 v.productos
                             ) &&
+
                             v.productos.length
+
                         ) {
 
                             const productos =
@@ -1795,28 +1888,41 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
                             productosHTML =
+
                                 productos
+
                                     .map(
+
                                         producto => `
 
                                             <div class="producto">
 
                                                 📦
+
                                                 ${String(
+
                                                     producto.nombre ||
+
                                                     "Producto sin nombre"
+
                                                 )}
 
                                                 ${
+
                                                     producto.cantidad
+
                                                         ? `(${producto.cantidad})`
+
                                                         : ""
+
                                                 }
 
                                             </div>
 
                                         `
+
                                     )
+
                                     .join(
                                         ""
                                     );
@@ -1871,8 +1977,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                      */
 
                     else if (
+
                         registro.tipo ===
                         "venta"
+
                     ) {
 
                         const productos =
@@ -1892,8 +2000,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                          */
 
                         const productosHTML =
+
                             productos
+
                                 .map(
+
                                     producto => `
 
                                         <div class="producto-venta">
@@ -1904,8 +2015,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                                                 📦
 
                                                 ${String(
+
                                                     producto.nombre ||
+
                                                     "Producto sin nombre"
+
                                                 )}
 
                                             </span>
@@ -1916,13 +2030,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                                                 ⚖️
 
                                                 ${String(
+
                                                     producto.cantidad ??
+
                                                     ""
+
                                                 )}
 
                                                 ${String(
+
                                                     producto.unidad ||
+
                                                     ""
+
                                                 )}
 
                                             </span>
@@ -1933,8 +2053,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                                                 🏷️
 
                                                 ${String(
+
                                                     producto.lote ||
+
                                                     ""
+
                                                 )}
 
                                             </span>
@@ -1943,7 +2066,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                                         </div>
 
                                     `
+
                                 )
+
                                 .join(
                                     ""
                                 );
@@ -1963,15 +2088,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                             const fecha =
                                 new Date(
+
                                     registro.fecha +
+
                                     "T00:00:00"
+
                                 );
 
 
                             if (
+
                                 !isNaN(
                                     fecha.getTime()
                                 )
+
                             ) {
 
                                 fechaTexto =
@@ -2030,15 +2160,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
 
                 }
+
             );
 
         }
 
+
         catch (error) {
 
             console.error(
+
                 "Error cargando historial del cliente:",
+
                 error
+
             );
 
 
