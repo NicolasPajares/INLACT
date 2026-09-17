@@ -38,6 +38,7 @@ main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
+  align-items: stretch;
 }
 
 
@@ -51,7 +52,7 @@ main {
   justify-content: center;
   text-align: center;
   min-height: 100%;
-  padding-top: 45px;
+  padding: 75px 25px 20px 0;
 }
 
 .cliente-nombre h2 {
@@ -62,13 +63,15 @@ main {
 
 
 /* ===============================
-   DATOS / CONTACTOS
+   COLUMNA CONTACTOS
 ================================ */
 
 .cliente-datos {
   display: flex;
   flex-direction: column;
   gap: 0;
+  width: 100%;
+  padding-left: 0;
 }
 
 
@@ -88,18 +91,19 @@ main {
 
 
 /* ===============================
-   CONTACTO PRINCIPAL
+   CONTACTOS
+   TODOS IGUALES
 ================================ */
 
 .contacto-principal {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
 }
 
 
 /* ===============================
-   CONTACTOS ADICIONALES
+   LISTA DE CONTACTOS
 ================================ */
 
 .lista-contactos {
@@ -111,22 +115,41 @@ main {
 
 
 /* ===============================
-   CONTACTO INDIVIDUAL
+   TARJETA DE CADA CONTACTO
+   TODOS IGUALES
 ================================ */
 
-.lista-contactos > div {
+.lista-contactos > div,
+.contacto-principal {
   position: relative;
-  background: transparent;
-  border-radius: 0;
-  padding: 18px 0 0 0;
-  box-shadow: none;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
   width: 100%;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
 }
 
 
 /* ===============================
-   CAMPOS CLIENTE
+   SEPARACIÓN ENTRE CONTACTOS
 ================================ */
+
+.lista-contactos > div + div {
+  margin-top: 18px;
+}
+
+
+/* ===============================
+   CAMPOS CONTACTO
+================================ */
+
+.campo {
+  margin-bottom: 16px;
+}
+
+.campo:last-child {
+  margin-bottom: 0;
+}
 
 .campo label {
   display: block;
@@ -192,11 +215,8 @@ main {
 
 .form-contacto {
   margin-top: 18px;
-
   background: #f8fafc;
-
   border-radius: 16px;
-
   padding: 20px;
 }
 
@@ -400,6 +420,7 @@ main {
 
   .cliente-nombre {
     min-height: 120px;
+    padding: 20px 0;
   }
 
   .cliente-nombre h2 {
