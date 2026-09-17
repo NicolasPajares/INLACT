@@ -602,359 +602,122 @@ if (menuPrincipalBtn) {
             );
 
 
-            /*
-             * ==========================================
-             * EDITAR
-             * ==========================================
-             *
-             * Por ahora dejamos preparado
-             * el botón.
-             *
-             * En el próximo paso hacemos
-             * la edición completa.
-             */
+           /*
+ * ==========================================
+ * EDITAR
+ * ==========================================
+ */
 
-            editarContactoBtn.addEventListener(
+editarContactoBtn.addEventListener(
     "click",
-    () => {
+    async () => {
 
         menu.hidden = true;
 
-        /*
-         * FORMULARIO DE EDICIÓN
-         */
+        const nuevoNombre =
+            prompt(
+                "Nombre:",
+                nombre
+            );
 
-        const fondo =
-            document.createElement("div");
+        if (nuevoNombre === null) {
+            return;
+        }
 
-        fondo.style.position = "fixed";
-        fondo.style.top = "0";
-        fondo.style.left = "0";
-        fondo.style.width = "100%";
-        fondo.style.height = "100%";
-        fondo.style.background = "rgba(0,0,0,0.45)";
-        fondo.style.display = "flex";
-        fondo.style.alignItems = "center";
-        fondo.style.justifyContent = "center";
-        fondo.style.zIndex = "1000";
-        fondo.style.padding = "20px";
-        fondo.style.boxSizing = "border-box";
+        const nuevaPosicion =
+            prompt(
+                "Posición:",
+                posicion
+            );
 
+        if (nuevaPosicion === null) {
+            return;
+        }
 
-        const formulario =
-            document.createElement("div");
+        const nuevoTelefono =
+            prompt(
+                "Teléfono:",
+                telefono
+            );
 
-        formulario.style.background = "#ffffff";
-        formulario.style.width = "100%";
-        formulario.style.maxWidth = "500px";
-        formulario.style.maxHeight = "90vh";
-        formulario.style.overflowY = "auto";
-        formulario.style.borderRadius = "12px";
-        formulario.style.padding = "20px";
-        formulario.style.boxSizing = "border-box";
-        formulario.style.boxShadow =
-            "0 10px 30px rgba(0,0,0,0.25)";
+        if (nuevoTelefono === null) {
+            return;
+        }
 
+        const nuevoEmail =
+            prompt(
+                "Email:",
+                email
+            );
 
-        formulario.innerHTML = `
+        if (nuevoEmail === null) {
+            return;
+        }
 
-            <h3
-                style="
-                    margin-top:0;
-                    color:#1f4e8c;
-                "
-            >
-                Editar contacto
-            </h3>
+        const nuevasObservaciones =
+            prompt(
+                "Observaciones:",
+                observaciones
+            );
 
+        if (nuevasObservaciones === null) {
+            return;
+        }
 
-            <div style="margin-bottom:12px;">
+        const nuevoContacto = {
 
-                <label>Nombre</label>
+            nombre:
+                nuevoNombre.trim(),
 
-                <input
-                    id="editarContactoNombre"
-                    type="text"
-                    value="${escaparHTML(nombre)}"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:10px;
-                        margin-top:5px;
-                    "
-                >
+            posicion:
+                nuevaPosicion.trim(),
 
-            </div>
+            telefono:
+                nuevoTelefono.trim(),
 
+            email:
+                nuevoEmail.trim(),
 
-            <div style="margin-bottom:12px;">
+            observaciones:
+                nuevasObservaciones.trim()
 
-                <label>Posición</label>
+        };
 
-                <input
-                    id="editarContactoPosicion"
-                    type="text"
-                    value="${escaparHTML(posicion)}"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:10px;
-                        margin-top:5px;
-                    "
-                >
+        try {
 
-            </div>
+            const nuevosContactos =
+                [...contactos];
 
+            nuevosContactos[indice] =
+                nuevoContacto;
 
-            <div style="margin-bottom:12px;">
-
-                <label>Teléfono</label>
-
-                <input
-                    id="editarContactoTelefono"
-                    type="text"
-                    value="${escaparHTML(telefono)}"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:10px;
-                        margin-top:5px;
-                    "
-                >
-
-            </div>
-
-
-            <div style="margin-bottom:12px;">
-
-                <label>Email</label>
-
-                <input
-                    id="editarContactoEmail"
-                    type="email"
-                    value="${escaparHTML(email)}"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:10px;
-                        margin-top:5px;
-                    "
-                >
-
-            </div>
-
-
-            <div style="margin-bottom:16px;">
-
-                <label>Observaciones</label>
-
-                <textarea
-                    id="editarContactoObservaciones"
-                    rows="4"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:10px;
-                        margin-top:5px;
-                        resize:vertical;
-                    "
-                >${escaparHTML(observaciones)}</textarea>
-
-            </div>
-
-
-            <div
-                style="
-                    display:flex;
-                    gap:10px;
-                    justify-content:flex-end;
-                "
-            >
-
-                <button
-                    id="cancelarEditarContactoBtn"
-                    type="button"
-                >
-                    Cancelar
-                </button>
-
-
-                <button
-                    id="guardarEditarContactoBtn"
-                    type="button"
-                >
-                    Guardar
-                </button>
-
-            </div>
-
-        `;
-
-
-        fondo.appendChild(
-            formulario
-        );
-
-        document.body.appendChild(
-            fondo
-        );
-
-
-        /*
-         * CANCELAR
-         */
-
-        document
-            .getElementById(
-                "cancelarEditarContactoBtn"
-            )
-            .addEventListener(
-                "click",
-                () => {
-
-                    fondo.remove();
-
+            await updateDoc(
+                clienteRef,
+                {
+                    contactos:
+                        nuevosContactos
                 }
             );
 
+            await cargarCliente();
 
-        /*
-         * GUARDAR
-         */
-
-        document
-            .getElementById(
-                "guardarEditarContactoBtn"
-            )
-            .addEventListener(
-                "click",
-                async () => {
-
-                    const nuevoContacto = {
-
-                        nombre:
-                            document
-                                .getElementById(
-                                    "editarContactoNombre"
-                                )
-                                .value
-                                .trim(),
-
-                        posicion:
-                            document
-                                .getElementById(
-                                    "editarContactoPosicion"
-                                )
-                                .value
-                                .trim(),
-
-                        telefono:
-                            document
-                                .getElementById(
-                                    "editarContactoTelefono"
-                                )
-                                .value
-                                .trim(),
-
-                        email:
-                            document
-                                .getElementById(
-                                    "editarContactoEmail"
-                                )
-                                .value
-                                .trim(),
-
-                        observaciones:
-                            document
-                                .getElementById(
-                                    "editarContactoObservaciones"
-                                )
-                                .value
-                                .trim()
-
-                    };
-
-
-                    if (!nuevoContacto.nombre) {
-
-                        alert(
-                            "Ingresá el nombre del contacto."
-                        );
-
-                        return;
-
-                    }
-
-
-                    if (
-                        !nuevoContacto.telefono &&
-                        !nuevoContacto.email
-                    ) {
-
-                        alert(
-                            "Ingresá al menos un teléfono o un email."
-                        );
-
-                        return;
-
-                    }
-
-
-                    try {
-
-                        const nuevosContactos =
-                            [...contactos];
-
-
-                        nuevosContactos[indice] =
-                            nuevoContacto;
-
-
-                        await updateDoc(
-
-                            clienteRef,
-
-                            {
-
-                                contactos:
-                                    nuevosContactos
-
-                            }
-
-                        );
-
-
-                        fondo.remove();
-
-
-                        await cargarCliente();
-
-
-                        alert(
-                            "Contacto actualizado ✔"
-                        );
-
-                    }
-
-                    catch (error) {
-
-                        console.error(
-                            "Error editando contacto:",
-                            error
-                        );
-
-
-                        alert(
-                            "No se pudo actualizar el contacto."
-                        );
-
-                    }
-
-                }
+            alert(
+                "Contacto actualizado ✔"
             );
 
-    }
-);
+        }
+        catch (error) {
+
+            console.error(
+                "Error editando contacto:",
+                error
+            );
+
+            alert(
+                "No se pudo actualizar el contacto."
+            );
+
+        }
 
     }
 );
