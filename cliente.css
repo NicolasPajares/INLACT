@@ -36,9 +36,8 @@ main {
 
 .cliente-cabecera {
   display: grid;
-  grid-template-columns: 1fr 1.35fr;
-  gap: 40px;
-  align-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
 }
 
 
