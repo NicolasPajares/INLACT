@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <div class="campo">
 
                         <label>
-                            Contacto
+                            Nombre
                         </label>
 
                         <span>
