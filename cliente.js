@@ -1543,7 +1543,54 @@ const editandoPrincipal =
          * EDITAR CONTACTO EXISTENTE
          * ========================================================
          */
+/*
+ * ========================================================
+ * EDITAR CONTACTO PRINCIPAL
+ * ========================================================
+ */
 
+if (editandoPrincipal) {
+
+    await updateDoc(
+
+        clienteRef,
+
+        {
+
+            contacto:
+                nuevoContacto.nombre,
+
+            posicion:
+                nuevoContacto.posicion,
+
+            telefono:
+                nuevoContacto.telefono,
+
+            email:
+                nuevoContacto.email,
+
+            observaciones:
+                nuevoContacto.observaciones
+
+        }
+
+    );
+
+
+    formulario?.remove();
+
+
+    await cargarCliente();
+
+
+    alert(
+        "Contacto principal actualizado ✔"
+    );
+
+
+    return;
+
+}
         if (
             estaEditando &&
             indiceEditar !== null &&
