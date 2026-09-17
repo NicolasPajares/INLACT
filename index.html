@@ -1,1830 +1,1291 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+<meta charset="UTF-8">
+<title>INLACT</title>
+<meta name="description" content="INLACT - Registro de visitas y clientes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-    <title>INLACT</title>
+<style>
+.producto-venta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 7px 0;
+}
 
-    <!-- SEO / Mobile -->
-    <meta
-        name="description"
-        content="INLACT - Registro de visitas y clientes"
-    >
+.dato-producto {
+  flex: 1;
+}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+.dato-cantidad {
+  min-width: 100px;
+}
 
-    <!-- CSS principal -->
-    <link
-        rel="stylesheet"
-        href="index.css"
-    >
+.dato-lote {
+  min-width: 130px;
+}
 
-    <!-- Leaflet CSS -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    >
+@media (max-width: 700px) {
+  .producto-venta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 7px 0;
+  }
 
+  .dato-producto,
+  .dato-cantidad,
+  .dato-lote {
+    min-width: 0;
+    width: 100%;
+  }
+}
 
-    <!-- ============================================================
-         VENTAS
-         VISTA COMPUTADORA + VISTA CELULAR
-         ============================================================ -->
+/* ===============================
+   NOTAS EN HISTORIAL
+================================ */
 
-    <style>
+.item-nota-visita {
+  cursor: pointer;
+  transition: background .15s ease;
+  padding: 12px 8px !important;
+  border-radius: 8px;
+}
 
-        /* ============================================================
-           COMPUTADORA
-           ============================================================ */
+.item-nota-visita:hover {
+  background: #f3f7fb;
+}
 
-        .producto-venta {
+.titulo-nota-historial {
+  display: block;
+  margin-top: 7px;
+  font-weight: 600;
+  color: #2c3e50;
+}
 
-            display: flex;
+/* ===============================
+   VENTANA DE NOTA
+================================ */
 
-            align-items: center;
+.overlay-nota-historial {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  z-index: 99999;
+}
 
-            gap: 18px;
+.ventana-nota-historial {
+  background: #ffffff;
+  width: 92%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.20);
+}
 
-            padding: 7px 0;
+.ventana-nota-historial h3 {
+  color: #1f4e8c;
+  margin-bottom: 8px;
+}
 
-        }
+.datos-nota-historial {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 18px;
+}
 
+.contenido-nota-historial {
+  white-space: pre-wrap;
+  line-height: 1.55;
+  font-size: 16px;
+  color: #2c3e50;
+}
 
-        .dato-producto {
-
-            flex: 1;
-
-        }
-
-
-        .dato-cantidad {
-
-            min-width: 100px;
-
-        }
-
-
-        .dato-lote {
-
-            min-width: 130px;
-
-        }
-
-
-        /* ============================================================
-           CELULAR
-           ============================================================ */
-
-        @media (max-width: 700px) {
-
-            .producto-venta {
-
-                display: flex;
-
-                flex-direction: column;
-
-                align-items: flex-start;
-
-                gap: 3px;
-
-                padding: 7px 0;
-
-            }
-
-
-            .dato-producto,
-            .dato-cantidad,
-            .dato-lote {
-
-                min-width: 0;
-
-                width: 100%;
-
-            }
-
-        }
-
-    </style>
-
+.cerrar-nota-historial {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  border: none;
+  border-radius: 8px;
+  background: #eeeeee;
+  color: #333333;
+  font-size: 16px;
+  cursor: pointer;
+}
+</style>
 </head>
-
 
 <body>
 
-
 <header>
+  <figure>
+    <img src="img/logo.jpg" alt="INLACT">
+  </figure>
 
-    <figure>
-
-        <img
-            src="img/logo.jpg"
-            alt="INLACT"
-        >
-
-    </figure>
-
-    <h2>NICOLÁS PAJARES</h2>
-
+  <h2>NICOLÁS PAJARES</h2>
 </header>
-
-
 
 <main>
 
-
-<!-- ============================================================
-     ACCESOS RÁPIDOS
-     ============================================================ -->
-
 <section class="quick-actions">
 
+  <a href="clientes.html" class="action-card">
+    <img src="img/icon-clientes.svg" alt="Clientes">
+    <span>Clientes</span>
+  </a>
 
-    <a
-        href="clientes.html"
-        class="action-card"
-    >
+  <a href="stock.html" class="action-card">
+    <img src="img/icon-stock.svg" alt="Stock">
+    <span>Stock</span>
+  </a>
 
-        <img
-            src="img/icon-clientes.svg"
-            alt="Clientes"
-        >
+  <a href="ensayos.html" class="action-card">
+    <img src="img/icon-ensayos.svg" alt="Ensayos">
+    <span>Ensayos</span>
+  </a>
 
-        <span>
-            Clientes
-        </span>
-
-    </a>
-
-
-
-    <a
-        href="stock.html"
-        class="action-card"
-    >
-
-        <img
-            src="img/icon-stock.svg"
-            alt="Stock"
-        >
-
-        <span>
-            Stock
-        </span>
-
-    </a>
-
-
-
-    <a
-        href="ensayos.html"
-        class="action-card"
-    >
-
-        <img
-            src="img/icon-ensayos.svg"
-            alt="Ensayos"
-        >
-
-        <span>
-            Ensayos
-        </span>
-
-    </a>
-
-
-
-    <a
-        href="precios.html"
-        class="action-card"
-    >
-
-        <img
-            src="img/icon-precios.svg"
-            alt="Precios"
-        >
-
-        <span>
-            Precios
-        </span>
-
-    </a>
-
+  <a href="precios.html" class="action-card">
+    <img src="img/icon-precios.svg" alt="Precios">
+    <span>Precios</span>
+  </a>
 
 </section>
 
-
-
-<!-- ============================================================
-     MAPA
-     ============================================================ -->
 
 <section class="card">
 
-    <h2>
-        Mapa de clientes
-    </h2>
+  <h2>Mapa de clientes</h2>
 
-    <div id="map"></div>
+  <div id="map"></div>
 
 </section>
 
-
-
-<!-- ============================================================
-     VISITAS CERCANAS
-     ============================================================ -->
 
 <section class="card">
 
-    <h2>
-        Visitas cercanas
-    </h2>
+  <h2>Visitas cercanas</h2>
 
-    <p id="estado">
-        Buscando fábricas...
-    </p>
+  <p id="estado">Buscando fábricas...</p>
 
-    <div
-        id="acciones"
-        class="lista-clientes"
-    ></div>
+  <div id="acciones" class="lista-clientes"></div>
 
 </section>
 
-
-
-<!-- ============================================================
-     ÚLTIMAS VISITAS
-     ============================================================ -->
 
 <section class="card">
 
-    <h3>
-        Últimas visitas
-    </h3>
+  <h3>Últimas visitas</h3>
 
-    <ul id="listaVisitas"></ul>
+  <ul id="listaVisitas"></ul>
 
-    <a
-        href="#"
-        id="abrir-historial"
-    >
-        Ver historial completo →
-    </a>
+  <a href="#" id="abrir-historial">
+    Ver historial completo →
+  </a>
 
 </section>
-
 
 </main>
 
 
-
-<!-- ============================================================
-     FOOTER
-     ============================================================ -->
-
 <footer>
 
-    <p>
-
-        © INLACT ·
-
-        <a
-            href="aviso-legal.html"
-        >
-            Aviso Legal
-        </a>
-
-    </p>
+  <p>
+    © INLACT ·
+    <a href="aviso-legal.html">Aviso Legal</a>
+  </p>
 
 </footer>
 
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ============================================================
-     LEAFLET
-     ============================================================ -->
+<script type="module" src="app.js"></script>
 
-<script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-></script>
-
-
-
-<!-- ============================================================
-     APP PRINCIPAL
-     ============================================================ -->
-
-<script
-    type="module"
-    src="app.js"
-></script>
-
-
-
-<!-- ============================================================
-     ÚLTIMAS ACTIVIDADES
-     VISITAS + ENSAYOS + VENTAS
-     ============================================================ -->
 
 <script type="module">
 
+import {
+  getApps,
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    getApps,
-
-    initializeApp
-
-}
-from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-
-import {
-
-    getFirestore,
-
-    collection,
-
-    getDocs
-
-}
-from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-
-
-/* ============================================================
-   FIREBASE
-   ============================================================ */
 
 const firebaseConfig = {
 
-    apiKey:
-        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwhmUOAeLZdv4",
 
-    authDomain:
-        "inlact.firebaseapp.com",
+  authDomain: "inlact.firebaseapp.com",
 
-    projectId:
-        "inlact",
+  projectId: "inlact",
 
-    storageBucket:
-        "inlact.appspot.com",
+  storageBucket: "inlact.appspot.com",
 
-    messagingSenderId:
-        "143868382036",
+  messagingSenderId: "143868382036",
 
-    appId:
-        "1:143868382036:web:b5af0e4faced7e880216c1"
+  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 
 };
 
 
-/*
- * IMPORTANTE
- *
- * app.js ya puede haber inicializado Firebase.
- *
- * Por eso NO usamos directamente:
- *
- * initializeApp(firebaseConfig)
- *
- * porque produciría:
- *
- * FirebaseError:
- * Firebase App named '[DEFAULT]' already exists
- *
- * Usamos la aplicación existente si ya está creada.
- */
-
 const app =
-    getApps().length
-        ? getApps()[0]
-        : initializeApp(
-            firebaseConfig
-        );
+  getApps().length
+    ? getApps()[0]
+    : initializeApp(firebaseConfig);
 
 
-const db =
-    getFirestore(
-        app
-    );
-
-
-
-/* ============================================================
-   ELEMENTOS
-   ============================================================ */
+const db = getFirestore(app);
 
 const lista =
-    document.getElementById(
-        "listaVisitas"
-    );
+  document.getElementById("listaVisitas");
 
 
-
-/* ============================================================
+/* ===============================
    ESCAPAR HTML
-   ============================================================ */
+================================ */
 
-function escaparHTML(
-    texto
-) {
+function escaparHTML(texto) {
 
-    return String(
-        texto ?? ""
-    )
+  return String(texto ?? "")
 
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-
-    .replace(
-        /</g,
-        "&lt;"
-    )
-
-    .replace(
-        />/g,
-        "&gt;"
-    )
-
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-
-    .replace(
-        /'/g,
-        "&#039;"
-    );
-
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 
+/* ===============================
+   OBTENER FECHA
+================================ */
 
-/* ============================================================
-   FECHA
-   ============================================================ */
+function obtenerFecha(item) {
 
-function obtenerFecha(
-    item
-) {
+  if (
+    item.fecha &&
+    typeof item.fecha.toDate === "function"
+  ) {
+    return item.fecha.toDate();
+  }
 
+  if (
+    typeof item.fecha === "string" &&
+    item.fecha.trim() !== ""
+  ) {
 
-    /*
-     * Firebase Timestamp
-     */
+    const partes =
+      item.fecha.split("-");
 
-    if (
+    if (partes.length === 3) {
 
-        item.fecha &&
+      const año =
+        Number(partes[0]);
 
-        typeof item.fecha.toDate ===
-        "function"
+      const mes =
+        Number(partes[1]) - 1;
 
-    ) {
+      const dia =
+        Number(partes[2]);
 
-        return item.fecha.toDate();
-
+      return new Date(
+        año,
+        mes,
+        dia
+      );
     }
 
+    const fecha =
+      new Date(item.fecha);
 
-
-    /*
-     * Fecha guardada como YYYY-MM-DD
-     */
-
-    if (
-
-        typeof item.fecha ===
-        "string" &&
-
-        item.fecha.trim() !== ""
-
-    ) {
-
-
-        const partes =
-            item.fecha.split("-");
-
-
-        if (
-
-            partes.length ===
-            3
-
-        ) {
-
-
-            const año =
-                Number(
-                    partes[0]
-                );
-
-
-            const mes =
-                Number(
-                    partes[1]
-                ) - 1;
-
-
-            const dia =
-                Number(
-                    partes[2]
-                );
-
-
-            return new Date(
-
-                año,
-
-                mes,
-
-                dia
-
-            );
-
-        }
-
-
-
-        /*
-         * Intento alternativo
-         */
-
-        const fecha =
-            new Date(
-                item.fecha
-            );
-
-
-        if (
-
-            !isNaN(
-                fecha.getTime()
-            )
-
-        ) {
-
-            return fecha;
-
-        }
-
+    if (!isNaN(fecha.getTime())) {
+      return fecha;
     }
+  }
 
-
-    return null;
-
+  return null;
 }
 
 
-
-/* ============================================================
+/* ===============================
    MOSTRAR FECHA
-   ============================================================ */
+================================ */
 
-function mostrarFecha(
-    fecha
-) {
+function mostrarFecha(fecha) {
 
+  if (!fecha) return "";
 
-    if (!fecha) {
-
-        return "";
-
+  return fecha.toLocaleString(
+    "es-AR",
+    {
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric",
+      hour:"2-digit",
+      minute:"2-digit"
     }
-
-
-    return fecha.toLocaleString(
-
-        "es-AR",
-
-        {
-
-            day:
-                "2-digit",
-
-            month:
-                "2-digit",
-
-            year:
-                "numeric",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
-
-        }
-
-    );
-
+  );
 }
 
 
+/* ===============================
+   ABRIR NOTA
+================================ */
 
-/* ============================================================
-   CARGAR ACTIVIDADES
-   ============================================================ */
+function abrirNotaHistorial(actividad) {
 
-async function cargarUltimasActividades() {
+  const overlay =
+    document.createElement("div");
 
+  overlay.className =
+    "overlay-nota-historial";
 
-    lista.innerHTML =
-        "<li>Cargando...</li>";
 
+  const ventana =
+    document.createElement("div");
 
-    try {
+  ventana.className =
+    "ventana-nota-historial";
 
 
-        /*
-         * Cargamos simultáneamente:
-         *
-         * visitas
-         * egresos
-         */
+  ventana.innerHTML = `
 
-        const [
+    <h3>
+      ${escaparHTML(
+        actividad.titulo ||
+        "Visita"
+      )}
+    </h3>
 
-            visitasSnap,
+    <div class="datos-nota-historial">
 
-            egresosSnap
+      <strong>
+        ${escaparHTML(
+          actividad.cliente
+        )}
+      </strong>
 
-        ] = await Promise.all([
+      <br>
 
+      ${mostrarFecha(
+        actividad.fecha
+      )}
 
-            getDocs(
+    </div>
 
-                collection(
+    <div class="contenido-nota-historial">
+      ${escaparHTML(
+        actividad.nota || ""
+      )}
+    </div>
 
-                    db,
+    <button
+      class="cerrar-nota-historial"
+      type="button"
+    >
+      Cerrar
+    </button>
 
-                    "visitas"
+  `;
 
-                )
 
-            ),
+  overlay.appendChild(ventana);
 
+  document.body.appendChild(overlay);
 
-            getDocs(
 
-                collection(
-
-                    db,
-
-                    "egresos"
-
-                )
-
-            )
-
-        ]);
-
-
-
-        /* ====================================================
-           GUARDAR EGRESOS
-           ==================================================== */
-
-        const egresos = [];
-
-
-        egresosSnap.forEach(
-
-            docSnap => {
-
-
-                egresos.push({
-
-                    id:
-                        docSnap.id,
-
-                    ...docSnap.data()
-
-                });
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           MAPA DE EGRESOS
-           ==================================================== */
-
-        const egresosPorId =
-            new Map();
-
-
-        egresos.forEach(
-
-            egreso => {
-
-
-                egresosPorId.set(
-
-                    egreso.id,
-
-                    egreso
-
-                );
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           ACTIVIDADES
-           ==================================================== */
-
-        const actividades = [];
-
-
-
-        /* ====================================================
-           VENTAS AGRUPADAS
-           ==================================================== */
-
-        const ventasAgrupadas =
-            new Map();
-
-
-
-        /*
-         * Primero recorremos VISITAS.
-         *
-         * Las visitas de tipo "Venta"
-         * se convierten en una sola actividad.
-         *
-         * Si contienen varios egresoId,
-         * todos los productos aparecen
-         * dentro de la misma venta.
-         */
-
-        visitasSnap.forEach(
-
-            docSnap => {
-
-
-                const v =
-                    docSnap.data();
-
-
-
-                /* =================================================
-                   VENTA
-                   ================================================= */
-
-                if (
-
-                    v.tipoVisita ===
-                    "Venta"
-
-                ) {
-
-
-                    let ids =
-                        v.egresoId;
-
-
-
-                    /*
-                     * Compatibilidad con registros
-                     * antiguos que tengan un único ID.
-                     */
-
-                    if (
-
-                        !Array.isArray(
-                            ids
-                        )
-
-                    ) {
-
-                        ids =
-                            ids
-                                ? [ids]
-                                : [];
-
-                    }
-
-
-
-                    /* =================================================
-                       PRODUCTOS DE LA VENTA
-                       ================================================= */
-
-                    let productos = [];
-
-
-                    ids.forEach(
-
-                        id => {
-
-
-                            const egreso =
-                                egresosPorId.get(
-                                    id
-                                );
-
-
-                            if (
-
-                                egreso &&
-
-                                egreso.tipoEgreso ===
-                                "venta"
-
-                            ) {
-
-
-                                productos.push({
-
-                                    nombre:
-                                        egreso.productoNombre ||
-                                        "Producto sin nombre",
-
-                                    cantidad:
-                                        egreso.cantidad,
-
-                                    unidad:
-                                        egreso.unidad ||
-                                        "",
-
-                                    lote:
-                                        egreso.lote ||
-                                        ""
-
-                                });
-
-                            }
-
-                        }
-
-                    );
-
-
-
-                    /*
-                     * Si no encontramos los egresos,
-                     * usamos los productos guardados
-                     * en la visita.
-                     */
-
-                    if (
-
-                        productos.length ===
-                        0 &&
-
-                        Array.isArray(
-                            v.productos
-                        )
-
-                    ) {
-
-
-                        productos =
-                            v.productos.map(
-
-                                p => ({
-
-                                    nombre:
-                                        p.nombre ||
-                                        "Producto sin nombre",
-
-                                    cantidad:
-                                        p.cantidad,
-
-                                    unidad:
-                                        p.unidad ||
-                                        "",
-
-                                    lote:
-                                        p.lote ||
-                                        ""
-
-                                })
-
-                            );
-
-                    }
-
-
-
-                    const fecha =
-                        obtenerFecha(
-                            v
-                        );
-
-
-                    const cliente =
-                        v.clienteNombre ||
-                        v.cliente ||
-                        "Cliente sin nombre";
-
-
-
-                    /* =================================================
-                       CLAVE DE AGRUPACIÓN
-                       ================================================= */
-
-                    let clave;
-
-
-
-                    /*
-                     * 1. Si existe ventaId,
-                     * usamos ventaId.
-                     */
-
-                    if (
-                        v.ventaId
-                    ) {
-
-                        clave =
-                            "venta-" +
-                            v.ventaId;
-
-                    }
-
-
-
-                    /*
-                     * 2. Si existe un array
-                     * de egresoId,
-                     * usamos esos IDs.
-                     */
-
-                    else if (
-
-                        Array.isArray(
-                            v.egresoId
-                        ) &&
-
-                        v.egresoId.length
-
-                    ) {
-
-
-                        clave =
-                            "egresos-" +
-
-                            [
-                                ...v.egresoId
-                            ]
-
-                                .sort()
-
-                                .join("-");
-
-                    }
-
-
-
-                    /*
-                     * 3. Compatibilidad con
-                     * registros anteriores.
-                     */
-
-                    else {
-
-
-                        const tiempo =
-                            fecha
-
-                                ? Math.floor(
-
-                                    fecha.getTime() /
-                                    60000
-
-                                )
-
-                                : 0;
-
-
-                        clave =
-                            "cliente-" +
-
-                            cliente +
-
-                            "-fecha-" +
-
-                            tiempo;
-
-                    }
-
-
-
-                    /* =================================================
-                       AGRUPAR
-                       ================================================= */
-
-                    if (
-
-                        ventasAgrupadas.has(
-                            clave
-                        )
-
-                    ) {
-
-
-                        const venta =
-                            ventasAgrupadas.get(
-                                clave
-                            );
-
-
-                        /*
-                         * Agregamos productos
-                         * sin repetir cliente,
-                         * fecha ni Venta.
-                         */
-
-                        productos.forEach(
-
-                            producto => {
-
-                                venta.productos.push(
-                                    producto
-                                );
-
-                            }
-
-                        );
-
-
-                        /*
-                         * Conservamos la fecha
-                         * más reciente.
-                         */
-
-                        if (
-
-                            fecha &&
-
-                            (
-
-                                !venta.fecha ||
-
-                                fecha >
-                                venta.fecha
-
-                            )
-
-                        ) {
-
-                            venta.fecha =
-                                fecha;
-
-                        }
-
-                    }
-
-
-                    else {
-
-
-                        ventasAgrupadas.set(
-
-                            clave,
-
-                            {
-
-                                id:
-                                    docSnap.id,
-
-                                origen:
-                                    "venta",
-
-                                fecha,
-
-                                cliente,
-
-                                tipo:
-                                    "Venta",
-
-                                productos
-
-                            }
-
-                        );
-
-                    }
-
-
-                    return;
-
-                }
-
-
-
-                /* =================================================
-                   VISITA NORMAL
-                   ================================================= */
-
-                actividades.push({
-
-                    id:
-                        docSnap.id,
-
-                    origen:
-                        "visita",
-
-                    fecha:
-                        obtenerFecha(
-                            v
-                        ),
-
-                    cliente:
-                        v.cliente ||
-                        v.clienteNombre ||
-                        "Cliente sin nombre",
-
-                    tipo:
-                        v.tipoVisita ||
-                        "Sin tipo",
-
-                    productos:
-                        Array.isArray(
-                            v.productos
-                        )
-                            ? v.productos
-                            : []
-
-                });
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           AGREGAR VENTAS AGRUPADAS
-           ==================================================== */
-
-        ventasAgrupadas.forEach(
-
-            venta => {
-
-                actividades.push(
-                    venta
-                );
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           IDs RELACIONADOS CON VENTAS
-           ==================================================== */
-
-        const idsRelacionados =
-            new Set();
-
-
-        visitasSnap.forEach(
-
-            docSnap => {
-
-
-                const v =
-                    docSnap.data();
-
-
-                if (
-
-                    v.tipoVisita !==
-                    "Venta"
-
-                ) {
-
-                    return;
-
-                }
-
-
-                let ids =
-                    v.egresoId;
-
-
-                if (
-
-                    !Array.isArray(
-                        ids
-                    )
-
-                ) {
-
-                    ids =
-                        ids
-                            ? [ids]
-                            : [];
-
-                }
-
-
-                ids.forEach(
-
-                    id => {
-
-                        if (id) {
-
-                            idsRelacionados.add(
-                                id
-                            );
-
-                        }
-
-                    }
-
-                );
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           VENTAS ANTIGUAS SIN VISITA
-           ==================================================== */
-
-        egresos.forEach(
-
-            egreso => {
-
-
-                if (
-
-                    egreso.tipoEgreso !==
-                    "venta"
-
-                ) {
-
-                    return;
-
-                }
-
-
-
-                /*
-                 * Si ya pertenece a una venta
-                 * mostrada anteriormente,
-                 * no lo volvemos a mostrar.
-                 */
-
-                if (
-
-                    idsRelacionados.has(
-                        egreso.id
-                    )
-
-                ) {
-
-                    return;
-
-                }
-
-
-
-                /*
-                 * Venta antigua independiente.
-                 */
-
-                actividades.push({
-
-                    id:
-                        egreso.id,
-
-                    origen:
-                        "venta",
-
-                    fecha:
-                        obtenerFecha(
-                            egreso
-                        ),
-
-                    cliente:
-                        egreso.clienteNombre ||
-                        "Cliente sin nombre",
-
-                    tipo:
-                        "Venta",
-
-                    productos: [
-
-                        {
-
-                            nombre:
-                                egreso.productoNombre ||
-                                "Producto sin nombre",
-
-                            cantidad:
-                                egreso.cantidad,
-
-                            unidad:
-                                egreso.unidad ||
-                                "",
-
-                            lote:
-                                egreso.lote ||
-                                ""
-
-                        }
-
-                    ]
-
-                });
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           ORDENAR
-           ==================================================== */
-
-        actividades.sort(
-
-            (
-                a,
-                b
-            ) => {
-
-
-                const fechaA =
-                    a.fecha
-
-                        ? a.fecha.getTime()
-
-                        : 0;
-
-
-                const fechaB =
-                    b.fecha
-
-                        ? b.fecha.getTime()
-
-                        : 0;
-
-
-                return (
-
-                    fechaB -
-
-                    fechaA
-
-                );
-
-            }
-
-        );
-
-
-
-        /* ====================================================
-           ÚLTIMAS 5 ACTIVIDADES
-           ==================================================== */
-
-        const ultimas =
-            actividades.slice(
-
-                0,
-
-                5
-
-            );
-
-
-
-        lista.innerHTML =
-            "";
-
-
-
-        if (
-
-            ultimas.length ===
-            0
-
-        ) {
-
-
-            lista.innerHTML =
-
-                "<li>No hay actividades registradas.</li>";
-
-
-            return;
-
-        }
-
-
-
-        /* ====================================================
-           MOSTRAR ACTIVIDADES
-           ==================================================== */
-
-        ultimas.forEach(
-
-            actividad => {
-
-
-                const li =
-                    document.createElement(
-                        "li"
-                    );
-
-
-
-                /* =================================================
-                   VENTA
-                   ================================================= */
-
-                if (
-
-                    actividad.origen ===
-                    "venta"
-
-                ) {
-
-
-                    let productosHTML =
-                        "";
-
-
-
-                    if (
-
-                        actividad.productos &&
-
-                        actividad.productos.length
-
-                    ) {
-
-
-                        productosHTML =
-
-                            actividad.productos
-
-                                .map(
-
-                                    producto => `
-
-                                        <div class="producto-venta">
-
-                                            <span class="dato-producto">
-
-                                                📦
-                                                ${escaparHTML(
-                                                    producto.nombre
-                                                )}
-
-                                            </span>
-
-
-                                            <span class="dato-cantidad">
-
-                                                ⚖️
-                                                ${escaparHTML(
-                                                    producto.cantidad ?? ""
-                                                )}
-
-                                                ${escaparHTML(
-                                                    producto.unidad || ""
-                                                )}
-
-                                            </span>
-
-
-                                            <span class="dato-lote">
-
-                                                🏷️
-                                                ${escaparHTML(
-                                                    producto.lote || ""
-                                                )}
-
-                                            </span>
-
-                                        </div>
-
-                                    `
-
-                                )
-
-                                .join(
-                                    ""
-                                );
-
-                    }
-
-
-
-                    li.innerHTML = `
-
-                        <strong>
-
-                            ${escaparHTML(
-                                actividad.cliente
-                            )}
-
-                        </strong>
-
-                        <br>
-
-                        <small>
-
-                            ${mostrarFecha(
-                                actividad.fecha
-                            )}
-
-                        </small>
-
-                        <br>
-
-                        <span class="tag-visita tag-entrega">
-
-                            Venta
-
-                        </span>
-
-
-                        <div class="productos-venta">
-
-                            ${productosHTML}
-
-                        </div>
-
-                    `;
-
-                }
-
-
-
-                /* =================================================
-                   VISITA / ENSAYO
-                   ================================================= */
-
-                else {
-
-
-                    let clase =
-                        "tag-visita";
-
-
-
-                    if (
-
-                        actividad.tipo ===
-                        "Visita comercial"
-
-                    ) {
-
-                        clase +=
-                            " tag-comercial";
-
-                    }
-
-
-                    else if (
-
-                        actividad.tipo ===
-                        "Ensayo"
-
-                    ) {
-
-                        clase +=
-                            " tag-ensayo";
-
-                    }
-
-
-                    else if (
-
-                        actividad.tipo ===
-                        "Entrega de productos"
-
-                    ) {
-
-                        clase +=
-                            " tag-entrega";
-
-                    }
-
-
-
-                    let productosHTML =
-                        "";
-
-
-
-                    if (
-
-                        actividad.productos &&
-
-                        actividad.productos.length
-
-                    ) {
-
-
-                        productosHTML =
-
-                            actividad.productos
-
-                                .map(
-
-                                    p => `
-
-                                        📦
-                                        ${escaparHTML(
-                                            p.nombre
-                                        )}
-
-                                        ${
-                                            p.cantidad
-
-                                                ? `(${escaparHTML(
-                                                    p.cantidad
-                                                )})`
-
-                                                : ""
-
-                                        }
-
-                                    `
-
-                                )
-
-                                .join(
-                                    "<br>"
-                                );
-
-                    }
-
-
-
-                    li.innerHTML = `
-
-                        <strong>
-
-                            ${escaparHTML(
-                                actividad.cliente
-                            )}
-
-                        </strong>
-
-                        <br>
-
-                        <small>
-
-                            ${mostrarFecha(
-                                actividad.fecha
-                            )}
-
-                        </small>
-
-                        <br>
-
-                        <span class="${clase}">
-
-                            ${escaparHTML(
-                                actividad.tipo
-                            )}
-
-                        </span>
-
-                        ${
-                            productosHTML
-
-                                ? `
-
-                                    <div class="productos">
-
-                                        ${productosHTML}
-
-                                    </div>
-
-                                  `
-
-                                : ""
-
-                        }
-
-                    `;
-
-                }
-
-
-
-                lista.appendChild(
-                    li
-                );
-
-            }
-
-        );
-
-    }
-
-
-    catch (error) {
-
-
-        console.error(
-
-            "Error cargando actividades:",
-
-            error
-
-        );
-
-
-        lista.innerHTML = `
-
-            <li>
-
-                <strong>
-
-                    No se pudieron cargar las actividades.
-
-                </strong>
-
-                <br>
-
-                <small>
-
-                    Revisá la consola para más información.
-
-                </small>
-
-            </li>
-
-        `;
-
-    }
-
-}
-
-
-
-/* ============================================================
-   INICIAR
-   ============================================================ */
-
-cargarUltimasActividades();
-
-
-
-/* ============================================================
-   HISTORIAL COMPLETO
-   ============================================================ */
-
-document
-
-    .getElementById(
-        "abrir-historial"
+  ventana
+    .querySelector(
+      ".cerrar-nota-historial"
     )
+    .onclick = () => {
 
-    .onclick = event => {
-
-
-        event.preventDefault();
-
-
-        window.open(
-
-            "historial.html",
-
-            "historial",
-
-            "width=420,height=700"
-
-        );
+      overlay.remove();
 
     };
 
 
+  overlay.onclick = event => {
+
+    if (event.target === overlay) {
+
+      overlay.remove();
+
+    }
+
+  };
+
+}
+
+
+/* ===============================
+   ÚLTIMAS ACTIVIDADES
+================================ */
+
+async function cargarUltimasActividades() {
+
+  lista.innerHTML =
+    "<li>Cargando...</li>";
+
+
+  try {
+
+    const [
+      visitasSnap,
+      egresosSnap
+    ] = await Promise.all([
+
+      getDocs(
+        collection(db,"visitas")
+      ),
+
+      getDocs(
+        collection(db,"egresos")
+      )
+
+    ]);
+
+
+    /* ===============================
+       EGRESOS
+    ================================ */
+
+    const egresos = [];
+
+
+    egresosSnap.forEach(docSnap => {
+
+      egresos.push({
+
+        id: docSnap.id,
+
+        ...docSnap.data()
+
+      });
+
+    });
+
+
+    const egresosPorId =
+      new Map();
+
+
+    egresos.forEach(egreso => {
+
+      egresosPorId.set(
+        egreso.id,
+        egreso
+      );
+
+    });
+
+
+    /* ===============================
+       ACTIVIDADES
+    ================================ */
+
+    const actividades = [];
+
+    const ventasAgrupadas =
+      new Map();
+
+
+    visitasSnap.forEach(docSnap => {
+
+      const v =
+        docSnap.data();
+
+
+      /* ===============================
+         VENTAS
+      ================================ */
+
+      if (
+        v.tipoVisita === "Venta"
+      ) {
+
+        let ids =
+          v.egresoId;
+
+
+        if (!Array.isArray(ids)) {
+
+          ids =
+            ids
+              ? [ids]
+              : [];
+
+        }
+
+
+        let productos = [];
+
+
+        ids.forEach(id => {
+
+          const egreso =
+            egresosPorId.get(id);
+
+
+          if (
+            egreso &&
+            egreso.tipoEgreso === "venta"
+          ) {
+
+            productos.push({
+
+              nombre:
+                egreso.productoNombre ||
+                "Producto sin nombre",
+
+              cantidad:
+                egreso.cantidad,
+
+              unidad:
+                egreso.unidad || "",
+
+              lote:
+                egreso.lote || ""
+
+            });
+
+          }
+
+        });
+
+
+        if (
+          productos.length === 0 &&
+          Array.isArray(v.productos)
+        ) {
+
+          productos =
+            v.productos.map(p => ({
+
+              nombre:
+                p.nombre ||
+                "Producto sin nombre",
+
+              cantidad:
+                p.cantidad,
+
+              unidad:
+                p.unidad || "",
+
+              lote:
+                p.lote || ""
+
+            }));
+
+        }
+
+
+        const fecha =
+          obtenerFecha(v);
+
+
+        const cliente =
+          v.clienteNombre ||
+          v.cliente ||
+          "Cliente sin nombre";
+
+
+        let clave;
+
+
+        if (v.ventaId) {
+
+          clave =
+            "venta-" +
+            v.ventaId;
+
+        } else if (
+          Array.isArray(v.egresoId) &&
+          v.egresoId.length
+        ) {
+
+          clave =
+            "egresos-" +
+            [...v.egresoId]
+              .sort()
+              .join("-");
+
+        } else {
+
+          const tiempo =
+            fecha
+              ? Math.floor(
+                  fecha.getTime() / 60000
+                )
+              : 0;
+
+
+          clave =
+            "cliente-" +
+            cliente +
+            "-fecha-" +
+            tiempo;
+
+        }
+
+
+        if (
+          ventasAgrupadas.has(clave)
+        ) {
+
+          const venta =
+            ventasAgrupadas.get(
+              clave
+            );
+
+
+          productos.forEach(
+            producto => {
+
+              venta.productos.push(
+                producto
+              );
+
+            }
+          );
+
+
+          if (
+            fecha &&
+            (
+              !venta.fecha ||
+              fecha > venta.fecha
+            )
+          ) {
+
+            venta.fecha =
+              fecha;
+
+          }
+
+        } else {
+
+          ventasAgrupadas.set(
+            clave,
+            {
+
+              id:
+                docSnap.id,
+
+              origen:
+                "venta",
+
+              fecha,
+
+              cliente,
+
+              tipo:
+                "Venta",
+
+              productos
+
+            }
+          );
+
+        }
+
+
+        return;
+
+      }
+
+
+      /* ===============================
+         NOTAS / VISITAS / ENSAYOS
+      ================================ */
+
+      actividades.push({
+
+        id:
+          docSnap.id,
+
+        origen:
+          "visita",
+
+        fecha:
+          obtenerFecha(v),
+
+        cliente:
+          v.cliente ||
+          v.clienteNombre ||
+          "Cliente sin nombre",
+
+        tipo:
+          v.tipoVisita ||
+          "Sin tipo",
+
+        titulo:
+          v.titulo ||
+          "",
+
+        nota:
+          v.nota ||
+          "",
+
+        productos:
+          Array.isArray(v.productos)
+            ? v.productos
+            : []
+
+      });
+
+    });
+
+
+    /* ===============================
+       AGREGAR VENTAS
+    ================================ */
+
+    ventasAgrupadas.forEach(
+      venta =>
+        actividades.push(venta)
+    );
+
+
+    /* ===============================
+       VENTAS NO RELACIONADAS
+    ================================ */
+
+    const idsRelacionados =
+      new Set();
+
+
+    visitasSnap.forEach(
+      docSnap => {
+
+        const v =
+          docSnap.data();
+
+
+        if (
+          v.tipoVisita !== "Venta"
+        ) {
+          return;
+        }
+
+
+        let ids =
+          v.egresoId;
+
+
+        if (!Array.isArray(ids)) {
+
+          ids =
+            ids
+              ? [ids]
+              : [];
+
+        }
+
+
+        ids.forEach(id => {
+
+          if (id) {
+
+            idsRelacionados.add(id);
+
+          }
+
+        });
+
+      }
+    );
+
+
+    egresos.forEach(egreso => {
+
+      if (
+        egreso.tipoEgreso !== "venta"
+      ) {
+        return;
+      }
+
+
+      if (
+        idsRelacionados.has(
+          egreso.id
+        )
+      ) {
+        return;
+      }
+
+
+      actividades.push({
+
+        id:
+          egreso.id,
+
+        origen:
+          "venta",
+
+        fecha:
+          obtenerFecha(egreso),
+
+        cliente:
+          egreso.clienteNombre ||
+          "Cliente sin nombre",
+
+        tipo:
+          "Venta",
+
+        productos: [
+
+          {
+
+            nombre:
+              egreso.productoNombre ||
+              "Producto sin nombre",
+
+            cantidad:
+              egreso.cantidad,
+
+            unidad:
+              egreso.unidad || "",
+
+            lote:
+              egreso.lote || ""
+
+          }
+
+        ]
+
+      });
+
+    });
+
+
+    /* ===============================
+       ORDENAR
+    ================================ */
+
+    actividades.sort(
+      (a,b) => {
+
+        const fechaA =
+          a.fecha
+            ? a.fecha.getTime()
+            : 0;
+
+
+        const fechaB =
+          b.fecha
+            ? b.fecha.getTime()
+            : 0;
+
+
+        return fechaB - fechaA;
+
+      }
+    );
+
+
+    /* ===============================
+       ÚLTIMAS 5
+    ================================ */
+
+    const ultimas =
+      actividades.slice(0,5);
+
+
+    lista.innerHTML = "";
+
+
+    if (
+      ultimas.length === 0
+    ) {
+
+      lista.innerHTML =
+        "<li>No hay actividades registradas.</li>";
+
+      return;
+
+    }
+
+
+    /* ===============================
+       MOSTRAR
+    ================================ */
+
+    ultimas.forEach(
+      actividad => {
+
+        const li =
+          document.createElement("li");
+
+
+        /* ===============================
+           NOTA DE VISITA
+        ================================ */
+
+        if (
+          actividad.tipo ===
+          "Nota de visita"
+        ) {
+
+          li.className =
+            "item-nota-visita";
+
+
+          li.innerHTML = `
+
+            <strong>
+              ${escaparHTML(
+                actividad.cliente
+              )}
+            </strong>
+
+            <br>
+
+            <small>
+              ${mostrarFecha(
+                actividad.fecha
+              )}
+            </small>
+
+            <br>
+
+            <span
+              class="tag-visita tag-comercial"
+            >
+              Visita
+            </span>
+
+            <span
+              class="titulo-nota-historial"
+            >
+              ${escaparHTML(
+                actividad.titulo ||
+                "Visita"
+              )}
+            </span>
+
+          `;
+
+
+          li.onclick = () => {
+
+            abrirNotaHistorial(
+              actividad
+            );
+
+          };
+
+
+          lista.appendChild(li);
+
+          return;
+
+        }
+
+
+        /* ===============================
+           VENTA
+        ================================ */
+
+        if (
+          actividad.origen ===
+          "venta"
+        ) {
+
+          let productosHTML = "";
+
+
+          if (
+            actividad.productos &&
+            actividad.productos.length
+          ) {
+
+            productosHTML =
+              actividad.productos
+                .map(
+                  producto => `
+
+                    <div
+                      class="producto-venta"
+                    >
+
+                      <span
+                        class="dato-producto"
+                      >
+                        📦
+                        ${escaparHTML(
+                          producto.nombre
+                        )}
+                      </span>
+
+                      <span
+                        class="dato-cantidad"
+                      >
+                        ⚖️
+                        ${escaparHTML(
+                          producto.cantidad ??
+                          ""
+                        )}
+                        ${escaparHTML(
+                          producto.unidad ||
+                          ""
+                        )}
+                      </span>
+
+                      <span
+                        class="dato-lote"
+                      >
+                        🏷️
+                        ${escaparHTML(
+                          producto.lote ||
+                          ""
+                        )}
+                      </span>
+
+                    </div>
+
+                  `
+                )
+                .join("");
+
+          }
+
+
+          li.innerHTML = `
+
+            <strong>
+              ${escaparHTML(
+                actividad.cliente
+              )}
+            </strong>
+
+            <br>
+
+            <small>
+              ${mostrarFecha(
+                actividad.fecha
+              )}
+            </small>
+
+            <br>
+
+            <span
+              class="tag-visita tag-entrega"
+            >
+              Venta
+            </span>
+
+            <div
+              class="productos-venta"
+            >
+              ${productosHTML}
+            </div>
+
+          `;
+
+
+        }
+
+
+        /* ===============================
+           OTRAS ACTIVIDADES
+        ================================ */
+
+        else {
+
+          let clase =
+            "tag-visita";
+
+
+          if (
+            actividad.tipo ===
+            "Visita comercial"
+          ) {
+
+            clase +=
+              " tag-comercial";
+
+          }
+
+          else if (
+            actividad.tipo ===
+            "Ensayo"
+          ) {
+
+            clase +=
+              " tag-ensayo";
+
+          }
+
+          else if (
+            actividad.tipo ===
+            "Entrega de productos"
+          ) {
+
+            clase +=
+              " tag-entrega";
+
+          }
+
+
+          let productosHTML =
+            "";
+
+
+          if (
+            actividad.productos &&
+            actividad.productos.length
+          ) {
+
+            productosHTML =
+              actividad.productos
+                .map(
+                  p => `
+
+                    📦
+                    ${escaparHTML(
+                      p.nombre
+                    )}
+
+                    ${
+                      p.cantidad
+                        ? `(${escaparHTML(
+                            p.cantidad
+                          )})`
+                        : ""
+                    }
+
+                  `
+                )
+                .join("<br>");
+
+          }
+
+
+          li.innerHTML = `
+
+            <strong>
+              ${escaparHTML(
+                actividad.cliente
+              )}
+            </strong>
+
+            <br>
+
+            <small>
+              ${mostrarFecha(
+                actividad.fecha
+              )}
+            </small>
+
+            <br>
+
+            <span
+              class="${clase}"
+            >
+              ${escaparHTML(
+                actividad.tipo
+              )}
+            </span>
+
+            ${
+              productosHTML
+                ? `
+                  <div class="productos">
+                    ${productosHTML}
+                  </div>
+                `
+                : ""
+            }
+
+          `;
+
+        }
+
+
+        lista.appendChild(li);
+
+      }
+    );
+
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Error cargando actividades:",
+      error
+    );
+
+
+    lista.innerHTML = `
+
+      <li>
+
+        <strong>
+          No se pudieron cargar las actividades.
+        </strong>
+
+        <br>
+
+        <small>
+          Revisá la consola para más información.
+        </small>
+
+      </li>
+
+    `;
+
+  }
+
+}
+
+
+/* ===============================
+   CARGAR
+================================ */
+
+cargarUltimasActividades();
+
+
+/* ===============================
+   HISTORIAL COMPLETO
+================================ */
+
+document
+  .getElementById(
+    "abrir-historial"
+  )
+  .onclick = event => {
+
+    event.preventDefault();
+
+    window.open(
+      "historial.html",
+      "historial",
+      "width=420,height=700"
+    );
+
+  };
+
 </script>
 
-
 </body>
-
 </html>
