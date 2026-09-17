@@ -29,7 +29,6 @@ main {
   color: #1f4e8c;
 }
 
-
 /* ===============================
    DISTRIBUCIÓN 50% / 50%
 ================================ */
@@ -49,16 +48,11 @@ main {
 .cliente-nombre {
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: flex-start;
+  text-align: left;
 
-  /*
-     El nombre queda centrado
-     respecto de la primera tarjeta
-     de contacto.
-  */
   min-height: 0;
-  padding: 75px 25px 20px 0;
+  padding: 0 25px 0 0;
 }
 
 .cliente-nombre h2 {
@@ -66,7 +60,6 @@ main {
   font-size: 30px;
   color: #1f4e8c;
 }
-
 
 /* ===============================
    COLUMNA CONTACTOS
