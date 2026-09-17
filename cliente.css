@@ -35,11 +35,10 @@ main {
 
 .cliente-cabecera {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: calc(50% + 22px) calc(50% - 22px);
   gap: 0;
   align-items: start;
 }
-
 
 /* ===============================
    EMPRESA
