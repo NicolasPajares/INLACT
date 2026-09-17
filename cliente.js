@@ -258,188 +258,161 @@ document.addEventListener("DOMContentLoaded", async () => {
         contactos.forEach(
             (contacto, indice) => {
 
-                const tarjeta =
-                    document.createElement("div");
+              const tarjeta =
+    document.createElement("div");
+
+tarjeta.className =
+    "contacto-card";
 
 
-                tarjeta.className =
-                    "contacto-card";
-                const menuBtn = document.createElement("button");
+const nombre =
+    contacto?.nombre ||
+    "Contacto sin nombre";
 
-                menuBtn.type = "button";
-                menuBtn.className = "menu-contacto";
-                menuBtn.textContent = "⋮";
+const posicion =
+    contacto?.posicion ||
+    "";
 
-                tarjeta.appendChild(menuBtn);
+const telefono =
+    contacto?.telefono ||
+    "";
 
-                /*
-                 * Cada contacto adicional queda
-                 * separado del anterior por una línea.
-                 */
+const email =
+    contacto?.email ||
+    "";
 
-                if (indice > 0) {
-
-                    tarjeta.style.borderTop =
-                        "1px solid #d9e8f2";
-
-                    tarjeta.style.marginTop =
-                        "18px";
-
-                    tarjeta.style.paddingTop =
-                        "18px";
-
-                }
+const observaciones =
+    contacto?.observaciones ||
+    "";
 
 
-                const nombre =
-                    contacto?.nombre ||
-                    "Contacto sin nombre";
+const telefonoLimpio =
+    String(telefono)
+        .replace(/\D/g, "");
 
 
-                const posicion =
-                    contacto?.posicion ||
-                    "";
+const telefonoHTML =
+    telefono
+        ? `
+            <span>
+                ${escaparHTML(telefono)}
+            </span>
+
+            <a
+                href="https://wa.me/54${telefonoLimpio}"
+                target="_blank"
+                rel="noopener"
+            >
+                WhatsApp
+            </a>
+          `
+        : "-";
 
 
-                const telefono =
-                    contacto?.telefono ||
-                    "";
+const emailHTML =
+    email
+        ? `
+            <span>
+                ${escaparHTML(email)}
+            </span>
+
+            <a
+                href="mailto:${encodeURIComponent(email)}"
+            >
+                Email
+            </a>
+          `
+        : "-";
 
 
-                const email =
-                    contacto?.email ||
-                    "";
+tarjeta.innerHTML = `
+
+    <div class="campo">
+
+        <label>
+            Nombre
+        </label>
+
+        <span>
+            ${escaparHTML(nombre)}
+        </span>
+
+    </div>
 
 
-                const observaciones =
-                    contacto?.observaciones ||
-                    "";
+    <div class="campo">
+
+        <label>
+            Posición
+        </label>
+
+        <span>
+            ${escaparHTML(
+                posicion || "-"
+            )}
+        </span>
+
+    </div>
 
 
-                /*
-                 * WHATSAPP
-                 *
-                 * Número visible + link WhatsApp
-                 * igual que el contacto principal.
-                 */
+    <div class="campo">
 
-                const telefonoLimpio =
-                    String(telefono)
-                        .replace(/\D/g, "");
+        <label>
+            Teléfono
+        </label>
 
+        <span>
+            ${telefonoHTML}
+        </span>
 
-                const telefonoHTML =
-                    telefono
-                        ? `
-                            <span>
-                                ${escaparHTML(telefono)}
-                            </span>
-
-                            <a
-                                href="https://wa.me/54${telefonoLimpio}"
-                                target="_blank"
-                                rel="noopener"
-                            >
-                                WhatsApp
-                            </a>
-                          `
-                        : "-";
+    </div>
 
 
-                /*
-                 * EMAIL
-                 *
-                 * Correo visible + link Email
-                 * igual que el contacto principal.
-                 */
+    <div class="campo">
 
-                const emailHTML =
-                    email
-                        ? `
-                            <span>
-                                ${escaparHTML(email)}
-                            </span>
+        <label>
+            Email
+        </label>
 
-                            <a
-                                href="mailto:${encodeURIComponent(email)}"
-                            >
-                                Email
-                            </a>
-                          `
-                        : "-";
+        <span>
+            ${emailHTML}
+        </span>
+
+    </div>
 
 
-                tarjeta.innerHTML = `
+    <div class="campo">
 
-                    <div class="campo">
+        <label>
+            Observaciones
+        </label>
 
-                        <label>
-                            Nombre
-                        </label>
+        <p>
+            ${escaparHTML(
+                observaciones || "-"
+            )}
+        </p>
 
-                        <span>
-                            ${escaparHTML(nombre)}
-                        </span>
+    </div>
 
-                    </div>
-
-
-                    <div class="campo">
-
-                        <label>
-                            Posición
-                        </label>
-
-                        <span>
-                            ${escaparHTML(
-                                posicion || "-"
-                            )}
-                        </span>
-
-                    </div>
+`;
 
 
-                    <div class="campo">
+const menuBtn =
+    document.createElement("button");
 
-                        <label>
-                            Teléfono
-                        </label>
+menuBtn.type =
+    "button";
 
-                        <span>
-                            ${telefonoHTML}
-                        </span>
+menuBtn.className =
+    "menu-contacto";
 
-                    </div>
+menuBtn.textContent =
+    "⋮";
 
-
-                    <div class="campo">
-
-                        <label>
-                            Email
-                        </label>
-
-                        <span>
-                            ${emailHTML}
-                        </span>
-
-                    </div>
-
-
-                    <div class="campo">
-
-                        <label>
-                            Observaciones
-                        </label>
-
-                        <p>
-                            ${escaparHTML(
-                                observaciones || "-"
-                            )}
-                        </p>
-
-                    </div>
-
-                `;
+tarjeta.appendChild(
+    menuBtn
+);
 
 
                 contenedor.appendChild(
