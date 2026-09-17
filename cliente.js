@@ -250,220 +250,438 @@ if (
      * ============================================================
      */
 
-    function mostrarContactosGuardados(contactos) {
+  function mostrarContactosGuardados(contactos) {
 
-        /*
-         * CAMBIO ÚNICO:
-         *
-         * Ahora utilizamos el contenedor que ya existe
-         * dentro de la columna derecha de la ficha.
-         *
-         * No lo eliminamos ni lo movemos.
-         */
+    const contenedor =
+        document.getElementById(
+            "contactosAdicionales"
+        );
 
-        const contenedor =
-            document.getElementById(
-                "contactosAdicionales"
+    if (!contenedor) {
+        return;
+    }
+
+    contenedor.innerHTML = "";
+
+    contenedor.className =
+        "lista-contactos";
+
+    if (
+        !Array.isArray(contactos) ||
+        contactos.length === 0
+    ) {
+        return;
+    }
+
+
+    contactos.forEach(
+        (contacto, indice) => {
+
+            const tarjeta =
+                document.createElement("div");
+
+            tarjeta.className =
+                "contacto-card";
+
+
+            const nombre =
+                contacto?.nombre ||
+                "Contacto sin nombre";
+
+            const posicion =
+                contacto?.posicion ||
+                "";
+
+            const telefono =
+                contacto?.telefono ||
+                "";
+
+            const email =
+                contacto?.email ||
+                "";
+
+            const observaciones =
+                contacto?.observaciones ||
+                "";
+
+
+            const telefonoLimpio =
+                String(telefono)
+                    .replace(/\D/g, "");
+
+
+            const telefonoHTML =
+                telefono
+                    ? `
+                        <span>
+                            ${escaparHTML(telefono)}
+                        </span>
+
+                        <a
+                            href="https://wa.me/54${telefonoLimpio}"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            WhatsApp
+                        </a>
+                      `
+                    : "-";
+
+
+            const emailHTML =
+                email
+                    ? `
+                        <span>
+                            ${escaparHTML(email)}
+                        </span>
+
+                        <a
+                            href="mailto:${encodeURIComponent(email)}"
+                        >
+                            Email
+                        </a>
+                      `
+                    : "-";
+
+
+            tarjeta.innerHTML = `
+
+                <div class="campo">
+
+                    <label>
+                        Nombre
+                    </label>
+
+                    <span>
+                        ${escaparHTML(nombre)}
+                    </span>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Posición
+                    </label>
+
+                    <span>
+                        ${escaparHTML(
+                            posicion || "-"
+                        )}
+                    </span>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Teléfono
+                    </label>
+
+                    <span>
+                        ${telefonoHTML}
+                    </span>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <span>
+                        ${emailHTML}
+                    </span>
+
+                </div>
+
+
+                <div class="campo">
+
+                    <label>
+                        Observaciones
+                    </label>
+
+                    <p>
+                        ${escaparHTML(
+                            observaciones || "-"
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            /*
+             * ==========================================
+             * BOTÓN TRES PUNTITOS
+             * ==========================================
+             */
+
+            const menuBtn =
+                document.createElement("button");
+
+            menuBtn.type =
+                "button";
+
+            menuBtn.className =
+                "menu-contacto";
+
+            menuBtn.textContent =
+                "⋮";
+
+
+            /*
+             * ==========================================
+             * MENÚ
+             * ==========================================
+             */
+
+            const menu =
+                document.createElement("div");
+
+            menu.className =
+                "menu-opciones-contacto";
+
+            menu.hidden =
+                true;
+
+
+            /*
+             * BOTÓN EDITAR
+             */
+
+            const editarContactoBtn =
+                document.createElement("button");
+
+            editarContactoBtn.type =
+                "button";
+
+            editarContactoBtn.textContent =
+                "Editar";
+
+
+            /*
+             * BOTÓN ELIMINAR
+             */
+
+            const eliminarContactoBtn =
+                document.createElement("button");
+
+            eliminarContactoBtn.type =
+                "button";
+
+            eliminarContactoBtn.textContent =
+                "Eliminar";
+
+            eliminarContactoBtn.className =
+                "eliminar-contacto";
+
+
+            /*
+             * AGREGAR OPCIONES AL MENÚ
+             */
+
+            menu.appendChild(
+                editarContactoBtn
+            );
+
+            menu.appendChild(
+                eliminarContactoBtn
             );
 
 
-        if (!contenedor) {
-            return;
+            /*
+             * AGREGAR MENÚ A LA TARJETA
+             */
+
+            tarjeta.appendChild(
+                menuBtn
+            );
+
+            tarjeta.appendChild(
+                menu
+            );
+
+
+            /*
+             * ==========================================
+             * ABRIR / CERRAR MENÚ
+             * ==========================================
+             */
+
+            menuBtn.addEventListener(
+                "click",
+                (evento) => {
+
+                    evento.stopPropagation();
+
+                    document
+                        .querySelectorAll(
+                            ".menu-opciones-contacto"
+                        )
+                        .forEach(
+                            otroMenu => {
+
+                                if (
+                                    otroMenu !== menu
+                                ) {
+
+                                    otroMenu.hidden =
+                                        true;
+
+                                }
+
+                            }
+                        );
+
+                    menu.hidden =
+                        !menu.hidden;
+
+                }
+            );
+
+
+            /*
+             * ==========================================
+             * EDITAR
+             * ==========================================
+             *
+             * Por ahora dejamos preparado
+             * el botón.
+             *
+             * En el próximo paso hacemos
+             * la edición completa.
+             */
+
+            editarContactoBtn.addEventListener(
+                "click",
+                () => {
+
+                    menu.hidden =
+                        true;
+
+                    alert(
+                        "Vamos a editar el contacto: " +
+                        nombre
+                    );
+
+                }
+            );
+
+
+            /*
+             * ==========================================
+             * ELIMINAR
+             * ==========================================
+             */
+
+            eliminarContactoBtn.addEventListener(
+                "click",
+                async () => {
+
+                    menu.hidden =
+                        true;
+
+                    const confirmar =
+                        confirm(
+                            `¿Querés eliminar el contacto "${nombre}"?`
+                        );
+
+                    if (!confirmar) {
+                        return;
+                    }
+
+
+                    try {
+
+                        const nuevosContactos =
+                            contactos.filter(
+                                (_, i) =>
+                                    i !== indice
+                            );
+
+
+                        await updateDoc(
+
+                            clienteRef,
+
+                            {
+
+                                contactos:
+                                    nuevosContactos
+
+                            }
+
+                        );
+
+
+                        await cargarCliente();
+
+
+                        alert(
+                            "Contacto eliminado ✔"
+                        );
+
+                    }
+
+                    catch (error) {
+
+                        console.error(
+                            "Error eliminando contacto:",
+                            error
+                        );
+
+                        alert(
+                            "No se pudo eliminar el contacto."
+                        );
+
+                    }
+
+                }
+            );
+
+
+            contenedor.appendChild(
+                tarjeta
+            );
+
         }
+    );
 
 
-        contenedor.innerHTML = "";
+    /*
+     * ==========================================
+     * CERRAR MENÚ AL HACER CLICK AFUERA
+     * ==========================================
+     */
 
+    document.addEventListener(
+        "click",
+        () => {
 
-        contenedor.className =
-            "lista-contactos";
+            document
+                .querySelectorAll(
+                    ".menu-opciones-contacto"
+                )
+                .forEach(
+                    menu => {
 
+                        menu.hidden =
+                            true;
 
-        if (
-            !Array.isArray(contactos) ||
-            contactos.length === 0
-        ) {
-            return;
-        }
-
-
-        contactos.forEach(
-            (contacto, indice) => {
-
-              const tarjeta =
-    document.createElement("div");
-
-tarjeta.className =
-    "contacto-card";
-
-
-const nombre =
-    contacto?.nombre ||
-    "Contacto sin nombre";
-
-const posicion =
-    contacto?.posicion ||
-    "";
-
-const telefono =
-    contacto?.telefono ||
-    "";
-
-const email =
-    contacto?.email ||
-    "";
-
-const observaciones =
-    contacto?.observaciones ||
-    "";
-
-
-const telefonoLimpio =
-    String(telefono)
-        .replace(/\D/g, "");
-
-
-const telefonoHTML =
-    telefono
-        ? `
-            <span>
-                ${escaparHTML(telefono)}
-            </span>
-
-            <a
-                href="https://wa.me/54${telefonoLimpio}"
-                target="_blank"
-                rel="noopener"
-            >
-                WhatsApp
-            </a>
-          `
-        : "-";
-
-
-const emailHTML =
-    email
-        ? `
-            <span>
-                ${escaparHTML(email)}
-            </span>
-
-            <a
-                href="mailto:${encodeURIComponent(email)}"
-            >
-                Email
-            </a>
-          `
-        : "-";
-
-
-tarjeta.innerHTML = `
-
-    <div class="campo">
-
-        <label>
-            Nombre
-        </label>
-
-        <span>
-            ${escaparHTML(nombre)}
-        </span>
-
-    </div>
-
-
-    <div class="campo">
-
-        <label>
-            Posición
-        </label>
-
-        <span>
-            ${escaparHTML(
-                posicion || "-"
-            )}
-        </span>
-
-    </div>
-
-
-    <div class="campo">
-
-        <label>
-            Teléfono
-        </label>
-
-        <span>
-            ${telefonoHTML}
-        </span>
-
-    </div>
-
-
-    <div class="campo">
-
-        <label>
-            Email
-        </label>
-
-        <span>
-            ${emailHTML}
-        </span>
-
-    </div>
-
-
-    <div class="campo">
-
-        <label>
-            Observaciones
-        </label>
-
-        <p>
-            ${escaparHTML(
-                observaciones || "-"
-            )}
-        </p>
-
-    </div>
-
-`;
-
-
-const menuBtn =
-    document.createElement("button");
-
-menuBtn.type =
-    "button";
-
-menuBtn.className =
-    "menu-contacto";
-
-menuBtn.textContent =
-    "⋮";
-
-tarjeta.appendChild(
-    menuBtn
-);
-
-
-                contenedor.appendChild(
-                    tarjeta
+                    }
                 );
 
-            }
-        );
+        }
+    );
 
-
-        /*
-         * El contenedor ya está dentro de la columna
-         * derecha de contactos.
-         * No se mueve al .cliente-card para conservar
-         * el diseño de la ficha.
-         */
-
-    }
-
+}
 
     /*
      * ============================================================
