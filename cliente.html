@@ -59,113 +59,149 @@
 ================================ -->
 <section class="card cliente-card">
 
-  <h2 id="clienteNombre">
-    Cargando cliente...
-  </h2>
+  <div class="cliente-cabecera">
 
-  <div id="clienteDatos" class="cliente-datos">
+    <!-- ===============================
+         NOMBRE DE LA EMPRESA
+    ================================= -->
+    <div class="cliente-nombre">
 
-    <div class="campo">
-      <label>Contacto</label>
+      <h2 id="clienteNombre">
+        Cargando cliente...
+      </h2>
 
-      <span id="contactoTxt"></span>
-
-      <input
-        type="text"
-        id="contactoInput"
-        hidden
-      >
-    </div>
-
-
-    <div class="campo">
-      <label>Posición</label>
-
-      <span id="posicionTxt"></span>
-
-      <input
-        type="text"
-        id="posicionInput"
-        hidden
-      >
-    </div>
-
-
-    <div class="campo">
-      <label>Teléfono</label>
-
-      <span id="telefonoTxt"></span>
-
-      <a
-        id="wspLink"
-        target="_blank"
-      ></a>
-
-      <input
-        type="text"
-        id="telefonoInput"
-        hidden
-      >
-    </div>
-
-
-    <div class="campo">
-      <label>Email</label>
-
-      <span id="emailTxt"></span>
-
-      <a
-        id="mailLink"
-        target="_blank"
-      ></a>
-
-      <input
-        type="email"
-        id="emailInput"
-        hidden
-      >
-    </div>
-
-
-    <div class="campo">
-      <label>Observaciones</label>
-
-      <p id="observacionesTxt"></p>
-
-      <textarea
-        id="observacionesInput"
-        rows="4"
-        hidden
-      ></textarea>
     </div>
 
 
     <!-- ===============================
-         ACCIONES
+         CONTACTOS
     ================================= -->
-    <div class="acciones-form">
+    <div class="cliente-datos" id="clienteDatos">
 
       <!--
-        IMPORTANTE:
-        Se mantiene el id "editarBtn"
-        porque cliente.js actual lo necesita.
-        Visualmente ahora dice Agregar contacto.
+        El título "Contacto" queda una sola vez,
+        fuera de los contactos individuales.
       -->
-      <button
-        id="editarBtn"
-        class="btn-principal"
-      >
-        ➕ Agregar contacto
-      </button>
+      <div class="titulo-contactos">
+        <h2>Contacto</h2>
+      </div>
 
 
-      <button
-        id="guardarBtn"
-        class="btn-secundario"
-        hidden
-      >
-        💾 Guardar cambios
-      </button>
+      <!-- ===============================
+           CONTACTO PRINCIPAL
+      ================================= -->
+
+      <div class="contacto-principal">
+
+        <div class="campo">
+          <span id="contactoTxt"></span>
+
+          <input
+            type="text"
+            id="contactoInput"
+            hidden
+          >
+        </div>
+
+
+        <div class="campo">
+          <label>Posición</label>
+
+          <span id="posicionTxt"></span>
+
+          <input
+            type="text"
+            id="posicionInput"
+            hidden
+          >
+        </div>
+
+
+        <div class="campo">
+          <label>Teléfono</label>
+
+          <span id="telefonoTxt"></span>
+
+          <a
+            id="wspLink"
+            target="_blank"
+          ></a>
+
+          <input
+            type="text"
+            id="telefonoInput"
+            hidden
+          >
+        </div>
+
+
+        <div class="campo">
+          <label>Email</label>
+
+          <span id="emailTxt"></span>
+
+          <a
+            id="mailLink"
+            target="_blank"
+          ></a>
+
+          <input
+            type="email"
+            id="emailInput"
+            hidden
+          >
+        </div>
+
+
+        <div class="campo">
+          <label>Observaciones</label>
+
+          <p id="observacionesTxt"></p>
+
+          <textarea
+            id="observacionesInput"
+            rows="4"
+            hidden
+          ></textarea>
+        </div>
+
+      </div>
+
+
+      <!--
+        cliente.js insertará aquí los contactos
+        adicionales, uno debajo del otro.
+      -->
+
+
+      <!-- ===============================
+           ACCIONES
+      ================================= -->
+      <div class="acciones-form">
+
+        <!--
+          IMPORTANTE:
+          Se mantiene el id "editarBtn"
+          porque cliente.js actual lo necesita.
+          Visualmente sigue siendo Agregar contacto.
+        -->
+        <button
+          id="editarBtn"
+          class="btn-principal"
+        >
+          ➕ Agregar contacto
+        </button>
+
+
+        <button
+          id="guardarBtn"
+          class="btn-secundario"
+          hidden
+        >
+          💾 Guardar cambios
+        </button>
+
+      </div>
 
     </div>
 
