@@ -3,11 +3,14 @@ import { db } from "./firebase.js";
 import {
     collection,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
+    query,
+    where,
+    getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     const nuevaNotaBtn =
         document.getElementById("nuevaNotaBtn");
@@ -19,6 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+
+    /*
+     * ==========================================
+     * NUEVA NOTA
+     * ==========================================
+     */
 
     nuevaNotaBtn.addEventListener(
         "click",
@@ -38,16 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
 
-            /*
-             * Buscamos el nombre del cliente
-             * directamente desde el título
-             * que ya cargó cliente.js.
-             */
-
             const clienteNombreEl =
                 document.getElementById(
                     "clienteNombre"
                 );
+
 
             const clienteNombre =
                 clienteNombreEl
@@ -57,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const overlay =
                 document.createElement("div");
+
 
             overlay.style.cssText = `
                 position: fixed;
@@ -73,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const box =
                 document.createElement("div");
+
 
             box.style.cssText = `
                 background: #fff;
@@ -116,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     <input
                         type="text"
-                        value="${clienteNombre}"
+                        value="${escaparHTML(clienteNombre)}"
                         readonly
                         style="
                             width:100%;
@@ -300,11 +306,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /*
-             * Fecha y hora actuales
+             * FECHA Y HORA
              */
 
             const ahora =
                 new Date();
+
 
             const fecha =
                 ahora.toLocaleDateString(
@@ -315,6 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         year: "numeric"
                     }
                 );
+
 
             const hora =
                 ahora.toLocaleTimeString(
@@ -329,6 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
             box.querySelector(
                 "#fechaNota"
             ).value = fecha;
+
 
             box.querySelector(
                 "#horaNota"
@@ -357,7 +366,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             /*
-             * GUARDAR NOTA
+             * GUARDAR
              */
 
             box.querySelector(
@@ -371,6 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             "#tituloNota"
                         ).value.trim();
 
+
                     const contenido =
                         box.querySelector(
                             "#contenidoNota"
@@ -378,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     if (!titulo) {
+
                         alert(
                             "Escribí un título para la nota."
                         );
@@ -387,6 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     if (!contenido) {
+
                         alert(
                             "Escribí el contenido de la nota."
                         );
@@ -409,13 +421,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         guardarBtn.textContent =
                             "Guardando...";
 
-
-                        /*
-                         * Guardamos la nota
-                         * en la colección VISITAS.
-                         *
-                         * No usamos GPS.
-                         */
 
                         await addDoc(
                             collection(
@@ -452,12 +457,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         );
 
 
-                        /*
-                         * Recargamos el historial
-                         * para que la nueva nota
-                         * aparezca inmediatamente.
-                         */
-
                         window.location.reload();
 
 
@@ -486,15 +485,305 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            /*
-             * Foco inicial
-             */
-
             box.querySelector(
                 "#tituloNota"
             )?.focus();
 
         }
     );
+
+
+    /*
+     * ==========================================
+     * MOSTRAR NOTAS GUARDADAS
+     * ==========================================
+     *
+     * Esto se ejecuta al cargar la página.
+     * Busca las notas del cliente y las agrega
+     * al historial mostrando título y contenido.
+     */
+
+    await mostrarNotasGuardadas();
+
+
+    async function mostrarNotasGuardadas() {
+
+        const clienteId =
+            new URLSearchParams(
+                window.location.search
+            ).get("id");
+
+
+        if (!clienteId) {
+            return;
+        }
+
+
+        const historial =
+            document.getElementById(
+                "listaVisitasCliente"
+            );
+
+
+        if (!historial) {
+            return;
+        }
+
+
+        try {
+
+            const qNotas =
+                query(
+                    collection(
+                        db,
+                        "visitas"
+                    ),
+                    where(
+                        "clienteId",
+                        "==",
+                        clienteId
+                    )
+                );
+
+
+            const snap =
+                await getDocs(
+                    qNotas
+                );
+
+
+            const notas = [];
+
+
+            snap.forEach(
+                docSnap => {
+
+                    const dato =
+                        docSnap.data();
+
+
+                    if (
+                        dato.tipoVisita !==
+                        "Nota"
+                    ) {
+                        return;
+                    }
+
+
+                    notas.push({
+                        id:
+                            docSnap.id,
+
+                        ...dato
+                    });
+
+                }
+            );
+
+
+            /*
+             * Orden más reciente primero.
+             */
+
+            notas.sort(
+                (a, b) => {
+
+                    const fechaA =
+                        obtenerFecha(
+                            a.fecha
+                        );
+
+                    const fechaB =
+                        obtenerFecha(
+                            b.fecha
+                        );
+
+                    return (
+                        fechaB -
+                        fechaA
+                    );
+
+                }
+            );
+
+
+            /*
+             * Agregamos cada nota al historial.
+             */
+
+            notas.forEach(
+                nota => {
+
+                    const fecha =
+                        obtenerFecha(
+                            nota.fecha
+                        );
+
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    div.className =
+                        "visita";
+
+
+                    div.innerHTML = `
+                        <div class="fecha">
+                            ${mostrarFecha(fecha)}
+                        </div>
+
+                        <span
+                            class="badge"
+                            style="
+                                background:#e8f4ff;
+                                color:#1f4e8c;
+                            "
+                        >
+                            Nota
+                        </span>
+
+                        <div
+                            style="
+                                margin-top:10px;
+                            "
+                        >
+
+                            <strong
+                                style="
+                                    display:block;
+                                    font-size:17px;
+                                    margin-bottom:7px;
+                                "
+                            >
+                                ${escaparHTML(
+                                    nota.titulo ||
+                                    "Sin título"
+                                )}
+                            </strong>
+
+
+                            <div
+                                style="
+                                    white-space:pre-wrap;
+                                    line-height:1.5;
+                                    color:#333;
+                                "
+                            >
+                                ${escaparHTML(
+                                    nota.nota ||
+                                    ""
+                                )}
+                            </div>
+
+                        </div>
+                    `;
+
+
+                    historial.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error cargando notas:",
+                error
+            );
+
+        }
+
+    }
+
+
+    function obtenerFecha(valor) {
+
+        if (
+            valor &&
+            typeof valor.toDate ===
+                "function"
+        ) {
+            return valor.toDate();
+        }
+
+
+        if (valor) {
+
+            const fecha =
+                new Date(
+                    valor
+                );
+
+
+            if (
+                !isNaN(
+                    fecha.getTime()
+                )
+            ) {
+                return fecha;
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+
+    function mostrarFecha(fecha) {
+
+        if (!fecha) {
+            return "Sin fecha";
+        }
+
+
+        return fecha.toLocaleString(
+            "es-AR",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    }
+
+
+    function escaparHTML(valor) {
+
+        return String(
+            valor ?? ""
+        )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
 
 });
