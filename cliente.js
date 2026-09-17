@@ -290,6 +290,26 @@ if (menuPrincipalBtn) {
                     )
                     .appendChild(menu);
 
+            const editarPrincipalBtn =
+    document.getElementById(
+        "editarContactoPrincipalBtn"
+    );
+
+
+if (editarPrincipalBtn) {
+
+    editarPrincipalBtn.addEventListener(
+        "click",
+        () => {
+
+            menu.hidden = true;
+
+            mostrarFormularioEditarContactoPrincipal();
+
+        }
+    );
+
+}
             }
 
             menu.hidden =
