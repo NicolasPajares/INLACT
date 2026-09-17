@@ -1,3 +1,12 @@
+import { db } from "./firebase.js";
+
+import {
+    collection,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const nuevaNotaBtn =
@@ -10,9 +19,41 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+
     nuevaNotaBtn.addEventListener(
         "click",
-        () => {
+        async () => {
+
+            const clienteId =
+                new URLSearchParams(
+                    window.location.search
+                ).get("id");
+
+
+            if (!clienteId) {
+                alert(
+                    "No se pudo identificar el cliente."
+                );
+                return;
+            }
+
+
+            /*
+             * Buscamos el nombre del cliente
+             * directamente desde el título
+             * que ya cargó cliente.js.
+             */
+
+            const clienteNombreEl =
+                document.getElementById(
+                    "clienteNombre"
+                );
+
+            const clienteNombre =
+                clienteNombreEl
+                    ? clienteNombreEl.textContent.trim()
+                    : "";
+
 
             const overlay =
                 document.createElement("div");
@@ -29,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 box-sizing: border-box;
             `;
 
+
             const box =
                 document.createElement("div");
 
@@ -44,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 box-sizing: border-box;
             `;
 
+
             box.innerHTML = `
                 <h3
                     style="
@@ -53,6 +96,111 @@ document.addEventListener("DOMContentLoaded", () => {
                 >
                     Nueva nota
                 </h3>
+
+
+                <div
+                    style="
+                        margin-bottom:14px;
+                    "
+                >
+
+                    <label
+                        style="
+                            display:block;
+                            font-weight:600;
+                            margin-bottom:5px;
+                        "
+                    >
+                        Cliente
+                    </label>
+
+                    <input
+                        type="text"
+                        value="${clienteNombre}"
+                        readonly
+                        style="
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #ddd;
+                            border-radius:8px;
+                            background:#f3f3f3;
+                            font-size:16px;
+                            box-sizing:border-box;
+                        "
+                    >
+
+                </div>
+
+
+                <div
+                    style="
+                        display:flex;
+                        gap:12px;
+                        margin-bottom:14px;
+                    "
+                >
+
+                    <div style="flex:1;">
+
+                        <label
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:5px;
+                            "
+                        >
+                            Fecha
+                        </label>
+
+                        <input
+                            id="fechaNota"
+                            type="text"
+                            readonly
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                                background:#f3f3f3;
+                                font-size:16px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+
+                    <div style="flex:1;">
+
+                        <label
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:5px;
+                            "
+                        >
+                            Hora
+                        </label>
+
+                        <input
+                            id="horaNota"
+                            type="text"
+                            readonly
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                                background:#f3f3f3;
+                                font-size:16px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
 
                 <div
                     style="
@@ -151,6 +299,42 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
 
 
+            /*
+             * Fecha y hora actuales
+             */
+
+            const ahora =
+                new Date();
+
+            const fecha =
+                ahora.toLocaleDateString(
+                    "es-AR",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }
+                );
+
+            const hora =
+                ahora.toLocaleTimeString(
+                    "es-AR",
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+
+            box.querySelector(
+                "#fechaNota"
+            ).value = fecha;
+
+            box.querySelector(
+                "#horaNota"
+            ).value = hora;
+
+
             overlay.appendChild(box);
 
             document.body.appendChild(
@@ -158,41 +342,157 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            const cancelarBtn =
-                box.querySelector(
-                    "#cancelarNota"
-                );
+            /*
+             * CANCELAR
+             */
 
-            if (cancelarBtn) {
-
-                cancelarBtn.addEventListener(
-                    "click",
-                    () => {
-                        overlay.remove();
-                    }
-                );
-
-            }
-
-
-            const tituloInput =
-                box.querySelector(
-                    "#tituloNota"
-                );
-
-            if (tituloInput) {
-
-                tituloInput.focus();
-
-            }
+            box.querySelector(
+                "#cancelarNota"
+            ).addEventListener(
+                "click",
+                () => {
+                    overlay.remove();
+                }
+            );
 
 
             /*
-             * Por ahora el botón Guardar
-             * NO guarda en Firebase.
-             *
-             * Lo conectamos en el próximo paso.
+             * GUARDAR NOTA
              */
+
+            box.querySelector(
+                "#guardarNota"
+            ).addEventListener(
+                "click",
+                async () => {
+
+                    const titulo =
+                        box.querySelector(
+                            "#tituloNota"
+                        ).value.trim();
+
+                    const contenido =
+                        box.querySelector(
+                            "#contenidoNota"
+                        ).value.trim();
+
+
+                    if (!titulo) {
+                        alert(
+                            "Escribí un título para la nota."
+                        );
+
+                        return;
+                    }
+
+
+                    if (!contenido) {
+                        alert(
+                            "Escribí el contenido de la nota."
+                        );
+
+                        return;
+                    }
+
+
+                    const guardarBtn =
+                        box.querySelector(
+                            "#guardarNota"
+                        );
+
+
+                    try {
+
+                        guardarBtn.disabled =
+                            true;
+
+                        guardarBtn.textContent =
+                            "Guardando...";
+
+
+                        /*
+                         * Guardamos la nota
+                         * en la colección VISITAS.
+                         *
+                         * No usamos GPS.
+                         */
+
+                        await addDoc(
+                            collection(
+                                db,
+                                "visitas"
+                            ),
+                            {
+                                clienteId:
+                                    clienteId,
+
+                                cliente:
+                                    clienteNombre,
+
+                                tipoVisita:
+                                    "Nota",
+
+                                titulo:
+                                    titulo,
+
+                                nota:
+                                    contenido,
+
+                                fecha:
+                                    serverTimestamp()
+                            }
+                        );
+
+
+                        overlay.remove();
+
+
+                        alert(
+                            "Nota guardada ✔"
+                        );
+
+
+                        /*
+                         * Recargamos el historial
+                         * para que la nueva nota
+                         * aparezca inmediatamente.
+                         */
+
+                        window.location.reload();
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Error guardando nota:",
+                            error
+                        );
+
+
+                        guardarBtn.disabled =
+                            false;
+
+                        guardarBtn.textContent =
+                            "💾 Guardar nota";
+
+
+                        alert(
+                            "No se pudo guardar la nota."
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * Foco inicial
+             */
+
+            box.querySelector(
+                "#tituloNota"
+            )?.focus();
 
         }
     );
