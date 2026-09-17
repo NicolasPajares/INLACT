@@ -192,7 +192,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         actualizarLinks();
 
-        modoLectura();
+modoLectura();
+
+
+const tarjetaPrincipal =
+    document.querySelector(
+        ".contacto-principal"
+    );
+
+
+if (
+    tarjetaPrincipal &&
+    !tarjetaPrincipal.querySelector(
+        ".menu-contacto"
+    )
+) {
+
+    const menuBtnPrincipal =
+        document.createElement("button");
+
+    menuBtnPrincipal.type =
+        "button";
+
+    menuBtnPrincipal.className =
+        "menu-contacto";
+
+    menuBtnPrincipal.textContent =
+        "⋮";
+
+    tarjetaPrincipal.appendChild(
+        menuBtnPrincipal
+    );
+
+}
 
 
         /*
