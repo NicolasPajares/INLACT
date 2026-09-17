@@ -634,3 +634,40 @@ main {
 .menu-opciones-contacto .eliminar-contacto {
   color: #c62828;
 }
+/* ===============================
+   AJUSTE FINAL MENÚ CONTACTO
+================================ */
+
+.menu-contacto {
+  position: absolute !important;
+  top: 8px !important;
+  right: 4px !important;
+
+  width: 12px !important;
+  height: 18px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.btn-menu-contacto {
+  width: 12px !important;
+  height: 18px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+
+  color: #1f4e8c !important;
+
+  font-size: 22px !important;
+  line-height: 18px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  cursor: pointer;
+}
