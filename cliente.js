@@ -608,116 +608,22 @@ if (menuPrincipalBtn) {
  * ==========================================
  */
 
+/*
+ * ==========================================
+ * EDITAR
+ * ==========================================
+ */
+
 editarContactoBtn.addEventListener(
     "click",
-    async () => {
+    () => {
 
         menu.hidden = true;
 
-        const nuevoNombre =
-            prompt(
-                "Nombre:",
-                nombre
-            );
-
-        if (nuevoNombre === null) {
-            return;
-        }
-
-        const nuevaPosicion =
-            prompt(
-                "Posición:",
-                posicion
-            );
-
-        if (nuevaPosicion === null) {
-            return;
-        }
-
-        const nuevoTelefono =
-            prompt(
-                "Teléfono:",
-                telefono
-            );
-
-        if (nuevoTelefono === null) {
-            return;
-        }
-
-        const nuevoEmail =
-            prompt(
-                "Email:",
-                email
-            );
-
-        if (nuevoEmail === null) {
-            return;
-        }
-
-        const nuevasObservaciones =
-            prompt(
-                "Observaciones:",
-                observaciones
-            );
-
-        if (nuevasObservaciones === null) {
-            return;
-        }
-
-        const nuevoContacto = {
-
-            nombre:
-                nuevoNombre.trim(),
-
-            posicion:
-                nuevaPosicion.trim(),
-
-            telefono:
-                nuevoTelefono.trim(),
-
-            email:
-                nuevoEmail.trim(),
-
-            observaciones:
-                nuevasObservaciones.trim()
-
-        };
-
-        try {
-
-            const nuevosContactos =
-                [...contactos];
-
-            nuevosContactos[indice] =
-                nuevoContacto;
-
-            await updateDoc(
-                clienteRef,
-                {
-                    contactos:
-                        nuevosContactos
-                }
-            );
-
-            await cargarCliente();
-
-            alert(
-                "Contacto actualizado ✔"
-            );
-
-        }
-        catch (error) {
-
-            console.error(
-                "Error editando contacto:",
-                error
-            );
-
-            alert(
-                "No se pudo actualizar el contacto."
-            );
-
-        }
+        mostrarFormularioEditarContacto(
+            contacto,
+            indice
+        );
 
     }
 );
