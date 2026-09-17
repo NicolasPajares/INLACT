@@ -190,14 +190,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             contactoPrincipal.observaciones;
 
 
-        actualizarLinks();
+       actualizarLinks();
 
-        modoLectura();
+modoLectura();
+
+/*
+ * MENÚ DEL CONTACTO PRINCIPAL
+ */
+agregarMenuContacto(
+    document.querySelector(".contacto-principal"),
+    "principal"
+);
 
 
-        /*
-         * CONTACTOS ADICIONALES
-         */
+/*
+ * CONTACTOS ADICIONALES
+ */
 
         const contactos =
             Array.isArray(c.contactos)
