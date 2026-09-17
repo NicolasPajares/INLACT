@@ -51,6 +51,7 @@ main {
   justify-content: center;
   text-align: center;
   min-height: 100%;
+  padding-top: 45px;
 }
 
 .cliente-nombre h2 {
