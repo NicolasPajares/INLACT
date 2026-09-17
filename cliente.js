@@ -911,6 +911,149 @@ editarContactoBtn.addEventListener(
      * ============================================================
      */
 
+/*
+ * ============================================================
+ * EDITAR CONTACTO EXISTENTE
+ * ============================================================
+ */
+
+function mostrarFormularioEditarContacto(
+    contacto,
+    indice
+) {
+
+    /*
+     * Primero usamos el mismo formulario
+     * que ya funciona para agregar contactos.
+     */
+
+    mostrarFormularioNuevoContacto();
+
+
+    /*
+     * Esperamos a que el formulario exista
+     */
+
+    const formulario =
+        document.getElementById(
+            "nuevoContactoForm"
+        );
+
+    if (!formulario) {
+        return;
+    }
+
+
+    /*
+     * Marcar que estamos editando
+     */
+
+    formulario.dataset.modo =
+        "editar";
+
+    formulario.dataset.indice =
+        String(indice);
+
+
+    /*
+     * Cambiar título
+     */
+
+    const titulo =
+        formulario.querySelector("h3");
+
+    if (titulo) {
+
+        titulo.textContent =
+            "Editar contacto";
+
+    }
+
+
+    /*
+     * Cargar datos actuales
+     */
+
+    const nombreInput =
+        document.getElementById(
+            "nuevoContactoNombre"
+        );
+
+    const posicionInput =
+        document.getElementById(
+            "nuevoContactoPosicion"
+        );
+
+    const telefonoInput =
+        document.getElementById(
+            "nuevoContactoTelefono"
+        );
+
+    const emailInput =
+        document.getElementById(
+            "nuevoContactoEmail"
+        );
+
+    const observacionesInput =
+        document.getElementById(
+            "nuevoContactoObservaciones"
+        );
+
+
+    nombreInput.value =
+        contacto?.nombre || "";
+
+    posicionInput.value =
+        contacto?.posicion || "";
+
+    telefonoInput.value =
+        contacto?.telefono || "";
+
+    emailInput.value =
+        contacto?.email || "";
+
+    observacionesInput.value =
+        contacto?.observaciones || "";
+
+
+    /*
+     * Cambiar texto del botón
+     */
+
+    const guardarBtnContacto =
+        document.getElementById(
+            "guardarNuevoContactoBtn"
+        );
+
+    if (guardarBtnContacto) {
+
+        guardarBtnContacto.textContent =
+            "💾 Guardar cambios";
+
+    }
+
+
+    /*
+     * Llevar el formulario al centro
+     */
+
+    formulario.scrollIntoView({
+
+        behavior: "smooth",
+
+        block: "center"
+
+    });
+
+
+    /*
+     * Cursor en nombre
+     */
+
+    nombreInput?.focus();
+
+}
+    
     function mostrarFormularioNuevoContacto() {
 
         /*
