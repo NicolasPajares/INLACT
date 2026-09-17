@@ -528,3 +528,69 @@ main {
   }
 
 }
+/* ===============================
+   MENÚ DE CONTACTO ⋮
+================================ */
+
+.contacto-principal,
+.contacto-card {
+  position: relative;
+}
+
+/* Botón de tres puntos */
+.menu-contacto {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.btn-menu-contacto {
+  background: transparent;
+  border: none;
+  color: #1f4e8c;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.btn-menu-contacto:hover {
+  background: #f3f7fb;
+}
+
+/* Menú desplegable */
+.menu-opciones-contacto {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  min-width: 130px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  border: 1px solid #e5e7eb;
+}
+
+.menu-opciones-contacto button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: none;
+  text-align: left;
+  font-size: 15px;
+  color: #1f2937;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.menu-opciones-contacto button:hover {
+  background: #f3f7fb;
+}
+
+.menu-opciones-contacto .eliminar-contacto {
+  color: #c62828;
+}
