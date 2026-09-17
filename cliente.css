@@ -671,3 +671,35 @@ main {
 
   cursor: pointer;
 }
+/* ===============================
+   TRES PUNTITOS - AJUSTE FINAL
+================================ */
+
+button.menu-contacto {
+  position: absolute !important;
+  top: 8px !important;
+  right: 4px !important;
+
+  width: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+
+  height: 20px !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+
+  color: #1f4e8c !important;
+
+  font-size: 22px !important;
+  line-height: 20px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  cursor: pointer !important;
+}
