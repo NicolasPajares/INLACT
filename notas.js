@@ -15,6 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const nuevaNotaBtn =
         document.getElementById("nuevaNotaBtn");
 
+    const lista =
+        document.getElementById(
+            "listaVisitasCliente"
+        );
+
 
     /**********************
      * ESCAPAR HTML
@@ -36,13 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function obtenerFecha(item) {
 
         if (
-            item.fecha &&
+            item?.fecha &&
             typeof item.fecha.toDate === "function"
         ) {
             return item.fecha.toDate();
         }
 
-        if (item.fecha) {
+        if (item?.fecha) {
 
             const fecha =
                 new Date(item.fecha);
@@ -86,15 +91,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const overlay =
             document.createElement("div");
 
-        overlay.className =
-            "overlay-nota-historial";
+        overlay.style.cssText = `
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.55);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:15px;
+            z-index:99999;
+        `;
 
 
         const ventana =
             document.createElement("div");
 
-        ventana.className =
-            "ventana-nota-historial";
+        ventana.style.cssText = `
+            background:#ffffff;
+            width:92%;
+            max-width:560px;
+            max-height:85vh;
+            overflow-y:auto;
+            border-radius:16px;
+            padding:24px;
+            box-shadow:0 8px 30px rgba(0,0,0,.20);
+            box-sizing:border-box;
+        `;
 
 
         const fecha =
@@ -103,7 +125,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         ventana.innerHTML = `
 
-            <h3>
+            <h3
+                style="
+                    color:#1f4e8c;
+                    margin:0 0 8px 0;
+                "
+            >
                 ${escaparHTML(
                     nota.titulo ||
                     "Nota"
@@ -111,7 +138,14 @@ document.addEventListener("DOMContentLoaded", () => {
             </h3>
 
 
-            <div class="datos-nota-historial">
+            <div
+                style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-bottom:18px;
+                    line-height:1.5;
+                "
+            >
 
                 <strong>
                     ${escaparHTML(
@@ -127,19 +161,35 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
 
 
-            <div class="contenido-nota-historial">
-
+            <div
+                style="
+                    white-space:pre-wrap;
+                    line-height:1.55;
+                    font-size:16px;
+                    color:#2c3e50;
+                "
+            >
                 ${escaparHTML(
                     nota.nota ||
                     ""
                 )}
-
             </div>
 
 
             <button
-                class="cerrar-nota-historial"
                 type="button"
+                id="cerrarNotaHistorial"
+                style="
+                    width:100%;
+                    margin-top:20px;
+                    padding:13px;
+                    border:none;
+                    border-radius:8px;
+                    background:#eeeeee;
+                    color:#333333;
+                    font-size:16px;
+                    cursor:pointer;
+                "
             >
                 Cerrar
             </button>
@@ -158,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         ventana
             .querySelector(
-                ".cerrar-nota-historial"
+                "#cerrarNotaHistorial"
             )
             .onclick = () => {
 
@@ -180,9 +230,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /**********************
-     * TRANSFORMAR NOTAS
+     * CARGAR NOTAS
      **********************/
-    async function cargarNotas() {
+    async function obtenerNotas() {
 
         const clienteId =
             new URLSearchParams(
@@ -190,14 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ).get("id");
 
 
-        const lista =
-            document.getElementById(
-                "listaVisitasCliente"
-            );
-
-
-        if (!clienteId || !lista) {
-            return;
+        if (!clienteId) {
+            return [];
         }
 
 
@@ -246,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         ...datos,
 
-                        fecha:
+                        fechaObjeto:
                             obtenerFecha(
                                 datos
                             )
@@ -261,13 +305,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 (a, b) => {
 
                     const fechaA =
-                        a.fecha
-                            ? a.fecha.getTime()
+                        a.fechaObjeto
+                            ? a.fechaObjeto.getTime()
                             : 0;
 
                     const fechaB =
-                        b.fecha
-                            ? b.fecha.getTime()
+                        b.fechaObjeto
+                            ? b.fechaObjeto.getTime()
                             : 0;
 
                     return fechaB - fechaA;
@@ -276,22 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            /*
-             * Esperamos un poco para asegurarnos
-             * de que cliente.js haya terminado de
-             * dibujar el historial.
-             */
-            setTimeout(
-                () => {
-
-                    transformarTarjetasNotas(
-                        lista,
-                        notas
-                    );
-
-                },
-                300
-            );
+            return notas;
 
 
         } catch (error) {
@@ -301,17 +330,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 error
             );
 
+            return [];
         }
     }
 
 
     /**********************
-     * TRANSFORMAR TARJETAS
+     * TRANSFORMAR HISTORIAL
      **********************/
-    function transformarTarjetasNotas(
-        lista,
-        notas
-    ) {
+    async function transformarNotas() {
+
+        if (!lista) {
+            return;
+        }
+
+
+        const notas =
+            await obtenerNotas();
+
 
         if (!notas.length) {
             return;
@@ -319,8 +355,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         /*
-         * cliente.js ya creó las tarjetas.
-         * Buscamos solamente las que tienen
+         * cliente.js crea las tarjetas
+         * dentro de #listaVisitasCliente.
+         *
+         * Buscamos las tarjetas que contienen
          * la etiqueta "Nota".
          */
         const tarjetas =
@@ -335,29 +373,35 @@ document.addEventListener("DOMContentLoaded", () => {
             tarjetas.filter(
                 tarjeta => {
 
+                    /*
+                     * Si ya fue transformada,
+                     * no la volvemos a tocar.
+                     */
+                    if (
+                        tarjeta.dataset.notaTransformada ===
+                        "true"
+                    ) {
+                        return false;
+                    }
+
+
+                    /*
+                     * cliente.js actualmente
+                     * muestra "Nota" en estas tarjetas.
+                     */
                     const texto =
                         tarjeta.textContent
                             .trim();
 
+
                     return (
-                        texto.includes(
-                            "Nota"
-                        ) &&
-                        !tarjeta.querySelector(
-                            ".titulo-nota-historial"
-                        )
+                        texto.includes("Nota")
                     );
 
                 }
             );
 
 
-        /*
-         * Las notas vienen ordenadas por fecha.
-         * cliente.js también ordena el historial
-         * por fecha, por lo que podemos reemplazar
-         * cada tarjeta de nota en el mismo orden.
-         */
         tarjetasNota.forEach(
             (tarjeta, indice) => {
 
@@ -370,18 +414,34 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
+                tarjeta.dataset.notaTransformada =
+                    "true";
+
+
                 tarjeta.className =
-                    "visita item-nota-visita";
+                    "visita";
+
+
+                tarjeta.style.cursor =
+                    "pointer";
+
+
+                tarjeta.style.padding =
+                    "12px 8px";
+
+
+                tarjeta.style.borderRadius =
+                    "8px";
 
 
                 tarjeta.innerHTML = `
 
-                    <div class="fecha">
-
+                    <div
+                        class="fecha"
+                    >
                         ${mostrarFecha(
-                            nota.fecha
+                            nota.fechaObjeto
                         )}
-
                     </div>
 
 
@@ -393,7 +453,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                     <span
-                        class="titulo-nota-historial"
+                        style="
+                            display:block;
+                            margin-top:7px;
+                            font-weight:600;
+                            color:#2c3e50;
+                        "
                     >
                         ${escaparHTML(
                             nota.titulo ||
@@ -402,10 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     </span>
 
                 `;
-
-
-                tarjeta.style.cursor =
-                    "pointer";
 
 
                 tarjeta.onclick =
@@ -417,9 +478,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     };
 
+
+                tarjeta.onmouseenter =
+                    () => {
+
+                        tarjeta.style.background =
+                            "#f3f7fb";
+
+                    };
+
+
+                tarjeta.onmouseleave =
+                    () => {
+
+                        tarjeta.style.background =
+                            "";
+
+                    };
+
             }
         );
 
+    }
+
+
+    /**********************
+     * OBSERVAR HISTORIAL
+     **********************/
+    if (lista) {
+
+        const observador =
+            new MutationObserver(
+                () => {
+
+                    transformarNotas();
+
+                }
+            );
+
+
+        observador.observe(
+            lista,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
+
+
+        /*
+         * También intentamos varias veces
+         * por si el historial ya estaba
+         * dibujado antes de crear el observador.
+         */
+        transformarNotas();
+
+
+        setTimeout(
+            transformarNotas,
+            500
+        );
+
+        setTimeout(
+            transformarNotas,
+            1500
+        );
+
+        setTimeout(
+            transformarNotas,
+            3000
+        );
     }
 
 
@@ -430,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         nuevaNotaBtn.addEventListener(
             "click",
-            async () => {
+            () => {
 
                 const clienteId =
                     new URLSearchParams(
@@ -465,15 +593,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 overlay.style.cssText = `
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(0,0,0,.6);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                    padding: 15px;
-                    box-sizing: border-box;
+                    position:fixed;
+                    inset:0;
+                    background:rgba(0,0,0,.6);
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    z-index:9999;
+                    padding:15px;
+                    box-sizing:border-box;
                 `;
 
 
@@ -482,15 +610,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
                 box.style.cssText = `
-                    background: #fff;
-                    padding: 24px;
-                    border-radius: 16px;
-                    width: 92%;
-                    max-width: 520px;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    font-size: 17px;
-                    box-sizing: border-box;
+                    background:#fff;
+                    padding:24px;
+                    border-radius:16px;
+                    width:92%;
+                    max-width:520px;
+                    max-height:90vh;
+                    overflow-y:auto;
+                    font-size:17px;
+                    box-sizing:border-box;
                 `;
 
 
@@ -749,7 +877,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     box
                 );
 
-
                 document.body.appendChild(
                     overlay
                 );
@@ -758,11 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 box.querySelector(
                     "#cancelarNota"
                 ).onclick =
-                    () => {
-
-                        overlay.remove();
-
-                    };
+                    () => overlay.remove();
 
 
                 box.querySelector(
@@ -808,7 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
 
 
-                        const guardarBtn =
+                        const boton =
                             box.querySelector(
                                 "#guardarNota"
                             );
@@ -816,10 +939,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         try {
 
-                            guardarBtn.disabled =
+                            boton.disabled =
                                 true;
 
-                            guardarBtn.textContent =
+                            boton.textContent =
                                 "Guardando...";
 
 
@@ -871,10 +994,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             );
 
 
-                            guardarBtn.disabled =
+                            boton.disabled =
                                 false;
 
-                            guardarBtn.textContent =
+                            boton.textContent =
                                 "💾 Guardar nota";
 
 
@@ -897,11 +1020,5 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
     }
-
-
-    /**********************
-     * CARGAR NOTAS
-     **********************/
-    cargarNotas();
 
 });
