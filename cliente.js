@@ -2147,7 +2147,7 @@ if (editandoPrincipal) {
             }
 
         );
-
+  }
   async function cargarVisitas() {
 
     visitasEl.innerHTML =
