@@ -2557,55 +2557,55 @@ if (editandoPrincipal) {
         historial.forEach(registro => {
 
 
-            // ==================================================
-            // VISITAS / NOTAS / ENTREGAS
-            // ==================================================
+          // ==================================================
+// VISITAS / NOTAS / ENTREGAS
+// ==================================================
 
-            if (
-                registro.tipo === "visita"
-            ) {
+if (
+    registro.tipo === "visita"
+) {
 
-                const v =
-                    registro.datos;
+    const v =
+        registro.datos;
 
-                const fecha =
-                    obtenerFechaVisita(v);
+    const fecha =
+        obtenerFechaVisita(v);
 
-                const tipo =
-                    v.tipoVisita ||
-                    "Visita comercial";
+    const tipo =
+        v.tipoVisita ||
+        "Visita comercial";
 
-                let clase =
-                    "";
+    let clase =
+        "";
 
 
-                if (
-                    tipo === "Visita comercial"
-                ) {
+    if (
+        tipo === "Visita comercial" ||
+        tipo === "Nota de visita"
+    ) {
 
-                    clase =
-                        "comercial";
+        clase =
+            "comercial";
 
-                }
+    }
 
-                else if (
-                    tipo === "Ensayo"
-                ) {
+    else if (
+        tipo === "Ensayo"
+    ) {
 
-                    clase =
-                        "ensayo";
+        clase =
+            "ensayo";
 
-                }
+    }
 
-                else if (
-                    tipo === "Entrega de productos"
-                ) {
+    else if (
+        tipo === "Entrega de productos"
+    ) {
 
-                    clase =
-                        "entrega";
+        clase =
+            "entrega";
 
-                }
-
+    }
 
                 // ------------------------------------------
                 // PRODUCTOS
