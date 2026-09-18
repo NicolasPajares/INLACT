@@ -15,13 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const nuevaNotaBtn =
         document.getElementById("nuevaNotaBtn");
 
-    if (!nuevaNotaBtn) {
-        console.error(
-            "No se encontró el botón #nuevaNotaBtn"
-        );
-        return;
-    }
-
 
     /**********************
      * ESCAPAR HTML
@@ -117,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 )}
             </h3>
 
+
             <div class="datos-nota-historial">
 
                 <strong>
@@ -132,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             </div>
 
+
             <div class="contenido-nota-historial">
 
                 ${escaparHTML(
@@ -140,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 )}
 
             </div>
+
 
             <button
                 class="cerrar-nota-historial"
@@ -184,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /**********************
-     * MOSTRAR NOTAS
+     * TRANSFORMAR NOTAS
      **********************/
     async function cargarNotas() {
 
@@ -280,66 +276,21 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            notas.forEach(
-                nota => {
+            /*
+             * Esperamos un poco para asegurarnos
+             * de que cliente.js haya terminado de
+             * dibujar el historial.
+             */
+            setTimeout(
+                () => {
 
-                    const item =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    item.className =
-                        "visita item-nota-visita";
-
-
-                    item.innerHTML = `
-
-                        <div class="fecha">
-
-                            ${mostrarFecha(
-                                nota.fecha
-                            )}
-
-                        </div>
-
-
-                        <span
-                            class="badge comercial"
-                        >
-                            Nota
-                        </span>
-
-
-                        <span
-                            class="titulo-nota-historial"
-                        >
-                            ${escaparHTML(
-                                nota.titulo ||
-                                "Nota"
-                            )}
-                        </span>
-
-                    `;
-
-
-                    item.addEventListener(
-                        "click",
-                        () => {
-
-                            abrirNotaHistorial(
-                                nota
-                            );
-
-                        }
+                    transformarTarjetasNotas(
+                        lista,
+                        notas
                     );
 
-
-                    lista.appendChild(
-                        item
-                    );
-
-                }
+                },
+                300
             );
 
 
@@ -355,490 +306,601 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /**********************
-     * NUEVA NOTA
+     * TRANSFORMAR TARJETAS
      **********************/
-    nuevaNotaBtn.addEventListener(
-        "click",
-        async () => {
+    function transformarTarjetasNotas(
+        lista,
+        notas
+    ) {
 
-            const clienteId =
-                new URLSearchParams(
-                    window.location.search
-                ).get("id");
-
-
-            if (!clienteId) {
-
-                alert(
-                    "No se pudo identificar el cliente."
-                );
-
-                return;
-            }
+        if (!notas.length) {
+            return;
+        }
 
 
-            const clienteNombreEl =
-                document.getElementById(
-                    "clienteNombre"
-                );
+        /*
+         * cliente.js ya creó las tarjetas.
+         * Buscamos solamente las que tienen
+         * la etiqueta "Nota".
+         */
+        const tarjetas =
+            Array.from(
+                lista.querySelectorAll(
+                    ".visita"
+                )
+            );
 
 
-            const clienteNombre =
-                clienteNombreEl
-                    ? clienteNombreEl.textContent.trim()
-                    : "";
+        const tarjetasNota =
+            tarjetas.filter(
+                tarjeta => {
+
+                    const texto =
+                        tarjeta.textContent
+                            .trim();
+
+                    return (
+                        texto.includes(
+                            "Nota"
+                        ) &&
+                        !tarjeta.querySelector(
+                            ".titulo-nota-historial"
+                        )
+                    );
+
+                }
+            );
 
 
-            const overlay =
-                document.createElement("div");
+        /*
+         * Las notas vienen ordenadas por fecha.
+         * cliente.js también ordena el historial
+         * por fecha, por lo que podemos reemplazar
+         * cada tarjeta de nota en el mismo orden.
+         */
+        tarjetasNota.forEach(
+            (tarjeta, indice) => {
+
+                const nota =
+                    notas[indice];
 
 
-            overlay.style.cssText = `
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.6);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-                padding: 15px;
-                box-sizing: border-box;
-            `;
+                if (!nota) {
+                    return;
+                }
 
 
-            const box =
-                document.createElement("div");
+                tarjeta.className =
+                    "visita item-nota-visita";
 
 
-            box.style.cssText = `
-                background: #fff;
-                padding: 24px;
-                border-radius: 16px;
-                width: 92%;
-                max-width: 520px;
-                max-height: 90vh;
-                overflow-y: auto;
-                font-size: 17px;
-                box-sizing: border-box;
-            `;
+                tarjeta.innerHTML = `
 
+                    <div class="fecha">
 
-            box.innerHTML = `
-
-                <h3
-                    style="
-                        margin-top:0;
-                        margin-bottom:18px;
-                    "
-                >
-                    Nueva nota
-                </h3>
-
-
-                <div
-                    style="
-                        margin-bottom:14px;
-                    "
-                >
-
-                    <label
-                        style="
-                            display:block;
-                            font-weight:600;
-                            margin-bottom:5px;
-                        "
-                    >
-                        Cliente
-                    </label>
-
-
-                    <input
-                        type="text"
-                        value="${escaparHTML(
-                            clienteNombre
-                        )}"
-                        readonly
-                        style="
-                            width:100%;
-                            padding:12px;
-                            border:1px solid #ddd;
-                            border-radius:8px;
-                            background:#f3f3f3;
-                            font-size:16px;
-                            box-sizing:border-box;
-                        "
-                    >
-
-                </div>
-
-
-                <div
-                    style="
-                        display:flex;
-                        gap:12px;
-                        margin-bottom:14px;
-                    "
-                >
-
-                    <div style="flex:1;">
-
-                        <label
-                            style="
-                                display:block;
-                                font-weight:600;
-                                margin-bottom:5px;
-                            "
-                        >
-                            Fecha
-                        </label>
-
-
-                        <input
-                            id="fechaNota"
-                            type="text"
-                            readonly
-                            style="
-                                width:100%;
-                                padding:12px;
-                                border:1px solid #ddd;
-                                border-radius:8px;
-                                background:#f3f3f3;
-                                font-size:16px;
-                                box-sizing:border-box;
-                            "
-                        >
+                        ${mostrarFecha(
+                            nota.fecha
+                        )}
 
                     </div>
 
 
-                    <div style="flex:1;">
-
-                        <label
-                            style="
-                                display:block;
-                                font-weight:600;
-                                margin-bottom:5px;
-                            "
-                        >
-                            Hora
-                        </label>
-
-
-                        <input
-                            id="horaNota"
-                            type="text"
-                            readonly
-                            style="
-                                width:100%;
-                                padding:12px;
-                                border:1px solid #ddd;
-                                border-radius:8px;
-                                background:#f3f3f3;
-                                font-size:16px;
-                                box-sizing:border-box;
-                            "
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    style="
-                        margin-bottom:14px;
-                    "
-                >
-
-                    <label
-                        style="
-                            display:block;
-                            font-weight:600;
-                            margin-bottom:5px;
-                        "
-                    >
-                        Título
-                    </label>
-
-
-                    <input
-                        id="tituloNota"
-                        type="text"
-                        placeholder="Ej.: Reunión con producción"
-                        style="
-                            width:100%;
-                            padding:13px;
-                            border:1px solid #ccc;
-                            border-radius:8px;
-                            font-size:16px;
-                            box-sizing:border-box;
-                        "
-                    >
-
-                </div>
-
-
-                <div
-                    style="
-                        margin-bottom:18px;
-                    "
-                >
-
-                    <label
-                        style="
-                            display:block;
-                            font-weight:600;
-                            margin-bottom:5px;
-                        "
+                    <span
+                        class="badge comercial"
                     >
                         Nota
-                    </label>
+                    </span>
 
 
-                    <textarea
-                        id="contenidoNota"
-                        rows="9"
-                        placeholder="Escribí la información que quieras guardar..."
-                        style="
-                            width:100%;
-                            padding:13px;
-                            border:1px solid #ccc;
-                            border-radius:8px;
-                            font-size:16px;
-                            resize:vertical;
-                            font-family:inherit;
-                            line-height:1.4;
-                            box-sizing:border-box;
-                        "
-                    ></textarea>
-
-                </div>
-
-
-                <div
-                    style="
-                        display:flex;
-                        gap:10px;
-                        justify-content:flex-end;
-                    "
-                >
-
-                    <button
-                        id="cancelarNota"
-                        type="button"
-                        class="btn-secundario"
+                    <span
+                        class="titulo-nota-historial"
                     >
-                        Cancelar
-                    </button>
+                        ${escaparHTML(
+                            nota.titulo ||
+                            "Nota"
+                        )}
+                    </span>
+
+                `;
 
 
-                    <button
-                        id="guardarNota"
-                        type="button"
-                        class="btn-principal"
-                    >
-                        💾 Guardar nota
-                    </button>
-
-                </div>
-
-            `;
+                tarjeta.style.cursor =
+                    "pointer";
 
 
-            const ahora =
-                new Date();
+                tarjeta.onclick =
+                    () => {
 
-
-            const fecha =
-                ahora.toLocaleDateString(
-                    "es-AR",
-                    {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
-                    }
-                );
-
-
-            const hora =
-                ahora.toLocaleTimeString(
-                    "es-AR",
-                    {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    }
-                );
-
-
-            box.querySelector(
-                "#fechaNota"
-            ).value =
-                fecha;
-
-
-            box.querySelector(
-                "#horaNota"
-            ).value =
-                hora;
-
-
-            overlay.appendChild(
-                box
-            );
-
-
-            document.body.appendChild(
-                overlay
-            );
-
-
-            box.querySelector(
-                "#cancelarNota"
-            ).addEventListener(
-                "click",
-                () => {
-
-                    overlay.remove();
-
-                }
-            );
-
-
-            box.querySelector(
-                "#guardarNota"
-            ).addEventListener(
-                "click",
-                async () => {
-
-                    const titulo =
-                        box
-                            .querySelector(
-                                "#tituloNota"
-                            )
-                            .value
-                            .trim();
-
-
-                    const contenido =
-                        box
-                            .querySelector(
-                                "#contenidoNota"
-                            )
-                            .value
-                            .trim();
-
-
-                    if (!titulo) {
-
-                        alert(
-                            "Escribí un título para la nota."
+                        abrirNotaHistorial(
+                            nota
                         );
 
-                        return;
-                    }
+                    };
 
+            }
+        );
 
-                    if (!contenido) {
-
-                        alert(
-                            "Escribí el contenido de la nota."
-                        );
-
-                        return;
-                    }
-
-
-                    const guardarBtn =
-                        box.querySelector(
-                            "#guardarNota"
-                        );
-
-
-                    try {
-
-                        guardarBtn.disabled =
-                            true;
-
-                        guardarBtn.textContent =
-                            "Guardando...";
-
-
-                        await addDoc(
-                            collection(
-                                db,
-                                "visitas"
-                            ),
-                            {
-                                clienteId:
-                                    clienteId,
-
-                                cliente:
-                                    clienteNombre,
-
-                                tipoVisita:
-                                    "Nota",
-
-                                titulo:
-                                    titulo,
-
-                                nota:
-                                    contenido,
-
-                                fecha:
-                                    serverTimestamp()
-                            }
-                        );
-
-
-                        overlay.remove();
-
-
-                        alert(
-                            "Nota guardada ✔"
-                        );
-
-
-                        window.location.reload();
-
-
-                    } catch (error) {
-
-                        console.error(
-                            "Error guardando nota:",
-                            error
-                        );
-
-
-                        guardarBtn.disabled =
-                            false;
-
-
-                        guardarBtn.textContent =
-                            "💾 Guardar nota";
-
-
-                        alert(
-                            "No se pudo guardar la nota."
-                        );
-
-                    }
-
-                }
-            );
-
-
-            box
-                .querySelector(
-                    "#tituloNota"
-                )
-                ?.focus();
-
-        }
-    );
+    }
 
 
     /**********************
-     * CARGAR AL ENTRAR
+     * NUEVA NOTA
+     **********************/
+    if (nuevaNotaBtn) {
+
+        nuevaNotaBtn.addEventListener(
+            "click",
+            async () => {
+
+                const clienteId =
+                    new URLSearchParams(
+                        window.location.search
+                    ).get("id");
+
+
+                if (!clienteId) {
+
+                    alert(
+                        "No se pudo identificar el cliente."
+                    );
+
+                    return;
+                }
+
+
+                const clienteNombreEl =
+                    document.getElementById(
+                        "clienteNombre"
+                    );
+
+
+                const clienteNombre =
+                    clienteNombreEl
+                        ? clienteNombreEl.textContent.trim()
+                        : "";
+
+
+                const overlay =
+                    document.createElement("div");
+
+
+                overlay.style.cssText = `
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0,0,0,.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 9999;
+                    padding: 15px;
+                    box-sizing: border-box;
+                `;
+
+
+                const box =
+                    document.createElement("div");
+
+
+                box.style.cssText = `
+                    background: #fff;
+                    padding: 24px;
+                    border-radius: 16px;
+                    width: 92%;
+                    max-width: 520px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    font-size: 17px;
+                    box-sizing: border-box;
+                `;
+
+
+                box.innerHTML = `
+
+                    <h3
+                        style="
+                            margin-top:0;
+                            margin-bottom:18px;
+                        "
+                    >
+                        Nueva nota
+                    </h3>
+
+
+                    <div
+                        style="
+                            margin-bottom:14px;
+                        "
+                    >
+
+                        <label
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:5px;
+                            "
+                        >
+                            Cliente
+                        </label>
+
+
+                        <input
+                            type="text"
+                            value="${escaparHTML(
+                                clienteNombre
+                            )}"
+                            readonly
+                            style="
+                                width:100%;
+                                padding:12px;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                                background:#f3f3f3;
+                                font-size:16px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:12px;
+                            margin-bottom:14px;
+                        "
+                    >
+
+                        <div style="flex:1;">
+
+                            <label
+                                style="
+                                    display:block;
+                                    font-weight:600;
+                                    margin-bottom:5px;
+                                "
+                            >
+                                Fecha
+                            </label>
+
+
+                            <input
+                                id="fechaNota"
+                                type="text"
+                                readonly
+                                style="
+                                    width:100%;
+                                    padding:12px;
+                                    border:1px solid #ddd;
+                                    border-radius:8px;
+                                    background:#f3f3f3;
+                                    font-size:16px;
+                                    box-sizing:border-box;
+                                "
+                            >
+
+                        </div>
+
+
+                        <div style="flex:1;">
+
+                            <label
+                                style="
+                                    display:block;
+                                    font-weight:600;
+                                    margin-bottom:5px;
+                                "
+                            >
+                                Hora
+                            </label>
+
+
+                            <input
+                                id="horaNota"
+                                type="text"
+                                readonly
+                                style="
+                                    width:100%;
+                                    padding:12px;
+                                    border:1px solid #ddd;
+                                    border-radius:8px;
+                                    background:#f3f3f3;
+                                    font-size:16px;
+                                    box-sizing:border-box;
+                                "
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            margin-bottom:14px;
+                        "
+                    >
+
+                        <label
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:5px;
+                            "
+                        >
+                            Título
+                        </label>
+
+
+                        <input
+                            id="tituloNota"
+                            type="text"
+                            placeholder="Ej.: Reunión con producción"
+                            style="
+                                width:100%;
+                                padding:13px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                font-size:16px;
+                                box-sizing:border-box;
+                            "
+                        >
+
+                    </div>
+
+
+                    <div
+                        style="
+                            margin-bottom:18px;
+                        "
+                    >
+
+                        <label
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:5px;
+                            "
+                        >
+                            Nota
+                        </label>
+
+
+                        <textarea
+                            id="contenidoNota"
+                            rows="9"
+                            placeholder="Escribí la información que quieras guardar..."
+                            style="
+                                width:100%;
+                                padding:13px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                font-size:16px;
+                                resize:vertical;
+                                font-family:inherit;
+                                line-height:1.4;
+                                box-sizing:border-box;
+                            "
+                        ></textarea>
+
+                    </div>
+
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:10px;
+                            justify-content:flex-end;
+                        "
+                    >
+
+                        <button
+                            id="cancelarNota"
+                            type="button"
+                            class="btn-secundario"
+                        >
+                            Cancelar
+                        </button>
+
+
+                        <button
+                            id="guardarNota"
+                            type="button"
+                            class="btn-principal"
+                        >
+                            💾 Guardar nota
+                        </button>
+
+                    </div>
+
+                `;
+
+
+                const ahora =
+                    new Date();
+
+
+                box.querySelector(
+                    "#fechaNota"
+                ).value =
+                    ahora.toLocaleDateString(
+                        "es-AR",
+                        {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric"
+                        }
+                    );
+
+
+                box.querySelector(
+                    "#horaNota"
+                ).value =
+                    ahora.toLocaleTimeString(
+                        "es-AR",
+                        {
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        }
+                    );
+
+
+                overlay.appendChild(
+                    box
+                );
+
+
+                document.body.appendChild(
+                    overlay
+                );
+
+
+                box.querySelector(
+                    "#cancelarNota"
+                ).onclick =
+                    () => {
+
+                        overlay.remove();
+
+                    };
+
+
+                box.querySelector(
+                    "#guardarNota"
+                ).onclick =
+                    async () => {
+
+                        const titulo =
+                            box
+                                .querySelector(
+                                    "#tituloNota"
+                                )
+                                .value
+                                .trim();
+
+
+                        const contenido =
+                            box
+                                .querySelector(
+                                    "#contenidoNota"
+                                )
+                                .value
+                                .trim();
+
+
+                        if (!titulo) {
+
+                            alert(
+                                "Escribí un título para la nota."
+                            );
+
+                            return;
+                        }
+
+
+                        if (!contenido) {
+
+                            alert(
+                                "Escribí el contenido de la nota."
+                            );
+
+                            return;
+                        }
+
+
+                        const guardarBtn =
+                            box.querySelector(
+                                "#guardarNota"
+                            );
+
+
+                        try {
+
+                            guardarBtn.disabled =
+                                true;
+
+                            guardarBtn.textContent =
+                                "Guardando...";
+
+
+                            await addDoc(
+                                collection(
+                                    db,
+                                    "visitas"
+                                ),
+                                {
+
+                                    clienteId:
+                                        clienteId,
+
+                                    cliente:
+                                        clienteNombre,
+
+                                    tipoVisita:
+                                        "Nota",
+
+                                    titulo:
+                                        titulo,
+
+                                    nota:
+                                        contenido,
+
+                                    fecha:
+                                        serverTimestamp()
+
+                                }
+                            );
+
+
+                            overlay.remove();
+
+
+                            alert(
+                                "Nota guardada ✔"
+                            );
+
+
+                            window.location.reload();
+
+
+                        } catch (error) {
+
+                            console.error(
+                                "Error guardando nota:",
+                                error
+                            );
+
+
+                            guardarBtn.disabled =
+                                false;
+
+                            guardarBtn.textContent =
+                                "💾 Guardar nota";
+
+
+                            alert(
+                                "No se pudo guardar la nota."
+                            );
+
+                        }
+
+                    };
+
+
+                box
+                    .querySelector(
+                        "#tituloNota"
+                    )
+                    ?.focus();
+
+            }
+        );
+
+    }
+
+
+    /**********************
+     * CARGAR NOTAS
      **********************/
     cargarNotas();
 
