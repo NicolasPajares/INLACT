@@ -10,7 +10,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     const nuevaNotaBtn =
         document.getElementById("nuevaNotaBtn");
@@ -23,12 +23,340 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
-    /*
-     * ==========================================
-     * NUEVA NOTA
-     * ==========================================
-     */
+    /**********************
+     * ESCAPAR HTML
+     **********************/
+    function escaparHTML(texto) {
 
+        return String(texto ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /**********************
+     * OBTENER FECHA
+     **********************/
+    function obtenerFecha(item) {
+
+        if (
+            item.fecha &&
+            typeof item.fecha.toDate === "function"
+        ) {
+            return item.fecha.toDate();
+        }
+
+        if (item.fecha) {
+
+            const fecha =
+                new Date(item.fecha);
+
+            if (!isNaN(fecha.getTime())) {
+                return fecha;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**********************
+     * MOSTRAR FECHA
+     **********************/
+    function mostrarFecha(fecha) {
+
+        if (!fecha) {
+            return "Sin fecha";
+        }
+
+        return fecha.toLocaleString(
+            "es-AR",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+    }
+
+
+    /**********************
+     * ABRIR NOTA
+     **********************/
+    function abrirNotaHistorial(nota) {
+
+        const overlay =
+            document.createElement("div");
+
+        overlay.className =
+            "overlay-nota-historial";
+
+
+        const ventana =
+            document.createElement("div");
+
+        ventana.className =
+            "ventana-nota-historial";
+
+
+        const fecha =
+            obtenerFecha(nota);
+
+
+        ventana.innerHTML = `
+
+            <h3>
+                ${escaparHTML(
+                    nota.titulo ||
+                    "Nota"
+                )}
+            </h3>
+
+            <div class="datos-nota-historial">
+
+                <strong>
+                    ${escaparHTML(
+                        nota.cliente ||
+                        ""
+                    )}
+                </strong>
+
+                <br>
+
+                ${mostrarFecha(fecha)}
+
+            </div>
+
+            <div class="contenido-nota-historial">
+
+                ${escaparHTML(
+                    nota.nota ||
+                    ""
+                )}
+
+            </div>
+
+            <button
+                class="cerrar-nota-historial"
+                type="button"
+            >
+                Cerrar
+            </button>
+
+        `;
+
+
+        overlay.appendChild(
+            ventana
+        );
+
+        document.body.appendChild(
+            overlay
+        );
+
+
+        ventana
+            .querySelector(
+                ".cerrar-nota-historial"
+            )
+            .onclick = () => {
+
+                overlay.remove();
+
+            };
+
+
+        overlay.onclick = event => {
+
+            if (
+                event.target === overlay
+            ) {
+                overlay.remove();
+            }
+
+        };
+    }
+
+
+    /**********************
+     * MOSTRAR NOTAS
+     **********************/
+    async function cargarNotas() {
+
+        const clienteId =
+            new URLSearchParams(
+                window.location.search
+            ).get("id");
+
+
+        const lista =
+            document.getElementById(
+                "listaVisitasCliente"
+            );
+
+
+        if (!clienteId || !lista) {
+            return;
+        }
+
+
+        try {
+
+            const q =
+                query(
+                    collection(
+                        db,
+                        "visitas"
+                    ),
+                    where(
+                        "clienteId",
+                        "==",
+                        clienteId
+                    )
+                );
+
+
+            const snap =
+                await getDocs(q);
+
+
+            const notas = [];
+
+
+            snap.forEach(
+                docSnap => {
+
+                    const datos =
+                        docSnap.data();
+
+
+                    if (
+                        datos.tipoVisita !==
+                        "Nota"
+                    ) {
+                        return;
+                    }
+
+
+                    notas.push({
+
+                        id:
+                            docSnap.id,
+
+                        ...datos,
+
+                        fecha:
+                            obtenerFecha(
+                                datos
+                            )
+
+                    });
+
+                }
+            );
+
+
+            notas.sort(
+                (a, b) => {
+
+                    const fechaA =
+                        a.fecha
+                            ? a.fecha.getTime()
+                            : 0;
+
+                    const fechaB =
+                        b.fecha
+                            ? b.fecha.getTime()
+                            : 0;
+
+                    return fechaB - fechaA;
+
+                }
+            );
+
+
+            notas.forEach(
+                nota => {
+
+                    const item =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    item.className =
+                        "visita item-nota-visita";
+
+
+                    item.innerHTML = `
+
+                        <div class="fecha">
+
+                            ${mostrarFecha(
+                                nota.fecha
+                            )}
+
+                        </div>
+
+
+                        <span
+                            class="badge comercial"
+                        >
+                            Nota
+                        </span>
+
+
+                        <span
+                            class="titulo-nota-historial"
+                        >
+                            ${escaparHTML(
+                                nota.titulo ||
+                                "Nota"
+                            )}
+                        </span>
+
+                    `;
+
+
+                    item.addEventListener(
+                        "click",
+                        () => {
+
+                            abrirNotaHistorial(
+                                nota
+                            );
+
+                        }
+                    );
+
+
+                    lista.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error cargando notas:",
+                error
+            );
+
+        }
+    }
+
+
+    /**********************
+     * NUEVA NOTA
+     **********************/
     nuevaNotaBtn.addEventListener(
         "click",
         async () => {
@@ -40,9 +368,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             if (!clienteId) {
+
                 alert(
                     "No se pudo identificar el cliente."
                 );
+
                 return;
             }
 
@@ -94,6 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
             box.innerHTML = `
+
                 <h3
                     style="
                         margin-top:0;
@@ -120,9 +451,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                         Cliente
                     </label>
 
+
                     <input
                         type="text"
-                        value="${escaparHTML(clienteNombre)}"
+                        value="${escaparHTML(
+                            clienteNombre
+                        )}"
                         readonly
                         style="
                             width:100%;
@@ -158,6 +492,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             Fecha
                         </label>
 
+
                         <input
                             id="fechaNota"
                             type="text"
@@ -187,6 +522,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         >
                             Hora
                         </label>
+
 
                         <input
                             id="horaNota"
@@ -224,6 +560,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         Título
                     </label>
 
+
                     <input
                         id="tituloNota"
                         type="text"
@@ -256,6 +593,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     >
                         Nota
                     </label>
+
 
                     <textarea
                         id="contenidoNota"
@@ -293,6 +631,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         Cancelar
                     </button>
 
+
                     <button
                         id="guardarNota"
                         type="button"
@@ -302,12 +641,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </button>
 
                 </div>
+
             `;
 
-
-            /*
-             * FECHA Y HORA
-             */
 
             const ahora =
                 new Date();
@@ -336,38 +672,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             box.querySelector(
                 "#fechaNota"
-            ).value = fecha;
+            ).value =
+                fecha;
 
 
             box.querySelector(
                 "#horaNota"
-            ).value = hora;
+            ).value =
+                hora;
 
 
-            overlay.appendChild(box);
+            overlay.appendChild(
+                box
+            );
+
 
             document.body.appendChild(
                 overlay
             );
 
 
-            /*
-             * CANCELAR
-             */
-
             box.querySelector(
                 "#cancelarNota"
             ).addEventListener(
                 "click",
                 () => {
+
                     overlay.remove();
+
                 }
             );
 
-
-            /*
-             * GUARDAR
-             */
 
             box.querySelector(
                 "#guardarNota"
@@ -376,15 +711,21 @@ document.addEventListener("DOMContentLoaded", async () => {
                 async () => {
 
                     const titulo =
-                        box.querySelector(
-                            "#tituloNota"
-                        ).value.trim();
+                        box
+                            .querySelector(
+                                "#tituloNota"
+                            )
+                            .value
+                            .trim();
 
 
                     const contenido =
-                        box.querySelector(
-                            "#contenidoNota"
-                        ).value.trim();
+                        box
+                            .querySelector(
+                                "#contenidoNota"
+                            )
+                            .value
+                            .trim();
 
 
                     if (!titulo) {
@@ -471,6 +812,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         guardarBtn.disabled =
                             false;
 
+
                         guardarBtn.textContent =
                             "💾 Guardar nota";
 
@@ -485,305 +827,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
 
 
-            box.querySelector(
-                "#tituloNota"
-            )?.focus();
+            box
+                .querySelector(
+                    "#tituloNota"
+                )
+                ?.focus();
 
         }
     );
 
 
-    /*
-     * ==========================================
-     * MOSTRAR NOTAS GUARDADAS
-     * ==========================================
-     *
-     * Esto se ejecuta al cargar la página.
-     * Busca las notas del cliente y las agrega
-     * al historial mostrando título y contenido.
-     */
-
-    await mostrarNotasGuardadas();
-
-
-    async function mostrarNotasGuardadas() {
-
-        const clienteId =
-            new URLSearchParams(
-                window.location.search
-            ).get("id");
-
-
-        if (!clienteId) {
-            return;
-        }
-
-
-        const historial =
-            document.getElementById(
-                "listaVisitasCliente"
-            );
-
-
-        if (!historial) {
-            return;
-        }
-
-
-        try {
-
-            const qNotas =
-                query(
-                    collection(
-                        db,
-                        "visitas"
-                    ),
-                    where(
-                        "clienteId",
-                        "==",
-                        clienteId
-                    )
-                );
-
-
-            const snap =
-                await getDocs(
-                    qNotas
-                );
-
-
-            const notas = [];
-
-
-            snap.forEach(
-                docSnap => {
-
-                    const dato =
-                        docSnap.data();
-
-
-                    if (
-                        dato.tipoVisita !==
-                        "Nota"
-                    ) {
-                        return;
-                    }
-
-
-                    notas.push({
-                        id:
-                            docSnap.id,
-
-                        ...dato
-                    });
-
-                }
-            );
-
-
-            /*
-             * Orden más reciente primero.
-             */
-
-            notas.sort(
-                (a, b) => {
-
-                    const fechaA =
-                        obtenerFecha(
-                            a.fecha
-                        );
-
-                    const fechaB =
-                        obtenerFecha(
-                            b.fecha
-                        );
-
-                    return (
-                        fechaB -
-                        fechaA
-                    );
-
-                }
-            );
-
-
-            /*
-             * Agregamos cada nota al historial.
-             */
-
-            notas.forEach(
-                nota => {
-
-                    const fecha =
-                        obtenerFecha(
-                            nota.fecha
-                        );
-
-
-                    const div =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    div.className =
-                        "visita";
-
-
-                    div.innerHTML = `
-                        <div class="fecha">
-                            ${mostrarFecha(fecha)}
-                        </div>
-
-                        <span
-                            class="badge"
-                            style="
-                                background:#e8f4ff;
-                                color:#1f4e8c;
-                            "
-                        >
-                            Nota
-                        </span>
-
-                        <div
-                            style="
-                                margin-top:10px;
-                            "
-                        >
-
-                            <strong
-                                style="
-                                    display:block;
-                                    font-size:17px;
-                                    margin-bottom:7px;
-                                "
-                            >
-                                ${escaparHTML(
-                                    nota.titulo ||
-                                    "Sin título"
-                                )}
-                            </strong>
-
-
-                            <div
-                                style="
-                                    white-space:pre-wrap;
-                                    line-height:1.5;
-                                    color:#333;
-                                "
-                            >
-                                ${escaparHTML(
-                                    nota.nota ||
-                                    ""
-                                )}
-                            </div>
-
-                        </div>
-                    `;
-
-
-                    historial.appendChild(
-                        div
-                    );
-
-                }
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error cargando notas:",
-                error
-            );
-
-        }
-
-    }
-
-
-    function obtenerFecha(valor) {
-
-        if (
-            valor &&
-            typeof valor.toDate ===
-                "function"
-        ) {
-            return valor.toDate();
-        }
-
-
-        if (valor) {
-
-            const fecha =
-                new Date(
-                    valor
-                );
-
-
-            if (
-                !isNaN(
-                    fecha.getTime()
-                )
-            ) {
-                return fecha;
-            }
-
-        }
-
-
-        return null;
-
-    }
-
-
-    function mostrarFecha(fecha) {
-
-        if (!fecha) {
-            return "Sin fecha";
-        }
-
-
-        return fecha.toLocaleString(
-            "es-AR",
-            {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-    }
-
-
-    function escaparHTML(valor) {
-
-        return String(
-            valor ?? ""
-        )
-            .replace(
-                /&/g,
-                "&amp;"
-            )
-            .replace(
-                /</g,
-                "&lt;"
-            )
-            .replace(
-                />/g,
-                "&gt;"
-            )
-            .replace(
-                /"/g,
-                "&quot;"
-            )
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-
-    }
+    /**********************
+     * CARGAR AL ENTRAR
+     **********************/
+    cargarNotas();
 
 });
