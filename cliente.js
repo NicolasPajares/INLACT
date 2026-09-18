@@ -2168,132 +2168,968 @@ if (editandoPrincipal) {
      * ============================================================
      */
 
-    async function cargarVisitas() {
+   async function cargarVisitas() {
+
+    visitasEl.innerHTML =
+        "Cargando historial...";
+
+    try {
+
+        /*
+         * ==================================================
+         * BUSCAR VISITAS / NOTAS
+         * ==================================================
+         */
+
+        const qVisitas =
+            query(
+                collection(db, "visitas"),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+        const snapVisitas =
+            await getDocs(qVisitas);
+
+
+        /*
+         * ==================================================
+         * BUSCAR ENSAYOS
+         * ==================================================
+         */
+
+        const qEnsayos =
+            query(
+                collection(db, "ensayos"),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+        const snapEnsayos =
+            await getDocs(qEnsayos);
+
+
+        /*
+         * ==================================================
+         * BUSCAR COTIZACIONES
+         * ==================================================
+         */
+
+        const qCotizaciones =
+            query(
+                collection(db, "cotizaciones"),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+        const snapCotizaciones =
+            await getDocs(qCotizaciones);
+
+
+        /*
+         * ==================================================
+         * BUSCAR VENTAS
+         * ==================================================
+         */
+
+        const qEgresos =
+            query(
+                collection(db, "egresos"),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+        const snapEgresos =
+            await getDocs(qEgresos);
+
+
+        /*
+         * ==================================================
+         * HISTORIAL UNIFICADO
+         * ==================================================
+         */
+
+        const historial = [];
+
+
+        /*
+         * ==================================================
+         * VISITAS Y NOTAS
+         * ==================================================
+         */
+
+        snapVisitas.forEach(docSnap => {
+
+            const v =
+                docSnap.data();
+
+
+            /*
+             * Si por algún motivo existe una visita
+             * con tipo "Venta", no la mostramos acá.
+             * Las ventas salen desde egresos.
+             */
+
+            if (
+                v.tipoVisita === "Venta"
+            ) {
+                return;
+            }
+
+
+            const fecha =
+                obtenerFechaVisita(v);
+
+
+            let tipoMostrar =
+                v.tipoVisita ||
+                "Visita";
+
+
+            /*
+             * Las que se registran desde INDEX
+             * actualmente se guardan como
+             * "Nota de visita".
+             *
+             * En el historial las mostramos
+             * simplemente como VISITA.
+             */
+
+            if (
+                tipoMostrar === "Nota de visita"
+            ) {
+
+                tipoMostrar =
+                    "Visita";
+
+            }
+
+
+            historial.push({
+
+                tipo:
+                    "visita",
+
+                subtipo:
+                    tipoMostrar,
+
+                fechaOrden:
+                    fecha
+                        ? fecha.getTime()
+                        : 0,
+
+                datos:
+                    v
+
+            });
+
+        });
+
+
+        /*
+         * ==================================================
+         * ENSAYOS
+         * ==================================================
+         */
+
+        snapEnsayos.forEach(docSnap => {
+
+            const e =
+                docSnap.data();
+
+
+            let fecha = null;
+
+
+            if (
+                e.fecha &&
+                typeof e.fecha.toDate === "function"
+            ) {
+
+                fecha =
+                    e.fecha.toDate();
+
+            }
+
+            else if (e.fecha) {
+
+                const fechaAux =
+                    new Date(e.fecha);
+
+
+                if (
+                    !isNaN(
+                        fechaAux.getTime()
+                    )
+                ) {
+
+                    fecha =
+                        fechaAux;
+
+                }
+
+            }
+
+
+            historial.push({
+
+                tipo:
+                    "ensayo",
+
+                fechaOrden:
+                    fecha
+                        ? fecha.getTime()
+                        : 0,
+
+                fecha:
+                    fecha,
+
+                datos:
+                    e
+
+            });
+
+        });
+
+
+        /*
+         * ==================================================
+         * COTIZACIONES
+         * ==================================================
+         */
+
+        snapCotizaciones.forEach(docSnap => {
+
+            const c =
+                docSnap.data();
+
+
+            let fecha = null;
+
+
+            if (
+                c.fecha &&
+                typeof c.fecha.toDate === "function"
+            ) {
+
+                fecha =
+                    c.fecha.toDate();
+
+            }
+
+            else if (c.fecha) {
+
+                const fechaAux =
+                    new Date(c.fecha);
+
+
+                if (
+                    !isNaN(
+                        fechaAux.getTime()
+                    )
+                ) {
+
+                    fecha =
+                        fechaAux;
+
+                }
+
+            }
+
+
+            historial.push({
+
+                tipo:
+                    "cotizacion",
+
+                fechaOrden:
+                    fecha
+                        ? fecha.getTime()
+                        : 0,
+
+                fecha:
+                    fecha,
+
+                datos:
+                    c
+
+            });
+
+        });
+
+
+        /*
+         * ==================================================
+         * VENTAS
+         * ==================================================
+         */
+
+        const ventas = [];
+
+
+        snapEgresos.forEach(docSnap => {
+
+            const e =
+                docSnap.data();
+
+
+            if (
+                e.tipoEgreso !== "venta"
+            ) {
+                return;
+            }
+
+
+            const fecha =
+                obtenerFechaVenta(e);
+
+
+            ventas.push({
+
+                id:
+                    docSnap.id,
+
+                fecha:
+                    e.fecha ||
+                    null,
+
+                fechaOrden:
+                    fecha
+                        ? fecha.getTime()
+                        : 0,
+
+                datos:
+                    e
+
+            });
+
+        });
+
+
+        /*
+         * ==================================================
+         * AGRUPAR VENTAS POR FECHA
+         * ==================================================
+         */
+
+        const ventasAgrupadas =
+            new Map();
+
+
+        ventas.forEach(venta => {
+
+            const e =
+                venta.datos;
+
+
+            const clave =
+                e.fecha ||
+
+                (
+                    venta.fechaOrden
+
+                        ? new Date(
+                            venta.fechaOrden
+                        )
+                            .toISOString()
+                            .slice(
+                                0,
+                                10
+                            )
+
+                        : "sin-fecha"
+                );
+
+
+            if (
+                !ventasAgrupadas.has(
+                    clave
+                )
+            ) {
+
+                ventasAgrupadas.set(
+                    clave,
+                    {
+
+                        tipo:
+                            "venta",
+
+                        fechaOrden:
+                            venta.fechaOrden,
+
+                        fecha:
+                            e.fecha,
+
+                        productos:
+                            []
+
+                    }
+                );
+
+            }
+
+
+            const grupo =
+                ventasAgrupadas.get(
+                    clave
+                );
+
+
+            grupo.productos.push({
+
+                nombre:
+                    e.productoNombre ||
+                    "Producto sin nombre",
+
+                cantidad:
+                    e.cantidad,
+
+                unidad:
+                    e.unidad ||
+                    "",
+
+                lote:
+                    e.lote ||
+                    ""
+
+            });
+
+
+            if (
+                venta.fechaOrden >
+                grupo.fechaOrden
+            ) {
+
+                grupo.fechaOrden =
+                    venta.fechaOrden;
+
+            }
+
+        });
+
+
+        /*
+         * Agregar ventas agrupadas
+         */
+
+        ventasAgrupadas.forEach(grupo => {
+
+            grupo.productos.sort(
+                compararProductos
+            );
+
+
+            historial.push(
+                grupo
+            );
+
+        });
+
+
+        /*
+         * ==================================================
+         * ORDENAR TODO
+         * ==================================================
+         */
+
+        historial.sort(
+            (a, b) =>
+                b.fechaOrden -
+                a.fechaOrden
+        );
+
+
+        /*
+         * ==================================================
+         * LIMPIAR HISTORIAL
+         * ==================================================
+         */
 
         visitasEl.innerHTML =
-            "Cargando historial...";
+            "";
 
 
-        try {
+        if (
+            historial.length === 0
+        ) {
 
-            /*
-             * ==================================================
-             * BUSCAR VISITAS
-             * ==================================================
-             */
+            visitasEl.innerHTML =
+                "<p>No hay registros en el historial.</p>";
 
-            const qVisitas =
-                query(
+            return;
 
-                    collection(
-                        db,
-                        "visitas"
-                    ),
-
-                    where(
-                        "clienteId",
-                        "==",
-                        clienteId
-                    )
-
-                );
+        }
 
 
-            const snapVisitas =
-                await getDocs(
-                    qVisitas
-                );
+        /*
+         * ==================================================
+         * MOSTRAR HISTORIAL
+         * ==================================================
+         */
+
+        historial.forEach(registro => {
 
 
             /*
              * ==================================================
-             * BUSCAR EGRESOS
+             * NOTA / VISITA
              * ==================================================
              */
 
-            const qEgresos =
-                query(
+            if (
+                registro.tipo === "visita"
+            ) {
 
-                    collection(
-                        db,
-                        "egresos"
-                    ),
-
-                    where(
-                        "clienteId",
-                        "==",
-                        clienteId
-                    )
-
-                );
+                const v =
+                    registro.datos;
 
 
-            const snapEgresos =
-                await getDocs(
-                    qEgresos
-                );
+                const fecha =
+                    obtenerFechaVisita(v);
 
 
-            /*
-             * ==================================================
-             * HISTORIAL
-             * ==================================================
-             */
-
-            const historial =
-                [];
+                const tipo =
+                    registro.subtipo ||
+                    "Visita";
 
 
-            /*
-             * ==================================================
-             * VISITAS NORMALES
-             * ==================================================
-             */
-
-            snapVisitas.forEach(
-
-                docSnap => {
-
-                    const v =
-                        docSnap.data();
+                let clase =
+                    "";
 
 
-                    /*
-                     * Las ventas no se muestran
-                     * desde visitas.
-                     */
+                if (
+                    tipo === "Visita"
+                ) {
 
-                    if (
+                    clase =
+                        "comercial";
 
-                        v.tipoVisita ===
-                        "Venta"
+                }
 
-                    ) {
+                else if (
+                    tipo === "Nota"
+                ) {
 
-                        return;
+                    clase =
+                        "";
 
+                }
+
+                else if (
+                    tipo === "Entrega de productos"
+                ) {
+
+                    clase =
+                        "entrega";
+
+                }
+
+
+                let productosHTML =
+                    "";
+
+
+                if (
+                    Array.isArray(
+                        v.productos
+                    ) &&
+                    v.productos.length
+                ) {
+
+                    const productos =
+                        [
+                            ...v.productos
+                        ];
+
+
+                    productos.sort(
+                        compararProductos
+                    );
+
+
+                    productosHTML =
+                        productos
+                            .map(
+                                producto => `
+
+                                    <div class="producto">
+
+                                        📦
+                                        ${escaparHTML(
+                                            producto.nombre ||
+                                            "Producto sin nombre"
+                                        )}
+
+                                        ${
+                                            producto.cantidad
+                                                ? `(${escaparHTML(producto.cantidad)})`
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                `
+                            )
+                            .join("");
+
+                }
+
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "visita";
+
+
+                div.innerHTML = `
+
+                    <div class="fecha">
+
+                        ${mostrarFecha(
+                            fecha
+                        )}
+
+                    </div>
+
+
+                    <span class="badge ${clase}">
+
+                        ${
+                            tipo === "Visita"
+                                ? "🚗 Visita"
+                                : tipo === "Nota"
+                                    ? "📝 Nota"
+                                    : tipo
+                        }
+
+                    </span>
+
+
+                    ${
+                        tipo === "Nota" &&
+                        v.titulo
+                            ? `
+                                <div class="titulo-nota">
+                                    ${escaparHTML(v.titulo)}
+                                </div>
+                              `
+                            : ""
                     }
 
 
+                    ${productosHTML}
+
+                `;
+
+
+                visitasEl.appendChild(
+                    div
+                );
+
+            }
+
+
+            /*
+             * ==================================================
+             * ENSAYO
+             * ==================================================
+             */
+
+            else if (
+                registro.tipo === "ensayo"
+            ) {
+
+                const e =
+                    registro.datos;
+
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "visita";
+
+
+                div.innerHTML = `
+
+                    <div class="fecha">
+
+                        ${mostrarFecha(
+                            registro.fecha
+                        )}
+
+                    </div>
+
+
+                    <span class="badge ensayo">
+
+                        🧪 Ensayo
+
+                    </span>
+
+
+                    <div class="titulo-historial">
+
+                        ${escaparHTML(
+                            e.nombreEnsayo ||
+                            "Ensayo sin nombre"
+                        )}
+
+                    </div>
+
+                `;
+
+
+                visitasEl.appendChild(
+                    div
+                );
+
+            }
+
+
+            /*
+             * ==================================================
+             * COTIZACIÓN
+             * ==================================================
+             */
+
+            else if (
+                registro.tipo === "cotizacion"
+            ) {
+
+                const c =
+                    registro.datos;
+
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "visita";
+
+
+                div.innerHTML = `
+
+                    <div class="fecha">
+
+                        ${mostrarFecha(
+                            registro.fecha
+                        )}
+
+                    </div>
+
+
+                    <span class="badge">
+
+                        📄 Cotización
+
+                    </span>
+
+
+                    <div class="titulo-historial">
+
+                        ${escaparHTML(
+                            c.nombreCotizacion ||
+                            "Cotización sin nombre"
+                        )}
+
+                    </div>
+
+                `;
+
+
+                visitasEl.appendChild(
+                    div
+                );
+
+            }
+
+
+            /*
+             * ==================================================
+             * VENTA
+             * ==================================================
+             */
+
+            else if (
+                registro.tipo === "venta"
+            ) {
+
+                const productos =
+                    [
+                        ...registro.productos
+                    ];
+
+
+                productos.sort(
+                    compararProductos
+                );
+
+
+                const productosHTML =
+                    productos
+                        .map(
+                            producto => `
+
+                                <div class="producto-venta">
+
+                                    <span class="col-producto">
+
+                                        📦
+
+                                        ${escaparHTML(
+                                            producto.nombre ||
+                                            "Producto sin nombre"
+                                        )}
+
+                                    </span>
+
+
+                                    <span class="col-cantidad">
+
+                                        ⚖️
+
+                                        ${escaparHTML(
+                                            producto.cantidad ?? ""
+                                        )}
+
+                                        ${escaparHTML(
+                                            producto.unidad || ""
+                                        )}
+
+                                    </span>
+
+
+                                    <span class="col-lote">
+
+                                        🏷️
+
+                                        ${escaparHTML(
+                                            producto.lote || ""
+                                        )}
+
+                                    </span>
+
+                                </div>
+
+                            `
+                        )
+                        .join("");
+
+
+                let fechaTexto =
+                    "Sin fecha";
+
+
+                if (
+                    registro.fecha
+                ) {
+
                     const fecha =
-                        obtenerFechaVisita(
-                            v
+                        new Date(
+                            registro.fecha +
+                            "T00:00:00"
                         );
 
 
-                    historial.push({
+                    if (
+                        !isNaN(
+                            fecha.getTime()
+                        )
+                    ) {
 
-                        tipo:
-                            "visita",
+                        fechaTexto =
+                            fecha.toLocaleDateString(
+                                "es-AR"
+                            );
 
-                        fechaOrden:
-                            fecha
-                                ? fecha.getTime()
-                                : 0,
+                    }
 
-                        datos:
-                            v
+                }
 
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "visita";
+
+
+                div.innerHTML = `
+
+                    <div class="fecha">
+
+                        ${fechaTexto}
+
+                    </div>
+
+
+                    <span class="badge entrega">
+
+                        💰 Venta
+
+                    </span>
+
+
+                    <div class="productos-venta">
+
+                        ${productosHTML}
+
+                    </div>
+
+                `;
+
+
+                visitasEl.appendChild(
+                    div
+                );
+
+            }
+
+        );
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "Error cargando historial del cliente:",
+            error
+        );
+
+
+        visitasEl.innerHTML =
+            "<p>No se pudo cargar el historial.</p>";
+
+    }
+
+}
                     });
 
                 }
