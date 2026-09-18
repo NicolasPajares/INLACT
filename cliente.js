@@ -2167,7 +2167,12 @@ if (editandoPrincipal) {
 
         const snapVisitas =
             await getDocs(qVisitas);
+console.log("ID DEL CLIENTE:", clienteId);
+console.log("VISITAS ENCONTRADAS:", snapVisitas.size);
 
+snapVisitas.forEach(docSnap => {
+    console.log("VISITA:", docSnap.id, docSnap.data());
+});
 
         // ==================================================
         // BUSCAR ENSAYOS
