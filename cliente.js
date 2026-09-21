@@ -1836,7 +1836,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 /*
  * ============================================================
- * HISTORIAL DE VISITAS
+ * HISTORIAL DE VISITAS Y NOTAS
  * ============================================================
  */
 
@@ -1858,7 +1858,7 @@ async function cargarHistorialHistorial() {
 
 
     listaHistorial.innerHTML =
-        "<p>Cargando visitas...</p>";
+        "<p>Cargando historial...</p>";
 
 
     try {
@@ -1900,16 +1900,12 @@ async function cargarHistorialHistorial() {
         );
 
         console.log(
-            "VISITAS ENCONTRADAS:",
+            "REGISTROS ENCONTRADOS:",
             resultado.size
         );
 
 
-        listaHistorial.innerHTML =
-            "";
-
-
-        const visitas = [];
+        const actividades = [];
 
 
         resultado.forEach(
@@ -1920,17 +1916,31 @@ async function cargarHistorialHistorial() {
 
 
                 console.log(
-                    "VISITA:",
+                    "REGISTRO HISTORIAL:",
                     documento.id,
                     datos
                 );
 
 
+                /*
+                 * Solamente mostramos:
+                 *
+                 * Nota de visita
+                 * Nota
+                 *
+                 * No mostramos todavía:
+                 * Venta
+                 * Entrega
+                 * etc.
+                 */
+
                 if (
-                    datos.tipoVisita !==
-                    "Nota de visita"
+                    datos.tipoVisita !== "Nota de visita" &&
+                    datos.tipoVisita !== "Nota"
                 ) {
+
                     return;
+
                 }
 
 
@@ -1955,6 +1965,7 @@ async function cargarHistorialHistorial() {
                             datos.fecha
                         );
 
+
                     if (
                         !isNaN(
                             fechaConvertida.getTime()
@@ -1969,7 +1980,8 @@ async function cargarHistorialHistorial() {
                 }
 
 
-                visitas.push({
+                actividades.push({
+
                     id:
                         documento.id,
 
@@ -1978,13 +1990,20 @@ async function cargarHistorialHistorial() {
 
                     fecha:
                         fecha
+
                 });
 
             }
         );
 
 
-        visitas.sort(
+        /*
+         * ============================================================
+         * ORDENAR DE MÁS NUEVA A MÁS VIEJA
+         * ============================================================
+         */
+
+        actividades.sort(
             (a, b) =>
                 (
                     b.fecha?.getTime() || 0
@@ -1996,20 +2015,35 @@ async function cargarHistorialHistorial() {
         );
 
 
+        listaHistorial.innerHTML =
+            "";
+
+
         if (
-            visitas.length ===
+            actividades.length ===
             0
         ) {
 
             listaHistorial.innerHTML =
-                "<p>No hay visitas registradas.</p>";
+                "<p>No hay visitas ni notas registradas.</p>";
 
             return;
+
         }
 
 
-        visitas.forEach(
-            visita => {
+        /*
+         * ============================================================
+         * MOSTRAR VISITAS Y NOTAS
+         * ============================================================
+         */
+
+        actividades.forEach(
+            actividad => {
+
+                const datos =
+                    actividad.datos;
+
 
                 const tarjeta =
                     document.createElement(
@@ -2022,28 +2056,42 @@ async function cargarHistorialHistorial() {
 
 
                 const titulo =
-                    visita.datos.titulo ||
-                    "Visita";
+                    datos.titulo ||
+                    (
+                        datos.tipoVisita === "Nota"
+                            ? "Nota"
+                            : "Visita"
+                    );
 
 
                 const fechaTexto =
-                    visita.fecha
-                        ? visita.fecha.toLocaleString(
+                    actividad.fecha
+                        ? actividad.fecha.toLocaleString(
                             "es-AR",
                             {
                                 day:
                                     "2-digit",
+
                                 month:
                                     "2-digit",
+
                                 year:
                                     "numeric",
+
                                 hour:
                                     "2-digit",
+
                                 minute:
                                     "2-digit"
                             }
                         )
                         : "Sin fecha";
+
+
+                const tipoTexto =
+                    datos.tipoVisita === "Nota"
+                        ? "Nota"
+                        : "Visita";
 
 
                 tarjeta.innerHTML = `
@@ -2058,6 +2106,7 @@ async function cargarHistorialHistorial() {
                         ${fechaTexto}
                     </div>
 
+
                     <div
                         style="
                             display:inline-block;
@@ -2069,8 +2118,9 @@ async function cargarHistorialHistorial() {
                             margin-bottom:8px;
                         "
                     >
-                        Visita
+                        ${tipoTexto}
                     </div>
+
 
                     <div
                         style="
@@ -2089,19 +2139,151 @@ async function cargarHistorialHistorial() {
                     "pointer";
 
 
+                /*
+                 * ====================================================
+                 * ABRIR CONTENIDO
+                 * ====================================================
+                 */
+
                 tarjeta.addEventListener(
                     "click",
                     () => {
 
                         const contenido =
-                            visita.datos.nota ||
+                            datos.nota ||
                             "";
 
 
-                        alert(
-                            contenido ||
-                            "Esta visita no tiene una nota."
+                        const overlay =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        overlay.style.cssText = `
+                            position:fixed;
+                            inset:0;
+                            background:rgba(0,0,0,.6);
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            z-index:99999;
+                            padding:20px;
+                        `;
+
+
+                        const ventana =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        ventana.style.cssText = `
+                            background:white;
+                            width:92%;
+                            max-width:600px;
+                            max-height:85vh;
+                            overflow-y:auto;
+                            border-radius:16px;
+                            padding:25px;
+                            box-sizing:border-box;
+                        `;
+
+
+                        ventana.innerHTML = `
+
+                            <h2
+                                style="
+                                    margin-top:0;
+                                    color:#1f4e8c;
+                                "
+                            >
+                                ${escaparHTML(titulo)}
+                            </h2>
+
+
+                            <div
+                                style="
+                                    font-size:13px;
+                                    color:#777;
+                                    margin-bottom:18px;
+                                "
+                            >
+                                ${fechaTexto}
+                            </div>
+
+
+                            <div
+                                style="
+                                    white-space:pre-wrap;
+                                    line-height:1.5;
+                                    font-size:16px;
+                                    color:#333;
+                                    margin-bottom:20px;
+                                "
+                            >
+                                ${escaparHTML(
+                                    contenido ||
+                                    "Sin contenido."
+                                )}
+                            </div>
+
+
+                            <button
+                                type="button"
+                                style="
+                                    width:100%;
+                                    padding:13px;
+                                    border:0;
+                                    border-radius:8px;
+                                    background:#1f4e8c;
+                                    color:white;
+                                    font-size:16px;
+                                    font-weight:bold;
+                                    cursor:pointer;
+                                "
+                            >
+                                Cerrar
+                            </button>
+
+                        `;
+
+
+                        overlay.appendChild(
+                            ventana
                         );
+
+
+                        document.body.appendChild(
+                            overlay
+                        );
+
+
+                        ventana
+                            .querySelector(
+                                "button"
+                            )
+                            .onclick =
+                            () => {
+
+                                overlay.remove();
+
+                            };
+
+
+                        overlay.onclick =
+                            event => {
+
+                                if (
+                                    event.target ===
+                                    overlay
+                                ) {
+
+                                    overlay.remove();
+
+                                }
+
+                            };
 
                     }
                 );
@@ -2140,7 +2322,7 @@ async function cargarHistorialHistorial() {
 
 await cargarHistorialHistorial();
 
-
+    
 /*
  * ============================================================
  * FINAL
