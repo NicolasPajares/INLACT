@@ -2072,59 +2072,54 @@ async function cargarHistorialHistorial() {
                  * ------------------------------------------------
                  */
 
-                let fecha = null;
+              let fecha = null;
 
 
-                if (
-                    datos.fecha &&
-                    typeof datos.fecha.toDate ===
-                    "function"
-                ) {
+/*
+ * Para ventas usamos la fecha y hora real
+ * del momento en que se registró el egreso.
+ */
 
-                    fecha =
-                        datos.fecha.toDate();
+if (
+    datos.creadoEn &&
+    typeof datos.creadoEn.toDate ===
+    "function"
+) {
 
-                }
+    fecha =
+        datos.creadoEn.toDate();
 
-                else if (datos.fecha) {
-
-                    const fechaConvertida =
-                        new Date(
-                            `${datos.fecha}T00:00:00`
-                        );
+}
 
 
-                    if (
-                        !isNaN(
-                            fechaConvertida.getTime()
-                        )
-                    ) {
+/*
+ * Si una venta antigua no tiene creadoEn,
+ * usamos la fecha guardada como respaldo.
+ */
 
-                        fecha =
-                            fechaConvertida;
+if (
+    !fecha &&
+    datos.fecha
+) {
 
-                    }
+    const fechaConvertida =
+        new Date(
+            `${datos.fecha}T00:00:00`
+        );
 
-                }
 
+    if (
+        !isNaN(
+            fechaConvertida.getTime()
+        )
+    ) {
 
-                /*
-                 * Si no tiene fecha de venta,
-                 * usamos creadoEn.
-                 */
+        fecha =
+            fechaConvertida;
 
-                if (
-                    !fecha &&
-                    datos.creadoEn &&
-                    typeof datos.creadoEn.toDate ===
-                    "function"
-                ) {
+    }
 
-                    fecha =
-                        datos.creadoEn.toDate();
-
-                }
-
+}
 
                 /*
                  * ------------------------------------------------
