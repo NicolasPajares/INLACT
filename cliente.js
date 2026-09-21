@@ -1836,7 +1836,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 /*
  * ============================================================
- * HISTORIAL DE VISITAS Y NOTAS
+ * HISTORIAL DE VISITAS, NOTAS Y VENTAS
  * ============================================================
  */
 
@@ -1874,7 +1874,13 @@ async function cargarHistorialHistorial() {
             );
 
 
-        const consulta =
+        /*
+         * ========================================================
+         * BUSCAR VISITAS Y NOTAS
+         * ========================================================
+         */
+
+        const consultaVisitas =
             query(
                 collection(
                     db,
@@ -1888,9 +1894,35 @@ async function cargarHistorialHistorial() {
             );
 
 
-        const resultado =
+        const resultadoVisitas =
             await getDocs(
-                consulta
+                consultaVisitas
+            );
+
+
+        /*
+         * ========================================================
+         * BUSCAR VENTAS
+         * ========================================================
+         */
+
+        const consultaEgresos =
+            query(
+                collection(
+                    db,
+                    "egresos"
+                ),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+
+        const resultadoEgresos =
+            await getDocs(
+                consultaEgresos
             );
 
 
@@ -1899,16 +1931,29 @@ async function cargarHistorialHistorial() {
             clienteId
         );
 
+
         console.log(
-            "REGISTROS ENCONTRADOS:",
-            resultado.size
+            "VISITAS ENCONTRADAS:",
+            resultadoVisitas.size
+        );
+
+
+        console.log(
+            "EGRESOS ENCONTRADOS:",
+            resultadoEgresos.size
         );
 
 
         const actividades = [];
 
 
-        resultado.forEach(
+        /*
+         * ========================================================
+         * VISITAS Y NOTAS
+         * ========================================================
+         */
+
+        resultadoVisitas.forEach(
             documento => {
 
                 const datos =
@@ -1916,23 +1961,11 @@ async function cargarHistorialHistorial() {
 
 
                 console.log(
-                    "REGISTRO HISTORIAL:",
+                    "REGISTRO VISITA/NOTA:",
                     documento.id,
                     datos
                 );
 
-
-                /*
-                 * Solamente mostramos:
-                 *
-                 * Nota de visita
-                 * Nota
-                 *
-                 * No mostramos todavía:
-                 * Venta
-                 * Entrega
-                 * etc.
-                 */
 
                 if (
                     datos.tipoVisita !== "Nota de visita" &&
@@ -1985,6 +2018,9 @@ async function cargarHistorialHistorial() {
                     id:
                         documento.id,
 
+                    origen:
+                        "visita",
+
                     datos:
                         datos,
 
@@ -1998,9 +2034,243 @@ async function cargarHistorialHistorial() {
 
 
         /*
-         * ============================================================
-         * ORDENAR DE MÁS NUEVA A MÁS VIEJA
-         * ============================================================
+         * ========================================================
+         * VENTAS
+         * ========================================================
+         */
+
+        const ventasPorFecha =
+            new Map();
+
+
+        resultadoEgresos.forEach(
+            documento => {
+
+                const datos =
+                    documento.data();
+
+
+                if (
+                    datos.tipoEgreso !== "venta"
+                ) {
+
+                    return;
+
+                }
+
+
+                console.log(
+                    "VENTA ENCONTRADA:",
+                    documento.id,
+                    datos
+                );
+
+
+                /*
+                 * ------------------------------------------------
+                 * FECHA DE LA VENTA
+                 * ------------------------------------------------
+                 */
+
+                let fecha = null;
+
+
+                if (
+                    datos.fecha &&
+                    typeof datos.fecha.toDate ===
+                    "function"
+                ) {
+
+                    fecha =
+                        datos.fecha.toDate();
+
+                }
+
+                else if (datos.fecha) {
+
+                    const fechaConvertida =
+                        new Date(
+                            `${datos.fecha}T00:00:00`
+                        );
+
+
+                    if (
+                        !isNaN(
+                            fechaConvertida.getTime()
+                        )
+                    ) {
+
+                        fecha =
+                            fechaConvertida;
+
+                    }
+
+                }
+
+
+                /*
+                 * Si no tiene fecha de venta,
+                 * usamos creadoEn.
+                 */
+
+                if (
+                    !fecha &&
+                    datos.creadoEn &&
+                    typeof datos.creadoEn.toDate ===
+                    "function"
+                ) {
+
+                    fecha =
+                        datos.creadoEn.toDate();
+
+                }
+
+
+                /*
+                 * ------------------------------------------------
+                 * CLAVE PARA AGRUPAR
+                 * ------------------------------------------------
+                 */
+
+                let claveFecha =
+                    "sin-fecha";
+
+
+                if (fecha) {
+
+                    claveFecha =
+                        fecha
+                            .getFullYear()
+                            + "-"
+                            +
+                        String(
+                            fecha.getMonth() + 1
+                        ).padStart(
+                            2,
+                            "0"
+                        )
+                            + "-"
+                            +
+                        String(
+                            fecha.getDate()
+                        ).padStart(
+                            2,
+                            "0"
+                        );
+
+                }
+
+
+                /*
+                 * ------------------------------------------------
+                 * CREAR GRUPO
+                 * ------------------------------------------------
+                 */
+
+                if (
+                    !ventasPorFecha.has(
+                        claveFecha
+                    )
+                ) {
+
+                    ventasPorFecha.set(
+                        claveFecha,
+                        {
+
+                            id:
+                                "venta-" +
+                                claveFecha,
+
+                            origen:
+                                "venta",
+
+                            fecha:
+                                fecha,
+
+                            productos:
+                                []
+
+                        }
+                    );
+
+                }
+
+
+                const venta =
+                    ventasPorFecha.get(
+                        claveFecha
+                    );
+
+
+                /*
+                 * ------------------------------------------------
+                 * AGREGAR PRODUCTO
+                 * ------------------------------------------------
+                 */
+
+                venta.productos.push({
+
+                    nombre:
+                        datos.productoNombre ||
+                        "Producto sin nombre",
+
+                    cantidad:
+                        datos.cantidad,
+
+                    unidad:
+                        datos.unidad ||
+                        "",
+
+                    lote:
+                        datos.lote ||
+                        ""
+
+                });
+
+
+                /*
+                 * Si encontramos una fecha más nueva
+                 * para el mismo grupo, la conservamos.
+                 */
+
+                if (
+                    fecha &&
+                    (
+                        !venta.fecha ||
+                        fecha > venta.fecha
+                    )
+                ) {
+
+                    venta.fecha =
+                        fecha;
+
+                }
+
+            }
+        );
+
+
+        /*
+         * ========================================================
+         * AGREGAR VENTAS AL HISTORIAL
+         * ========================================================
+         */
+
+        ventasPorFecha.forEach(
+            venta => {
+
+                actividades.push(
+                    venta
+                );
+
+            }
+        );
+
+
+        /*
+         * ========================================================
+         * ORDENAR TODO DE MÁS NUEVO A MÁS VIEJO
+         * ========================================================
          */
 
         actividades.sort(
@@ -2020,12 +2290,11 @@ async function cargarHistorialHistorial() {
 
 
         if (
-            actividades.length ===
-            0
+            actividades.length === 0
         ) {
 
             listaHistorial.innerHTML =
-                "<p>No hay visitas ni notas registradas.</p>";
+                "<p>No hay registros en el historial.</p>";
 
             return;
 
@@ -2033,13 +2302,317 @@ async function cargarHistorialHistorial() {
 
 
         /*
-         * ============================================================
-         * MOSTRAR VISITAS Y NOTAS
-         * ============================================================
+         * ========================================================
+         * MOSTRAR HISTORIAL
+         * ========================================================
          */
 
         actividades.forEach(
             actividad => {
+
+
+                /*
+                 * ==================================================
+                 * VENTA
+                 * ==================================================
+                 */
+
+                if (
+                    actividad.origen ===
+                    "venta"
+                ) {
+
+                    const tarjeta =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    tarjeta.className =
+                        "visita";
+
+
+                    const fechaTexto =
+                        actividad.fecha
+                            ? actividad.fecha.toLocaleString(
+                                "es-AR",
+                                {
+                                    day:
+                                        "2-digit",
+
+                                    month:
+                                        "2-digit",
+
+                                    year:
+                                        "numeric",
+
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+                                }
+                            )
+                            : "Sin fecha";
+
+
+                    tarjeta.innerHTML = `
+
+                        <div
+                            style="
+                                font-size:13px;
+                                color:#777;
+                                margin-bottom:5px;
+                            "
+                        >
+                            ${fechaTexto}
+                        </div>
+
+
+                        <div
+                            style="
+                                display:inline-block;
+                                background:#2e7d32;
+                                color:white;
+                                padding:4px 9px;
+                                border-radius:12px;
+                                font-size:12px;
+                                margin-bottom:8px;
+                            "
+                        >
+                            Venta
+                        </div>
+
+
+                        <div
+                            style="
+                                font-size:17px;
+                                font-weight:600;
+                                color:#1f4e8c;
+                            "
+                        >
+                            ${actividad.productos.length}
+                            producto${actividad.productos.length === 1 ? "" : "s"}
+                        </div>
+
+                    `;
+
+
+                    tarjeta.style.cursor =
+                        "pointer";
+
+
+                    tarjeta.addEventListener(
+                        "click",
+                        () => {
+
+                            const overlay =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            overlay.style.cssText = `
+                                position:fixed;
+                                inset:0;
+                                background:rgba(0,0,0,.6);
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                z-index:99999;
+                                padding:20px;
+                            `;
+
+
+                            const ventana =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            ventana.style.cssText = `
+                                background:white;
+                                width:92%;
+                                max-width:600px;
+                                max-height:85vh;
+                                overflow-y:auto;
+                                border-radius:16px;
+                                padding:25px;
+                                box-sizing:border-box;
+                            `;
+
+
+                            let productosHTML =
+                                "";
+
+
+                            actividad.productos.forEach(
+                                producto => {
+
+                                    productosHTML += `
+
+                                        <div
+                                            style="
+                                                padding:12px 0;
+                                                border-bottom:1px solid #ddd;
+                                            "
+                                        >
+
+                                            <strong
+                                                style="
+                                                    color:#1f4e8c;
+                                                    font-size:16px;
+                                                "
+                                            >
+                                                ${escaparHTML(
+                                                    producto.nombre
+                                                )}
+                                            </strong>
+
+                                            <div
+                                                style="
+                                                    margin-top:5px;
+                                                    color:#555;
+                                                "
+                                            >
+                                                Cantidad:
+                                                ${producto.cantidad ?? "-"}
+                                                ${escaparHTML(
+                                                    producto.unidad
+                                                )}
+                                            </div>
+
+                                            ${
+                                                producto.lote
+                                                    ? `
+                                                        <div
+                                                            style="
+                                                                margin-top:3px;
+                                                                color:#777;
+                                                                font-size:13px;
+                                                            "
+                                                        >
+                                                            Lote:
+                                                            ${escaparHTML(
+                                                                producto.lote
+                                                            )}
+                                                        </div>
+                                                    `
+                                                    : ""
+                                            }
+
+                                        </div>
+
+                                    `;
+
+                                }
+                            );
+
+
+                            ventana.innerHTML = `
+
+                                <h2
+                                    style="
+                                        margin-top:0;
+                                        color:#2e7d32;
+                                    "
+                                >
+                                    Venta
+                                </h2>
+
+
+                                <div
+                                    style="
+                                        font-size:13px;
+                                        color:#777;
+                                        margin-bottom:15px;
+                                    "
+                                >
+                                    ${fechaTexto}
+                                </div>
+
+
+                                <div>
+                                    ${productosHTML}
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    style="
+                                        width:100%;
+                                        margin-top:20px;
+                                        padding:13px;
+                                        border:0;
+                                        border-radius:8px;
+                                        background:#1f4e8c;
+                                        color:white;
+                                        font-size:16px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                    "
+                                >
+                                    Cerrar
+                                </button>
+
+                            `;
+
+
+                            overlay.appendChild(
+                                ventana
+                            );
+
+
+                            document.body.appendChild(
+                                overlay
+                            );
+
+
+                            ventana
+                                .querySelector(
+                                    "button"
+                                )
+                                .onclick =
+                                () => {
+
+                                    overlay.remove();
+
+                                };
+
+
+                            overlay.onclick =
+                                event => {
+
+                                    if (
+                                        event.target ===
+                                        overlay
+                                    ) {
+
+                                        overlay.remove();
+
+                                    }
+
+                                };
+
+                        }
+                    );
+
+
+                    listaHistorial.appendChild(
+                        tarjeta
+                    );
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * ==================================================
+                 * VISITA / NOTA
+                 * ==================================================
+                 */
 
                 const datos =
                     actividad.datos;
@@ -2094,6 +2667,12 @@ async function cargarHistorialHistorial() {
                         : "Visita";
 
 
+                const colorTipo =
+                    datos.tipoVisita === "Nota"
+                        ? "#42a5f5"
+                        : "#1f4e8c";
+
+
                 tarjeta.innerHTML = `
 
                     <div
@@ -2110,7 +2689,7 @@ async function cargarHistorialHistorial() {
                     <div
                         style="
                             display:inline-block;
-                            background:#1f4e8c;
+                            background:${colorTipo};
                             color:white;
                             padding:4px 9px;
                             border-radius:12px;
@@ -2138,12 +2717,6 @@ async function cargarHistorialHistorial() {
                 tarjeta.style.cursor =
                     "pointer";
 
-
-                /*
-                 * ====================================================
-                 * ABRIR CONTENIDO
-                 * ====================================================
-                 */
 
                 tarjeta.addEventListener(
                     "click",
@@ -2321,7 +2894,6 @@ async function cargarHistorialHistorial() {
  */
 
 await cargarHistorialHistorial();
-
     
 /*
  * ============================================================
