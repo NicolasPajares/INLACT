@@ -1925,6 +1925,54 @@ async function cargarHistorialHistorial() {
                 consultaEgresos
             );
 
+        /*
+ * ========================================================
+ * BUSCAR ENSAYOS
+ * ========================================================
+ */
+
+const consultaEnsayos =
+    query(
+        collection(
+            db,
+            "ensayos"
+        ),
+        where(
+            "clienteId",
+            "==",
+            clienteId
+        )
+    );
+
+const resultadoEnsayos =
+    await getDocs(
+        consultaEnsayos
+    );
+
+
+/*
+ * ========================================================
+ * BUSCAR COTIZACIONES
+ * ========================================================
+ */
+
+const consultaCotizaciones =
+    query(
+        collection(
+            db,
+            "cotizaciones"
+        ),
+        where(
+            "clienteId",
+            "==",
+            clienteId
+        )
+    );
+
+const resultadoCotizaciones =
+    await getDocs(
+        consultaCotizaciones
+    );
 
         console.log(
             "ID CLIENTE HISTORIAL:",
