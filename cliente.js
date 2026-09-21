@@ -2321,11 +2321,22 @@ resultadoEnsayos.forEach(
         const datos =
             documento.data();
 
-
         let fecha = null;
 
-
+        // Usar fecha real de creación
         if (
+            datos.creadoEn &&
+            typeof datos.creadoEn.toDate ===
+            "function"
+        ) {
+
+            fecha =
+                datos.creadoEn.toDate();
+
+        }
+
+        // Compatibilidad con ensayos antiguos
+        else if (
             datos.fecha &&
             typeof datos.fecha.toDate ===
             "function"
@@ -2343,7 +2354,6 @@ resultadoEnsayos.forEach(
                     `${datos.fecha}T00:00:00`
                 );
 
-
             if (
                 !isNaN(
                     fechaConvertida.getTime()
@@ -2356,7 +2366,6 @@ resultadoEnsayos.forEach(
             }
 
         }
-
 
         actividades.push({
 
@@ -2376,8 +2385,6 @@ resultadoEnsayos.forEach(
 
     }
 );
-
-
 /*
  * ========================================================
  * COTIZACIONES
@@ -2390,11 +2397,22 @@ resultadoCotizaciones.forEach(
         const datos =
             documento.data();
 
-
         let fecha = null;
 
-
+        // Usar fecha real de creación
         if (
+            datos.creadoEn &&
+            typeof datos.creadoEn.toDate ===
+            "function"
+        ) {
+
+            fecha =
+                datos.creadoEn.toDate();
+
+        }
+
+        // Compatibilidad con cotizaciones antiguas
+        else if (
             datos.fecha &&
             typeof datos.fecha.toDate ===
             "function"
@@ -2412,7 +2430,6 @@ resultadoCotizaciones.forEach(
                     `${datos.fecha}T00:00:00`
                 );
 
-
             if (
                 !isNaN(
                     fechaConvertida.getTime()
@@ -2425,7 +2442,6 @@ resultadoCotizaciones.forEach(
             }
 
         }
-
 
         actividades.push({
 
@@ -2445,6 +2461,7 @@ resultadoCotizaciones.forEach(
 
     }
 );
+        
         
         /*
          * ========================================================
