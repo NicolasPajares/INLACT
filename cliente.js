@@ -1834,14 +1834,315 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
 
 
-   /*
+/*
+ * ============================================================
+ * HISTORIAL DE VISITAS
+ * ============================================================
+ */
+
+async function cargarHistorialHistorial() {
+
+    const listaHistorial =
+        document.getElementById(
+            "listaVisitasCliente"
+        );
+
+    if (!listaHistorial) {
+
+        console.warn(
+            "No se encontró #listaVisitasCliente"
+        );
+
+        return;
+    }
+
+
+    listaHistorial.innerHTML =
+        "<p>Cargando visitas...</p>";
+
+
+    try {
+
+        const {
+            collection,
+            query,
+            where,
+            getDocs
+        } =
+            await import(
+                "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"
+            );
+
+
+        const consulta =
+            query(
+                collection(
+                    db,
+                    "visitas"
+                ),
+                where(
+                    "clienteId",
+                    "==",
+                    clienteId
+                )
+            );
+
+
+        const resultado =
+            await getDocs(
+                consulta
+            );
+
+
+        console.log(
+            "ID CLIENTE HISTORIAL:",
+            clienteId
+        );
+
+        console.log(
+            "VISITAS ENCONTRADAS:",
+            resultado.size
+        );
+
+
+        listaHistorial.innerHTML =
+            "";
+
+
+        const visitas = [];
+
+
+        resultado.forEach(
+            documento => {
+
+                const datos =
+                    documento.data();
+
+
+                console.log(
+                    "VISITA:",
+                    documento.id,
+                    datos
+                );
+
+
+                if (
+                    datos.tipoVisita !==
+                    "Nota de visita"
+                ) {
+                    return;
+                }
+
+
+                let fecha = null;
+
+
+                if (
+                    datos.fecha &&
+                    typeof datos.fecha.toDate ===
+                    "function"
+                ) {
+
+                    fecha =
+                        datos.fecha.toDate();
+
+                }
+
+                else if (datos.fecha) {
+
+                    const fechaConvertida =
+                        new Date(
+                            datos.fecha
+                        );
+
+                    if (
+                        !isNaN(
+                            fechaConvertida.getTime()
+                        )
+                    ) {
+
+                        fecha =
+                            fechaConvertida;
+
+                    }
+
+                }
+
+
+                visitas.push({
+                    id:
+                        documento.id,
+
+                    datos:
+                        datos,
+
+                    fecha:
+                        fecha
+                });
+
+            }
+        );
+
+
+        visitas.sort(
+            (a, b) =>
+                (
+                    b.fecha?.getTime() || 0
+                )
+                -
+                (
+                    a.fecha?.getTime() || 0
+                )
+        );
+
+
+        if (
+            visitas.length ===
+            0
+        ) {
+
+            listaHistorial.innerHTML =
+                "<p>No hay visitas registradas.</p>";
+
+            return;
+        }
+
+
+        visitas.forEach(
+            visita => {
+
+                const tarjeta =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                tarjeta.className =
+                    "visita";
+
+
+                const titulo =
+                    visita.datos.titulo ||
+                    "Visita";
+
+
+                const fechaTexto =
+                    visita.fecha
+                        ? visita.fecha.toLocaleString(
+                            "es-AR",
+                            {
+                                day:
+                                    "2-digit",
+                                month:
+                                    "2-digit",
+                                year:
+                                    "numeric",
+                                hour:
+                                    "2-digit",
+                                minute:
+                                    "2-digit"
+                            }
+                        )
+                        : "Sin fecha";
+
+
+                tarjeta.innerHTML = `
+
+                    <div
+                        style="
+                            font-size:13px;
+                            color:#777;
+                            margin-bottom:5px;
+                        "
+                    >
+                        ${fechaTexto}
+                    </div>
+
+                    <div
+                        style="
+                            display:inline-block;
+                            background:#1f4e8c;
+                            color:white;
+                            padding:4px 9px;
+                            border-radius:12px;
+                            font-size:12px;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Visita
+                    </div>
+
+                    <div
+                        style="
+                            font-size:17px;
+                            font-weight:600;
+                            color:#1f4e8c;
+                        "
+                    >
+                        ${escaparHTML(titulo)}
+                    </div>
+
+                `;
+
+
+                tarjeta.style.cursor =
+                    "pointer";
+
+
+                tarjeta.addEventListener(
+                    "click",
+                    () => {
+
+                        const contenido =
+                            visita.datos.nota ||
+                            "";
+
+
+                        alert(
+                            contenido ||
+                            "Esta visita no tiene una nota."
+                        );
+
+                    }
+                );
+
+
+                listaHistorial.appendChild(
+                    tarjeta
+                );
+
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "ERROR CARGANDO HISTORIAL:",
+            error
+        );
+
+
+        listaHistorial.innerHTML =
+            "<p>No se pudo cargar el historial.</p>";
+
+    }
+
+}
+
+
+/*
+ * ============================================================
+ * CARGAR HISTORIAL
+ * ============================================================
+ */
+
+await cargarHistorialHistorial();
+
+
+/*
  * ============================================================
  * FINAL
  * ============================================================
  */
-console.log("PRUEBA CLIENTE.JS - SE EJECUTÓ");
-    console.log(
-    "FUNCIÓN HISTORIAL:",
-    typeof cargarHistorialHistorial
-);
-});
