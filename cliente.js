@@ -2309,7 +2309,143 @@ if (
             }
         );
 
+/*
+ * ========================================================
+ * ENSAYOS
+ * ========================================================
+ */
 
+resultadoEnsayos.forEach(
+    documento => {
+
+        const datos =
+            documento.data();
+
+
+        let fecha = null;
+
+
+        if (
+            datos.fecha &&
+            typeof datos.fecha.toDate ===
+            "function"
+        ) {
+
+            fecha =
+                datos.fecha.toDate();
+
+        }
+
+        else if (datos.fecha) {
+
+            const fechaConvertida =
+                new Date(
+                    `${datos.fecha}T00:00:00`
+                );
+
+
+            if (
+                !isNaN(
+                    fechaConvertida.getTime()
+                )
+            ) {
+
+                fecha =
+                    fechaConvertida;
+
+            }
+
+        }
+
+
+        actividades.push({
+
+            id:
+                documento.id,
+
+            origen:
+                "ensayo",
+
+            datos:
+                datos,
+
+            fecha:
+                fecha
+
+        });
+
+    }
+);
+
+
+/*
+ * ========================================================
+ * COTIZACIONES
+ * ========================================================
+ */
+
+resultadoCotizaciones.forEach(
+    documento => {
+
+        const datos =
+            documento.data();
+
+
+        let fecha = null;
+
+
+        if (
+            datos.fecha &&
+            typeof datos.fecha.toDate ===
+            "function"
+        ) {
+
+            fecha =
+                datos.fecha.toDate();
+
+        }
+
+        else if (datos.fecha) {
+
+            const fechaConvertida =
+                new Date(
+                    `${datos.fecha}T00:00:00`
+                );
+
+
+            if (
+                !isNaN(
+                    fechaConvertida.getTime()
+                )
+            ) {
+
+                fecha =
+                    fechaConvertida;
+
+            }
+
+        }
+
+
+        actividades.push({
+
+            id:
+                documento.id,
+
+            origen:
+                "cotizacion",
+
+            datos:
+                datos,
+
+            fecha:
+                fecha
+
+        });
+
+    }
+);
+        
         /*
          * ========================================================
          * ORDENAR TODO DE MÁS NUEVO A MÁS VIEJO
