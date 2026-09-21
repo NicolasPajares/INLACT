@@ -1840,4 +1840,8 @@ document.addEventListener("DOMContentLoaded", async () => {
  * ============================================================
  */
 console.log("PRUEBA CLIENTE.JS - SE EJECUTÓ");
+    console.log(
+    "FUNCIÓN HISTORIAL:",
+    typeof cargarHistorialHistorial
+);
 });
