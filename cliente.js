@@ -2787,7 +2787,147 @@ resultadoCotizaciones.forEach(
 
                 }
 
+/*
+ * ==================================================
+ * ENSAYO / COTIZACIÓN
+ * ==================================================
+ */
 
+if (
+    actividad.origen === "ensayo" ||
+    actividad.origen === "cotizacion"
+) {
+
+    const datos =
+        actividad.datos;
+
+
+    const tarjeta =
+        document.createElement(
+            "div"
+        );
+
+
+    tarjeta.className =
+        "visita";
+
+
+    const esEnsayo =
+        actividad.origen ===
+        "ensayo";
+
+
+    const tipoTexto =
+        esEnsayo
+            ? "🧪 Ensayo"
+            : "📄 Cotización";
+
+
+    const titulo =
+        esEnsayo
+            ? (
+                datos.nombreEnsayo ||
+                "Ensayo"
+            )
+            : (
+                datos.nombreCotizacion ||
+                "Cotización"
+            );
+
+
+    const fechaTexto =
+        actividad.fecha
+            ? actividad.fecha.toLocaleString(
+                "es-AR",
+                {
+                    day:
+                        "2-digit",
+
+                    month:
+                        "2-digit",
+
+                    year:
+                        "numeric",
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit"
+                }
+            )
+            : "Sin fecha";
+
+
+    tarjeta.innerHTML = `
+
+        <div
+            style="
+                font-size:13px;
+                color:#777;
+                margin-bottom:5px;
+            "
+        >
+            ${fechaTexto}
+        </div>
+
+
+        <div
+            style="
+                display:inline-block;
+                background:#f1f4f8;
+                color:#1f4e8c;
+                padding:5px 10px;
+                border-radius:12px;
+                font-size:13px;
+                font-weight:600;
+                margin-bottom:8px;
+            "
+        >
+            ${tipoTexto}
+        </div>
+
+
+        <div
+            style="
+                font-size:17px;
+                font-weight:600;
+                color:#1f4e8c;
+            "
+        >
+            ${escaparHTML(titulo)}
+        </div>
+
+    `;
+
+
+    tarjeta.style.cursor =
+        "pointer";
+
+
+    tarjeta.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                esEnsayo
+                    ? `ensayo.html?id=${actividad.id}`
+                    : `cotizacion.html?id=${actividad.id}`;
+
+        }
+    );
+
+
+    listaHistorial.appendChild(
+        tarjeta
+    );
+
+
+    return;
+
+}
+
+                
                 /*
                  * ==================================================
                  * VISITA / NOTA
