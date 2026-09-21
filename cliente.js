@@ -1839,5 +1839,5 @@ document.addEventListener("DOMContentLoaded", async () => {
  * FINAL
  * ============================================================
  */
-
+console.log("PRUEBA CLIENTE.JS - SE EJECUTÓ");
 });
