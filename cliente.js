@@ -2364,19 +2364,20 @@ if (
                         </div>
 
 
-                        <div
-                            style="
-                                display:inline-block;
-                                background:#2e7d32;
-                                color:white;
-                                padding:4px 9px;
-                                border-radius:12px;
-                                font-size:12px;
-                                margin-bottom:8px;
-                            "
-                        >
-                            Venta
-                        </div>
+                       <div
+    style="
+        display:inline-block;
+        background:#f1f4f8;
+        color:#1f4e8c;
+        padding:5px 10px;
+        border-radius:12px;
+        font-size:13px;
+        font-weight:600;
+        margin-bottom:8px;
+    "
+>
+    💰 Venta
+</div>
 
 
                         <div
