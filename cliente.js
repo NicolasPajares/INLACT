@@ -2661,16 +2661,10 @@ async function cargarHistorialHistorial() {
                         : "Sin fecha";
 
 
-                const tipoTexto =
-                    datos.tipoVisita === "Nota"
-                        ? "Nota"
-                        : "Visita";
-
-
-                const colorTipo =
-                    datos.tipoVisita === "Nota"
-                        ? "#42a5f5"
-                        : "#1f4e8c";
+               const tipoTexto =
+                datos.tipoVisita === "Nota"
+                ? "📝 Nota"
+                : "📍 Visita";
 
 
                 tarjeta.innerHTML = `
@@ -2686,19 +2680,20 @@ async function cargarHistorialHistorial() {
                     </div>
 
 
-                    <div
-                        style="
-                            display:inline-block;
-                            background:${colorTipo};
-                            color:white;
-                            padding:4px 9px;
-                            border-radius:12px;
-                            font-size:12px;
-                            margin-bottom:8px;
-                        "
-                    >
-                        ${tipoTexto}
-                    </div>
+                  <div
+    style="
+        display:inline-block;
+        background:#f1f4f8;
+        color:#1f4e8c;
+        padding:5px 10px;
+        border-radius:12px;
+        font-size:13px;
+        font-weight:600;
+        margin-bottom:8px;
+    "
+>
+    ${tipoTexto}
+</div>
 
 
                     <div
