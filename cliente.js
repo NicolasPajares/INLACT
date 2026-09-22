@@ -1716,74 +1716,99 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+  /*
+ * ============================================================
+ * ACTUALIZAR LINKS
+ * ============================================================
+ */
+
+function actualizarLinks() {
+
     /*
-     * ============================================================
-     * ACTUALIZAR LINKS
-     * ============================================================
+     * WHATSAPP
      */
 
-    function actualizarLinks() {
+    if (wspLink) {
 
         const telefono =
-            telefonoInput?.value || "";
+            telefonoInput?.value
+                ?.replace(
+                    /\D/g,
+                    ""
+                ) || "";
 
 
-        const email =
-            emailInput?.value || "";
+        if (telefono) {
 
+            wspLink.href =
+                `https://wa.me/54${telefono}`;
 
-        const telefonoLimpio =
-            telefono.replace(
-                /\D/g,
-                ""
-            );
+            wspLink.textContent =
+                "WhatsApp";
 
-
-        if (wspLink) {
-
-            if (telefonoLimpio) {
-
-                wspLink.href =
-                    `https://wa.me/54${telefonoLimpio}`;
-
-                wspLink.hidden =
-                    false;
-
-            }
-
-            else {
-
-                wspLink.hidden =
-                    true;
-
-            }
+            wspLink.style.display =
+                "inline-flex";
 
         }
 
+        else {
 
-        if (mailLink) {
+            wspLink.removeAttribute(
+                "href"
+            );
 
-            if (email) {
+            wspLink.textContent =
+                "";
 
-                mailLink.href =
-                    `mailto:${email}`;
-
-                mailLink.hidden =
-                    false;
-
-            }
-
-            else {
-
-                mailLink.hidden =
-                    true;
-
-            }
+            wspLink.style.display =
+                "none";
 
         }
 
     }
 
+
+    /*
+     * EMAIL
+     */
+
+    if (mailLink) {
+
+        const email =
+            emailInput?.value
+                ?.trim() || "";
+
+
+        if (email) {
+
+            mailLink.href =
+                `mailto:${email}`;
+
+            mailLink.textContent =
+                "Email";
+
+            mailLink.style.display =
+                "inline-flex";
+
+        }
+
+        else {
+
+            mailLink.removeAttribute(
+                "href"
+            );
+
+            mailLink.textContent =
+                "";
+
+            mailLink.style.display =
+                "none";
+
+        }
+
+    }
+
+}
 
     /*
      * ============================================================
