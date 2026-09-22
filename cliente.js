@@ -3253,6 +3253,31 @@ if (
  */
 
 await cargarHistorialHistorial();
+
+    /*
+ * ============================================================
+ * VER HISTORIAL COMPLETO
+ * ============================================================
+ */
+
+const verHistorialCompleto =
+    document.getElementById(
+        "verHistorialCompleto"
+    );
+
+if (verHistorialCompleto) {
+
+    verHistorialCompleto.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                `historial-cliente.html?id=${clienteId}`;
+
+        }
+    );
+
+}
     
 /*
  * ============================================================
