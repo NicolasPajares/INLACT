@@ -2528,8 +2528,10 @@ resultadoCotizaciones.forEach(
          * ========================================================
          */
 
-        actividades.forEach(
-            actividad => {
+        actividades
+    .slice(0, 5)
+    .forEach(
+        actividad => {
 
 
                 /*
