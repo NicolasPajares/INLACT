@@ -251,7 +251,10 @@
 
   <button
     class="btn-volver"
-    onclick="window.location.href='clientes.html'"
+    onclick=window.open(
+    `historial-cliente.html?id=${clienteId}`,
+    "_blank"
+);
   >
     ⬅ Volver a clientes
   </button>
