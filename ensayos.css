@@ -301,3 +301,89 @@ main button:last-of-type:hover{
     }
 
 }
+
+
+/* ===============================
+   MENÚ DE ACCIONES DEL ENSAYO
+================================ */
+.ensayo-menu-contenedor {
+    position: relative;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+button.btn-menu-ensayo {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    border: none !important;
+    border-radius: 8px !important;
+
+    color: #1f4e8c !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    cursor: pointer;
+    box-shadow: none !important;
+    transition: background 0.2s ease;
+}
+
+button.btn-menu-ensayo:hover {
+    background: #edf4fc !important;
+    transform: none !important;
+}
+
+.menu-opciones-ensayo {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    min-width: 145px;
+
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+
+    z-index: 100;
+}
+
+.menu-opciones-ensayo button {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+
+    padding: 10px 12px !important;
+    margin: 0 !important;
+
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+
+    color: #1f2937 !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    text-align: left !important;
+
+    cursor: pointer;
+    transform: none !important;
+}
+
+.menu-opciones-ensayo button:hover {
+    background: #f3f7fb !important;
+}
+
+.menu-opciones-ensayo .eliminar-ensayo {
+    color: #c62828 !important;
+}
