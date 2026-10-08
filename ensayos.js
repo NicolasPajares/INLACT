@@ -1,24 +1,26 @@
+
 /*************************
  * FIREBASE
  *************************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
-  query,
-  orderBy
+    getFirestore,
+    collection,
+    getDocs,
+    deleteDoc,
+    doc,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.appspot.com",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+    apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+    authDomain: "inlact.firebaseapp.com",
+    projectId: "inlact",
+    storageBucket: "inlact.firebasestorage.app",
+    messagingSenderId: "143868382036",
+    appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -37,134 +39,202 @@ let ensayos = [];
  * NUEVO ENSAYO
  *************************/
 btnNuevoEnsayo.addEventListener("click", () => {
-  window.location.href = "nuevo-ensayo.html";
+    window.location.href = "nuevo-ensayo.html";
+});
+
+/*************************
+ * CERRAR MENÚS
+ *************************/
+document.addEventListener("click", () => {
+    document.querySelectorAll(".menu-opciones-ensayo")
+        .forEach(menu => menu.remove());
+
+    document.querySelectorAll(".btn-menu-ensayo")
+        .forEach(btn => btn.setAttribute("aria-expanded", "false"));
 });
 
 /*************************
  * CARGAR ENSAYOS
  *************************/
 async function cargarEnsayos() {
+    listaEnsayos.innerHTML = "<li>Cargando ensayos...</li>";
 
-  listaEnsayos.innerHTML = "<li>Cargando ensayos...</li>";
+    try {
+        const q = query(
+            collection(db, "ensayos"),
+            orderBy("fecha", "desc")
+        );
 
-  ensayos = [];
+        const snap = await getDocs(q);
 
-  const q = query(
-    collection(db, "ensayos"),
-    orderBy("fecha", "desc")
-  );
+        ensayos = [];
 
-  const snap = await getDocs(q);
+        snap.forEach(d => {
+            ensayos.push({
+                id: d.id,
+                ...d.data()
+            });
+        });
 
-  snap.forEach(d => {
-    ensayos.push({
-      id: d.id,
-      ...d.data()
-    });
-  });
+        filtrarEnsayos();
 
-  if (ensayos.length === 0) {
-    listaEnsayos.innerHTML = "<li>No hay ensayos cargados</li>";
-    return;
-  }
-
-  renderEnsayos(ensayos);
-
+    } catch (error) {
+        console.error("Error cargando ensayos:", error);
+        listaEnsayos.innerHTML =
+            "<li>Error al cargar los ensayos.</li>";
+    }
 }
 
 /*************************
- * RENDER ENSAYOS
+ * MOSTRAR ENSAYOS
  *************************/
 function renderEnsayos(lista) {
+    listaEnsayos.innerHTML = "";
 
-  listaEnsayos.innerHTML = "";
+    if (lista.length === 0) {
+        listaEnsayos.innerHTML =
+            "<li>No se encontraron ensayos.</li>";
+        return;
+    }
 
-  lista.forEach(e => {
+    lista.forEach(e => {
+        const li = document.createElement("li");
+        li.className = "cliente-item";
 
-    const li = document.createElement("li");
-    li.className = "cliente-item";
+        /* INFORMACIÓN DEL ENSAYO */
+        const info = document.createElement("div");
+        info.className = "cliente-info";
 
-    // INFORMACIÓN
-    const info = document.createElement("div");
-    info.className = "cliente-info";
+        const fecha = document.createElement("div");
+        fecha.className = "fecha-ensayo";
+        fecha.textContent = e.fecha?.toDate
+            ? e.fecha.toDate().toLocaleDateString("es-AR")
+            : "--/--/----";
 
-    const fecha = e.fecha?.toDate
-      ? e.fecha.toDate().toLocaleDateString("es-AR")
-      : "--/--/----";
+        const cliente = document.createElement("div");
+        cliente.className = "cliente-ensayo";
+        cliente.textContent =
+            e.clienteNombre || "Cliente sin nombre";
 
-    info.innerHTML = `
-      <div class="fecha-ensayo">
-        ${fecha}
-      </div>
+        const nombre = document.createElement("div");
+        nombre.className = "nombre-ensayo";
+        nombre.textContent =
+            e.nombreEnsayo || "Ensayo sin nombre";
 
-      <div class="cliente-ensayo">
-        ${e.clienteNombre || "Cliente sin nombre"}
-      </div>
+        info.appendChild(fecha);
+        info.appendChild(cliente);
+        info.appendChild(nombre);
 
-      <div class="nombre-ensayo">
-        ${e.nombreEnsayo || "Ensayo sin nombre"}
-      </div>
-    `;
+        info.addEventListener("click", () => {
+            window.location.href =
+                `ensayo.html?id=${encodeURIComponent(e.id)}`;
+        });
 
-    info.onclick = () => {
-      window.location.href = `ensayo.html?id=${e.id}`;
-    };
+        /* CONTENEDOR DEL MENÚ */
+        const contenedorMenu = document.createElement("div");
+        contenedorMenu.className = "ensayo-menu-contenedor";
 
-    /*************************
-     * BOTÓN BORRAR
-     *************************/
-    const btnBorrar = document.createElement("button");
-    btnBorrar.className = "btn-borrar";
-    btnBorrar.textContent = "✖";
+        /* BOTÓN DE TRES PUNTOS */
+        const btnMenu = document.createElement("button");
+        btnMenu.type = "button";
+        btnMenu.className = "btn-menu-ensayo";
+        btnMenu.textContent = "⋮";
+        btnMenu.setAttribute("aria-label", "Acciones del ensayo");
+        btnMenu.setAttribute("aria-expanded", "false");
 
-    btnBorrar.onclick = async (ev) => {
+        btnMenu.addEventListener("click", (ev) => {
+            ev.stopPropagation();
 
-      ev.stopPropagation();
+            const menuExistente =
+                contenedorMenu.querySelector(".menu-opciones-ensayo");
 
-      const ok = confirm(
-        `¿Querés borrar el ensayo "${e.nombreEnsayo}"?`
-      );
+            if (menuExistente) {
+                menuExistente.remove();
+                btnMenu.setAttribute("aria-expanded", "false");
+                return;
+            }
 
-      if (!ok) return;
+            /* CERRAR OTROS MENÚS */
+            document.querySelectorAll(".menu-opciones-ensayo")
+                .forEach(menu => menu.remove());
 
-      await deleteDoc(doc(db, "ensayos", e.id));
+            document.querySelectorAll(".btn-menu-ensayo")
+                .forEach(btn => btn.setAttribute("aria-expanded", "false"));
 
-      cargarEnsayos();
+            /* CREAR MENÚ */
+            const menu = document.createElement("div");
+            menu.className = "menu-opciones-ensayo";
 
-    };
+            /* EDITAR */
+            const btnEditar = document.createElement("button");
+            btnEditar.type = "button";
+            btnEditar.textContent = "Editar";
 
-    li.appendChild(info);
-    li.appendChild(btnBorrar);
+            btnEditar.addEventListener("click", (event) => {
+                event.stopPropagation();
 
-    listaEnsayos.appendChild(li);
+                window.location.href =
+                    `nuevo-ensayo.html?id=${encodeURIComponent(e.id)}`;
+            });
 
-  });
+            /* ELIMINAR */
+            const btnEliminar = document.createElement("button");
+            btnEliminar.type = "button";
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.className = "eliminar-ensayo";
 
+            btnEliminar.addEventListener("click", async (event) => {
+                event.stopPropagation();
+
+                const ok = confirm(
+                    `¿Querés borrar el ensayo "${e.nombreEnsayo || "Sin nombre"}"?`
+                );
+
+                if (!ok) return;
+
+                btnEliminar.disabled = true;
+
+                try {
+                    await deleteDoc(doc(db, "ensayos", e.id));
+                    await cargarEnsayos();
+                } catch (error) {
+                    console.error("Error eliminando ensayo:", error);
+                    alert("No se pudo eliminar el ensayo. Intentá nuevamente.");
+                    btnEliminar.disabled = false;
+                }
+            });
+
+            menu.appendChild(btnEditar);
+            menu.appendChild(btnEliminar);
+            contenedorMenu.appendChild(menu);
+
+            btnMenu.setAttribute("aria-expanded", "true");
+        });
+
+        contenedorMenu.appendChild(btnMenu);
+
+        li.appendChild(info);
+        li.appendChild(contenedorMenu);
+
+        listaEnsayos.appendChild(li);
+    });
 }
+
 /*************************
  * BUSCADOR
  *************************/
-buscador.addEventListener("input", () => {
+function filtrarEnsayos() {
+    const texto = buscador.value.trim().toLowerCase();
 
-  const texto = buscador.value.toLowerCase();
+    const filtrados = ensayos.filter(e =>
+        (e.clienteNombre || "").toLowerCase().includes(texto) ||
+        (e.nombreEnsayo || "").toLowerCase().includes(texto)
+    );
 
-  const filtrados = ensayos.filter(e =>
+    renderEnsayos(filtrados);
+}
 
-    (e.clienteNombre || "")
-      .toLowerCase()
-      .includes(texto)
-
-    ||
-
-    (e.nombreEnsayo || "")
-      .toLowerCase()
-      .includes(texto)
-
-  );
-
-  renderEnsayos(filtrados);
-
-});
+buscador.addEventListener("input", filtrarEnsayos);
 
 /*************************
  * INIT
