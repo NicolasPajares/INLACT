@@ -244,3 +244,67 @@ main.contenedor-ensayo{
     margin: 0;
     padding: 0;
 }
+
+/* ===============================
+   TARJETAS DE ÚLTIMAS ACTIVIDADES
+================================ */
+
+#listaVisitas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+#listaVisitas li.actividad-historial {
+    list-style: none;
+    background: #ffffff;
+    border: 1px solid #e1e7ee;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+#listaVisitas li.actividad-historial:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(31, 78, 140, .10);
+}
+
+#listaVisitas .actividad-fecha {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 7px;
+}
+
+#listaVisitas .actividad-empresa {
+    margin: 0 0 8px;
+    color: #1f4e8c;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#listaVisitas .actividad-badge {
+    display: inline-block;
+    background: #f1f4f8;
+    color: #1f4e8c;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+#listaVisitas .actividad-titulo {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1f4e8c;
+    overflow-wrap: anywhere;
+}
+
+#listaVisitas li.actividad-mensaje {
+    list-style: none;
+    border-bottom: none;
+    padding: 12px 0;
+    color: #777;
+}
