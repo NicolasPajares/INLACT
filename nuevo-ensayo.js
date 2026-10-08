@@ -1,3 +1,4 @@
+
 /**********************
  * FIREBASE
  **********************/
@@ -8,6 +9,9 @@ import {
     collection,
     getDocs,
     addDoc,
+    getDoc,
+    updateDoc,
+    doc,
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -49,86 +53,77 @@ const resultadosEl = document.getElementById("resultados");
 const conclusionEl = document.getElementById("conclusion");
 const propuestaComercialEl = document.getElementById("propuestaComercial");
 
-/**********************
- * CARGAR CLIENTES
- **********************/
-async function cargarClientes() {
+const tituloFormulario = document.querySelector(".card-formulario h1");
+const btnGuardar = form.querySelector(".btn-guardar");
 
-    const snap = await getDocs(collection(db, "clientes"));
-
-    snap.forEach(docu => {
-
-        const cliente = docu.data();
-
-        const option = document.createElement("option");
-
-        option.value = docu.id;
-        option.textContent = cliente.nombre || "Cliente sin nombre";
-        option.dataset.nombre = cliente.nombre || "";
-
-        selectCliente.appendChild(option);
-
-    });
-
-}
+const parametros = new URLSearchParams(window.location.search);
+const ensayoId = parametros.get("id");
+const modoEdicion = Boolean(ensayoId);
 
 /**********************
- * BLOQUE DE IMÁGENES
+ * IMÁGENES
  **********************/
 const accionesForm = document.querySelector(".acciones-form");
 
 accionesForm.insertAdjacentHTML("beforebegin", `
-<label>Imágenes</label>
+    <label for="inputFotos">Imágenes</label>
 
-<input
-    type="file"
-    id="inputFotos"
-    accept="image/*"
-    multiple
-/>
+    <input
+        type="file"
+        id="inputFotos"
+        accept="image/*"
+        multiple
+    />
 
-<div id="previewFotos" style="margin-top:12px;"></div>
+    <div id="previewFotos" style="margin-top:12px;"></div>
 `);
 
 const fotosInput = document.getElementById("inputFotos");
 const previewFotos = document.getElementById("previewFotos");
 
 let fotosSeleccionadas = [];
+let fotosExistentes = [];
 
 /**********************
- * PREVIEW
+ * MOSTRAR PREVISUALIZACIÓN
  **********************/
-fotosInput.addEventListener("change", () => {
-
+function mostrarPreviewFotos() {
     previewFotos.innerHTML = "";
 
-    fotosSeleccionadas = [];
-
-    const archivos = Array.from(fotosInput.files);
-
-    archivos.forEach(file => {
-
-        fotosSeleccionadas.push(file);
-
+    fotosExistentes.forEach(url => {
         const img = document.createElement("img");
-
-        img.src = URL.createObjectURL(file);
-
+        img.src = url;
+        img.alt = "Imagen guardada del ensayo";
         img.style.maxWidth = "250px";
+        img.style.marginRight = "10px";
         img.style.marginBottom = "12px";
         img.style.borderRadius = "10px";
 
         previewFotos.appendChild(img);
-
     });
 
+    fotosSeleccionadas.forEach(file => {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.alt = "Nueva imagen seleccionada";
+        img.style.maxWidth = "250px";
+        img.style.marginRight = "10px";
+        img.style.marginBottom = "12px";
+        img.style.borderRadius = "10px";
+
+        previewFotos.appendChild(img);
+    });
+}
+
+fotosInput.addEventListener("change", () => {
+    fotosSeleccionadas = Array.from(fotosInput.files);
+    mostrarPreviewFotos();
 });
 
 /**********************
- * SUBIR FOTO A STORAGE
+ * SUBIR IMAGEN A STORAGE
  **********************/
 async function subirImagen(file) {
-
     const nombre =
         Date.now() +
         "_" +
@@ -141,84 +136,170 @@ async function subirImagen(file) {
     await uploadBytes(referencia, file);
 
     return await getDownloadURL(referencia);
-
 }
+
 /**********************
- * GUARDAR ENSAYO
+ * CARGAR CLIENTES
+ **********************/
+async function cargarClientes() {
+    const snap = await getDocs(collection(db, "clientes"));
+
+    snap.forEach(docu => {
+        const cliente = docu.data();
+
+        const option = document.createElement("option");
+        option.value = docu.id;
+        option.textContent = cliente.nombre || "Cliente sin nombre";
+        option.dataset.nombre = cliente.nombre || "";
+
+        selectCliente.appendChild(option);
+    });
+}
+
+/**********************
+ * CARGAR ENSAYO PARA EDITAR
+ **********************/
+async function cargarEnsayoParaEditar() {
+    if (!modoEdicion) return;
+
+    tituloFormulario.textContent = "Editar ensayo";
+    btnGuardar.textContent = "💾 Guardar cambios";
+    document.title = "INLACT · Editar ensayo";
+
+    const referencia = doc(db, "ensayos", ensayoId);
+    const snap = await getDoc(referencia);
+
+    if (!snap.exists()) {
+        alert("No se encontró el ensayo que querés editar.");
+        window.location.href = "ensayos.html";
+        return;
+    }
+
+    const data = snap.data();
+
+    selectCliente.value = data.clienteId || "";
+    nombreEnsayoEl.value = data.nombreEnsayo || "";
+
+    if (data.fecha?.toDate) {
+        const fecha = data.fecha.toDate();
+        const anio = fecha.getFullYear();
+        const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+        const dia = String(fecha.getDate()).padStart(2, "0");
+
+        fechaEl.value = `${anio}-${mes}-${dia}`;
+    } else if (data.fecha) {
+        const fecha = new Date(data.fecha);
+
+        if (!Number.isNaN(fecha.getTime())) {
+            const anio = fecha.getFullYear();
+            const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+            const dia = String(fecha.getDate()).padStart(2, "0");
+
+            fechaEl.value = `${anio}-${mes}-${dia}`;
+        }
+    }
+
+    propuestaEl.value = data.propuesta || "";
+    dosisEl.value = data.dosis || "";
+    elaboracionEl.value = data.elaboracion || "";
+    resultadosEl.value = data.resultados || "";
+    conclusionEl.value = data.conclusion || "";
+    propuestaComercialEl.value = data.propuestaComercial || "";
+
+    fotosExistentes = Array.isArray(data.fotos) ? [...data.fotos] : [];
+
+    mostrarPreviewFotos();
+}
+
+/**********************
+ * GUARDAR O ACTUALIZAR
  **********************/
 form.addEventListener("submit", async (e) => {
-
     e.preventDefault();
 
+    if (!form.reportValidity()) return;
+
+    const clienteOption =
+        selectCliente.options[selectCliente.selectedIndex];
+
+    if (!selectCliente.value || !clienteOption) {
+        alert("Seleccioná un cliente para el ensayo.");
+        return;
+    }
+
+    btnGuardar.disabled = true;
+
     try {
-
-        const clienteOption =
-            selectCliente.options[selectCliente.selectedIndex];
-
-        // Subir todas las imágenes a Firebase Storage
-        const fotos = [];
+        /* CONSERVAR FOTOS Y AGREGAR LAS NUEVAS */
+        const fotos = [...fotosExistentes];
 
         for (const file of fotosSeleccionadas) {
-
             const url = await subirImagen(file);
-
             fotos.push(url);
-
         }
 
-        const nuevoEnsayo = {
-
+        const datosEnsayo = {
             clienteId: selectCliente.value,
-            clienteNombre: clienteOption.dataset.nombre,
+            clienteNombre: clienteOption.dataset.nombre ||
+                clienteOption.textContent,
 
-            nombreEnsayo: nombreEnsayoEl.value,
+            nombreEnsayo: nombreEnsayoEl.value.trim(),
 
             fecha: Timestamp.fromDate(
-                new Date(fechaEl.value)
+                new Date(`${fechaEl.value}T12:00:00`)
             ),
 
             propuesta: propuestaEl.value || "",
-
             dosis: dosisEl.value || "",
-
             elaboracion: elaboracionEl.value || "",
-
             resultados: resultadosEl.value || "",
-
             conclusion: conclusionEl.value || "",
-
-            propuestaComercial:
-                propuestaComercialEl.value || "",
-
-            fotos: fotos,
-
-            creadoEn: Timestamp.now()
-
+            propuestaComercial: propuestaComercialEl.value || "",
+            fotos
         };
 
-        const docRef = await addDoc(
-            collection(db, "ensayos"),
-            nuevoEnsayo
-        );
+        if (modoEdicion) {
+            await updateDoc(
+                doc(db, "ensayos", ensayoId),
+                datosEnsayo
+            );
 
-        window.location.href =
-            `ensayo.html?id=${docRef.id}`;
+            window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
+        } else {
+            datosEnsayo.creadoEn = Timestamp.now();
 
-    }
-    catch (error) {
+            const docRef = await addDoc(
+                collection(db, "ensayos"),
+                datosEnsayo
+            );
 
-        console.error(error);
+            window.location.href =
+                `ensayo.html?id=${encodeURIComponent(docRef.id)}`;
+        }
+
+    } catch (error) {
+        console.error("Error guardando el ensayo:", error);
 
         alert(
             "Error al guardar el ensayo.\n\n" +
             error.message
         );
-
+    } finally {
+        btnGuardar.disabled = false;
     }
-
 });
 
 /**********************
  * INIT
  **********************/
-cargarClientes();
+async function iniciar() {
+    try {
+        await cargarClientes();
+        await cargarEnsayoParaEditar();
+    } catch (error) {
+        console.error("Error inicializando el formulario:", error);
+        alert("No se pudieron cargar los datos. Intentá nuevamente.");
+    }
+}
+
+iniciar();
