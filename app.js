@@ -659,3 +659,347 @@ navigator.geolocation.watchPosition(
 - INICIO
 **********************/
 dibujarClientes();
+
+
+/* ==========================================
+   ÚLTIMAS 5 ACTIVIDADES
+   Visitas, notas, ventas, ensayos y cotizaciones
+========================================== */
+
+function escaparHTMLActividad(valor) {
+  return String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function fechaActividad(datos) {
+  const valor = datos?.creadoEn ?? datos?.fecha;
+
+  if (!valor) return null;
+
+  let fecha;
+
+  if (typeof valor.toDate === "function") {
+    fecha = valor.toDate();
+  } else if (valor instanceof Date) {
+    fecha = valor;
+  } else {
+    fecha = new Date(valor);
+  }
+
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
+}
+
+function fechaActividadTexto(fecha) {
+  if (!fecha) return "Fecha no disponible";
+
+  return fecha.toLocaleString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function empresaActividad(datos) {
+  return datos?.clienteNombre || datos?.cliente || "Empresa sin nombre";
+}
+
+function abrirDetalleActividad(titulo, contenido) {
+  const overlay = document.createElement("div");
+
+  overlay.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10000;
+    padding:16px;
+  `;
+
+  const ventana = document.createElement("div");
+
+  ventana.style.cssText = `
+    background:#fff;
+    padding:22px;
+    border-radius:14px;
+    width:100%;
+    max-width:520px;
+    max-height:85vh;
+    overflow-y:auto;
+    box-shadow:0 8px 30px rgba(0,0,0,.2);
+  `;
+
+  ventana.innerHTML = `
+    <h3 style="color:#1f4e8c;margin-bottom:16px;">
+      ${escaparHTMLActividad(titulo)}
+    </h3>
+    <div style="white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;">
+      ${contenido}
+    </div>
+    <button type="button" id="cerrarDetalleActividad"
+      style="width:100%;padding:12px;margin-top:20px;
+      border:0;border-radius:8px;background:#1f4e8c;
+      color:white;font-size:16px;cursor:pointer;">
+      Cerrar
+    </button>
+  `;
+
+  overlay.appendChild(ventana);
+  document.body.appendChild(overlay);
+
+  ventana.querySelector("#cerrarDetalleActividad").onclick =
+    () => overlay.remove();
+
+  overlay.addEventListener("click", evento => {
+    if (evento.target === overlay) overlay.remove();
+  });
+}
+
+function mostrarDetalleVenta(actividad) {
+  const productos = actividad.productos || [];
+
+  const contenido = productos.length
+    ? productos.map(producto => `
+        <div style="padding:10px 0;border-bottom:1px solid #e1e7ee;">
+          <strong>${escaparHTMLActividad(producto.nombre || "Producto")}</strong>
+          <div>Cantidad: ${escaparHTMLActividad(producto.cantidad ?? "-")} ${escaparHTMLActividad(producto.unidad || "")}</div>
+          ${producto.lote
+            ? `<div>Lote: ${escaparHTMLActividad(producto.lote)}</div>`
+            : ""}
+        </div>
+      `).join("")
+    : "<p>No hay productos registrados en esta venta.</p>";
+
+  abrirDetalleActividad(
+    `Venta · ${actividad.empresa}`,
+    contenido
+  );
+}
+
+async function cargarUltimasActividades() {
+  const lista = document.getElementById("listaVisitas");
+  if (!lista) return;
+
+  lista.innerHTML = `
+    <li class="actividad-mensaje">Cargando actividades...</li>
+  `;
+
+  try {
+    const [visitasSnap, egresosSnap, ensayosSnap, cotizacionesSnap] =
+      await Promise.all([
+        getDocs(collection(db, "visitas")),
+        getDocs(collection(db, "egresos")),
+        getDocs(collection(db, "ensayos")),
+        getDocs(collection(db, "cotizaciones"))
+      ]);
+
+    const actividades = [];
+
+    // VISITAS Y NOTAS
+    visitasSnap.forEach(documento => {
+      const datos = documento.data();
+      const tipo = datos.tipoVisita || "";
+
+      // Las ventas se toman de egresos, como en historial.html.
+      if (tipo === "Venta" || tipo === "Entrega de productos") return;
+
+      const esNota =
+        tipo === "Nota" || tipo === "Nota de visita";
+
+      const esVisita =
+        tipo === "" || tipo === "Visita";
+
+      if (!esNota && !esVisita) return;
+
+      actividades.push({
+        id: documento.id,
+        categoria: esNota ? "📝 Nota" : "📍 Visita",
+        titulo: datos.titulo || (esNota ? "Nota" : "Visita"),
+        empresa: empresaActividad(datos),
+        fecha: fechaActividad(datos),
+        nota: datos.nota || "",
+        tipoDetalle: esNota ? "nota" : "visita"
+      });
+    });
+
+    // VENTAS: agrupar egresos del mismo cliente y día.
+    const ventasAgrupadas = new Map();
+
+    egresosSnap.forEach(documento => {
+      const datos = documento.data();
+
+      if (String(datos.tipoEgreso || "").toLowerCase() !== "venta") {
+        return;
+      }
+
+      const fecha = fechaActividad(datos);
+      const empresa = empresaActividad(datos);
+      const dia = fecha
+        ? `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`
+        : "sin-fecha";
+
+      const claveCliente = datos.clienteId || empresa;
+      const clave = `${claveCliente}_${dia}`;
+
+      if (!ventasAgrupadas.has(clave)) {
+        ventasAgrupadas.set(clave, {
+          id: documento.id,
+          categoria: "💰 Venta",
+          titulo: "",
+          empresa,
+          fecha,
+          productos: [],
+          tipoDetalle: "venta"
+        });
+      }
+
+      const venta = ventasAgrupadas.get(clave);
+
+      if (fecha && (!venta.fecha || fecha > venta.fecha)) {
+        venta.fecha = fecha;
+      }
+
+      const producto = {
+        nombre: datos.productoNombre || datos.nombreProducto ||
+          datos.producto || datos.nombre || "Producto",
+        cantidad: datos.cantidad ?? "-",
+        unidad: datos.unidad || "",
+        lote: datos.lote || ""
+      };
+
+      venta.productos.push(producto);
+    });
+
+    ventasAgrupadas.forEach(venta => {
+      venta.titulo = `${venta.productos.length} ${
+        venta.productos.length === 1 ? "producto" : "productos"
+      }`;
+
+      actividades.push(venta);
+    });
+
+    // ENSAYOS
+    ensayosSnap.forEach(documento => {
+      const datos = documento.data();
+
+      actividades.push({
+        id: documento.id,
+        categoria: "🧪 Ensayo",
+        titulo: datos.nombreEnsayo || "Ensayo",
+        empresa: empresaActividad(datos),
+        fecha: fechaActividad(datos),
+        tipoDetalle: "ensayo"
+      });
+    });
+
+    // COTIZACIONES
+    cotizacionesSnap.forEach(documento => {
+      const datos = documento.data();
+
+      actividades.push({
+        id: documento.id,
+        categoria: "📄 Cotización",
+        titulo: datos.nombreCotizacion || "Cotización",
+        empresa: empresaActividad(datos),
+        fecha: fechaActividad(datos),
+        tipoDetalle: "cotizacion"
+      });
+    });
+
+    // MÁS RECIENTES PRIMERO
+    actividades.sort((a, b) =>
+      (b.fecha?.getTime() || 0) - (a.fecha?.getTime() || 0)
+    );
+
+    const ultimas = actividades.slice(0, 5);
+
+    if (!ultimas.length) {
+      lista.innerHTML = `
+        <li class="actividad-mensaje">
+          Todavía no hay actividades registradas.
+        </li>
+      `;
+      return;
+    }
+
+    lista.innerHTML = ultimas.map(actividad => `
+      <li class="actividad-historial"
+          data-tipo="${escaparHTMLActividad(actividad.tipoDetalle)}"
+          data-id="${escaparHTMLActividad(actividad.id)}">
+        <div class="actividad-fecha">
+          ${escaparHTMLActividad(fechaActividadTexto(actividad.fecha))}
+        </div>
+        <div class="actividad-empresa">
+          ${escaparHTMLActividad(actividad.empresa)}
+        </div>
+        <div class="actividad-badge">
+          ${escaparHTMLActividad(actividad.categoria)}
+        </div>
+        <div class="actividad-titulo">
+          ${escaparHTMLActividad(actividad.titulo)}
+        </div>
+      </li>
+    `).join("");
+
+    // ACCIONES AL HACER CLIC EN CADA TARJETA
+    lista.querySelectorAll(".actividad-historial").forEach((tarjeta, indice) => {
+      tarjeta.addEventListener("click", () => {
+        const actividad = ultimas[indice];
+
+        if (actividad.tipoDetalle === "venta") {
+          mostrarDetalleVenta(actividad);
+          return;
+        }
+
+        if (actividad.tipoDetalle === "nota" ||
+            actividad.tipoDetalle === "visita") {
+          abrirDetalleActividad(
+            `${actividad.categoria} · ${actividad.empresa}`,
+            escaparHTMLActividad(actividad.nota || "No hay una nota adicional registrada.")
+          );
+          return;
+        }
+
+        if (actividad.tipoDetalle === "ensayo") {
+          window.open(
+            `ensayo.html?id=${encodeURIComponent(actividad.id)}`,
+            "_blank"
+          );
+          return;
+        }
+
+        if (actividad.tipoDetalle === "cotizacion") {
+          window.open(
+            `cotizacion.html?id=${encodeURIComponent(actividad.id)}`,
+            "_blank"
+          );
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error("Error cargando últimas actividades:", error);
+
+    lista.innerHTML = `
+      <li class="actividad-mensaje">
+        No se pudieron cargar las actividades. Revisá la conexión e intentá nuevamente.
+      </li>
+    `;
+  }
+}
+
+// El enlace lleva al historial completo.
+document.getElementById("abrir-historial")?.addEventListener("click", evento => {
+  evento.preventDefault();
+  window.location.href = "historial.html";
+});
+
+// Cargar las actividades al abrir el inicio.
+cargarUltimasActividades();
