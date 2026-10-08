@@ -183,17 +183,429 @@
 </section>
 
 
-<section class="card">
 
-  <h3>Últimas visitas</h3>
+import { db } from "./firebase.js";
 
-  <ul id="listaVisitas"></ul>
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  <a href="#" id="abrir-historial">
-    Ver historial completo →
-  </a>
+const lista = document.getElementById("listaVisitas");
 
-</section>
+/* ===============================
+   UTILIDADES
+================================ */
+
+function escaparHTML(texto) {
+  return String(texto ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function convertirFecha(valor) {
+  if (valor && typeof valor.toDate === "function") {
+    return valor.toDate();
+  }
+
+  if (valor) {
+    if (typeof valor === "string") {
+      const coincidencia = valor.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+      if (coincidencia) {
+        return new Date(
+          Number(coincidencia[1]),
+          Number(coincidencia[2]) - 1,
+          Number(coincidencia[3])
+        );
+      }
+    }
+
+    const fecha = new Date(valor);
+
+    if (!isNaN(fecha.getTime())) {
+      return fecha;
+    }
+  }
+
+  return null;
+}
+
+function obtenerFechaActividad(datos) {
+  return convertirFecha(datos.creadoEn) ||
+         convertirFecha(datos.fecha);
+}
+
+function mostrarFecha(fecha) {
+  if (!fecha) return "Sin fecha";
+
+  return fecha.toLocaleString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function nombreEmpresa(datos) {
+  return datos.clienteNombre ||
+         datos.cliente ||
+         "Empresa sin nombre";
+}
+
+function mostrarError() {
+  lista.innerHTML = `
+    <div class="mensaje-actividades">
+      No se pudieron cargar las actividades.
+      Intentá actualizar la página.
+    </div>
+  `;
+}
+
+/* ===============================
+   VENTANA DE DETALLE
+================================ */
+
+function abrirDetalle(titulo, empresa, fecha, contenidoHTML) {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay-actividad";
+
+  const ventana = document.createElement("div");
+  ventana.className = "ventana-actividad";
+
+  ventana.innerHTML = `
+    <h3>${escaparHTML(titulo)}</h3>
+
+    <div style="color:#555;margin-bottom:5px">
+      ${escaparHTML(empresa)}
+    </div>
+
+    <div style="font-size:13px;color:#777;margin-bottom:18px">
+      ${escaparHTML(mostrarFecha(fecha))}
+    </div>
+
+    <div>${contenidoHTML}</div>
+
+    <button type="button" class="cerrar-actividad">
+      Cerrar
+    </button>
+  `;
+
+  overlay.appendChild(ventana);
+  document.body.appendChild(overlay);
+
+  ventana.querySelector(".cerrar-actividad").onclick = () => {
+    overlay.remove();
+  };
+
+  overlay.onclick = evento => {
+    if (evento.target === overlay) {
+      overlay.remove();
+    }
+  };
+}
+
+/* ===============================
+   TARJETA DE ACTIVIDAD
+================================ */
+
+function crearTarjeta(actividad) {
+  const tarjeta = document.createElement("div");
+  tarjeta.className = "actividad-historial";
+
+  tarjeta.innerHTML = `
+    <div class="actividad-fecha">
+      ${escaparHTML(mostrarFecha(actividad.fecha))}
+    </div>
+
+    <div class="actividad-empresa">
+      🏢 ${escaparHTML(actividad.empresa)}
+    </div>
+
+    <div class="actividad-badge">
+      ${escaparHTML(actividad.tipo)}
+    </div>
+
+    <div class="actividad-titulo">
+      ${escaparHTML(actividad.titulo)}
+    </div>
+  `;
+
+  tarjeta.addEventListener("click", () => {
+    /* Ventas: mostrar productos */
+    if (actividad.origen === "venta") {
+      let productosHTML = "";
+
+      actividad.productos.forEach(producto => {
+        productosHTML += `
+          <div class="producto-actividad">
+            <strong>📦 ${escaparHTML(producto.nombre)}</strong>
+
+            <p>
+              Cantidad:
+              ${escaparHTML(producto.cantidad ?? "-")}
+              ${escaparHTML(producto.unidad || "")}
+            </p>
+
+            ${
+              producto.lote
+                ? `<p>Lote: ${escaparHTML(producto.lote)}</p>`
+                : ""
+            }
+          </div>
+        `;
+      });
+
+      abrirDetalle(
+        "💰 Venta",
+        actividad.empresa,
+        actividad.fecha,
+        productosHTML || "<p>Sin productos detallados.</p>"
+      );
+
+      return;
+    }
+
+    /* Ensayos y cotizaciones: abrir registro */
+    if (
+      actividad.origen === "ensayo" ||
+      actividad.origen === "cotizacion"
+    ) {
+      const pagina = actividad.origen === "ensayo"
+        ? `ensayo.html?id=${encodeURIComponent(actividad.id)}`
+        : `cotizacion.html?id=${encodeURIComponent(actividad.id)}`;
+
+      window.open(pagina, "_blank");
+      return;
+    }
+
+    /* Visitas y notas: mostrar contenido */
+    const contenido =
+      actividad.datos.nota ||
+      actividad.datos.descripcion ||
+      "";
+
+    abrirDetalle(
+      actividad.titulo,
+      actividad.empresa,
+      actividad.fecha,
+      `<div class="detalle-actividad">${
+        escaparHTML(contenido || "Sin contenido.")
+      }</div>`
+    );
+  });
+
+  return tarjeta;
+}
+
+/* ===============================
+   CARGAR TODAS LAS ACTIVIDADES
+================================ */
+
+async function cargarUltimasActividades() {
+  lista.innerHTML = `
+    <div class="mensaje-actividades">
+      Cargando actividades...
+    </div>
+  `;
+
+  try {
+    const [
+      visitasSnap,
+      egresosSnap,
+      ensayosSnap,
+      cotizacionesSnap
+    ] = await Promise.all([
+      getDocs(collection(db, "visitas")),
+      getDocs(collection(db, "egresos")),
+      getDocs(collection(db, "ensayos")),
+      getDocs(collection(db, "cotizaciones"))
+    ]);
+
+    const actividades = [];
+
+    /* ===============================
+       VISITAS Y NOTAS
+    ================================ */
+
+    visitasSnap.forEach(documento => {
+      const datos = documento.data();
+
+      /* Las ventas y entregas se obtienen de egresos */
+      if (
+        datos.tipoVisita === "Venta" ||
+        datos.tipoVisita === "Entrega de productos"
+      ) {
+        return;
+      }
+
+      const esNota = datos.tipoVisita === "Nota";
+
+      const esVisita =
+        datos.tipoVisita === "Nota de visita" ||
+        datos.tipoVisita === "Visita" ||
+        !datos.tipoVisita;
+
+      if (!esNota && !esVisita) return;
+
+      actividades.push({
+        id: documento.id,
+        origen: "visita",
+        datos,
+        fecha: obtenerFechaActividad(datos),
+        empresa: nombreEmpresa(datos),
+        tipo: esNota ? "📝 Nota" : "📍 Visita",
+        titulo: datos.titulo || (esNota ? "Nota" : "Visita")
+      });
+    });
+
+    /* ===============================
+       VENTAS
+       Agrupadas por empresa y día
+    ================================ */
+
+    const ventasPorGrupo = new Map();
+
+    egresosSnap.forEach(documento => {
+      const datos = documento.data();
+
+      if (datos.tipoEgreso !== "venta") return;
+
+      const fecha = obtenerFechaActividad(datos);
+      const empresa = nombreEmpresa(datos);
+      const clienteId = datos.clienteId || empresa;
+
+      const claveDia = fecha
+        ? [
+            fecha.getFullYear(),
+            String(fecha.getMonth() + 1).padStart(2, "0"),
+            String(fecha.getDate()).padStart(2, "0")
+          ].join("-")
+        : "sin-fecha";
+
+      const clave = `${clienteId}__${claveDia}`;
+
+      if (!ventasPorGrupo.has(clave)) {
+        ventasPorGrupo.set(clave, {
+          id: `venta-${clave}`,
+          origen: "venta",
+          datos,
+          fecha,
+          empresa,
+          tipo: "💰 Venta",
+          titulo: "Venta",
+          productos: []
+        });
+      }
+
+      const venta = ventasPorGrupo.get(clave);
+
+      venta.productos.push({
+        nombre: datos.productoNombre || "Producto sin nombre",
+        cantidad: datos.cantidad,
+        unidad: datos.unidad || "",
+        lote: datos.lote || ""
+      });
+
+      if (fecha && (!venta.fecha || fecha > venta.fecha)) {
+        venta.fecha = fecha;
+      }
+    });
+
+    ventasPorGrupo.forEach(venta => {
+      venta.titulo =
+        `${venta.productos.length} producto` +
+        (venta.productos.length === 1 ? "" : "s");
+
+      actividades.push(venta);
+    });
+
+    /* ===============================
+       ENSAYOS
+    ================================ */
+
+    ensayosSnap.forEach(documento => {
+      const datos = documento.data();
+
+      actividades.push({
+        id: documento.id,
+        origen: "ensayo",
+        datos,
+        fecha: obtenerFechaActividad(datos),
+        empresa: nombreEmpresa(datos),
+        tipo: "🧪 Ensayo",
+        titulo: datos.nombreEnsayo || "Ensayo"
+      });
+    });
+
+    /* ===============================
+       COTIZACIONES
+    ================================ */
+
+    cotizacionesSnap.forEach(documento => {
+      const datos = documento.data();
+
+      actividades.push({
+        id: documento.id,
+        origen: "cotizacion",
+        datos,
+        fecha: obtenerFechaActividad(datos),
+        empresa: nombreEmpresa(datos),
+        tipo: "📄 Cotización",
+        titulo: datos.nombreCotizacion || "Cotización"
+      });
+    });
+
+    /* ===============================
+       ORDENAR Y MOSTRAR LAS 5 MÁS
+       RECIENTES
+    ================================ */
+
+    actividades.sort((a, b) => {
+      const fechaA = a.fecha ? a.fecha.getTime() : 0;
+      const fechaB = b.fecha ? b.fecha.getTime() : 0;
+
+      return fechaB - fechaA;
+    });
+
+    const ultimas = actividades.slice(0, 5);
+
+    lista.innerHTML = "";
+
+    if (ultimas.length === 0) {
+      lista.innerHTML = `
+        <div class="mensaje-actividades">
+          No hay actividades registradas.
+        </div>
+      `;
+      return;
+    }
+
+    ultimas.forEach(actividad => {
+      lista.appendChild(crearTarjeta(actividad));
+    });
+
+  } catch (error) {
+    console.error("Error cargando últimas actividades:", error);
+    mostrarError();
+  }
+}
+
+/* ===============================
+   INICIAR
+================================ */
+
+cargarUltimasActividades();
+
+/* El enlace normal abre el historial completo */
+document.getElementById("abrir-historial").addEventListener("click", evento => {
+  evento.preventDefault();
+  window.location.href = "historial.html";
+});
 
 </main>
 
