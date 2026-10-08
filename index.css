@@ -39,14 +39,15 @@ header h2 {
 }
 
 /* ===============================
-   MAIN
+MAIN
 ================================ */
 main {
-    padding: 25px;
-    width: 100%;
-    max-width: none;
-    margin: 0;
+padding: 25px;
+width: 100%;
+max-width: 900px;
+margin: 0 auto;
 }
+
 /* ===============================
    TARJETAS
 ================================ */
