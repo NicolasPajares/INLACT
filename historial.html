@@ -100,9 +100,10 @@
         }
 
         .actividad-empresa {
-            margin-top: 6px;
-            color: #555;
-            font-size: 14px;
+            margin: 0 0 8px;
+            color: #1f4e8c;
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .mensaje-historial {
@@ -463,16 +464,16 @@
                     ${escaparHTML(mostrarFecha(fecha))}
                 </div>
 
+                <div class="actividad-empresa">
+                    🏢 ${escaparHTML(empresa)}
+                </div>
+
                 <div class="actividad-badge">
                     ${tipo}
                 </div>
 
                 <div class="actividad-titulo">
                     ${escaparHTML(titulo)}
-                </div>
-
-                <div class="actividad-empresa">
-                    🏢 ${escaparHTML(empresa)}
                 </div>
 
             `;
