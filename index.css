@@ -308,3 +308,19 @@ main.contenedor-ensayo{
     padding: 12px 0;
     color: #777;
 }
+
+/* =================================
+ANCHO GENERAL DE LA PÁGINA INDEX
+================================= */
+
+body {
+max-width: 100%;
+}
+
+.container {
+width: 100%;
+max-width: 900px;
+margin-left: auto;
+margin-right: auto;
+box-sizing: border-box;
+}
