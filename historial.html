@@ -1,42 +1,1009 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Historial de Visitas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS principal -->
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="historial.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Historial completo · INLACT</title>
+
+    <meta
+        name="description"
+        content="Historial completo de actividades de INLACT"
+    >
+
+    <link rel="stylesheet" href="index.css">
+
+    <style>
+        .historial-container {
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .historial-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .historial-header h1 {
+            margin: 0;
+            color: #1f4e8c;
+            font-size: 28px;
+        }
+
+        .historial-subtitulo {
+            margin: 6px 0 0;
+            color: #777;
+        }
+
+        .btn-volver-historial {
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 16px;
+            background: #1f4e8c;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-volver-historial:hover {
+            background: #173b6a;
+        }
+
+        .lista-historial {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .actividad-historial {
+            background: white;
+            border: 1px solid #e1e7ee;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition:
+                transform .15s ease,
+                box-shadow .15s ease;
+        }
+
+        .actividad-historial:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(31, 78, 140, .10);
+        }
+
+        .actividad-fecha {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 7px;
+        }
+
+        .actividad-badge {
+            display: inline-block;
+            background: #f1f4f8;
+            color: #1f4e8c;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .actividad-titulo {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1f4e8c;
+        }
+
+        .actividad-empresa {
+            margin-top: 6px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .mensaje-historial {
+            text-align: center;
+            padding: 30px 10px;
+            color: #777;
+        }
+
+        .overlay-historial {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .ventana-historial {
+            background: white;
+            width: 92%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 16px;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        .producto-historial {
+            padding: 12px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .producto-historial strong {
+            color: #1f4e8c;
+            font-size: 16px;
+        }
+
+        .producto-historial p {
+            margin: 5px 0 0;
+            color: #555;
+        }
+
+        .cerrar-historial {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #1f4e8c;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .historial-container {
+                margin: 18px 12px;
+            }
+
+            .historial-header h1 {
+                font-size: 23px;
+            }
+
+            .btn-volver-historial {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-  <figure>
-    <img src="img/logo.jpg" alt="INLACT">
-  </figure>
-  <h2>NICOLÁS PAJARES</h2>
-</header>
+    <!-- HEADER DE INLACT -->
 
-<main>
+    <header>
+        <figure>
+            <img src="img/logo.jpg" alt="INLACT">
+        </figure>
 
-  <section class="card">
-    <h2>Historial de visitas</h2>
+        <h2>NICOLÁS PAJARES</h2>
+    </header>
 
-    <input
-      type="text"
-      id="buscador"
-      placeholder="Buscar por cliente, tipo o producto..."
-    >
 
-    <div id="lista-visitas"></div>
+    <main>
 
-    <button id="cerrar-historial">⬅ Volver</button>
-  </section>
+        <section class="card historial-container">
 
-</main>
+            <div class="historial-header">
 
-<script type="module" src="historial.js"></script>
+                <div>
+                    <h1>Historial completo</h1>
+
+                    <p class="historial-subtitulo">
+                        Actividad registrada en todas las empresas
+                    </p>
+                </div>
+
+                <button
+                    id="volverInicioBtn"
+                    class="btn-volver-historial"
+                    type="button"
+                >
+                    ← Volver al inicio
+                </button>
+
+            </div>
+
+
+            <div
+                id="listaHistorialCompleto"
+                class="lista-historial"
+            >
+                <div class="mensaje-historial">
+                    Cargando historial...
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER DE INLACT -->
+
+    <footer>
+        <p>
+            © INLACT ·
+            <a href="aviso-legal.html">Aviso Legal</a>
+        </p>
+    </footer>
+
+
+    <script type="module">
+
+        import { db } from "./firebase.js";
+
+        import {
+            collection,
+            getDocs
+        } from
+        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+        const lista = document.getElementById(
+            "listaHistorialCompleto"
+        );
+
+
+        /*
+         * ======================================================
+         * UTILIDADES
+         * ======================================================
+         */
+
+        function escaparHTML(texto) {
+            return String(texto ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function convertirFecha(valor) {
+
+            if (
+                valor &&
+                typeof valor.toDate === "function"
+            ) {
+                return valor.toDate();
+            }
+
+            if (valor) {
+                const fecha = new Date(valor);
+
+                if (!isNaN(fecha.getTime())) {
+                    return fecha;
+                }
+            }
+
+            return null;
+        }
+
+
+        function obtenerFechaActividad(datos) {
+
+            /*
+             * Priorizar la fecha real de creación.
+             */
+
+            if (datos.creadoEn) {
+                const fechaCreacion =
+                    convertirFecha(datos.creadoEn);
+
+                if (fechaCreacion) {
+                    return fechaCreacion;
+                }
+            }
+
+            /*
+             * Compatibilidad con registros antiguos.
+             */
+
+            return convertirFecha(datos.fecha);
+        }
+
+
+        function mostrarFecha(fecha) {
+
+            if (!fecha) {
+                return "Sin fecha";
+            }
+
+            return fecha.toLocaleString(
+                "es-AR",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            );
+        }
+
+
+        function mostrarError(mensaje) {
+
+            lista.innerHTML = `
+                <div class="mensaje-historial">
+                    ${escaparHTML(mensaje)}
+                </div>
+            `;
+        }
+
+
+        function nombreEmpresa(datos) {
+
+            return (
+                datos.clienteNombre ||
+                datos.cliente ||
+                "Empresa sin nombre"
+            );
+        }
+
+
+        /*
+         * ======================================================
+         * VENTANA EMERGENTE
+         * ======================================================
+         */
+
+        function abrirOverlay(
+            titulo,
+            empresa,
+            fechaTexto,
+            contenidoHTML
+        ) {
+
+            const overlay = document.createElement("div");
+
+            overlay.className = "overlay-historial";
+
+
+            const ventana = document.createElement("div");
+
+            ventana.className = "ventana-historial";
+
+
+            ventana.innerHTML = `
+
+                <h2 style="
+                    margin-top:0;
+                    color:#1f4e8c;
+                ">
+                    ${escaparHTML(titulo)}
+                </h2>
+
+                <div style="
+                    color:#555;
+                    margin-bottom:5px;
+                ">
+                    ${escaparHTML(empresa)}
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#777;
+                    margin-bottom:18px;
+                ">
+                    ${escaparHTML(fechaTexto)}
+                </div>
+
+                <div>
+                    ${contenidoHTML}
+                </div>
+
+                <button
+                    type="button"
+                    class="cerrar-historial"
+                >
+                    Cerrar
+                </button>
+
+            `;
+
+
+            overlay.appendChild(ventana);
+
+            document.body.appendChild(overlay);
+
+
+            ventana
+                .querySelector(".cerrar-historial")
+                .addEventListener("click", () => {
+                    overlay.remove();
+                });
+
+
+            overlay.addEventListener("click", evento => {
+
+                if (evento.target === overlay) {
+                    overlay.remove();
+                }
+
+            });
+
+        }
+
+
+        /*
+         * ======================================================
+         * CREAR TARJETA
+         * ======================================================
+         */
+
+        function crearTarjeta(
+            fecha,
+            tipo,
+            titulo,
+            empresa
+        ) {
+
+            const tarjeta = document.createElement("div");
+
+            tarjeta.className = "actividad-historial";
+
+
+            tarjeta.innerHTML = `
+
+                <div class="actividad-fecha">
+                    ${escaparHTML(mostrarFecha(fecha))}
+                </div>
+
+                <div class="actividad-badge">
+                    ${tipo}
+                </div>
+
+                <div class="actividad-titulo">
+                    ${escaparHTML(titulo)}
+                </div>
+
+                <div class="actividad-empresa">
+                    🏢 ${escaparHTML(empresa)}
+                </div>
+
+            `;
+
+
+            return tarjeta;
+
+        }
+
+
+        /*
+         * ======================================================
+         * CARGAR TODA LA ACTIVIDAD
+         * ======================================================
+         */
+
+        async function cargarHistorialCompleto() {
+
+            lista.innerHTML = `
+                <div class="mensaje-historial">
+                    Cargando historial...
+                </div>
+            `;
+
+
+            try {
+
+                const [
+                    visitasSnap,
+                    egresosSnap,
+                    ensayosSnap,
+                    cotizacionesSnap
+                ] = await Promise.all([
+
+                    getDocs(
+                        collection(db, "visitas")
+                    ),
+
+                    getDocs(
+                        collection(db, "egresos")
+                    ),
+
+                    getDocs(
+                        collection(db, "ensayos")
+                    ),
+
+                    getDocs(
+                        collection(db, "cotizaciones")
+                    )
+
+                ]);
+
+
+                const actividades = [];
+
+
+                /*
+                 * =================================================
+                 * VISITAS Y NOTAS
+                 *
+                 * Se excluyen las antiguas visitas "Venta"
+                 * para no duplicar ventas registradas en egresos.
+                 * También se excluyen las entregas.
+                 * =================================================
+                 */
+
+                visitasSnap.forEach(documento => {
+
+                    const datos = documento.data();
+
+                    if (
+                        datos.tipoVisita === "Venta" ||
+                        datos.tipoVisita === "Entrega de productos"
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                     * Solo se consideran visitas y notas.
+                     * Si el registro no tiene tipo, se conserva
+                     * como visita por compatibilidad.
+                     */
+
+                    const esNota =
+                        datos.tipoVisita === "Nota";
+
+
+                    const esVisita =
+                        datos.tipoVisita === "Nota de visita" ||
+                        datos.tipoVisita === "Visita" ||
+                        !datos.tipoVisita;
+
+
+                    if (!esNota && !esVisita) {
+                        return;
+                    }
+
+
+                    actividades.push({
+
+                        id: documento.id,
+
+                        origen: "visita",
+
+                        datos,
+
+                        fecha: obtenerFechaActividad(datos),
+
+                        empresa: nombreEmpresa(datos),
+
+                        tipo: esNota
+                            ? "📝 Nota"
+                            : "📍 Visita",
+
+                        titulo:
+                            datos.titulo ||
+                            (esNota ? "Nota" : "Visita")
+
+                    });
+
+                });
+
+
+                /*
+                 * =================================================
+                 * VENTAS
+                 *
+                 * Solo egresos con tipoEgreso === "venta".
+                 * Se agrupan por empresa y día.
+                 * =================================================
+                 */
+
+                const ventasPorGrupo = new Map();
+
+
+                egresosSnap.forEach(documento => {
+
+                    const datos = documento.data();
+
+
+                    if (datos.tipoEgreso !== "venta") {
+                        return;
+                    }
+
+
+                    const fecha =
+                        obtenerFechaActividad(datos);
+
+
+                    const empresa =
+                        nombreEmpresa(datos);
+
+
+                    const clienteId =
+                        datos.clienteId ||
+                        empresa;
+
+
+                    let claveDia = "sin-fecha";
+
+
+                    if (fecha) {
+
+                        claveDia =
+                            fecha.getFullYear() +
+                            "-" +
+                            String(fecha.getMonth() + 1)
+                                .padStart(2, "0") +
+                            "-" +
+                            String(fecha.getDate())
+                                .padStart(2, "0");
+
+                    }
+
+
+                    const claveGrupo =
+                        `${clienteId}__${claveDia}`;
+
+
+                    if (!ventasPorGrupo.has(claveGrupo)) {
+
+                        ventasPorGrupo.set(
+                            claveGrupo,
+                            {
+                                id: `venta-${claveGrupo}`,
+                                origen: "venta",
+                                fecha,
+                                empresa,
+                                tipo: "💰 Venta",
+                                titulo: "Venta",
+                                productos: []
+                            }
+                        );
+
+                    }
+
+
+                    const venta =
+                        ventasPorGrupo.get(claveGrupo);
+
+
+                    venta.productos.push({
+
+                        nombre:
+                            datos.productoNombre ||
+                            "Producto sin nombre",
+
+                        cantidad:
+                            datos.cantidad,
+
+                        unidad:
+                            datos.unidad || "",
+
+                        lote:
+                            datos.lote || ""
+
+                    });
+
+
+                    if (
+                        fecha &&
+                        (
+                            !venta.fecha ||
+                            fecha > venta.fecha
+                        )
+                    ) {
+                        venta.fecha = fecha;
+                    }
+
+                });
+
+
+                ventasPorGrupo.forEach(venta => {
+
+                    venta.titulo =
+                        `${venta.productos.length} producto` +
+                        (venta.productos.length === 1 ? "" : "s");
+
+                    actividades.push(venta);
+
+                });
+
+
+                /*
+                 * =================================================
+                 * ENSAYOS
+                 * =================================================
+                 */
+
+                ensayosSnap.forEach(documento => {
+
+                    const datos = documento.data();
+
+
+                    actividades.push({
+
+                        id: documento.id,
+
+                        origen: "ensayo",
+
+                        datos,
+
+                        fecha: obtenerFechaActividad(datos),
+
+                        empresa: nombreEmpresa(datos),
+
+                        tipo: "🧪 Ensayo",
+
+                        titulo:
+                            datos.nombreEnsayo ||
+                            "Ensayo"
+
+                    });
+
+                });
+
+
+                /*
+                 * =================================================
+                 * COTIZACIONES
+                 * =================================================
+                 */
+
+                cotizacionesSnap.forEach(documento => {
+
+                    const datos = documento.data();
+
+
+                    actividades.push({
+
+                        id: documento.id,
+
+                        origen: "cotizacion",
+
+                        datos,
+
+                        fecha: obtenerFechaActividad(datos),
+
+                        empresa: nombreEmpresa(datos),
+
+                        tipo: "📄 Cotización",
+
+                        titulo:
+                            datos.nombreCotizacion ||
+                            "Cotización"
+
+                    });
+
+                });
+
+
+                /*
+                 * =================================================
+                 * ORDENAR DE MÁS NUEVO A MÁS VIEJO
+                 * =================================================
+                 */
+
+                actividades.sort((a, b) => {
+
+                    const fechaA =
+                        a.fecha ? a.fecha.getTime() : 0;
+
+                    const fechaB =
+                        b.fecha ? b.fecha.getTime() : 0;
+
+                    return fechaB - fechaA;
+
+                });
+
+
+                lista.innerHTML = "";
+
+
+                if (actividades.length === 0) {
+
+                    lista.innerHTML = `
+                        <div class="mensaje-historial">
+                            No hay actividades registradas.
+                        </div>
+                    `;
+
+                    return;
+
+                }
+
+
+                /*
+                 * =================================================
+                 * MOSTRAR TODAS LAS ACTIVIDADES
+                 * =================================================
+                 */
+
+                actividades.forEach(actividad => {
+
+                    const tarjeta = crearTarjeta(
+                        actividad.fecha,
+                        actividad.tipo,
+                        actividad.titulo,
+                        actividad.empresa
+                    );
+
+
+                    /*
+                     * VENTA
+                     */
+
+                    if (actividad.origen === "venta") {
+
+                        tarjeta.addEventListener("click", () => {
+
+                            let productosHTML = "";
+
+
+                            actividad.productos.forEach(producto => {
+
+                                productosHTML += `
+
+                                    <div class="producto-historial">
+
+                                        <strong>
+                                            ${escaparHTML(producto.nombre)}
+                                        </strong>
+
+                                        <p>
+                                            Cantidad:
+                                            ${escaparHTML(producto.cantidad ?? "-")}
+                                            ${escaparHTML(producto.unidad)}
+                                        </p>
+
+                                        ${
+                                            producto.lote
+                                                ? `
+                                                    <p>
+                                                        Lote:
+                                                        ${escaparHTML(producto.lote)}
+                                                    </p>
+                                                `
+                                                : ""
+                                        }
+
+                                    </div>
+
+                                `;
+
+                            });
+
+
+                            abrirOverlay(
+                                "💰 Venta",
+                                actividad.empresa,
+                                mostrarFecha(actividad.fecha),
+                                productosHTML
+                            );
+
+                        });
+
+                    }
+
+
+                    /*
+                     * ENSAYO / COTIZACIÓN
+                     *
+                     * Se abren en otra pestaña.
+                     */
+
+                    else if (
+                        actividad.origen === "ensayo" ||
+                        actividad.origen === "cotizacion"
+                    ) {
+
+                        tarjeta.addEventListener("click", () => {
+
+                            const pagina =
+                                actividad.origen === "ensayo"
+                                    ? `ensayo.html?id=${actividad.id}`
+                                    : `cotizacion.html?id=${actividad.id}`;
+
+
+                            window.open(
+                                pagina,
+                                "_blank"
+                            );
+
+                        });
+
+                    }
+
+
+                    /*
+                     * VISITA / NOTA
+                     */
+
+                    else {
+
+                        tarjeta.addEventListener("click", () => {
+
+                            const contenido =
+                                actividad.datos.nota || "";
+
+
+                            abrirOverlay(
+                                actividad.titulo,
+                                actividad.empresa,
+                                mostrarFecha(actividad.fecha),
+                                `
+                                    <div style="
+                                        white-space:pre-wrap;
+                                        line-height:1.5;
+                                        font-size:16px;
+                                        color:#333;
+                                    ">
+                                        ${escaparHTML(
+                                            contenido || "Sin contenido."
+                                        )}
+                                    </div>
+                                `
+                            );
+
+                        });
+
+                    }
+
+
+                    lista.appendChild(tarjeta);
+
+                });
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "ERROR CARGANDO HISTORIAL GLOBAL:",
+                    error
+                );
+
+                mostrarError(
+                    "No se pudo cargar el historial."
+                );
+
+            }
+
+        }
+
+
+        /*
+         * ======================================================
+         * VOLVER AL INICIO
+         * ======================================================
+         */
+
+        document
+            .getElementById("volverInicioBtn")
+            .addEventListener("click", () => {
+
+                window.location.href = "index.html";
+
+            });
+
+
+        /*
+         * ======================================================
+         * INICIAR
+         * ======================================================
+         */
+
+        cargarHistorialCompleto();
+
+    </script>
+
 </body>
+
 </html>
