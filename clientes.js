@@ -1,5 +1,5 @@
 
-import { db } from "./firebase.js";
+import { db } from "https://nicolaspajares.github.io/INLACT/firebase.js";
 
 import {
   collection,
