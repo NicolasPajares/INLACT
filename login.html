@@ -1,0 +1,202 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingresar | INLACT</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #f1f7fb;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #173b59;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 390px;
+      padding: 35px 28px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(25, 75, 110, 0.12);
+      text-align: center;
+    }
+
+    .brand {
+      color: #168ac0;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 23px;
+    }
+
+    .subtitle {
+      margin: 0 0 26px;
+      color: #667d8e;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin: 15px 0 7px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cad8e2;
+      border-radius: 8px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #168ac0;
+      box-shadow: 0 0 0 3px rgba(22, 138, 192, 0.12);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 13px;
+      border: none;
+      border-radius: 8px;
+      background: #168ac0;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1075a5;
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    #mensaje {
+      margin-top: 17px;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: #b42318;
+    }
+
+    .success {
+      color: #18794e;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-card">
+    <div class="brand">INLACT</div>
+
+    <h1>Iniciar sesión</h1>
+    <p class="subtitle">
+      Ingresá con tu cuenta para acceder al panel de trabajo.
+    </p>
+
+    <form id="formLogin">
+      <label for="email">Correo electrónico</label>
+      <input
+        type="email"
+        id="email"
+        autocomplete="username"
+        placeholder="tu@inlact.com"
+        required
+      >
+
+      <label for="password">Contraseña</label>
+      <input
+        type="password"
+        id="password"
+        autocomplete="current-password"
+        placeholder="Ingresá tu contraseña"
+        required
+      >
+
+      <button type="submit" id="btnIngresar">
+        Ingresar
+      </button>
+    </form>
+
+    <div id="mensaje" role="status" aria-live="polite"></div>
+  </main>
+
+  <script type="module">
+    import {
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    import { auth } from "./firebase.js";
+
+    const formulario = document.getElementById("formLogin");
+    const boton = document.getElementById("btnIngresar");
+    const mensaje = document.getElementById("mensaje");
+
+    formulario.addEventListener("submit", async (evento) => {
+      evento.preventDefault();
+
+      mensaje.textContent = "";
+      mensaje.className = "";
+      boton.disabled = true;
+      boton.textContent = "Ingresando...";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+
+        mensaje.textContent = "Inicio de sesión correcto.";
+        mensaje.className = "success";
+
+        // Por ahora dejamos al usuario en esta pantalla.
+        // El acceso al panel se conectará en el siguiente paso.
+      } catch (error) {
+        console.error("Error de inicio de sesión:", error);
+
+        mensaje.textContent =
+          error.code === "auth/invalid-credential"
+            ? "El correo o la contraseña son incorrectos."
+            : error.code === "auth/too-many-requests"
+              ? "Hubo demasiados intentos. Esperá un momento y probá nuevamente."
+              : "No se pudo iniciar sesión. Verificá los datos e intentá otra vez.";
+
+        mensaje.className = "error";
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Ingresar";
+      }
+    });
+  </script>
+</body>
+</html>
+```
