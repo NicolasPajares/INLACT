@@ -1,73 +1,134 @@
-/**********************
- * FIREBASE
- **********************/
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
-  getFirestore,
   doc,
-  getDoc
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 import {
-  getAuth,
-  signInAnonymously
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/**********************
- * CONFIG
- **********************/
-const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.firebasestorage.app",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+import { db, auth } from "./firebase.js";
 
 /**********************
- * URL PARAMS
+ * CONFIGURACIÓN
  **********************/
 const params = new URLSearchParams(window.location.search);
 const ensayoId = params.get("id");
-const esPublico = params.get("publico") === "1";
+const tokenPublico = params.get("token");
+
+const esPublico = Boolean(tokenPublico);
+
+let ensayoActual = null;
+let tokenActual = null;
+let usuarioInterno = false;
 
 /**********************
- * INIT (AUTH)
+ * INICIO
  **********************/
-signInAnonymously(auth)
-  .then(() => iniciar())
-  .catch(() => iniciar());
+onAuthStateChanged(auth, async (usuario) => {
+  try {
+    if (esPublico) {
+      await cargarEnsayoPublico();
+      activarMenuSticky();
+      activarScrollMenu();
+      return;
+    }
 
-async function iniciar() {
-  await cargarEnsayo();
-  activarMenuSticky();
-  activarScrollMenu();
+    if (!usuario) {
+      window.location.replace("login.html");
+      return;
+    }
+
+    usuarioInterno = true;
+
+    await cargarEnsayoInterno();
+    activarMenuSticky();
+    activarScrollMenu();
+  } catch (error) {
+    console.error("Error al abrir el ensayo:", error);
+    mostrarError(
+      esPublico
+        ? "Este enlace no está disponible o fue desactivado."
+        : "No se pudo cargar el ensayo. Verificá tu conexión y permisos."
+    );
+  }
+});
+
+/**********************
+ * CARGAR ENSAYO INTERNO
+ **********************/
+async function cargarEnsayoInterno() {
+  if (!ensayoId) {
+    mostrarError("No se indicó qué ensayo abrir.");
+    return;
+  }
+
+  const referencia = doc(db, "ensayos", ensayoId);
+  const resultado = await getDoc(referencia);
+
+  if (!resultado.exists()) {
+    mostrarError("No se encontró el ensayo.");
+    return;
+  }
+
+  ensayoActual = {
+    id: resultado.id,
+    ...resultado.data()
+  };
+
+  tokenActual = ensayoActual.publicacionToken || null;
+
+  mostrarEnsayo(ensayoActual);
+  mostrarControlesPublicacion();
 }
 
 /**********************
- * CARGAR ENSAYO
+ * CARGAR COPIA PÚBLICA
  **********************/
-async function cargarEnsayo() {
-  if (!ensayoId) return;
+async function cargarEnsayoPublico() {
+  const referencia = doc(
+    db,
+    "ensayos_publicos",
+    tokenPublico
+  );
 
-  const refEnsayo = doc(db, "ensayos", ensayoId);
-  const snap = await getDoc(refEnsayo);
-  if (!snap.exists()) return;
+  const resultado = await getDoc(referencia);
 
-  const data = snap.data();
+  if (!resultado.exists()) {
+    mostrarError("Este enlace no está disponible.");
+    return;
+  }
 
+  const datos = resultado.data();
+
+  if (datos.activo !== true) {
+    mostrarError("Este enlace fue desactivado por INLACT.");
+    return;
+  }
+
+  mostrarEnsayo(datos);
+}
+
+/**********************
+ * MOSTRAR ENSAYO
+ **********************/
+function mostrarEnsayo(data) {
   document.getElementById("empresa").textContent =
     data.clienteNombre || "";
 
   document.getElementById("nombre-ensayo").textContent =
     data.nombreEnsayo || "";
 
+  const fecha = data.fecha;
+
   document.getElementById("fecha").textContent =
-    data.fecha?.toDate().toLocaleDateString() || "";
+    fecha && typeof fecha.toDate === "function"
+      ? fecha.toDate().toLocaleDateString("es-AR")
+      : "";
 
   renderBloque("propuesta", "Propuesta", data.propuesta);
   renderBloque("dosis", "Dosis", data.dosis);
@@ -82,105 +143,291 @@ async function cargarEnsayo() {
   );
 
   renderImagenes(data.fotos || []);
+
+  document.body.style.visibility = "visible";
 }
 
 /**********************
- * RENDER BLOQUE TEXTO
+ * BLOQUES DE TEXTO
  **********************/
 function renderBloque(id, titulo, contenido) {
   const contenedor = document.getElementById(id);
   if (!contenedor) return;
 
-  contenedor.innerHTML = `
-    <h3 style="
-      color:#1f4e8c;
-      margin-bottom:12px;
-      font-weight:600;
-    ">
-      ${titulo}
-    </h3>
-    <p style="white-space:pre-line;">
-      ${contenido || "—"}
-    </p>
-  `;
+  contenedor.replaceChildren();
+
+  const encabezado = document.createElement("h3");
+  encabezado.textContent = titulo;
+  encabezado.style.cssText =
+    "color:#1f4e8c;margin-bottom:12px;font-weight:600;";
+
+  const parrafo = document.createElement("p");
+  parrafo.style.whiteSpace = "pre-line";
+  parrafo.textContent = contenido || "—";
+
+  contenedor.append(encabezado, parrafo);
 }
 
 /**********************
- * RENDER IMÁGENES
+ * IMÁGENES Y PUBLICACIÓN
  **********************/
 function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
 
-  contenedor.innerHTML = `
-    <h3 style="
-      color:#1f4e8c;
-      margin-bottom:16px;
-      font-weight:600;
-    ">
-      Imágenes
-    </h3>
-  `;
+  contenedor.replaceChildren();
+
+  const encabezado = document.createElement("h3");
+  encabezado.textContent = "Imágenes";
+  encabezado.style.cssText =
+    "color:#1f4e8c;margin-bottom:16px;font-weight:600;";
+
+  contenedor.appendChild(encabezado);
 
   fotos.forEach(url => {
     const img = document.createElement("img");
     img.src = url;
-    img.style.width = "100%";
-    img.style.maxWidth = "480px";
-    img.style.display = "block";
-    img.style.marginBottom = "16px";
-    img.style.borderRadius = "12px";
+    img.alt = "Imagen del ensayo";
+    img.style.cssText =
+      "width:100%;max-width:480px;display:block;margin-bottom:16px;border-radius:12px;";
 
     contenedor.appendChild(img);
   });
 
-  // SOLO EL USUARIO INTERNO VE EL LINK
-  if (!esPublico) {
-
-    const linkPublico =
-      `${window.location.origin}/INLACT/ensayo.html?id=${ensayoId}&publico=1`;
-
-    const linkDiv = document.createElement("div");
-    linkDiv.style.marginTop = "24px";
-
-    linkDiv.innerHTML = `
-      <h4 style="color:#1f4e8c; margin-bottom:8px;">
-        Link para los clientes
-      </h4>
-
-      <input
-        type="text"
-        value="${linkPublico}"
-        readonly
-        style="width:100%; padding:8px;"
-      />
-    `;
-
-    contenedor.appendChild(linkDiv);
+  if (usuarioInterno && !esPublico) {
+    mostrarControlesPublicacion();
   }
 }
 
 /**********************
- * MENU STICKY
+ * CONTROLES DE PUBLICACIÓN
  **********************/
-function activarMenuSticky() {
-  const menu = document.querySelector(".menu-ensayo");
-  if (!menu) return;
+function mostrarControlesPublicacion() {
+  if (!usuarioInterno || esPublico) return;
 
-  menu.style.position = "sticky";
-  menu.style.top = "20px";
+  const contenedor = document.getElementById("fotos");
+  if (!contenedor) return;
+
+  const anterior = document.getElementById("controles-publicacion");
+  if (anterior) anterior.remove();
+
+  const panel = document.createElement("div");
+  panel.id = "controles-publicacion";
+  panel.style.cssText =
+    "margin-top:24px;padding:16px;background:#f1f7fb;border-radius:10px;";
+
+  const titulo = document.createElement("h4");
+  titulo.textContent = "Compartir ensayo con el cliente";
+  titulo.style.color = "#1f4e8c";
+
+  const descripcion = document.createElement("p");
+  descripcion.textContent =
+    "El cliente podrá consultar la copia publicada mediante este enlace.";
+
+  const boton = document.createElement("button");
+  boton.type = "button";
+  boton.style.cssText =
+    "padding:11px 16px;margin:8px 0;border:0;border-radius:8px;background:#168ac0;color:white;cursor:pointer;font-weight:600;";
+
+  const enlace = document.createElement("input");
+  enlace.type = "text";
+  enlace.readOnly = true;
+  enlace.style.cssText =
+    "width:100%;padding:10px;box-sizing:border-box;margin-top:8px;";
+
+  const botonCopiar = document.createElement("button");
+  botonCopiar.type = "button";
+  botonCopiar.textContent = "Copiar enlace";
+  botonCopiar.style.cssText =
+    "padding:10px 14px;margin-top:8px;border:0;border-radius:8px;background:#1f4e8c;color:white;cursor:pointer;";
+
+  const estado = document.createElement("p");
+  estado.style.cssText = "font-size:14px;margin-top:8px;";
+
+  const estaActivo = ensayoActual.publicacionActiva === true;
+
+  boton.textContent = estaActivo
+    ? "Desactivar enlace público"
+    : tokenActual
+      ? "Volver a activar enlace público"
+      : "Crear enlace público";
+
+  if (estaActivo && tokenActual) {
+    enlace.value = crearUrlPublica(tokenActual);
+    enlace.hidden = false;
+    botonCopiar.hidden = false;
+  } else {
+    enlace.hidden = true;
+    botonCopiar.hidden = true;
+  }
+
+  boton.addEventListener("click", async () => {
+    boton.disabled = true;
+    estado.textContent = "Procesando...";
+
+    try {
+      if (ensayoActual.publicacionActiva === true) {
+        await desactivarPublicacion();
+        estado.textContent = "Enlace desactivado.";
+      } else {
+        await publicarEnsayo();
+        estado.textContent = "Ensayo publicado correctamente.";
+      }
+
+      mostrarControlesPublicacion();
+    } catch (error) {
+      console.error("Error en la publicación:", error);
+      estado.textContent =
+        "No se pudo completar la operación. Revisá la conexión y los permisos.";
+      boton.disabled = false;
+    }
+  });
+
+  botonCopiar.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(enlace.value);
+      estado.textContent = "Enlace copiado.";
+    } catch {
+      enlace.focus();
+      enlace.select();
+      estado.textContent =
+        "Seleccioná y copiá el enlace manualmente.";
+    }
+  });
+
+  panel.append(titulo, descripcion, boton, enlace, botonCopiar, estado);
+  contenedor.appendChild(panel);
 }
 
 /**********************
- * SCROLL MENU
+ * PUBLICAR COPIA
  **********************/
-function activarScrollMenu() {
-  const botones = document.querySelectorAll(".menu-ensayo button");
+async function publicarEnsayo() {
+  if (!ensayoActual?.id) {
+    throw new Error("No se identificó el ensayo original.");
+  }
 
-  botones.forEach(btn => {
+  if (!tokenActual) {
+    tokenActual = generarTokenAleatorio();
+  }
+
+  // Solo se copian los campos que verá el cliente.
+  const copiaPublica = {
+    clienteNombre: ensayoActual.clienteNombre || "",
+    nombreEnsayo: ensayoActual.nombreEnsayo || "",
+    fecha: ensayoActual.fecha || null,
+    propuesta: ensayoActual.propuesta || "",
+    dosis: ensayoActual.dosis || "",
+    elaboracion: ensayoActual.elaboracion || "",
+    resultados: ensayoActual.resultados || "",
+    conclusion: ensayoActual.conclusion || "",
+    propuestaComercial: ensayoActual.propuestaComercial || "",
+    fotos: Array.isArray(ensayoActual.fotos)
+      ? ensayoActual.fotos
+      : [],
+    activo: true,
+    actualizadoEn: serverTimestamp()
+  };
+
+  await setDoc(
+    doc(db, "ensayos_publicos", tokenActual),
+    copiaPublica
+  );
+
+  await updateDoc(
+    doc(db, "ensayos", ensayoActual.id),
+    {
+      publicacionToken: tokenActual,
+      publicacionActiva: true
+    }
+  );
+
+  ensayoActual.publicacionToken = tokenActual;
+  ensayoActual.publicacionActiva = true;
+}
+
+/**********************
+ * DESACTIVAR PUBLICACIÓN
+ **********************/
+async function desactivarPublicacion() {
+  if (!tokenActual) {
+    throw new Error("No hay una publicación para desactivar.");
+  }
+
+  await updateDoc(
+    doc(db, "ensayos_publicos", tokenActual),
+    {
+      activo: false,
+      actualizadoEn: serverTimestamp()
+    }
+  );
+
+  await updateDoc(
+    doc(db, "ensayos", ensayoActual.id),
+    {
+      publicacionActiva: false
+    }
+  );
+
+  ensayoActual.publicacionActiva = false;
+}
+
+/**********************
+ * GENERAR CÓDIGO ALEATORIO
+ **********************/
+function generarTokenAleatorio() {
+  const valores = new Uint8Array(32);
+  crypto.getRandomValues(valores);
+
+  return Array.from(valores)
+    .map(valor => valor.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**********************
+ * URL PÚBLICA
+ **********************/
+function crearUrlPublica(token) {
+  return `${window.location.origin}${window.location.pathname}?token=${encodeURIComponent(token)}`;
+}
+
+/**********************
+ * MOSTRAR ERRORES
+ **********************/
+function mostrarError(mensaje) {
+  document.body.style.visibility = "visible";
+
+  const contenido = document.querySelector(".contenido-blanco");
+  if (!contenido) {
+    alert(mensaje);
+    return;
+  }
+
+  contenido.replaceChildren();
+
+  const aviso = document.createElement("p");
+  aviso.textContent = mensaje;
+  aviso.style.cssText =
+    "padding:24px;color:#b42318;font-weight:600;";
+
+  contenido.appendChild(aviso);
+}
+
+/**********************
+ * MENÚ LATERAL
+ **********************/
+function activarMenuSticky() {
+  const menu = document.querySelector(".menu-ensayo");
+  if (menu) {
+    menu.style.position = "sticky";
+    menu.style.top = "20px";
+  }
+}
+
+function activarScrollMenu() {
+  document.querySelectorAll(".menu-ensayo button").forEach(btn => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.seccion;
-      const destino = document.getElementById(id);
+      const destino = document.getElementById(btn.dataset.seccion);
       if (!destino) return;
 
       destino.scrollIntoView({
