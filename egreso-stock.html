@@ -17,7 +17,7 @@
 
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
 
@@ -343,10 +343,17 @@
      JAVASCRIPT
 ============================================================ -->
 
-<script
-    type="module"
-    src="egreso-stock.js">
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
 </script>
+</body>
+</html>
+
 
 
 </body>
