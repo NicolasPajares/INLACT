@@ -6,65 +6,22 @@
 */
 
 
-/*
-************************************************************
-* FIREBASE
-************************************************************
-*/
+/************************************************************
+ * FIREBASE
+ ************************************************************/
 
 import {
-    initializeApp
-} from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-    getFirestore,
     collection,
     getDocs,
-    doc,
-    writeBatch,
-    serverTimestamp
-} from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    query,
+    where,
+    orderBy,
+    updateDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import { db } from "./firebase.js";
 
-/*
-************************************************************
-* CONFIG FIREBASE
-************************************************************
-*/
-
-const firebaseConfig = {
-
-    apiKey:
-        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-
-    authDomain:
-        "inlact.firebaseapp.com",
-
-    projectId:
-        "inlact",
-
-    storageBucket:
-        "inlact.firebasestorage.app",
-
-    messagingSenderId:
-        "143868382036",
-
-    appId:
-        "1:143868382036:web:b5af0e4faced7e880216c1"
-
-};
-
-
-const app =
-    initializeApp(firebaseConfig);
-
-const db =
-    getFirestore(app);
-
-
-/*
 ************************************************************
 * ELEMENTOS PRINCIPALES
 ************************************************************
