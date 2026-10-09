@@ -1,5 +1,5 @@
 
-import { db } from "./firebase.js?v=2";
+import { db } from "./firebase.js";
 
 import {
   collection,
