@@ -228,27 +228,24 @@ async function cargarUbicaciones() {
         ubicaciones = [];
 
 
-        snapshot.forEach(
-            docSnap => {
+     snapshot.forEach(docSnap => {
 
-                const datos =
-                    docSnap.data();
+    const datos = docSnap.data();
 
+    // Ignorar ubicaciones desactivadas.
+    if (datos.activo === false) {
+        return;
+    }
 
-                ubicaciones.push({
+    ubicaciones.push({
+        id: docSnap.id,
+        nombre:
+            datos.nombre ||
+            datos.descripcion ||
+            "Ubicación sin nombre"
+    });
 
-                    id:
-                        docSnap.id,
-
-                    nombre:
-                        datos.nombre ||
-                        datos.descripcion ||
-                        "Ubicación sin nombre"
-
-                });
-
-            }
-        );
+});
 
 
         ubicaciones.sort(
