@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="nuevo-ensayo.css" />
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
       <figure>
@@ -84,7 +84,17 @@
 </footer>
 
 <!-- JS -->
-<script type="module" src="nuevo-ensayo.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
