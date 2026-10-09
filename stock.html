@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="stock.css">
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 
 <header>
@@ -115,7 +115,17 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module" src="stock.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
