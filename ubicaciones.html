@@ -14,7 +14,7 @@
 
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
 
@@ -70,7 +70,17 @@
 
 </main>
 
-<script type="module" src="ubicaciones.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 
