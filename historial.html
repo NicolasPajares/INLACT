@@ -1,17 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Historial completo · INLACT</title>
-
-    <meta
-        name="description"
-        content="Historial completo de actividades de INLACT"
-    >
-
+    <meta name="description" content="Historial completo de actividades de INLACT">
     <link rel="stylesheet" href="index.css">
 
     <style>
@@ -66,9 +61,7 @@
             border-radius: 12px;
             padding: 16px;
             cursor: pointer;
-            transition:
-                transform .15s ease,
-                box-shadow .15s ease;
+            transition: transform .15s ease, box-shadow .15s ease;
         }
 
         .actividad-historial:hover {
@@ -179,62 +172,41 @@
     </style>
 </head>
 
-<body>
-
-    <!-- HEADER DE INLACT -->
+<body style="visibility: hidden;">
 
     <header>
-          <figure>
-        <a href="index.html" aria-label="Volver al inicio">
-            <img src="img/logo.jpg" alt="INLACT">
-        </a>
-    </figure>
-
-
+        <figure>
+            <a href="index.html" aria-label="Volver al inicio">
+                <img src="img/logo.jpg" alt="INLACT">
+            </a>
+        </figure>
         <h2>NICOLÁS PAJARES</h2>
     </header>
 
-
     <main>
-
         <section class="card historial-container">
-
             <div class="historial-header">
-
                 <div>
                     <h1>Historial completo</h1>
-
                     <p class="historial-subtitulo">
                         Actividad registrada en todas las empresas
                     </p>
                 </div>
 
-                <button
-                    id="volverInicioBtn"
-                    class="btn-volver-historial"
-                    type="button"
-                >
+                <button id="volverInicioBtn"
+                        class="btn-volver-historial"
+                        type="button">
                     ← Volver al inicio
                 </button>
-
             </div>
 
-
-            <div
-                id="listaHistorialCompleto"
-                class="lista-historial"
-            >
+            <div id="listaHistorialCompleto" class="lista-historial">
                 <div class="mensaje-historial">
                     Cargando historial...
                 </div>
             </div>
-
         </section>
-
     </main>
-
-
-    <!-- FOOTER DE INLACT -->
 
     <footer>
         <p>
@@ -243,28 +215,16 @@
         </p>
     </footer>
 
-
     <script type="module">
-
+        import { protegerPagina } from "./proteger.js";
         import { db } from "./firebase.js";
 
         import {
             collection,
             getDocs
-        } from
-        "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-
-        const lista = document.getElementById(
-            "listaHistorialCompleto"
-        );
-
-
-        /*
-         * ======================================================
-         * UTILIDADES
-         * ======================================================
-         */
+        const lista = document.getElementById("listaHistorialCompleto");
 
         function escaparHTML(texto) {
             return String(texto ?? "")
@@ -275,72 +235,41 @@
                 .replace(/'/g, "&#039;");
         }
 
-
         function convertirFecha(valor) {
-
-            if (
-                valor &&
-                typeof valor.toDate === "function"
-            ) {
+            if (valor && typeof valor.toDate === "function") {
                 return valor.toDate();
             }
 
             if (valor) {
                 const fecha = new Date(valor);
-
-                if (!isNaN(fecha.getTime())) {
-                    return fecha;
-                }
+                if (!isNaN(fecha.getTime())) return fecha;
             }
 
             return null;
         }
 
-
         function obtenerFechaActividad(datos) {
-
-            /*
-             * Priorizar la fecha real de creación.
-             */
-
             if (datos.creadoEn) {
-                const fechaCreacion =
-                    convertirFecha(datos.creadoEn);
-
-                if (fechaCreacion) {
-                    return fechaCreacion;
-                }
+                const fechaCreacion = convertirFecha(datos.creadoEn);
+                if (fechaCreacion) return fechaCreacion;
             }
-
-            /*
-             * Compatibilidad con registros antiguos.
-             */
 
             return convertirFecha(datos.fecha);
         }
 
-
         function mostrarFecha(fecha) {
+            if (!fecha) return "Sin fecha";
 
-            if (!fecha) {
-                return "Sin fecha";
-            }
-
-            return fecha.toLocaleString(
-                "es-AR",
-                {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
+            return fecha.toLocaleString("es-AR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
         }
 
-
         function mostrarError(mensaje) {
-
             lista.innerHTML = `
                 <div class="mensaje-historial">
                     ${escaparHTML(mensaje)}
@@ -348,121 +277,55 @@
             `;
         }
 
-
         function nombreEmpresa(datos) {
-
-            return (
-                datos.clienteNombre ||
-                datos.cliente ||
-                "Empresa sin nombre"
-            );
+            return datos.clienteNombre ||
+                   datos.cliente ||
+                   "Empresa sin nombre";
         }
 
-
-        /*
-         * ======================================================
-         * VENTANA EMERGENTE
-         * ======================================================
-         */
-
-        function abrirOverlay(
-            titulo,
-            empresa,
-            fechaTexto,
-            contenidoHTML
-        ) {
-
+        function abrirOverlay(titulo, empresa, fechaTexto, contenidoHTML) {
             const overlay = document.createElement("div");
-
             overlay.className = "overlay-historial";
 
-
             const ventana = document.createElement("div");
-
             ventana.className = "ventana-historial";
 
-
             ventana.innerHTML = `
-
-                <h2 style="
-                    margin-top:0;
-                    color:#1f4e8c;
-                ">
+                <h2 style="margin-top:0;color:#1f4e8c;">
                     ${escaparHTML(titulo)}
                 </h2>
 
-                <div style="
-                    color:#555;
-                    margin-bottom:5px;
-                ">
+                <div style="color:#555;margin-bottom:5px;">
                     ${escaparHTML(empresa)}
                 </div>
 
-                <div style="
-                    font-size:13px;
-                    color:#777;
-                    margin-bottom:18px;
-                ">
+                <div style="font-size:13px;color:#777;margin-bottom:18px;">
                     ${escaparHTML(fechaTexto)}
                 </div>
 
-                <div>
-                    ${contenidoHTML}
-                </div>
+                <div>${contenidoHTML}</div>
 
-                <button
-                    type="button"
-                    class="cerrar-historial"
-                >
+                <button type="button" class="cerrar-historial">
                     Cerrar
                 </button>
-
             `;
 
-
             overlay.appendChild(ventana);
-
             document.body.appendChild(overlay);
 
-
-            ventana
-                .querySelector(".cerrar-historial")
-                .addEventListener("click", () => {
-                    overlay.remove();
-                });
-
+            ventana.querySelector(".cerrar-historial")
+                .addEventListener("click", () => overlay.remove());
 
             overlay.addEventListener("click", evento => {
-
-                if (evento.target === overlay) {
-                    overlay.remove();
-                }
-
+                if (evento.target === overlay) overlay.remove();
             });
-
         }
 
-
-        /*
-         * ======================================================
-         * CREAR TARJETA
-         * ======================================================
-         */
-
-        function crearTarjeta(
-            fecha,
-            tipo,
-            titulo,
-            empresa
-        ) {
-
+        function crearTarjeta(fecha, tipo, titulo, empresa) {
             const tarjeta = document.createElement("div");
-
             tarjeta.className = "actividad-historial";
 
-
             tarjeta.innerHTML = `
-
                 <div class="actividad-fecha">
                     ${escaparHTML(mostrarFecha(fecha))}
                 </div>
@@ -471,80 +334,38 @@
                     🏢 ${escaparHTML(empresa)}
                 </div>
 
-                <div class="actividad-badge">
-                    ${tipo}
-                </div>
+                <div class="actividad-badge">${tipo}</div>
 
                 <div class="actividad-titulo">
                     ${escaparHTML(titulo)}
                 </div>
-
             `;
-
 
             return tarjeta;
-
         }
 
-
-        /*
-         * ======================================================
-         * CARGAR TODA LA ACTIVIDAD
-         * ======================================================
-         */
-
         async function cargarHistorialCompleto() {
-
             lista.innerHTML = `
-                <div class="mensaje-historial">
-                    Cargando historial...
-                </div>
+                <div class="mensaje-historial">Cargando historial...</div>
             `;
 
-
             try {
-
                 const [
                     visitasSnap,
                     egresosSnap,
                     ensayosSnap,
                     cotizacionesSnap
                 ] = await Promise.all([
-
-                    getDocs(
-                        collection(db, "visitas")
-                    ),
-
-                    getDocs(
-                        collection(db, "egresos")
-                    ),
-
-                    getDocs(
-                        collection(db, "ensayos")
-                    ),
-
-                    getDocs(
-                        collection(db, "cotizaciones")
-                    )
-
+                    getDocs(collection(db, "visitas")),
+                    getDocs(collection(db, "egresos")),
+                    getDocs(collection(db, "ensayos")),
+                    getDocs(collection(db, "cotizaciones"))
                 ]);
-
 
                 const actividades = [];
 
-
-                /*
-                 * =================================================
-                 * VISITAS Y NOTAS
-                 *
-                 * Se excluyen las antiguas visitas "Venta"
-                 * para no duplicar ventas registradas en egresos.
-                 * También se excluyen las entregas.
-                 * =================================================
-                 */
-
+                // VISITAS Y NOTAS
                 visitasSnap.forEach(documento => {
-
                     const datos = documento.data();
 
                     if (
@@ -554,284 +375,132 @@
                         return;
                     }
 
-
-                    /*
-                     * Solo se consideran visitas y notas.
-                     * Si el registro no tiene tipo, se conserva
-                     * como visita por compatibilidad.
-                     */
-
-                    const esNota =
-                        datos.tipoVisita === "Nota";
-
+                    const esNota = datos.tipoVisita === "Nota";
 
                     const esVisita =
                         datos.tipoVisita === "Nota de visita" ||
                         datos.tipoVisita === "Visita" ||
                         !datos.tipoVisita;
 
-
-                    if (!esNota && !esVisita) {
-                        return;
-                    }
-
+                    if (!esNota && !esVisita) return;
 
                     actividades.push({
-
                         id: documento.id,
-
                         origen: "visita",
-
                         datos,
-
                         fecha: obtenerFechaActividad(datos),
-
                         empresa: nombreEmpresa(datos),
-
-                        tipo: esNota
-                            ? "📝 Nota"
-                            : "📍 Visita",
-
-                        titulo:
-                            datos.titulo ||
-                            (esNota ? "Nota" : "Visita")
-
+                        tipo: esNota ? "📝 Nota" : "📍 Visita",
+                        titulo: datos.titulo || (esNota ? "Nota" : "Visita")
                     });
-
                 });
 
-
-                /*
-                 * =================================================
-                 * VENTAS
-                 *
-                 * Solo egresos con tipoEgreso === "venta".
-                 * Se agrupan por empresa y día.
-                 * =================================================
-                 */
-
+                // VENTAS AGRUPADAS POR EMPRESA Y DÍA
                 const ventasPorGrupo = new Map();
 
-
                 egresosSnap.forEach(documento => {
-
                     const datos = documento.data();
 
+                    if (datos.tipoEgreso !== "venta") return;
 
-                    if (datos.tipoEgreso !== "venta") {
-                        return;
-                    }
-
-
-                    const fecha =
-                        obtenerFechaActividad(datos);
-
-
-                    const empresa =
-                        nombreEmpresa(datos);
-
-
-                    const clienteId =
-                        datos.clienteId ||
-                        empresa;
-
+                    const fecha = obtenerFechaActividad(datos);
+                    const empresa = nombreEmpresa(datos);
+                    const clienteId = datos.clienteId || empresa;
 
                     let claveDia = "sin-fecha";
 
-
                     if (fecha) {
-
                         claveDia =
-                            fecha.getFullYear() +
-                            "-" +
-                            String(fecha.getMonth() + 1)
-                                .padStart(2, "0") +
-                            "-" +
-                            String(fecha.getDate())
-                                .padStart(2, "0");
-
+                            fecha.getFullYear() + "-" +
+                            String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
+                            String(fecha.getDate()).padStart(2, "0");
                     }
 
-
-                    const claveGrupo =
-                        `${clienteId}__${claveDia}`;
-
+                    const claveGrupo = `${clienteId}__${claveDia}`;
 
                     if (!ventasPorGrupo.has(claveGrupo)) {
-
-                        ventasPorGrupo.set(
-                            claveGrupo,
-                            {
-                                id: `venta-${claveGrupo}`,
-                                origen: "venta",
-                                fecha,
-                                empresa,
-                                tipo: "💰 Venta",
-                                titulo: "Venta",
-                                productos: []
-                            }
-                        );
-
+                        ventasPorGrupo.set(claveGrupo, {
+                            id: `venta-${claveGrupo}`,
+                            origen: "venta",
+                            fecha,
+                            empresa,
+                            tipo: "💰 Venta",
+                            titulo: "Venta",
+                            productos: []
+                        });
                     }
 
-
-                    const venta =
-                        ventasPorGrupo.get(claveGrupo);
-
+                    const venta = ventasPorGrupo.get(claveGrupo);
 
                     venta.productos.push({
-
-                        nombre:
-                            datos.productoNombre ||
-                            "Producto sin nombre",
-
-                        cantidad:
-                            datos.cantidad,
-
-                        unidad:
-                            datos.unidad || "",
-
-                        lote:
-                            datos.lote || ""
-
+                        nombre: datos.productoNombre || "Producto sin nombre",
+                        cantidad: datos.cantidad,
+                        unidad: datos.unidad || "",
+                        lote: datos.lote || ""
                     });
 
-
-                    if (
-                        fecha &&
-                        (
-                            !venta.fecha ||
-                            fecha > venta.fecha
-                        )
-                    ) {
+                    if (fecha && (!venta.fecha || fecha > venta.fecha)) {
                         venta.fecha = fecha;
                     }
-
                 });
 
-
                 ventasPorGrupo.forEach(venta => {
-
                     venta.titulo =
                         `${venta.productos.length} producto` +
                         (venta.productos.length === 1 ? "" : "s");
 
                     actividades.push(venta);
-
                 });
 
-
-                /*
-                 * =================================================
-                 * ENSAYOS
-                 * =================================================
-                 */
-
+                // ENSAYOS
                 ensayosSnap.forEach(documento => {
-
                     const datos = documento.data();
 
-
                     actividades.push({
-
                         id: documento.id,
-
                         origen: "ensayo",
-
                         datos,
-
                         fecha: obtenerFechaActividad(datos),
-
                         empresa: nombreEmpresa(datos),
-
                         tipo: "🧪 Ensayo",
-
-                        titulo:
-                            datos.nombreEnsayo ||
-                            "Ensayo"
-
+                        titulo: datos.nombreEnsayo || "Ensayo"
                     });
-
                 });
 
-
-                /*
-                 * =================================================
-                 * COTIZACIONES
-                 * =================================================
-                 */
-
+                // COTIZACIONES
                 cotizacionesSnap.forEach(documento => {
-
                     const datos = documento.data();
 
-
                     actividades.push({
-
                         id: documento.id,
-
                         origen: "cotizacion",
-
                         datos,
-
                         fecha: obtenerFechaActividad(datos),
-
                         empresa: nombreEmpresa(datos),
-
                         tipo: "📄 Cotización",
-
-                        titulo:
-                            datos.nombreCotizacion ||
-                            "Cotización"
-
+                        titulo: datos.nombreCotizacion || "Cotización"
                     });
-
                 });
 
-
-                /*
-                 * =================================================
-                 * ORDENAR DE MÁS NUEVO A MÁS VIEJO
-                 * =================================================
-                 */
-
+                // ORDENAR DE MÁS NUEVO A MÁS VIEJO
                 actividades.sort((a, b) => {
-
-                    const fechaA =
-                        a.fecha ? a.fecha.getTime() : 0;
-
-                    const fechaB =
-                        b.fecha ? b.fecha.getTime() : 0;
-
+                    const fechaA = a.fecha ? a.fecha.getTime() : 0;
+                    const fechaB = b.fecha ? b.fecha.getTime() : 0;
                     return fechaB - fechaA;
-
                 });
-
 
                 lista.innerHTML = "";
 
-
                 if (actividades.length === 0) {
-
                     lista.innerHTML = `
                         <div class="mensaje-historial">
                             No hay actividades registradas.
                         </div>
                     `;
-
                     return;
-
                 }
 
-
-                /*
-                 * =================================================
-                 * MOSTRAR TODAS LAS ACTIVIDADES
-                 * =================================================
-                 */
-
                 actividades.forEach(actividad => {
-
                     const tarjeta = crearTarjeta(
                         actividad.fecha,
                         actividad.tipo,
@@ -839,24 +508,14 @@
                         actividad.empresa
                     );
 
-
-                    /*
-                     * VENTA
-                     */
-
+                    // VENTAS
                     if (actividad.origen === "venta") {
-
                         tarjeta.addEventListener("click", () => {
-
                             let productosHTML = "";
 
-
                             actividad.productos.forEach(producto => {
-
                                 productosHTML += `
-
                                     <div class="producto-historial">
-
                                         <strong>
                                             ${escaparHTML(producto.nombre)}
                                         </strong>
@@ -867,23 +526,14 @@
                                             ${escaparHTML(producto.unidad)}
                                         </p>
 
-                                        ${
-                                            producto.lote
-                                                ? `
-                                                    <p>
-                                                        Lote:
-                                                        ${escaparHTML(producto.lote)}
-                                                    </p>
-                                                `
-                                                : ""
-                                        }
-
+                                        ${producto.lote ? `
+                                            <p>
+                                                Lote: ${escaparHTML(producto.lote)}
+                                            </p>
+                                        ` : ""}
                                     </div>
-
                                 `;
-
                             });
-
 
                             abrirOverlay(
                                 "💰 Venta",
@@ -891,52 +541,27 @@
                                 mostrarFecha(actividad.fecha),
                                 productosHTML
                             );
-
                         });
-
                     }
 
-
-                    /*
-                     * ENSAYO / COTIZACIÓN
-                     *
-                     * Se abren en otra pestaña.
-                     */
-
+                    // ENSAYOS Y COTIZACIONES
                     else if (
                         actividad.origen === "ensayo" ||
                         actividad.origen === "cotizacion"
                     ) {
-
                         tarjeta.addEventListener("click", () => {
+                            const pagina = actividad.origen === "ensayo"
+                                ? `ensayo.html?id=${encodeURIComponent(actividad.id)}`
+                                : `cotizacion.html?id=${encodeURIComponent(actividad.id)}`;
 
-                            const pagina =
-                                actividad.origen === "ensayo"
-                                    ? `ensayo.html?id=${actividad.id}`
-                                    : `cotizacion.html?id=${actividad.id}`;
-
-
-                            window.open(
-                                pagina,
-                                "_blank"
-                            );
-
+                            window.open(pagina, "_blank");
                         });
-
                     }
 
-
-                    /*
-                     * VISITA / NOTA
-                     */
-
+                    // VISITAS Y NOTAS
                     else {
-
                         tarjeta.addEventListener("click", () => {
-
-                            const contenido =
-                                actividad.datos.nota || "";
-
+                            const contenido = actividad.datos.nota || "";
 
                             abrirOverlay(
                                 actividad.titulo,
@@ -949,65 +574,36 @@
                                         font-size:16px;
                                         color:#333;
                                     ">
-                                        ${escaparHTML(
-                                            contenido || "Sin contenido."
-                                        )}
+                                        ${escaparHTML(contenido || "Sin contenido.")}
                                     </div>
                                 `
                             );
-
                         });
-
                     }
 
-
                     lista.appendChild(tarjeta);
-
                 });
 
+            } catch (error) {
+                console.error("ERROR CARGANDO HISTORIAL GLOBAL:", error);
+                mostrarError("No se pudo cargar el historial.");
             }
-
-            catch (error) {
-
-                console.error(
-                    "ERROR CARGANDO HISTORIAL GLOBAL:",
-                    error
-                );
-
-                mostrarError(
-                    "No se pudo cargar el historial."
-                );
-
-            }
-
         }
 
-
-        /*
-         * ======================================================
-         * VOLVER AL INICIO
-         * ======================================================
-         */
-
-        document
-            .getElementById("volverInicioBtn")
+        document.getElementById("volverInicioBtn")
             .addEventListener("click", () => {
-
                 window.location.href = "index.html";
-
             });
 
-
-        /*
-         * ======================================================
-         * INICIAR
-         * ======================================================
-         */
-
-        cargarHistorialCompleto();
-
+        // PROTECCIÓN: iniciar el historial solo después de validar el acceso.
+        try {
+            await protegerPagina();
+            await cargarHistorialCompleto();
+        } catch (error) {
+            console.error("No se pudo validar el acceso al historial:", error);
+            window.location.replace("login.html");
+        }
     </script>
 
 </body>
-
 </html>
