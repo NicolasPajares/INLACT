@@ -35,4 +35,5 @@ export const db = initializeFirestore(app, {
 
 // Autenticación de usuarios
 export const auth = getAuth(app);
+console.log("Firebase inicializado:", { db, auth });
 ```
