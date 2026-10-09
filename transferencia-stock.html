@@ -37,7 +37,7 @@
 </head>
 
 
-<body>
+<script type="module" src="productos.js"></script>
 
 
 <header>
@@ -211,12 +211,14 @@
 </footer>
 
 
-<script
-    type="module"
-    src="transferencia-stock.js">
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
 </script>
-
-
 </body>
-
 </html>
+
