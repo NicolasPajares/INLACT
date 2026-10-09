@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="clientes.css">
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
         <figure>
@@ -92,7 +92,18 @@
 </footer>
 
 <!-- JS -->
-<script type="module" src="clientes.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina()
+    .then(async () => {
+      await import("./clientes.js");
+    })
+    .catch((error) => {
+      console.error("Error al proteger la página de clientes:", error);
+    });
+</script>
 
 </body>
 </html>
