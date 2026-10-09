@@ -884,3 +884,11 @@ footer a:hover {
   padding: 0;
   background: #ffffff;
 }
+
+/* ANCHO COMPLETO DE LA COTIZACIÓN */
+main.contenedor-cotizacion {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
