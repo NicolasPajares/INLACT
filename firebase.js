@@ -1,23 +1,38 @@
+```javascript
 // firebase.js
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
-  initializeFirestore,
-  persistentLocalCache
+    initializeFirestore,
+    persistentLocalCache
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+    getAuth
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-  authDomain: "inlact.firebaseapp.com",
-  projectId: "inlact",
-  storageBucket: "inlact.firebasestorage.app",
-  messagingSenderId: "143868382036",
-  appId: "1:143868382036:web:b5af0e4faced7e880216c1"
+    apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+    authDomain: "inlact.firebaseapp.com",
+    projectId: "inlact",
+    storageBucket: "inlact.firebasestorage.app",
+    messagingSenderId: "143868382036",
+    appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
+
 
 const app = initializeApp(firebaseConfig);
 
-// 🔥 ESTA LÍNEA ES LA CLAVE
+
+// Firestore: conservamos la configuración actual
 export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache(),
-  experimentalForceLongPolling: true
+    localCache: persistentLocalCache(),
+    experimentalForceLongPolling: true
 });
+
+
+// Autenticación de usuarios
+export const auth = getAuth(app);
+```
