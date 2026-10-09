@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="stock.css">
 </head>
 
-<body style="visibility: hidden;">
+<body>
 
 
 <header>
@@ -115,21 +115,7 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-
-
-<script type="module">
-  import { protegerPagina } from "./proteger.js";
-
-  try {
-    await protegerPagina();
-  } catch (error) {
-    console.error("Error al proteger la página de Stock:", error);
-  }
-</script>
-
 <script type="module" src="stock.js"></script>
-
 
 </body>
 </html>
-
