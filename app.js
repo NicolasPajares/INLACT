@@ -559,7 +559,9 @@ function mostrarFormularioNota(cliente, lat, lng) {
 
         cliente: cliente.nombre,
 
-        tipoVisita: "Nota de visita",
+        tipoVisita: "Visita",
+
+        origenRegistro: "inicio",
 
         titulo: titulo,
 
@@ -807,25 +809,39 @@ async function cargarUltimasActividades() {
       const datos = documento.data();
       const tipo = datos.tipoVisita || "";
 
-      // Las ventas se toman de egresos, como en historial.html.
-      if (tipo === "Venta" || tipo === "Entrega de productos") return;
+      // Las ventas y entregas se gestionan por separado.
+      if (
+        tipo === "Venta" ||
+        tipo === "Entrega de productos"
+      ) {
+        return;
+      }
 
-      const esNota =
-        tipo === "Nota" || tipo === "Nota de visita";
+      // Las visitas nuevas del inicio se identifican expresamente.
+      // Para registros antiguos, usamos la ubicación como referencia.
+      const tieneUbicacion =
+        datos.lat != null && datos.lng != null;
 
       const esVisita =
-        tipo === "" || tipo === "Visita";
+        datos.origenRegistro === "inicio" ||
+        tipo === "Visita" ||
+        tipo === "" ||
+        (tipo === "Nota de visita" && tieneUbicacion);
+
+      const esNota =
+        tipo === "Nota" ||
+        (tipo === "Nota de visita" && !tieneUbicacion);
 
       if (!esNota && !esVisita) return;
 
       actividades.push({
         id: documento.id,
-        categoria: esNota ? "📝 Nota" : "📍 Visita",
-        titulo: datos.titulo || (esNota ? "Nota" : "Visita"),
+        categoria: esVisita ? "📍 Visita" : "📝 Nota",
+        titulo: datos.titulo || (esVisita ? "Visita" : "Nota"),
         empresa: empresaActividad(datos),
         fecha: fechaActividad(datos),
         nota: datos.nota || "",
-        tipoDetalle: esNota ? "nota" : "visita"
+        tipoDetalle: esVisita ? "visita" : "nota"
       });
     });
 
