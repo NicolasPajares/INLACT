@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="precios.css">
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
        <figure>
@@ -100,7 +100,16 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module" src="precios.js"></script>
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
