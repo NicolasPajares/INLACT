@@ -1,3 +1,4 @@
+
 /**********************
  * FIREBASE
  **********************/
@@ -10,6 +11,9 @@ import {
     getDocs,
     query,
     where,
+    doc,
+    getDoc,
+    updateDoc,
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -32,106 +36,174 @@ const db = getFirestore(app);
  * ELEMENTOS
  **********************/
 const form = document.getElementById("formUbicacion");
-
 const nombre = document.getElementById("nombre");
-
+const btnGuardar = document.getElementById("btnGuardar");
 const btnCancelar = document.getElementById("btnCancelar");
+
+/**********************
+ * MODO EDICIÓN
+ **********************/
+const parametros = new URLSearchParams(window.location.search);
+const ubicacionId = parametros.get("id");
+const modoEdicion = Boolean(ubicacionId);
+
+let guardando = false;
+
+/**********************
+ * PREPARAR FORMULARIO
+ **********************/
+if (modoEdicion) {
+    document.title = "INLACT · Editar Ubicación";
+
+    const titulo = document.querySelector(".card h2");
+
+    if (titulo) {
+        titulo.textContent = "Editar Ubicación";
+    }
+
+    btnGuardar.textContent = "Guardar Cambios";
+
+    cargarUbicacionParaEditar();
+}
+
+/**********************
+ * CARGAR UBICACIÓN
+ **********************/
+async function cargarUbicacionParaEditar() {
+    btnGuardar.disabled = true;
+
+    try {
+        const referencia = doc(db, "ubicaciones", ubicacionId);
+        const resultado = await getDoc(referencia);
+
+        if (!resultado.exists()) {
+            alert("La ubicación que intentás editar no existe.");
+            window.location.href = "ubicaciones.html";
+            return;
+        }
+
+        const datos = resultado.data();
+
+        if (datos.activo !== true) {
+            alert("Esta ubicación está inactiva y no se puede editar desde el listado.");
+            window.location.href = "ubicaciones.html";
+            return;
+        }
+
+        nombre.value = datos.nombre || "";
+        btnGuardar.disabled = false;
+
+    } catch (error) {
+        console.error("Error al cargar la ubicación:", error);
+
+        alert("No se pudo cargar la ubicación. Intentá nuevamente.");
+        window.location.href = "ubicaciones.html";
+    }
+}
 
 /**********************
  * CANCELAR
  **********************/
 btnCancelar.addEventListener("click", () => {
-
     window.location.href = "ubicaciones.html";
-
 });
 
 /**********************
- * VERIFICAR SI EXISTE
+ * VERIFICAR DUPLICADOS
  **********************/
 async function ubicacionExiste(nombreUbicacion) {
-
     const q = query(
         collection(db, "ubicaciones"),
         where("nombre", "==", nombreUbicacion)
     );
 
-    const snap = await getDocs(q);
+    const snapshot = await getDocs(q);
 
-    return !snap.empty;
+    return snapshot.docs.some(documento => {
+        const datos = documento.data();
 
+        // Permite conservar el nombre de la propia ubicación al editar.
+        if (modoEdicion && documento.id === ubicacionId) {
+            return false;
+        }
+
+        // Solo considera duplicados las ubicaciones activas.
+        return datos.activo === true;
+    });
 }
+
 /**********************
- * GUARDAR UBICACIÓN
+ * GUARDAR / ACTUALIZAR
  **********************/
 form.addEventListener("submit", async (e) => {
-
     e.preventDefault();
 
-    const nuevaUbicacion = {
+    if (guardando) return;
 
-        nombre: nombre.value.trim(),
+    const nombreNuevo = nombre.value.trim();
 
-        activo: true,
-
-        fechaCreacion: Timestamp.now()
-
-    };
-
-    /*==============================
-      VALIDACIÓN
-    ==============================*/
-
-    if (nuevaUbicacion.nombre === "") {
-
+    if (nombreNuevo === "") {
         alert("Debe ingresar el nombre de la ubicación.");
-
         nombre.focus();
-
         return;
-
     }
 
-    /*==============================
-      UBICACIÓN DUPLICADA
-    ==============================*/
+    guardando = true;
+    btnGuardar.disabled = true;
 
-    if (await ubicacionExiste(nuevaUbicacion.nombre)) {
-
-        alert("Ya existe una ubicación con ese nombre.");
-
-        nombre.focus();
-
-        return;
-
-    }
-
-    /*==============================
-      GUARDAR
-    ==============================*/
+    const textoOriginal = btnGuardar.textContent;
+    btnGuardar.textContent = "Guardando...";
 
     try {
+        if (await ubicacionExiste(nombreNuevo)) {
+            alert("Ya existe una ubicación activa con ese nombre.");
+            nombre.focus();
+            nombre.select();
+            return;
+        }
 
-        await addDoc(
+        if (modoEdicion) {
+            /**********************
+             * ACTUALIZAR
+             **********************/
+            await updateDoc(
+                doc(db, "ubicaciones", ubicacionId),
+                {
+                    nombre: nombreNuevo
+                }
+            );
 
-            collection(db, "ubicaciones"),
+            alert("Ubicación actualizada correctamente.");
 
-            nuevaUbicacion
+        } else {
+            /**********************
+             * CREAR
+             **********************/
+            await addDoc(
+                collection(db, "ubicaciones"),
+                {
+                    nombre: nombreNuevo,
+                    activo: true,
+                    fechaCreacion: Timestamp.now()
+                }
+            );
 
-        );
-
-        alert("Ubicación creada correctamente.");
+            alert("Ubicación creada correctamente.");
+        }
 
         window.location.href = "ubicaciones.html";
 
+    } catch (error) {
+        console.error("Error al guardar la ubicación:", error);
+
+        alert(
+            "Ocurrió un error al guardar la ubicación. " +
+            "Revisá la conexión e intentá nuevamente."
+        );
+
+    } finally {
+        guardando = false;
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = textoOriginal;
     }
-
-    catch (error) {
-
-        console.error(error);
-
-        alert("Ocurrió un error al guardar la ubicación.");
-
-    }
-
 });
