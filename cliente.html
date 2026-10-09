@@ -284,6 +284,7 @@ onclick="window.location.href='clientes.html';"
 ================================ -->
 
 
+
 <script type="module">
   import { protegerPagina } from "./proteger.js";
 
@@ -291,18 +292,15 @@ onclick="window.location.href='clientes.html';"
 
   try {
     await protegerPagina();
-
-    // Cargar la lógica específica del detalle del cliente.
-    await import("./cliente.js");
-
-    // Cargar las funciones de notas después de validar el acceso.
-    await import("./notas.js");
-
     document.body.style.visibility = "visible";
   } catch (error) {
-    console.error("Error al proteger o cargar el detalle del cliente:", error);
+    console.error("Error al proteger la página de cliente:", error);
   }
 </script>
+
+<script type="module" src="cliente.js"></script>
+<script type="module" src="notas.js"></script>
+
 
 
 </body>
