@@ -115,7 +115,19 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module" src="stock.js"></script>
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina()
+    .then(async () => {
+      await import("./stock.js");
+    })
+    .catch((error) => {
+      console.error("Error al proteger la página de Stock:", error);
+    });
+</script>
 
 </body>
 </html>
+
+
