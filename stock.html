@@ -116,16 +116,18 @@
 </footer>
 
 
+
 <script type="module">
   import { protegerPagina } from "./proteger.js";
 
-  protegerPagina().then(async () => {
-    await import("./productos.js");
-  });
+  try {
+    await protegerPagina();
+    document.body.style.visibility = "visible";
+    await import("./stock.js");
+  } catch (error) {
+    console.error("Error al proteger la página de Stock:", error);
+  }
 </script>
 </body>
 </html>
 
-
-</body>
-</html>
