@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="ensayos.css">
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
         <figure>
@@ -88,7 +88,17 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
-<script type="module" src="ensayos.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 </html>
