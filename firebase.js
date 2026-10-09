@@ -6,6 +6,10 @@ import {
   persistentLocalCache
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import {
+  getAuth
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
   authDomain: "inlact.firebaseapp.com",
@@ -17,7 +21,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+// Firestore: mantenemos la configuración que ya funciona.
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache(),
   experimentalForceLongPolling: true
 });
+
+// Autenticación: agregamos auth sin modificar db.
+export const auth = getAuth(app);
