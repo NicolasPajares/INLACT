@@ -1,5 +1,6 @@
+
 /* ============================================================
-   NUEVA COTIZACIÓN
+   NUEVA COTIZACIÓN / EDICIÓN DE COTIZACIÓN
 ============================================================ */
 
 import {
@@ -11,6 +12,9 @@ import {
     collection,
     getDocs,
     addDoc,
+    doc,
+    getDoc,
+    updateDoc,
     Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -20,87 +24,32 @@ import {
 ============================================================ */
 
 const firebaseConfig = {
-
-    apiKey:
-        "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-
-    authDomain:
-        "inlact.firebaseapp.com",
-
-    projectId:
-        "inlact",
-
-    storageBucket:
-        "inlact.firebasestorage.app",
-
-    messagingSenderId:
-        "143868382036",
-
-    appId:
-        "1:143868382036:web:b5af0e4faced7e880216c1"
-
+    apiKey: "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
+    authDomain: "inlact.firebaseapp.com",
+    projectId: "inlact",
+    storageBucket: "inlact.firebasestorage.app",
+    messagingSenderId: "143868382036",
+    appId: "1:143868382036:web:b5af0e4faced7e880216c1"
 };
 
-const app =
-    initializeApp(firebaseConfig);
-
-const db =
-    getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 
 /* ============================================================
    ELEMENTOS
 ============================================================ */
 
-const form =
-    document.getElementById(
-        "formNuevaCotizacion"
-    );
-
-const selectCliente =
-    document.getElementById(
-        "cliente"
-    );
-
-const fechaEl =
-    document.getElementById(
-        "fecha"
-    );
-
-const nombreCotizacionEl =
-    document.getElementById(
-        "nombreCotizacion"
-    );
-
-const propuestaEl =
-    document.getElementById(
-        "propuesta"
-    );
-
-const dosisEl =
-    document.getElementById(
-        "dosis"
-    );
-
-const observacionesEl =
-    document.getElementById(
-        "observaciones"
-    );
-
-const listaProductosEl =
-    document.getElementById(
-        "listaProductosCotizacion"
-    );
-
-const btnAgregarProducto =
-    document.getElementById(
-        "btnAgregarProductoCotizacion"
-    );
-
-const selectListaPrecios =
-    document.getElementById(
-        "listaPrecios"
-    );
+const form = document.getElementById("formNuevaCotizacion");
+const selectCliente = document.getElementById("cliente");
+const fechaEl = document.getElementById("fecha");
+const nombreCotizacionEl = document.getElementById("nombreCotizacion");
+const propuestaEl = document.getElementById("propuesta");
+const dosisEl = document.getElementById("dosis");
+const observacionesEl = document.getElementById("observaciones");
+const listaProductosEl = document.getElementById("listaProductosCotizacion");
+const btnAgregarProducto = document.getElementById("btnAgregarProductoCotizacion");
+const selectListaPrecios = document.getElementById("listaPrecios");
 
 
 /* ============================================================
@@ -108,12 +57,15 @@ const selectListaPrecios =
 ============================================================ */
 
 let productos = [];
-
 let listasPrecios = [];
-
 let listaPreciosSeleccionada = null;
-
 let productosCotizacion = [];
+
+const cotizacionId = new URLSearchParams(
+    window.location.search
+).get("id");
+
+let cotizacionOriginal = null;
 
 
 /* ============================================================
@@ -121,64 +73,25 @@ let productosCotizacion = [];
 ============================================================ */
 
 async function cargarClientes() {
-
     try {
-
-        const snap =
-            await getDocs(
-                collection(
-                    db,
-                    "clientes"
-                )
-            );
-
+        const snap = await getDocs(collection(db, "clientes"));
 
         snap.forEach(docu => {
+            const cliente = docu.data();
+            const option = document.createElement("option");
 
-            const cliente =
-                docu.data();
+            option.value = docu.id;
+            option.textContent = cliente.nombre || "Cliente sin nombre";
+            option.dataset.nombre = cliente.nombre || "";
 
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                docu.id;
-
-
-            option.textContent =
-                cliente.nombre ||
-                "Cliente sin nombre";
-
-
-            option.dataset.nombre =
-                cliente.nombre || "";
-
-
-            selectCliente.appendChild(
-                option
-            );
-
+            selectCliente.appendChild(option);
         });
 
+    } catch (error) {
+        console.error("Error cargando clientes:", error);
+        alert("No se pudieron cargar los clientes.");
+        throw error;
     }
-
-    catch (error) {
-
-        console.error(
-            "Error cargando clientes:",
-            error
-        );
-
-        alert(
-            "No se pudieron cargar los clientes."
-        );
-
-    }
-
 }
 
 
@@ -187,98 +100,39 @@ async function cargarClientes() {
 ============================================================ */
 
 async function cargarProductos() {
-
     try {
-
-        const snap =
-            await getDocs(
-                collection(
-                    db,
-                    "productos"
-                )
-            );
-
+        const snap = await getDocs(collection(db, "productos"));
 
         productos = [];
 
-
         snap.forEach(docu => {
+            const datos = docu.data();
 
-            const datos =
-                docu.data();
-
-
-            /*
-             * Solo productos activos
-             */
-
-            if (
-                datos.activo === false
-            ) {
-
-                return;
-
-            }
-
+            if (datos.activo === false) return;
 
             productos.push({
-
-                id:
-                    docu.id,
-
-                codigo:
-                    datos.codigo ||
-                    "",
-
-                descripcion:
-                    datos.descripcion ||
-                    "Producto sin nombre",
-
-                unidad:
-                    datos.unidad ||
-                    ""
-
+                id: docu.id,
+                codigo: datos.codigo || "",
+                descripcion: datos.descripcion || "Producto sin nombre",
+                unidad: datos.unidad || ""
             });
-
         });
 
-
-        /*
-         * Orden alfabético
-         */
-
-        productos.sort(
-            (a, b) =>
-                a.descripcion.localeCompare(
-                    b.descripcion,
-                    "es",
-                    {
-                        sensitivity: "base"
-                    }
-                )
+        productos.sort((a, b) =>
+            a.descripcion.localeCompare(
+                b.descripcion,
+                "es",
+                { sensitivity: "base" }
+            )
         );
 
+        console.log("Productos cargados:", productos.length);
 
-        console.log(
-            "Productos cargados:",
-            productos.length
-        );
-
+    } catch (error) {
+        console.error("Error cargando productos:", error);
+        alert("No se pudieron cargar los productos.");
+        throw error;
     }
-
-    catch (error) {
-
-        console.error(
-            "Error cargando productos:",
-            error
-        );
-
-        alert(
-            "No se pudieron cargar los productos."
-        );
-
-    }
-
 }
 
 
@@ -287,139 +141,57 @@ async function cargarProductos() {
 ============================================================ */
 
 async function cargarListasPrecios() {
-
     try {
-
-        const snap =
-            await getDocs(
-                collection(
-                    db,
-                    "listaprecios"
-                )
-            );
-
+        const snap = await getDocs(collection(db, "listaprecios"));
 
         listasPrecios = [];
 
-
         snap.forEach(docu => {
-
-            const datos =
-                docu.data();
-
+            const datos = docu.data();
 
             listasPrecios.push({
-
-                id:
-                    docu.id,
-
-                nombre:
-                    datos.nombre ||
-                    "Lista sin nombre",
-
-                fecha:
-                    datos.fecha ||
-                    null,
-
-                productos:
-                    Array.isArray(
-                        datos.productos
-                    )
-                        ? datos.productos
-                        : []
-
+                id: docu.id,
+                nombre: datos.nombre || "Lista sin nombre",
+                fecha: datos.fecha || null,
+                productos: Array.isArray(datos.productos)
+                    ? datos.productos
+                    : []
             });
-
         });
 
+        listasPrecios.sort((a, b) => {
+            const fechaA = a.fecha && typeof a.fecha.toDate === "function"
+                ? a.fecha.toDate().getTime()
+                : 0;
 
-        /*
-         * Ordenar por fecha más reciente
-         */
+            const fechaB = b.fecha && typeof b.fecha.toDate === "function"
+                ? b.fecha.toDate().getTime()
+                : 0;
 
-        listasPrecios.sort(
-            (a, b) => {
+            return fechaB - fechaA;
+        });
 
-                const fechaA =
-                    a.fecha &&
-                    typeof a.fecha.toDate === "function"
-                        ? a.fecha.toDate().getTime()
-                        : 0;
+        selectListaPrecios.innerHTML = "";
 
-
-                const fechaB =
-                    b.fecha &&
-                    typeof b.fecha.toDate === "function"
-                        ? b.fecha.toDate().getTime()
-                        : 0;
-
-
-                return fechaB - fechaA;
-
-            }
-        );
-
-
-        /*
-         * Limpiar selector
-         */
-
-        selectListaPrecios.innerHTML = `
-
-            <option value="">
-                Seleccionar lista de precios
-            </option>
-
-        `;
-
-
-        /*
-         * Agregar listas
-         */
+        const opcionInicial = document.createElement("option");
+        opcionInicial.value = "";
+        opcionInicial.textContent = "Seleccionar lista de precios";
+        selectListaPrecios.appendChild(opcionInicial);
 
         listasPrecios.forEach(lista => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                lista.id;
-
-
-            option.textContent =
-                lista.nombre;
-
-
-            selectListaPrecios.appendChild(
-                option
-            );
-
+            const option = document.createElement("option");
+            option.value = lista.id;
+            option.textContent = lista.nombre;
+            selectListaPrecios.appendChild(option);
         });
 
+        console.log("Listas de precios cargadas:", listasPrecios.length);
 
-        console.log(
-            "Listas de precios cargadas:",
-            listasPrecios.length
-        );
-
+    } catch (error) {
+        console.error("Error cargando listas de precios:", error);
+        alert("No se pudieron cargar las listas de precios.");
+        throw error;
     }
-
-    catch (error) {
-
-        console.error(
-            "Error cargando listas de precios:",
-            error
-        );
-
-        alert(
-            "No se pudieron cargar las listas de precios."
-        );
-
-    }
-
 }
 
 
@@ -427,288 +199,139 @@ async function cargarListasPrecios() {
    CAMBIAR LISTA DE PRECIOS
 ============================================================ */
 
-selectListaPrecios.addEventListener(
-    "change",
-    () => {
+selectListaPrecios.addEventListener("change", () => {
+    const id = selectListaPrecios.value;
 
-        const id =
-            selectListaPrecios.value;
+    listaPreciosSeleccionada =
+        listasPrecios.find(lista => lista.id === id) || null;
 
-
-        listaPreciosSeleccionada =
-            listasPrecios.find(
-                lista =>
-                    lista.id === id
-            ) || null;
+    actualizarSugerenciasProductos();
+});
 
 
-        /*
-         * Actualizar precios sugeridos
-         */
+/* ============================================================
+   ACTUALIZAR PRECIOS SUGERIDOS
+   No modifica los precios escritos por el usuario.
+============================================================ */
 
-        renderProductos();
+function actualizarSugerenciasProductos() {
+    const filas = listaProductosEl.querySelectorAll(
+        ".producto-cotizacion"
+    );
 
-    }
-);
+    filas.forEach(fila => {
+        const productoId = fila.dataset.productoId;
+        const sugerencia = fila.querySelector(".precio-sugerido");
+
+        if (!sugerencia || !productoId) return;
+
+        const precio = obtenerPrecioSugerido(productoId);
+
+        if (precio) {
+            sugerencia.textContent =
+                `Precio sugerido: ${formatearPrecio(
+                    precio.precio,
+                    precio.moneda
+                )}`;
+        } else {
+            sugerencia.textContent = listaPreciosSeleccionada
+                ? "Producto sin precio en esta lista"
+                : "Seleccioná una lista de precios";
+        }
+    });
+}
 
 
 /* ============================================================
    BUSCADOR DE PRODUCTO
 ============================================================ */
 
-function crearBuscadorProducto(
-    contenedor,
-    productoSeleccionado
-) {
+function crearBuscadorProducto(contenedor, productoSeleccionado) {
+    const buscador = document.createElement("input");
 
-    /*
-     * INPUT
-     */
+    buscador.type = "text";
+    buscador.placeholder = "Buscar producto por nombre o código...";
+    buscador.autocomplete = "off";
+    buscador.className = "producto-nombre";
 
-    const buscador =
-        document.createElement(
-            "input"
-        );
+    const resultados = document.createElement("div");
+    resultados.className = "resultados-productos";
+    resultados.hidden = true;
 
+    contenedor.appendChild(buscador);
+    contenedor.appendChild(resultados);
 
-    buscador.type =
-        "text";
-
-
-    buscador.placeholder =
-        "Buscar producto por nombre o código...";
-
-
-    buscador.autocomplete =
-        "off";
-
-
-    buscador.className =
-        "producto-nombre";
-
-
-    /*
-     * RESULTADOS
-     */
-
-    const resultados =
-        document.createElement(
-            "div"
-        );
-
-
-    resultados.className =
-        "resultados-productos";
-
-
-    resultados.hidden =
-        true;
-
-
-    contenedor.appendChild(
-        buscador
-    );
-
-
-    contenedor.appendChild(
-        resultados
-    );
-
-
-    /*
-     * Producto existente
-     */
-
-    if (
-        productoSeleccionado
-    ) {
-
+    if (productoSeleccionado) {
         buscador.value =
             productoSeleccionado.nombre ||
             productoSeleccionado.descripcion ||
             "";
-
     }
 
+    buscador.addEventListener("input", () => {
+        const texto = buscador.value.toLowerCase().trim();
 
-    /*
-     * BUSCAR
-     */
+        resultados.innerHTML = "";
 
-    buscador.addEventListener(
-        "input",
-        () => {
-
-            const texto =
-                buscador.value
-                    .toLowerCase()
-                    .trim();
-
-
-            resultados.innerHTML =
-                "";
-
-
-            if (
-                texto === ""
-            ) {
-
-                resultados.hidden =
-                    true;
-
-                return;
-
-            }
-
-
-            const encontrados =
-                productos
-                    .filter(
-                        producto => {
-
-                            const nombre =
-                                (
-                                    producto.descripcion ||
-                                    ""
-                                ).toLowerCase();
-
-
-                            const codigo =
-                                (
-                                    producto.codigo ||
-                                    ""
-                                ).toLowerCase();
-
-
-                            return (
-                                nombre.includes(
-                                    texto
-                                ) ||
-                                codigo.includes(
-                                    texto
-                                )
-                            );
-
-                        }
-                    )
-                    .slice(
-                        0,
-                        15
-                    );
-
-
-            if (
-                encontrados.length === 0
-            ) {
-
-                resultados.innerHTML = `
-
-                    <div class="sin-resultados">
-                        No se encontraron productos.
-                    </div>
-
-                `;
-
-
-                resultados.hidden =
-                    false;
-
-                return;
-
-            }
-
-
-            encontrados.forEach(
-                producto => {
-
-                    const opcion =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    opcion.className =
-                        "resultado-producto";
-
-
-                    opcion.innerHTML = `
-
-                        <strong>
-                            ${producto.descripcion}
-                        </strong>
-
-                        <small>
-                            ${
-                                producto.codigo
-                                    ? `Código: ${producto.codigo}`
-                                    : ""
-                            }
-
-                            ${
-                                producto.unidad
-                                    ? ` · ${producto.unidad}`
-                                    : ""
-                            }
-                        </small>
-
-                    `;
-
-
-                    opcion.addEventListener(
-                        "click",
-                        () => {
-
-                            seleccionarProducto(
-                                producto,
-                                buscador,
-                                resultados,
-                                contenedor
-                            );
-
-                        }
-                    );
-
-
-                    resultados.appendChild(
-                        opcion
-                    );
-
-                }
-            );
-
-
-            resultados.hidden =
-                false;
-
+        if (!texto) {
+            resultados.hidden = true;
+            return;
         }
-    );
 
+        const encontrados = productos.filter(producto => {
+            const nombre = (producto.descripcion || "").toLowerCase();
+            const codigo = (producto.codigo || "").toLowerCase();
 
-    /*
-     * Cerrar al hacer click afuera
-     */
+            return nombre.includes(texto) || codigo.includes(texto);
+        }).slice(0, 15);
 
-    document.addEventListener(
-        "click",
-        event => {
+        if (encontrados.length === 0) {
+            const sinResultados = document.createElement("div");
+            sinResultados.className = "sin-resultados";
+            sinResultados.textContent = "No se encontraron productos.";
 
-            if (
-                !contenedor.contains(
-                    event.target
-                )
-            ) {
-
-                resultados.hidden =
-                    true;
-
-            }
-
+            resultados.appendChild(sinResultados);
+            resultados.hidden = false;
+            return;
         }
-    );
 
+        encontrados.forEach(producto => {
+            const opcion = document.createElement("div");
+            opcion.className = "resultado-producto";
+
+            const nombre = document.createElement("strong");
+            nombre.textContent = producto.descripcion;
+
+            const detalle = document.createElement("small");
+            detalle.textContent = [
+                producto.codigo ? `Código: ${producto.codigo}` : "",
+                producto.unidad ? ` · ${producto.unidad}` : ""
+            ].join("");
+
+            opcion.append(nombre, detalle);
+
+            opcion.addEventListener("click", () => {
+                seleccionarProducto(
+                    producto,
+                    buscador,
+                    resultados,
+                    contenedor
+                );
+            });
+
+            resultados.appendChild(opcion);
+        });
+
+        resultados.hidden = false;
+    });
+
+    document.addEventListener("click", event => {
+        if (!contenedor.contains(event.target)) {
+            resultados.hidden = true;
+        }
+    });
 
     return buscador;
-
 }
 
 
@@ -716,48 +339,19 @@ function crearBuscadorProducto(
    BUSCAR PRECIO SUGERIDO
 ============================================================ */
 
-function obtenerPrecioSugerido(
-    productoId
-) {
+function obtenerPrecioSugerido(productoId) {
+    if (!listaPreciosSeleccionada) return null;
 
-    if (
-        !listaPreciosSeleccionada
-    ) {
+    const producto = listaPreciosSeleccionada.productos.find(
+        p => p.productoId === productoId
+    );
 
-        return null;
-
-    }
-
-
-    const producto =
-        listaPreciosSeleccionada.productos.find(
-            p =>
-                p.productoId === productoId
-        );
-
-
-    if (
-        !producto
-    ) {
-
-        return null;
-
-    }
-
+    if (!producto) return null;
 
     return {
-
-        precio:
-            Number(
-                producto.precio || 0
-            ),
-
-        moneda:
-            producto.moneda ||
-            "ARS"
-
+        precio: Number(producto.precio || 0),
+        moneda: producto.moneda || "ARS"
     };
-
 }
 
 
@@ -765,185 +359,69 @@ function obtenerPrecioSugerido(
    SELECCIONAR PRODUCTO
 ============================================================ */
 
-function seleccionarProducto(
-    producto,
-    buscador,
-    resultados,
-    contenedor
-) {
+function seleccionarProducto(producto, buscador, resultados, contenedor) {
+    const fila = contenedor.closest(".producto-cotizacion");
 
-    /*
-     * Evitar duplicados
-     */
+    const productoActual = fila &&
+        fila.dataset.productoId === producto.id;
 
-    const fila =
-        contenedor.closest(
-            ".producto-cotizacion"
-        );
+    const yaExiste = productosCotizacion.some(
+        p => p.productoId === producto.id
+    );
 
-
-    const productoActual =
-        fila &&
-        fila.dataset.productoId ===
-        producto.id;
-
-
-    const yaExiste =
-        productosCotizacion.some(
-            p =>
-                p.productoId ===
-                producto.id
-        );
-
-
-    if (
-        yaExiste &&
-        !productoActual
-    ) {
-
-        alert(
-            "⚠️ Este producto ya está agregado a la cotización."
-        );
-
+    if (yaExiste && !productoActual) {
+        alert("⚠️ Este producto ya está agregado a la cotización.");
         return;
-
     }
 
+    if (!fila) return;
 
-    /*
-     * Guardar producto en la fila
-     */
+    fila.dataset.productoId = producto.id;
+    fila.dataset.codigo = producto.codigo;
+    fila.dataset.unidad = producto.unidad;
+    fila.dataset.descripcion = producto.descripcion;
 
-    if (
-        fila
-    ) {
+    const sugerido = obtenerPrecioSugerido(producto.id);
+    const moneda = fila.querySelector(".producto-moneda");
+    const precioSugerido = fila.querySelector(".precio-sugerido");
 
-        fila.dataset.productoId =
-            producto.id;
-
-
-        fila.dataset.codigo =
-            producto.codigo;
-
-
-        fila.dataset.unidad =
-            producto.unidad;
-
-
-        fila.dataset.descripcion =
-            producto.descripcion;
-
-
-        /*
-         * Buscar precio sugerido
-         */
-
-        const sugerido =
-            obtenerPrecioSugerido(
-                producto.id
-            );
-
-
-        const moneda =
-            fila.querySelector(
-                ".producto-moneda"
-            );
-
-
-        const precioInput =
-            fila.querySelector(
-                ".producto-precio-unitario"
-            );
-
-
-        const precioSugerido =
-            fila.querySelector(
-                ".precio-sugerido"
-            );
-
-
-        /*
-         * Moneda de la lista
-         */
-
-        if (
-            sugerido &&
-            moneda
-        ) {
-
-            moneda.value =
-                sugerido.moneda;
-
-        }
-
-
-        /*
-         * Precio sugerido
-         */
-
-        if (
-            sugerido &&
-            precioSugerido
-        ) {
-
-            precioSugerido.textContent =
-                `Precio sugerido: ${formatearPrecio(
-                    sugerido.precio,
-                    sugerido.moneda
-                )}`;
-
-            precioSugerido.style.display =
-                "block";
-
-        }
-
-        else if (
-            precioSugerido
-        ) {
-
-            precioSugerido.textContent =
-                listaPreciosSeleccionada
-                    ? "Producto sin precio en esta lista"
-                    : "Seleccioná una lista de precios";
-
-            precioSugerido.style.display =
-                "block";
-
-        }
-
-
-        /*
-         * El precio editable queda vacío.
-         * El usuario puede escribir
-         * cualquier precio.
-         */
-
-        if (
-            precioInput
-        ) {
-
-            precioInput.value =
-                "";
-
-        }
-
-
-        buscador.value =
-            producto.descripcion;
-
-
-        resultados.innerHTML =
-            "";
-
-
-        resultados.hidden =
-            true;
-
-
-        actualizarProductosCotizacion();
-
+    if (sugerido && moneda) {
+        moneda.value = sugerido.moneda;
     }
 
+    if (sugerido && precioSugerido) {
+        precioSugerido.textContent =
+            `Precio sugerido: ${formatearPrecio(
+                sugerido.precio,
+                sugerido.moneda
+            )}`;
+    } else if (precioSugerido) {
+        precioSugerido.textContent = listaPreciosSeleccionada
+            ? "Producto sin precio en esta lista"
+            : "Seleccioná una lista de precios";
+    }
+
+    // Al elegir un producto nuevo, el precio queda vacío para ingresarlo.
+    // Si se está seleccionando el mismo producto, se conserva el precio.
+    if (!productoActual) {
+        const precioInput = fila.querySelector(".producto-precio-unitario");
+
+        if (precioInput) {
+            precioInput.value = "";
+        }
+    }
+
+    const unidad = fila.querySelector(".unidad-producto");
+
+    if (unidad) {
+        unidad.textContent = producto.unidad || "Sin unidad";
+    }
+
+    buscador.value = producto.descripcion;
+    resultados.innerHTML = "";
+    resultados.hidden = true;
+
+    actualizarProductosCotizacion();
 }
 
 
@@ -951,552 +429,197 @@ function seleccionarProducto(
    FORMATEAR PRECIO
 ============================================================ */
 
-function formatearPrecio(
-    precio,
-    moneda
-) {
+function formatearPrecio(precio, moneda) {
+    const simbolo = moneda === "USD"
+        ? "USD "
+        : moneda === "EUR"
+            ? "EUR "
+            : "$ ";
 
-    const simbolo =
-        moneda === "USD"
-            ? "USD "
-            : moneda === "EUR"
-                ? "EUR "
-                : "$ ";
-
-
-    return (
-        simbolo +
-        Number(
-            precio || 0
-        ).toLocaleString(
-            "es-AR",
-            {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }
-        )
+    return simbolo + Number(precio || 0).toLocaleString(
+        "es-AR",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
     );
-
 }
 
 
 /* ============================================================
-   CREAR FILA PRODUCTO
+   CREAR FILA DE PRODUCTO
 ============================================================ */
 
-function agregarFilaProducto(
-    productoInicial = null
-) {
+function agregarFilaProducto(productoInicial = null) {
+    const tarjeta = document.createElement("div");
+    tarjeta.className = "producto-cotizacion";
 
-    const tarjeta =
-        document.createElement(
-            "div"
-        );
+    tarjeta.dataset.productoId = productoInicial
+        ? productoInicial.productoId || ""
+        : "";
 
+    tarjeta.dataset.id = productoInicial && productoInicial.id
+        ? productoInicial.id
+        : Date.now().toString() +
+          Math.random().toString(36).substring(2);
 
-    tarjeta.className =
-        "producto-cotizacion";
+    if (productoInicial) {
+        tarjeta.dataset.descripcion =
+            productoInicial.nombre ||
+            productoInicial.descripcion ||
+            "";
 
+        tarjeta.dataset.codigo = productoInicial.codigo || "";
+        tarjeta.dataset.unidad = productoInicial.unidad || "";
+    }
 
-    /*
-     * ID temporal de la fila
-     */
+    /* CABECERA */
 
-    tarjeta.dataset.productoId =
-        productoInicial
-            ? productoInicial.productoId || ""
-            : "";
+    const cabecera = document.createElement("div");
+    cabecera.className = "producto-cotizacion-cabecera";
 
+    const titulo = document.createElement("strong");
+    titulo.textContent = "Producto";
 
-    tarjeta.dataset.id =
-        Date.now().toString() +
-        Math.random()
-            .toString(36)
-            .substring(2);
+    const btnEliminar = document.createElement("button");
+    btnEliminar.type = "button";
+    btnEliminar.className = "btn-eliminar-producto";
+    btnEliminar.textContent = "✕";
+    btnEliminar.title = "Eliminar producto";
+    btnEliminar.setAttribute("aria-label", "Eliminar producto");
 
+    btnEliminar.addEventListener("click", () => {
+        tarjeta.remove();
+        actualizarProductosCotizacion();
+    });
 
-    /* ========================================================
-       CABECERA DEL PRODUCTO
-    ======================================================== */
+    cabecera.append(titulo, btnEliminar);
+    tarjeta.appendChild(cabecera);
 
-    const cabecera =
-        document.createElement(
-            "div"
-        );
+    /* BUSCADOR */
 
+    const contenedorBuscador = document.createElement("div");
+    contenedorBuscador.className = "contenedor-buscador-producto";
 
-    cabecera.className =
-        "producto-cotizacion-cabecera";
+    tarjeta.appendChild(contenedorBuscador);
 
+    crearBuscadorProducto(contenedorBuscador, productoInicial);
 
-    const titulo =
-        document.createElement(
-            "strong"
-        );
+    /* UNIDAD */
 
+    const unidad = document.createElement("span");
+    unidad.className = "unidad-producto";
+    unidad.textContent = productoInicial
+        ? productoInicial.unidad || "Sin unidad"
+        : "Sin producto";
 
-    titulo.textContent =
-        "Producto";
+    tarjeta.appendChild(unidad);
 
+    /* BLOQUE DE PRECIO */
 
-    /*
-     * BOTÓN ELIMINAR
-     *
-     * Ahora usamos una X en lugar
-     * del tachito.
-     */
+    const bloquePrecio = document.createElement("div");
+    bloquePrecio.className = "producto-precio";
 
-    const btnEliminar =
-        document.createElement(
-            "button"
-        );
+    /* MONEDA */
 
-
-    btnEliminar.type =
-        "button";
-
-
-    btnEliminar.className =
-        "btn-eliminar-producto";
-
-
-    btnEliminar.textContent =
-        "✕";
-
-
-    btnEliminar.title =
-        "Eliminar producto";
-
-
-    btnEliminar.setAttribute(
-        "aria-label",
-        "Eliminar producto"
-    );
-
-
-    btnEliminar.addEventListener(
-        "click",
-        () => {
-
-            tarjeta.remove();
-
-            actualizarProductosCotizacion();
-
-        }
-    );
-
-
-    /*
-     * Encabezado:
-     *
-     * Producto                         ✕
-     */
-
-    cabecera.appendChild(
-        titulo
-    );
-
-
-    cabecera.appendChild(
-        btnEliminar
-    );
-
-
-    tarjeta.appendChild(
-        cabecera
-    );
-
-
-    /* ========================================================
-       CONTENEDOR BUSCADOR
-    ======================================================== */
-
-    const contenedorBuscador =
-        document.createElement(
-            "div"
-        );
-
-
-    contenedorBuscador.className =
-        "contenedor-buscador-producto";
-
-
-    tarjeta.appendChild(
-        contenedorBuscador
-    );
-
-
-    /* ========================================================
-       BUSCADOR
-    ======================================================== */
-
-    crearBuscadorProducto(
-        contenedorBuscador,
-        productoInicial
-    );
-
-
-    /* ========================================================
-       UNIDAD
-    ======================================================== */
-
-    const unidad =
-        document.createElement(
-            "span"
-        );
-
-
-    unidad.className =
-        "unidad-producto";
-
-
-    unidad.textContent =
-        productoInicial
-            ? (
-                productoInicial.unidad ||
-                "Sin unidad"
-            )
-            : "Sin producto";
-
-
-    tarjeta.appendChild(
-        unidad
-    );
-
-
-    /* ========================================================
-       BLOQUE PRECIO
-    ======================================================== */
-
-    const bloquePrecio =
-        document.createElement(
-            "div"
-        );
-
-
-    bloquePrecio.className =
-        "producto-precio";
-
-
-    /* ========================================================
-       MONEDA
-    ======================================================== */
-
-    const moneda =
-        document.createElement(
-            "select"
-        );
-
-
-    moneda.className =
-        "producto-moneda";
-
-
+    const moneda = document.createElement("select");
+    moneda.className = "producto-moneda";
     moneda.innerHTML = `
-
-        <option value="USD">
-            USD
-        </option>
-
-        <option value="ARS">
-            ARS
-        </option>
-
-        <option value="EUR">
-            EUR
-        </option>
-
+        <option value="USD">USD</option>
+        <option value="ARS">ARS</option>
+        <option value="EUR">EUR</option>
     `;
 
+    /* PRECIO UNITARIO */
 
-    /* ========================================================
-       PRECIO EDITABLE
-    ======================================================== */
+    const precioInput = document.createElement("input");
+    precioInput.type = "number";
+    precioInput.className = "producto-precio-unitario";
+    precioInput.placeholder = "Precio unitario";
+    precioInput.min = "0";
+    precioInput.step = "0.01";
 
-    const precioInput =
-        document.createElement(
-            "input"
-        );
+    /* PRECIO SUGERIDO */
 
+    const precioSugerido = document.createElement("small");
+    precioSugerido.className = "precio-sugerido";
+    precioSugerido.style.color = "#9ca3af";
+    precioSugerido.style.fontSize = "13px";
+    precioSugerido.style.display = "block";
+    precioSugerido.textContent = listaPreciosSeleccionada
+        ? "Seleccioná el producto"
+        : "Seleccioná una lista de precios";
 
-    precioInput.type =
-        "number";
+    /* RECUPERAR DATOS EXISTENTES */
 
+    if (productoInicial) {
+        moneda.value = productoInicial.moneda || "ARS";
 
-    precioInput.className =
-        "producto-precio-unitario";
-
-
-    precioInput.placeholder =
-        "Precio unitario";
-
-
-    precioInput.min =
-        "0";
-
-
-    precioInput.step =
-        "0.01";
-
-
-    /*
-     * El precio sugerido NO se coloca
-     * dentro del input.
-     *
-     * El usuario puede escribir
-     * libremente otro precio.
-     */
-
-    /* ========================================================
-       PRECIO SUGERIDO
-    ======================================================== */
-
-    const precioSugerido =
-        document.createElement(
-            "small"
-        );
-
-
-    precioSugerido.className =
-        "precio-sugerido";
-
-
-    precioSugerido.style.color =
-        "#9ca3af";
-
-
-    precioSugerido.style.fontSize =
-        "13px";
-
-
-    precioSugerido.style.display =
-        "block";
-
-
-    precioSugerido.textContent =
-        listaPreciosSeleccionada
-            ? "Seleccioná el producto"
-            : "Seleccioná una lista de precios";
-
-
-    /* ========================================================
-       RECUPERAR PRODUCTO INICIAL
-    ======================================================== */
-
-    if (
-        productoInicial
-    ) {
-
-        if (
-            productoInicial.moneda
-        ) {
-
-            moneda.value =
-                productoInicial.moneda;
-
+        if (productoInicial.precioUnitario !== undefined &&
+            productoInicial.precioUnitario !== null) {
+            precioInput.value = productoInicial.precioUnitario;
         }
 
+        const sugerido = obtenerPrecioSugerido(
+            productoInicial.productoId
+        );
 
-        if (
-            productoInicial.precioUnitario !== undefined
-        ) {
-
-            precioInput.value =
-                productoInicial.precioUnitario;
-
-        }
-
-
-        const sugerido =
-            obtenerPrecioSugerido(
-                productoInicial.productoId
-            );
-
-
-        if (
-            sugerido
-        ) {
-
+        if (sugerido) {
             precioSugerido.textContent =
                 `Precio sugerido: ${formatearPrecio(
                     sugerido.precio,
                     sugerido.moneda
                 )}`;
-
         }
-
     }
 
+    moneda.addEventListener("change", actualizarProductosCotizacion);
+    precioInput.addEventListener("input", actualizarProductosCotizacion);
 
-    /* ========================================================
-       CAMBIO MONEDA
-    ======================================================== */
+    bloquePrecio.append(moneda, precioInput, precioSugerido);
+    tarjeta.appendChild(bloquePrecio);
 
-    moneda.addEventListener(
-        "change",
-        () => {
+    listaProductosEl.appendChild(tarjeta);
 
-            actualizarProductosCotizacion();
+    if (!productoInicial) {
+        const input = tarjeta.querySelector(".producto-nombre");
 
-        }
-    );
-
-
-    /* ========================================================
-       CAMBIO PRECIO
-    ======================================================== */
-
-    precioInput.addEventListener(
-        "input",
-        () => {
-
-            actualizarProductosCotizacion();
-
-        }
-    );
-
-
-    /* ========================================================
-       ARMAR BLOQUE PRECIO
-    ======================================================== */
-
-    bloquePrecio.appendChild(
-        moneda
-    );
-
-
-    bloquePrecio.appendChild(
-        precioInput
-    );
-
-
-    bloquePrecio.appendChild(
-        precioSugerido
-    );
-
-
-    tarjeta.appendChild(
-        bloquePrecio
-    );
-
-
-    /* ========================================================
-       AGREGAR A LA PÁGINA
-    ======================================================== */
-
-    listaProductosEl.appendChild(
-        tarjeta
-    );
-
-
-    /* ========================================================
-       ENFOCAR NUEVA FILA
-    ======================================================== */
-
-    if (
-        !productoInicial
-    ) {
-
-        const input =
-            tarjeta.querySelector(
-                ".producto-nombre"
-            );
-
-
-        if (
-            input
-        ) {
-
-            input.focus();
-
-        }
-
+        if (input) input.focus();
     }
-
 
     actualizarProductosCotizacion();
-
 }
 
 
 /* ============================================================
-   ACTUALIZAR PRODUCTOS
+   ACTUALIZAR PRODUCTOS DE LA COTIZACIÓN
 ============================================================ */
 
 function actualizarProductosCotizacion() {
-
     productosCotizacion = [];
 
-
-    const filas =
-        listaProductosEl.querySelectorAll(
-            ".producto-cotizacion"
-        );
-
-
-    filas.forEach(
-        fila => {
-
-            const productoId =
-                fila.dataset.productoId;
-
-
-            if (
-                !productoId
-            ) {
-
-                return;
-
-            }
-
-
-            const moneda =
-                fila.querySelector(
-                    ".producto-moneda"
-                );
-
-
-            const precio =
-                fila.querySelector(
-                    ".producto-precio-unitario"
-                );
-
-
-            productosCotizacion.push({
-
-                id:
-                    fila.dataset.id,
-
-                productoId:
-                    productoId,
-
-                nombre:
-                    fila.dataset.descripcion ||
-                    "",
-
-                codigo:
-                    fila.dataset.codigo ||
-                    "",
-
-                unidad:
-                    fila.dataset.unidad ||
-                    "",
-
-                moneda:
-                    moneda
-                        ? moneda.value
-                        : "ARS",
-
-                precio:
-                    precio
-                        ? precio.value
-                        : ""
-
-            });
-
-        }
+    const filas = listaProductosEl.querySelectorAll(
+        ".producto-cotizacion"
     );
 
+    filas.forEach(fila => {
+        const productoId = fila.dataset.productoId;
+
+        if (!productoId) return;
+
+        const moneda = fila.querySelector(".producto-moneda");
+        const precio = fila.querySelector(".producto-precio-unitario");
+
+        productosCotizacion.push({
+            id: fila.dataset.id,
+            productoId,
+            nombre: fila.dataset.descripcion || "",
+            codigo: fila.dataset.codigo || "",
+            unidad: fila.dataset.unidad || "",
+            moneda: moneda ? moneda.value : "ARS",
+            precio: precio ? precio.value : ""
+        });
+    });
 }
 
 
@@ -1504,14 +627,9 @@ function actualizarProductosCotizacion() {
    BOTÓN AGREGAR PRODUCTO
 ============================================================ */
 
-btnAgregarProducto.addEventListener(
-    "click",
-    () => {
-
-        agregarFilaProducto();
-
-    }
-);
+btnAgregarProducto.addEventListener("click", () => {
+    agregarFilaProducto();
+});
 
 
 /* ============================================================
@@ -1519,404 +637,280 @@ btnAgregarProducto.addEventListener(
 ============================================================ */
 
 function establecerFechaActual() {
+    if (fechaEl.value) return;
 
-    if (
-        fechaEl.value
-    ) {
+    const hoy = new Date();
+    const año = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoy.getDate()).padStart(2, "0");
 
-        return;
-
-    }
-
-
-    const hoy =
-        new Date();
-
-
-    const año =
-        hoy.getFullYear();
-
-
-    const mes =
-        String(
-            hoy.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const dia =
-        String(
-            hoy.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    fechaEl.value =
-        `${año}-${mes}-${dia}`;
-
+    fechaEl.value = `${año}-${mes}-${dia}`;
 }
 
 
 /* ============================================================
-   GUARDAR COTIZACIÓN
+   CARGAR COTIZACIÓN EXISTENTE PARA EDITAR
 ============================================================ */
 
-form.addEventListener(
-    "submit",
-    async event => {
+async function cargarCotizacionExistente() {
+    if (!cotizacionId) return;
 
-        event.preventDefault();
+    try {
+        const referencia = doc(db, "cotizaciones", cotizacionId);
+        const resultado = await getDoc(referencia);
+
+        if (!resultado.exists()) {
+            alert("No se encontró la cotización.");
+            window.location.href = "precios.html";
+            return;
+        }
+
+        cotizacionOriginal = resultado.data();
+        const datos = cotizacionOriginal;
+
+        const titulo = document.querySelector(".card-formulario h1");
+
+        if (titulo) {
+            titulo.textContent = "Editar cotización";
+        }
+
+        const botonGuardar = form.querySelector(".btn-guardar");
+
+        if (botonGuardar) {
+            botonGuardar.textContent = "💾 Guardar cambios";
+        }
+
+        // Cliente
+        selectCliente.value = datos.clienteId || "";
+
+        // Fecha
+        if (datos.fecha) {
+            const fecha = typeof datos.fecha.toDate === "function"
+                ? datos.fecha.toDate()
+                : new Date(datos.fecha);
+
+            if (!Number.isNaN(fecha.getTime())) {
+                fechaEl.value = [
+                    fecha.getFullYear(),
+                    String(fecha.getMonth() + 1).padStart(2, "0"),
+                    String(fecha.getDate()).padStart(2, "0")
+                ].join("-");
+            }
+        }
+
+        // Campos de texto
+        nombreCotizacionEl.value = datos.nombreCotizacion || "";
+        propuestaEl.value = datos.propuesta || "";
+        dosisEl.value = datos.dosis || "";
+        observacionesEl.value = datos.observaciones || "";
+
+        // Lista de precios
+        selectListaPrecios.value = datos.listaPreciosId || "";
+
+        listaPreciosSeleccionada = listasPrecios.find(
+            lista => lista.id === datos.listaPreciosId
+        ) || null;
+
+        // Productos
+        listaProductosEl.innerHTML = "";
+        productosCotizacion = [];
+
+        if (Array.isArray(datos.productos)) {
+            datos.productos.forEach(producto => {
+                agregarFilaProducto({
+                    ...producto,
+                    productoId: producto.productoId || "",
+                    nombre: producto.nombre || "",
+                    descripcion: producto.nombre || "",
+                    precioUnitario: producto.precioUnitario ?? ""
+                });
+            });
+        }
+
+        actualizarProductosCotizacion();
+        actualizarSugerenciasProductos();
+
+    } catch (error) {
+        console.error("Error cargando cotización:", error);
+        alert("No se pudo cargar la cotización para editar.");
+        throw error;
+    }
+}
 
 
-        try {
+/* ============================================================
+   GUARDAR O ACTUALIZAR COTIZACIÓN
+============================================================ */
 
-            /*
-             * CLIENTE
-             */
+form.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const botonGuardar = form.querySelector(".btn-guardar");
+
+    try {
+        /* CLIENTE */
+
+        if (!selectCliente.value) {
+            alert("Seleccioná un cliente.");
+            selectCliente.focus();
+            return;
+        }
+
+        const clienteOption =
+            selectCliente.options[selectCliente.selectedIndex];
+
+        /* FECHA */
+
+        if (!fechaEl.value) {
+            alert("Seleccioná una fecha.");
+            fechaEl.focus();
+            return;
+        }
+
+        /* NOMBRE */
+
+        const nombreCotizacion = nombreCotizacionEl.value.trim();
+
+        if (!nombreCotizacion) {
+            alert("Ingresá el nombre de la cotización.");
+            nombreCotizacionEl.focus();
+            return;
+        }
+
+        /* PRODUCTOS */
+
+        actualizarProductosCotizacion();
+
+        if (productosCotizacion.length === 0) {
+            alert("Agregá al menos un producto.");
+            return;
+        }
+
+        for (const producto of productosCotizacion) {
+            if (!producto.nombre.trim()) {
+                alert("Completá el nombre de todos los productos.");
+                return;
+            }
 
             if (
-                !selectCliente.value
+                producto.precio === "" ||
+                !Number.isFinite(Number(producto.precio)) ||
+                Number(producto.precio) < 0
             ) {
-
                 alert(
-                    "Seleccioná un cliente."
+                    `Ingresá el precio del producto "${producto.nombre}".`
                 );
-
-                selectCliente.focus();
-
                 return;
-
             }
+        }
 
+        /* FECHA FIREBASE */
 
-            const clienteOption =
-                selectCliente.options[
-                    selectCliente.selectedIndex
-                ];
+        const partes = fechaEl.value.split("-");
 
+        const fechaCotizacion = new Date(
+            Number(partes[0]),
+            Number(partes[1]) - 1,
+            Number(partes[2]),
+            12,
+            0,
+            0
+        );
 
-            /*
-             * FECHA
-             */
+        /* PRODUCTOS FINALES */
 
-            if (
-                !fechaEl.value
-            ) {
+        const productosFinales = productosCotizacion.map(producto => ({
+            productoId: producto.productoId,
+            nombre: producto.nombre.trim(),
+            codigo: producto.codigo,
+            unidad: producto.unidad,
+            moneda: producto.moneda,
+            precioUnitario: Number(producto.precio)
+        }));
 
-                alert(
-                    "Seleccioná una fecha."
-                );
+        /* LISTA DE PRECIOS */
 
-                fechaEl.focus();
-
-                return;
-
+        const datosLista = listaPreciosSeleccionada
+            ? {
+                listaPreciosId: listaPreciosSeleccionada.id,
+                listaPreciosNombre: listaPreciosSeleccionada.nombre
             }
-
-
-            /*
-             * NOMBRE
-             */
-
-            const nombreCotizacion =
-                nombreCotizacionEl.value.trim();
-
-
-            if (
-                !nombreCotizacion
-            ) {
-
-                alert(
-                    "Ingresá el nombre de la cotización."
-                );
-
-                nombreCotizacionEl.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * ACTUALIZAR PRODUCTOS
-             */
-
-            actualizarProductosCotizacion();
-
-
-            /*
-             * PRODUCTOS
-             */
-
-            if (
-                productosCotizacion.length === 0
-            ) {
-
-                alert(
-                    "Agregá al menos un producto."
-                );
-
-                return;
-
-            }
-
-
-            /*
-             * VALIDAR PRODUCTOS
-             */
-
-            for (
-                const producto
-                of productosCotizacion
-            ) {
-
-                if (
-                    !producto.nombre.trim()
-                ) {
-
-                    alert(
-                        "Completá el nombre de todos los productos."
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    producto.precio === "" ||
-                    !Number.isFinite(
-                        Number(
-                            producto.precio
-                        )
-                    ) ||
-                    Number(
-                        producto.precio
-                    ) < 0
-                ) {
-
-                    alert(
-                        `Ingresá el precio del producto "${producto.nombre}".`
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            /*
-             * FECHA FIREBASE
-             */
-
-            const partes =
-                fechaEl.value.split("-");
-
-
-            const fechaCotizacion =
-                new Date(
-                    Number(partes[0]),
-                    Number(partes[1]) - 1,
-                    Number(partes[2]),
-                    12,
-                    0,
-                    0
-                );
-
-
-            /*
-             * DATOS PRODUCTOS
-             */
-
-            const productosFinales =
-                productosCotizacion.map(
-                    producto => ({
-
-                        productoId:
-                            producto.productoId,
-
-                        nombre:
-                            producto.nombre.trim(),
-
-                        codigo:
-                            producto.codigo,
-
-                        unidad:
-                            producto.unidad,
-
-                        moneda:
-                            producto.moneda,
-
-                        precioUnitario:
-                            Number(
-                                producto.precio
-                            )
-
-                    })
-                );
-
-
-            /*
-             * DATOS LISTA DE PRECIOS
-             */
-
-            const datosLista =
-                listaPreciosSeleccionada
-                    ? {
-
-                        listaPreciosId:
-                            listaPreciosSeleccionada.id,
-
-                        listaPreciosNombre:
-                            listaPreciosSeleccionada.nombre
-
-                    }
-                    : {
-
-                        listaPreciosId:
-                            "",
-
-                        listaPreciosNombre:
-                            ""
-
-                    };
-
-
-            /*
-             * OBJETO FINAL
-             */
-
-            const nuevaCotizacion = {
-
-                clienteId:
-                    selectCliente.value,
-
-                clienteNombre:
-                    clienteOption.dataset.nombre ||
-                    clienteOption.textContent,
-
-                nombreCotizacion:
-                    nombreCotizacion,
-
-                fecha:
-                    Timestamp.fromDate(
-                        fechaCotizacion
-                    ),
-
-                propuesta:
-                    propuestaEl.value ||
-                    "",
-
-                dosis:
-                    dosisEl.value ||
-                    "",
-
-                listaPreciosId:
-                    datosLista.listaPreciosId,
-
-                listaPreciosNombre:
-                    datosLista.listaPreciosNombre,
-
-                productos:
-                    productosFinales,
-
-                observaciones:
-                    observacionesEl.value ||
-                    "",
-
-                creadoEn:
-                    Timestamp.now()
-
+            : {
+                listaPreciosId: "",
+                listaPreciosNombre: ""
             };
 
+        /* OBJETO A GUARDAR */
 
-            /*
-             * BOTÓN GUARDAR
-             */
+        const datosCotizacion = {
+            clienteId: selectCliente.value,
+            clienteNombre:
+                clienteOption.dataset.nombre ||
+                clienteOption.textContent,
+            nombreCotizacion,
+            fecha: Timestamp.fromDate(fechaCotizacion),
+            propuesta: propuestaEl.value || "",
+            dosis: dosisEl.value || "",
+            listaPreciosId: datosLista.listaPreciosId,
+            listaPreciosNombre: datosLista.listaPreciosNombre,
+            productos: productosFinales,
+            observaciones: observacionesEl.value || ""
+        };
 
-            const botonGuardar =
-                form.querySelector(
-                    ".btn-guardar"
-                );
-
-
-            if (
-                botonGuardar
-            ) {
-
-                botonGuardar.disabled =
-                    true;
-
-                botonGuardar.textContent =
-                    "Guardando...";
-
-            }
-
-
-            /*
-             * FIRESTORE
-             */
-
-            const docRef =
-                await addDoc(
-                    collection(
-                        db,
-                        "cotizaciones"
-                    ),
-                    nuevaCotizacion
-                );
-
-
-            /*
-             * IR A COTIZACIÓN
-             */
-
-            window.location.href =
-                `cotizacion.html?id=${docRef.id}`;
-
+        if (botonGuardar) {
+            botonGuardar.disabled = true;
+            botonGuardar.textContent = cotizacionId
+                ? "Guardando cambios..."
+                : "Guardando...";
         }
 
-        catch (error) {
+        let idGuardado;
 
-            console.error(
-                "Error al guardar cotización:",
-                error
+        if (cotizacionId) {
+            // EDITAR: actualiza el documento existente.
+            // No crea una cotización duplicada.
+            await updateDoc(
+                doc(db, "cotizaciones", cotizacionId),
+                {
+                    ...datosCotizacion,
+                    actualizadoEn: Timestamp.now()
+                }
             );
 
+            idGuardado = cotizacionId;
 
-            alert(
-                "Error al guardar la cotización.\n\n" +
-                error.message
+        } else {
+            // NUEVA: crea un documento nuevo.
+            const docRef = await addDoc(
+                collection(db, "cotizaciones"),
+                {
+                    ...datosCotizacion,
+                    creadoEn: Timestamp.now()
+                }
             );
 
-
-            const botonGuardar =
-                form.querySelector(
-                    ".btn-guardar"
-                );
-
-
-            if (
-                botonGuardar
-            ) {
-
-                botonGuardar.disabled =
-                    false;
-
-                botonGuardar.textContent =
-                    "💾 Guardar cotización";
-
-            }
-
+            idGuardado = docRef.id;
         }
 
+        window.location.href =
+            `cotizacion.html?id=${encodeURIComponent(idGuardado)}`;
+
+    } catch (error) {
+        console.error("Error guardando cotización:", error);
+
+        alert(
+            "Error al guardar la cotización.\n\n" +
+            error.message
+        );
+
+        if (botonGuardar) {
+            botonGuardar.disabled = false;
+            botonGuardar.textContent = cotizacionId
+                ? "💾 Guardar cambios"
+                : "💾 Guardar cotización";
+        }
     }
-);
+});
 
 
 /* ============================================================
@@ -1924,26 +918,22 @@ form.addEventListener(
 ============================================================ */
 
 async function iniciar() {
-
     establecerFechaActual();
 
+    try {
+        // Cargar primero los selectores y catálogos.
+        await Promise.all([
+            cargarClientes(),
+            cargarProductos(),
+            cargarListasPrecios()
+        ]);
 
-    /*
-     * Cargar todo antes de permitir
-     * trabajar con productos.
-     */
+        // Si la URL contiene ?id=..., recuperar la cotización.
+        await cargarCotizacionExistente();
 
-    await Promise.all([
-
-        cargarClientes(),
-
-        cargarProductos(),
-
-        cargarListasPrecios()
-
-    ]);
-
+    } catch (error) {
+        console.error("No se pudo iniciar el formulario:", error);
+    }
 }
-
 
 iniciar();
