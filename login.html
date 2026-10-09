@@ -175,11 +175,10 @@
       try {
         await signInWithEmailAndPassword(auth, email, password);
 
-        mensaje.textContent = "Inicio de sesión correcto.";
-        mensaje.className = "success";
+       mensaje.textContent = "Inicio de sesión correcto.";
+mensaje.className = "success";
 
-        // Por ahora dejamos al usuario en esta pantalla.
-        // El acceso al panel se conectará en el siguiente paso.
+window.location.href = "index.html";
       } catch (error) {
         console.error("Error de inicio de sesión:", error);
 
