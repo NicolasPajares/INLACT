@@ -1,3 +1,4 @@
+
 /* ===============================
    RESET BÁSICO
 ================================ */
@@ -32,30 +33,20 @@ main {
   width: 100%;
   padding: 18px;
   margin-bottom: 25px;
-
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
   color: #ffffff;
-
   border: none;
   border-radius: 14px;
-
   font-size: 20px;
   font-weight: 700;
-
   cursor: pointer;
-
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-
-  transition: transform .2s ease,
-              box-shadow .2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 
 #btnNuevaUbicacion:hover {
-
-  transform: scale(1.03);
-
-  box-shadow: 0 12px 25px rgba(0,0,0,.35);
-
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, .25);
 }
 
 /* ===============================
@@ -71,209 +62,209 @@ h2 {
    BUSCADOR
 ================================ */
 #buscadorUbicaciones {
-
   width: 100%;
-
   padding: 14px 16px;
-
   margin-bottom: 20px;
-
   font-size: 16px;
-
   border-radius: 10px;
-
   border: 1px solid #d1d5db;
-
   outline: none;
-
+  background: #ffffff;
 }
 
 #buscadorUbicaciones:focus {
-
   border-color: #3b82f6;
-
-  box-shadow: 0 0 0 2px rgba(59,130,246,.20);
-
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, .20);
 }
 
 /* ===============================
    LISTA
 ================================ */
 #listaUbicaciones {
-
   list-style: none;
-
 }
 
 /* ===============================
-   CARD UBICACIÓN
+   TARJETA UBICACIÓN
 ================================ */
 .ubicacion-item {
-
+  position: relative;
   background: #ffffff;
-
   padding: 16px 18px;
-
   margin-bottom: 14px;
-
   border-radius: 14px;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
-
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
-
-  transition: transform .15s ease,
-              box-shadow .15s ease;
-
+  gap: 12px;
+  transition: box-shadow .15s ease;
 }
 
 .ubicacion-item:hover {
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .12);
+}
 
-  transform: translateY(-2px);
-
-  box-shadow: 0 10px 22px rgba(0,0,0,.15);
-
+/* Evita que la tarjeta quede por encima del menú */
+.ubicacion-item:has(.menu-lista:not([hidden])) {
+  z-index: 5;
 }
 
 /* ===============================
-   INFO
+   INFORMACIÓN
 ================================ */
 .ubicacion-info {
-
   flex: 1;
-
+  min-width: 0;
 }
 
 .ubicacion-info strong {
-
   display: block;
-
   font-size: 18px;
-
   color: #1f4e8c;
-
+  overflow-wrap: anywhere;
 }
 
 /* ===============================
-   BOTÓN OPCIONES
+   CONTENEDOR DEL MENÚ
 ================================ */
-.btn-menu {
-
-  width: 42px;
-
-  height: 42px;
-
-  border: none;
-
-  border-radius: 50%;
-
-  background: transparent;
-
-  font-size: 24px;
-
-  cursor: pointer;
-
-  color: #6b7280;
-
-  transition: background .2s,
-              transform .15s;
-
+.acciones-ubicacion {
+  position: relative;
+  flex-shrink: 0;
 }
 
-.btn-menu:hover {
-
-  background: #eef4ff;
-
+/* ===============================
+   BOTÓN TRES PUNTOS
+================================ */
+.btn-menu-lista {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 42px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
   color: #1f4e8c;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
 
-  transform: scale(1.10);
+.btn-menu-lista:hover,
+.btn-menu-lista:focus-visible {
+  background: #eef4ff;
+  color: #2563eb;
+  outline: none;
+}
 
+/* ===============================
+   PANEL DESPLEGABLE
+================================ */
+.menu-lista {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  width: 160px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+}
+
+.menu-lista[hidden] {
+  display: none !important;
+}
+
+/* ===============================
+   OPCIONES DEL MENÚ
+================================ */
+.opcion-menu-lista {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #1f4e8c;
+  text-align: left;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+
+.opcion-menu-lista:hover,
+.opcion-menu-lista:focus-visible {
+  background: #eef4ff;
+  outline: none;
+}
+
+/* Eliminar en rojo */
+.opcion-menu-lista.eliminar-lista {
+  color: #dc2626;
+}
+
+.opcion-menu-lista.eliminar-lista:hover,
+.opcion-menu-lista.eliminar-lista:focus-visible {
+  background: #fef2f2;
 }
 
 /* ===============================
    BOTÓN VOLVER
 ================================ */
 #btnVolver {
-
   display: block;
-
   width: fit-content;
-
   min-width: 170px;
-
   margin: 25px auto 0;
-
   padding: 14px 24px;
-
   font-size: 16px;
-
   background: #ffffff;
-
   border: 2px solid #1f4e8c;
-
   color: #1f4e8c;
-
   border-radius: 12px;
-
   cursor: pointer;
-
-  transition: background .2s ease,
-              color .2s ease;
-
+  transition: background .2s ease, color .2s ease;
 }
 
 #btnVolver:hover {
-
   background: #1f4e8c;
-
   color: #ffffff;
-
 }
 
 /* ===============================
    RESPONSIVE
 ================================ */
-@media (min-width:768px){
-
-  #btnNuevaUbicacion{
-
-      font-size:22px;
-
-      padding:20px;
-
+@media (min-width: 768px) {
+  #btnNuevaUbicacion {
+    font-size: 22px;
+    padding: 20px;
   }
 
-  .ubicacion-item{
-
-      padding:18px 22px;
-
+  .ubicacion-item {
+    padding: 18px 22px;
   }
-
 }
 
 /* ===============================
-   ACCESO ACTIVO (FORZADO)
+   ACCESO ACTIVO
 ================================ */
 .quick-actions .action-card.active {
-
-    background: linear-gradient(135deg,#1f4e8c,#3b82f6);
-
-    box-shadow:0 8px 22px rgba(31,78,140,.35);
-
+  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+  box-shadow: 0 8px 22px rgba(31, 78, 140, .35);
 }
 
-.quick-actions .action-card.active span{
-
-    color:#ffffff;
-
+.quick-actions .action-card.active span {
+  color: #ffffff;
 }
 
-.quick-actions .action-card.active img{
-
-    filter:brightness(0) invert(1);
-
+.quick-actions .action-card.active img {
+  filter: brightness(0) invert(1);
 }
