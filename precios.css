@@ -276,3 +276,88 @@ main button:last-of-type:hover {
         padding: 20px;
     }
 }
+
+
+/* MENÚ DE ACCIONES: MISMO ESTILO QUE CLIENTES Y ENSAYOS */
+.cotizacion-menu-contenedor {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+button.btn-menu-cotizacion {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #1f4e8c !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: background 0.2s ease;
+  transform: none !important;
+}
+
+button.btn-menu-cotizacion:hover {
+  background: #edf4fc !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.menu-opciones-cotizacion {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  min-width: 145px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.menu-opciones-cotizacion[hidden] {
+  display: none !important;
+}
+
+.menu-opciones-cotizacion button {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  background: #fff !important;
+  border: none !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+  color: #1f2937 !important;
+  font-family: inherit !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  text-align: left !important;
+  cursor: pointer;
+  transform: none !important;
+}
+
+.menu-opciones-cotizacion button:hover {
+  background: #f3f7fb !important;
+}
+
+.menu-opciones-cotizacion .editar-cotizacion {
+  color: #1f4e8c !important;
+}
+
+.menu-opciones-cotizacion .eliminar-cotizacion {
+  color: #c62828 !important;
+}
