@@ -302,14 +302,14 @@ function renderListas(lista) {
                     type="button"
                     class="btn-editar-lista"
                 >
-                    ✏️ Editar
+                    Editar
                 </button>
 
                 <button
                     type="button"
                     class="btn-eliminar-lista"
                 >
-                    🗑️ Eliminar
+                    Eliminar
                 </button>
 
             `;
