@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="nueva-lista-precios.css">
 </head>
 
-<body>
+<body style="visibility: hidden;">
 
 <header>
        <figure>
@@ -101,7 +101,14 @@
     </p>
 </footer>
 
-<script type="module" src="nueva-lista-precios.js"></script>
 
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
 </body>
 </html>
+
