@@ -283,18 +283,27 @@ onclick="window.location.href='clientes.html';"
      JS
 ================================ -->
 
+
 <script type="module">
   import { protegerPagina } from "./proteger.js";
 
-  protegerPagina()
-    .then(async () => {
-      await import("./clientes.js");
-    })
-    .catch((error) => {
-      console.error("Error al proteger la página de clientes:", error);
-    });
+  document.body.style.visibility = "hidden";
+
+  try {
+    await protegerPagina();
+
+    // Cargar la lógica específica del detalle del cliente.
+    await import("./cliente.js");
+
+    // Cargar las funciones de notas después de validar el acceso.
+    await import("./notas.js");
+
+    document.body.style.visibility = "visible";
+  } catch (error) {
+    console.error("Error al proteger o cargar el detalle del cliente:", error);
+  }
 </script>
-<script type="module" src="notas.js"></script>
+
 
 </body>
 </html>
