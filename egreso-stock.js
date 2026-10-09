@@ -10,6 +10,7 @@
  * FIREBASE
  ************************************************************/
 
+
 import {
     collection,
     getDocs,
@@ -17,11 +18,13 @@ import {
     where,
     orderBy,
     updateDoc,
-    doc
+    doc,
+    writeBatch,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-
 import { db } from "./firebase.js";
+
 
 /*
 ************************************************************
