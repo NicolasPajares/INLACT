@@ -71,7 +71,17 @@ Cancelar
 
 </main>
 
-<script type="module" src="nueva-ubicacion.js"></script>
+
+<script type="module">
+  import { protegerPagina } from "./proteger.js";
+
+  protegerPagina().then(async () => {
+    await import("./productos.js");
+  });
+</script>
+</body>
+</html>
+
 
 </body>
 
