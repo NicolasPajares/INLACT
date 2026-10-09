@@ -1,111 +1,177 @@
+
 /* ============================================================
    COTIZACIÓN INLACT
-============================================================ */
-
-
-/* ============================================================
-   FIREBASE
+   Enlaces públicos mediante copias separadas y token aleatorio
 ============================================================ */
 
 import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-  getFirestore,
   doc,
-  getDoc
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
-  getAuth,
-  signInAnonymously
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-
-/* ============================================================
-   CONFIGURACIÓN FIREBASE
-============================================================ */
-
-const firebaseConfig = {
-
-  apiKey:
-    "AIzaSyCpCO82XE8I990mWw4Fe8EVwmUOAeLZdv4",
-
-  authDomain:
-    "inlact.firebaseapp.com",
-
-  projectId:
-    "inlact",
-
-  storageBucket:
-    "inlact.firebasestorage.app",
-
-  messagingSenderId:
-    "143868382036",
-
-  appId:
-    "1:143868382036:web:b5af0e4faced7e880216c1"
-
-};
-
-
-const app =
-  initializeApp(firebaseConfig);
-
-const db =
-  getFirestore(app);
-
-const auth =
-  getAuth(app);
+import { db, auth } from "./firebase.js";
 
 
 /* ============================================================
    ELEMENTOS
 ============================================================ */
 
-const empresaEl =
-  document.getElementById("empresa");
-
-const fechaEl =
-  document.getElementById("fecha");
-
-const nombreCotizacionEl =
-  document.getElementById("nombre-cotizacion");
-
-const clienteEl =
-  document.getElementById("cliente");
-
-const propuestaEl =
-  document.getElementById("contenido-propuesta");
-
-const dosisEl =
-  document.getElementById("contenido-dosis");
-
-const listaProductosEl =
-  document.getElementById("lista-productos-cotizacion");
-
-const observacionesEl =
-  document.getElementById("contenido-observaciones");
-
-const linkPublicoEl =
-  document.getElementById("link-publico-cotizacion");
+const empresaEl = document.getElementById("empresa");
+const fechaEl = document.getElementById("fecha");
+const nombreCotizacionEl = document.getElementById("nombre-cotizacion");
+const clienteEl = document.getElementById("cliente");
+const propuestaEl = document.getElementById("contenido-propuesta");
+const dosisEl = document.getElementById("contenido-dosis");
+const listaProductosEl = document.getElementById("lista-productos-cotizacion");
+const observacionesEl = document.getElementById("contenido-observaciones");
+const totalEl = document.getElementById("total-cotizacion");
 
 
 /* ============================================================
-   URL
+   URL Y ESTADO
 ============================================================ */
 
-const parametros =
-  new URLSearchParams(
-    window.location.search
+const parametros = new URLSearchParams(window.location.search);
+const cotizacionId = parametros.get("id");
+const tokenPublico = parametros.get("token");
+const esPublico = Boolean(tokenPublico);
+
+let cotizacionActual = null;
+let tokenActual = null;
+let usuarioInterno = false;
+
+
+/* ============================================================
+   AUTENTICACIÓN E INICIO
+============================================================ */
+
+onAuthStateChanged(auth, async (usuario) => {
+  try {
+    if (esPublico) {
+      await cargarCotizacionPublica();
+      configurarMenu();
+      return;
+    }
+
+    if (!usuario) {
+      window.location.replace("login.html");
+      return;
+    }
+
+    usuarioInterno = true;
+
+    await cargarCotizacionInterna();
+    configurarMenu();
+  } catch (error) {
+    console.error("Error al cargar la cotización:", error);
+
+    mostrarError(
+      esPublico
+        ? "Este enlace no está disponible o fue desactivado."
+        : "No se pudo cargar la cotización. Verificá la conexión y los permisos."
+    );
+  }
+});
+
+
+/* ============================================================
+   CARGAR COTIZACIÓN INTERNA
+============================================================ */
+
+async function cargarCotizacionInterna() {
+  if (!cotizacionId) {
+    mostrarError("No se indicó qué cotización abrir.");
+    return;
+  }
+
+  const referencia = doc(db, "cotizaciones", cotizacionId);
+  const resultado = await getDoc(referencia);
+
+  if (!resultado.exists()) {
+    mostrarError("La cotización no existe o fue eliminada.");
+    return;
+  }
+
+  cotizacionActual = {
+    id: resultado.id,
+    ...resultado.data()
+  };
+
+  tokenActual = cotizacionActual.publicacionToken || null;
+
+  mostrarCotizacion(cotizacionActual);
+  mostrarControlesPublicacion();
+}
+
+
+/* ============================================================
+   CARGAR COPIA PÚBLICA
+============================================================ */
+
+async function cargarCotizacionPublica() {
+  const referencia = doc(
+    db,
+    "cotizaciones_publicas",
+    tokenPublico
   );
 
-const cotizacionId =
-  parametros.get("id");
+  const resultado = await getDoc(referencia);
 
-const esPublico =
-  parametros.get("publico") === "1";
+  if (!resultado.exists()) {
+    mostrarError("Este enlace no está disponible.");
+    return;
+  }
+
+  const datos = resultado.data();
+
+  if (datos.activo !== true) {
+    mostrarError("Este enlace fue desactivado por INLACT.");
+    return;
+  }
+
+  mostrarCotizacion(datos);
+}
+
+
+/* ============================================================
+   MOSTRAR COTIZACIÓN
+============================================================ */
+
+function mostrarCotizacion(cotizacion) {
+  if (empresaEl) {
+    empresaEl.textContent =
+      cotizacion.clienteNombre || "Cliente sin nombre";
+  }
+
+  if (clienteEl) {
+    clienteEl.textContent =
+      cotizacion.clienteNombre || "Cliente sin nombre";
+  }
+
+  if (fechaEl) {
+    fechaEl.textContent = formatearFecha(cotizacion.fecha);
+  }
+
+  if (nombreCotizacionEl) {
+    nombreCotizacionEl.textContent =
+      cotizacion.nombreCotizacion || "Cotización";
+  }
+
+  mostrarTexto(propuestaEl, cotizacion.propuesta);
+  mostrarTexto(dosisEl, cotizacion.dosis);
+  mostrarTexto(observacionesEl, cotizacion.observaciones);
+
+  cargarProductos(cotizacion);
+
+  document.body.style.visibility = "visible";
+}
 
 
 /* ============================================================
@@ -113,71 +179,27 @@ const esPublico =
 ============================================================ */
 
 function formatearFecha(fecha) {
-
-  if (!fecha) {
-    return "";
-  }
+  if (!fecha) return "";
 
   let fechaReal = null;
 
-
-  /* Firebase Timestamp */
-
-  if (
-    typeof fecha.toDate === "function"
-  ) {
-
-    fechaReal =
-      fecha.toDate();
-
+  if (typeof fecha.toDate === "function") {
+    fechaReal = fecha.toDate();
+  } else if (fecha instanceof Date) {
+    fechaReal = fecha;
+  } else if (typeof fecha === "string") {
+    fechaReal = new Date(fecha);
   }
 
-
-  /* Date */
-
-  else if (
-    fecha instanceof Date
-  ) {
-
-    fechaReal =
-      fecha;
-
-  }
-
-
-  /* String */
-
-  else if (
-    typeof fecha === "string"
-  ) {
-
-    fechaReal =
-      new Date(fecha);
-
-  }
-
-
-  if (
-    !fechaReal ||
-    Number.isNaN(
-      fechaReal.getTime()
-    )
-  ) {
-
+  if (!fechaReal || Number.isNaN(fechaReal.getTime())) {
     return "";
-
   }
 
-
-  return fechaReal.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    }
-  );
-
+  return fechaReal.toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
 }
 
 
@@ -185,39 +207,21 @@ function formatearFecha(fecha) {
    FORMATEAR PRECIO
 ============================================================ */
 
-function formatearPrecio(
-  precio,
-  moneda
-) {
+function formatearPrecio(precio, moneda) {
+  const valor = Number(precio || 0);
 
-  const valor =
-    Number(precio || 0);
-
-
-  let simbolo =
-    "$ ";
-
+  let simbolo = "$ ";
 
   if (moneda === "USD") {
     simbolo = "USD ";
-  }
-
-  else if (moneda === "EUR") {
+  } else if (moneda === "EUR") {
     simbolo = "EUR ";
   }
 
-
-  return (
-    simbolo +
-    valor.toLocaleString(
-      "es-AR",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    )
-  );
-
+  return simbolo + valor.toLocaleString("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 
 
@@ -226,16 +230,12 @@ function formatearPrecio(
 ============================================================ */
 
 function escaparHTML(texto) {
-
-  return String(
-    texto || ""
-  )
+  return String(texto || "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
-
 }
 
 
@@ -243,268 +243,10 @@ function escaparHTML(texto) {
    MOSTRAR TEXTO
 ============================================================ */
 
-function mostrarTexto(
-  elemento,
-  texto
-) {
+function mostrarTexto(elemento, texto) {
+  if (!elemento) return;
 
-  if (!elemento) {
-    return;
-  }
-
-  elemento.textContent =
-    texto || "";
-
-}
-
-
-/* ============================================================
-   CARGAR COTIZACIÓN
-============================================================ */
-
-async function cargarCotizacion() {
-
-  try {
-
-    if (!cotizacionId) {
-
-      mostrarError(
-        "No se encontró el identificador de la cotización."
-      );
-
-      return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       BUSCAR DOCUMENTO
-    -------------------------------------------------------- */
-
-    const referencia =
-      doc(
-        db,
-        "cotizaciones",
-        cotizacionId
-      );
-
-
-    const snap =
-      await getDoc(
-        referencia
-      );
-
-
-    /* --------------------------------------------------------
-       VERIFICAR EXISTENCIA
-    -------------------------------------------------------- */
-
-    if (!snap.exists()) {
-
-      mostrarError(
-        "La cotización no existe o fue eliminada."
-      );
-
-      return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       DATOS
-    -------------------------------------------------------- */
-
-    const cotizacion =
-      snap.data();
-
-
-    console.log(
-      "Cotización cargada:",
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       PORTADA
-    -------------------------------------------------------- */
-
-    cargarPortada(
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       PROPUESTA
-    -------------------------------------------------------- */
-
-    cargarPropuesta(
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       DOSIS
-    -------------------------------------------------------- */
-
-    cargarDosis(
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       PRODUCTOS
-    -------------------------------------------------------- */
-
-    cargarProductos(
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       OBSERVACIONES
-    -------------------------------------------------------- */
-
-    cargarObservaciones(
-      cotizacion
-    );
-
-
-    /* --------------------------------------------------------
-       LINK PÚBLICO
-    -------------------------------------------------------- */
-
-    cargarLinkPublico(
-      cotizacionId
-    );
-
-  }
-
-  catch (error) {
-
-    console.error(
-      "Error cargando cotización:",
-      error
-    );
-
-
-    mostrarError(
-      "No se pudo cargar la cotización."
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   CARGAR PORTADA
-============================================================ */
-
-function cargarPortada(
-  cotizacion
-) {
-
-  /* ----------------------------------------------------------
-     EMPRESA
-  ---------------------------------------------------------- */
-
-  if (empresaEl) {
-
-    empresaEl.textContent =
-      cotizacion.clienteNombre ||
-      "Cliente sin nombre";
-
-  }
-
-
-  /* ----------------------------------------------------------
-     CLIENTE
-     Se mantiene por compatibilidad si existe en el HTML.
-  ---------------------------------------------------------- */
-
-  if (clienteEl) {
-
-    clienteEl.textContent =
-      cotizacion.clienteNombre ||
-      "Cliente sin nombre";
-
-  }
-
-
-  /* ----------------------------------------------------------
-     FECHA
-  ---------------------------------------------------------- */
-
-  if (fechaEl) {
-
-    fechaEl.textContent =
-      formatearFecha(
-        cotizacion.fecha
-      );
-
-  }
-
-
-  /* ----------------------------------------------------------
-     NOMBRE DE LA COTIZACIÓN
-  ---------------------------------------------------------- */
-
-  if (nombreCotizacionEl) {
-
-    nombreCotizacionEl.textContent =
-      cotizacion.nombreCotizacion ||
-      "Cotización";
-
-  }
-
-}
-
-
-/* ============================================================
-   PROPUESTA
-============================================================ */
-
-function cargarPropuesta(
-  cotizacion
-) {
-
-  mostrarTexto(
-    propuestaEl,
-    cotizacion.propuesta
-  );
-
-}
-
-
-/* ============================================================
-   DOSIS
-============================================================ */
-
-function cargarDosis(
-  cotizacion
-) {
-
-  mostrarTexto(
-    dosisEl,
-    cotizacion.dosis
-  );
-
-}
-
-
-/* ============================================================
-   OBSERVACIONES
-============================================================ */
-
-function cargarObservaciones(
-  cotizacion
-) {
-
-  mostrarTexto(
-    observacionesEl,
-    cotizacion.observaciones
-  );
-
+  elemento.textContent = texto || "";
 }
 
 
@@ -512,279 +254,281 @@ function cargarObservaciones(
    PRODUCTOS
 ============================================================ */
 
-function cargarProductos(
-  cotizacion
-) {
+function cargarProductos(cotizacion) {
+  if (!listaProductosEl) return;
 
-  if (!listaProductosEl) {
+  listaProductosEl.replaceChildren();
+
+  const productos = Array.isArray(cotizacion.productos)
+    ? cotizacion.productos
+    : [];
+
+  if (productos.length === 0) {
+    if (totalEl) totalEl.textContent = "";
     return;
   }
 
-
-  listaProductosEl.innerHTML =
-    "";
-
-
-  const productos =
-    Array.isArray(
-      cotizacion.productos
-    )
-      ? cotizacion.productos
-      : [];
-
-
-  /* ----------------------------------------------------------
-     SIN PRODUCTOS
-  ---------------------------------------------------------- */
-
-  if (
-    productos.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  /* ----------------------------------------------------------
-     CABECERA
-  ---------------------------------------------------------- */
-
-  const cabecera =
-    document.createElement(
-      "div"
-    );
-
-
-  cabecera.className =
-    "cabecera-productos-cotizacion";
-
+  const cabecera = document.createElement("div");
+  cabecera.className = "cabecera-productos-cotizacion";
 
   cabecera.innerHTML = `
-
-    <span>
-      Producto
-    </span>
-
-    <span>
-      Unidad
-    </span>
-
-    <span>
-      Moneda
-    </span>
-
-    <span>
-      Precio
-    </span>
-
+    <span>Producto</span>
+    <span>Unidad</span>
+    <span>Moneda</span>
+    <span>Precio</span>
   `;
 
+  listaProductosEl.appendChild(cabecera);
 
-  listaProductosEl.appendChild(
-    cabecera
-  );
+  productos.forEach((producto) => {
+    const tarjeta = document.createElement("div");
+    tarjeta.className = "producto-cotizacion";
 
+    const nombre =
+      producto.nombre ||
+      producto.descripcion ||
+      "Producto sin nombre";
 
-  /* ----------------------------------------------------------
-     PRODUCTOS
-  ---------------------------------------------------------- */
+    const unidad = producto.unidad || "-";
+    const moneda = producto.moneda || "ARS";
+    const precio = Number(producto.precioUnitario || 0);
 
-  productos.forEach(
-    producto => {
+    tarjeta.innerHTML = `
+      <div class="producto-nombre">${escaparHTML(nombre)}</div>
+      <div class="producto-unidad">${escaparHTML(unidad)}</div>
+      <div class="producto-moneda">${escaparHTML(moneda)}</div>
+      <div class="producto-precio">${formatearPrecio(precio, moneda)}</div>
+    `;
 
-      const tarjeta =
-        document.createElement(
-          "div"
-        );
+    listaProductosEl.appendChild(tarjeta);
+  });
 
-
-      tarjeta.className =
-        "producto-cotizacion";
-
-
-      const nombre =
-        producto.nombre ||
-        producto.descripcion ||
-        "Producto sin nombre";
-
-
-      const unidad =
-        producto.unidad ||
-        "-";
-
-
-      const moneda =
-        producto.moneda ||
-        "ARS";
-
-
-      const precio =
-        Number(
-          producto.precioUnitario ||
-          0
-        );
-
-
-      tarjeta.innerHTML = `
-
-        <div class="producto-nombre">
-          ${escaparHTML(nombre)}
-        </div>
-
-        <div class="producto-unidad">
-          ${escaparHTML(unidad)}
-        </div>
-
-        <div class="producto-moneda">
-          ${escaparHTML(moneda)}
-        </div>
-
-        <div class="producto-precio">
-          ${formatearPrecio(
-            precio,
-            moneda
-          )}
-        </div>
-
-      `;
-
-
-      listaProductosEl.appendChild(
-        tarjeta
-      );
-
-    }
-  );
-
+  // No se calcula un total automáticamente porque los productos
+  // actuales no muestran un campo de cantidad confirmado.
+  if (totalEl) {
+    totalEl.textContent = cotizacion.total
+      ? "Total: " + formatearPrecio(
+          cotizacion.total,
+          cotizacion.monedaTotal || "ARS"
+        )
+      : "";
+  }
 }
 
 
 /* ============================================================
-   LINK PÚBLICO PARA EL CLIENTE
+   CONTROLES DE PUBLICACIÓN
 ============================================================ */
 
-function cargarLinkPublico(
-  idCotizacion
-) {
+function mostrarControlesPublicacion() {
+  if (!usuarioInterno || esPublico) return;
 
-  const contenedor =
-    document.querySelector(
-      ".link-publico-cotizacion"
-    );
+  const contenedor = document.querySelector(
+    ".link-publico-cotizacion"
+  );
 
+  if (!contenedor) return;
 
-  const input =
-    document.getElementById(
-      "link-publico-cotizacion"
-    );
+  let panel = document.getElementById("controles-publicacion-cotizacion");
 
+  if (panel) panel.remove();
 
-  /*
-   * Si el cliente está viendo la versión pública,
-   * no mostramos el bloque para compartir.
-   */
+  panel = document.createElement("div");
+  panel.id = "controles-publicacion-cotizacion";
+  panel.style.cssText =
+    "margin-top:16px;padding:16px;background:#f1f7fb;border-radius:10px;";
 
-  if (esPublico) {
+  const titulo = document.createElement("h4");
+  titulo.textContent = "Compartir cotización con el cliente";
+  titulo.style.color = "#1f4e8c";
 
-    if (contenedor) {
+  const descripcion = document.createElement("p");
+  descripcion.textContent =
+    "El cliente podrá consultar una copia de esta cotización mediante el enlace.";
 
-      contenedor.style.display =
-        "none";
+  const boton = document.createElement("button");
+  boton.type = "button";
+  boton.style.cssText =
+    "padding:11px 16px;margin:8px 0;border:0;border-radius:8px;background:#168ac0;color:white;cursor:pointer;font-weight:600;";
 
+  const enlace = document.createElement("input");
+  enlace.type = "text";
+  enlace.readOnly = true;
+  enlace.style.cssText =
+    "width:100%;padding:10px;box-sizing:border-box;margin-top:8px;";
+
+  const botonCopiar = document.createElement("button");
+  botonCopiar.type = "button";
+  botonCopiar.textContent = "Copiar enlace";
+  botonCopiar.style.cssText =
+    "padding:10px 14px;margin-top:8px;border:0;border-radius:8px;background:#1f4e8c;color:white;cursor:pointer;";
+
+  const estado = document.createElement("p");
+  estado.style.cssText = "font-size:14px;margin-top:8px;";
+
+  const estaActivo = cotizacionActual.publicacionActiva === true;
+
+  boton.textContent = estaActivo
+    ? "Desactivar enlace público"
+    : tokenActual
+      ? "Volver a activar enlace público"
+      : "Crear enlace público";
+
+  if (estaActivo && tokenActual) {
+    enlace.value = crearUrlPublica(tokenActual);
+    botonCopiar.hidden = false;
+    enlace.hidden = false;
+  } else {
+    enlace.hidden = true;
+    botonCopiar.hidden = true;
+  }
+
+  boton.addEventListener("click", async () => {
+    boton.disabled = true;
+    estado.textContent = "Procesando...";
+
+    try {
+      if (cotizacionActual.publicacionActiva === true) {
+        await desactivarPublicacion();
+        estado.textContent = "Enlace desactivado.";
+      } else {
+        await publicarCotizacion();
+        estado.textContent = "Cotización publicada correctamente.";
+      }
+
+      mostrarControlesPublicacion();
+
+      const nuevoEstado = document.getElementById(
+        "controles-publicacion-cotizacion"
+      );
+
+      if (nuevoEstado) {
+        const aviso = nuevoEstado.querySelector("p:last-child");
+        if (aviso) aviso.textContent = estado.textContent;
+      }
+    } catch (error) {
+      console.error("Error al publicar la cotización:", error);
+      estado.textContent =
+        "No se pudo completar la operación. Verificá la conexión y los permisos.";
+      boton.disabled = false;
     }
+  });
 
-    return;
+  botonCopiar.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(enlace.value);
+      estado.textContent = "Enlace copiado.";
+    } catch {
+      enlace.focus();
+      enlace.select();
+      estado.textContent = "Seleccioná y copiá el enlace manualmente.";
+    }
+  });
 
-  }
-
-
-  /*
-   * Verificar que exista el campo.
-   */
-
-  if (!input) {
-
-    console.warn(
-      "No se encontró el elemento #link-publico-cotizacion"
-    );
-
-    return;
-
-  }
-
-
-  /*
-   * Crear URL pública.
-   */
-
-  const urlPublica =
-    new URL(
-      window.location.href
-    );
-
-
-  /*
-   * Aseguramos que apunte a cotizacion.html.
-   */
-
-  urlPublica.pathname =
-    "/INLACT/cotizacion.html";
-
-
-  /*
-   * Eliminamos parámetros anteriores.
-   */
-
-  urlPublica.search =
-    "";
-
-
-  /*
-   * Agregamos ID de la cotización.
-   */
-
-  urlPublica.searchParams.set(
-    "id",
-    idCotizacion
+  panel.append(
+    titulo,
+    descripcion,
+    boton,
+    enlace,
+    botonCopiar,
+    estado
   );
 
-
-  /*
-   * Indicamos que es versión pública.
-   */
-
-  urlPublica.searchParams.set(
-    "publico",
-    "1"
-  );
+  contenedor.appendChild(panel);
+}
 
 
-  /*
-   * Mostrar link.
-   */
+/* ============================================================
+   PUBLICAR COTIZACIÓN
+============================================================ */
 
-  input.value =
-    urlPublica.toString();
-
-
-  /*
-   * Asegurar que sea visible.
-   */
-
-  if (contenedor) {
-
-    contenedor.style.display =
-      "block";
-
+async function publicarCotizacion() {
+  if (!cotizacionActual?.id) {
+    throw new Error("No se identificó la cotización original.");
   }
 
+  if (!tokenActual) {
+    tokenActual = generarTokenAleatorio();
+  }
 
-  console.log(
-    "Link público:",
-    input.value
+  const copiaPublica = {
+    clienteNombre: cotizacionActual.clienteNombre || "",
+    nombreCotizacion: cotizacionActual.nombreCotizacion || "",
+    fecha: cotizacionActual.fecha || null,
+    propuesta: cotizacionActual.propuesta || "",
+    dosis: cotizacionActual.dosis || "",
+    productos: Array.isArray(cotizacionActual.productos)
+      ? cotizacionActual.productos
+      : [],
+    observaciones: cotizacionActual.observaciones || "",
+    total: cotizacionActual.total ?? null,
+    monedaTotal: cotizacionActual.monedaTotal || "ARS",
+    activo: true,
+    actualizadoEn: serverTimestamp()
+  };
+
+  await setDoc(
+    doc(db, "cotizaciones_publicas", tokenActual),
+    copiaPublica
   );
 
+  await updateDoc(
+    doc(db, "cotizaciones", cotizacionActual.id),
+    {
+      publicacionToken: tokenActual,
+      publicacionActiva: true
+    }
+  );
+
+  cotizacionActual.publicacionToken = tokenActual;
+  cotizacionActual.publicacionActiva = true;
+}
+
+
+/* ============================================================
+   DESACTIVAR PUBLICACIÓN
+============================================================ */
+
+async function desactivarPublicacion() {
+  if (!tokenActual) {
+    throw new Error("No existe un enlace para desactivar.");
+  }
+
+  await updateDoc(
+    doc(db, "cotizaciones_publicas", tokenActual),
+    {
+      activo: false,
+      actualizadoEn: serverTimestamp()
+    }
+  );
+
+  await updateDoc(
+    doc(db, "cotizaciones", cotizacionActual.id),
+    {
+      publicacionActiva: false
+    }
+  );
+
+  cotizacionActual.publicacionActiva = false;
+}
+
+
+/* ============================================================
+   TOKEN Y URL PÚBLICA
+============================================================ */
+
+function generarTokenAleatorio() {
+  const valores = new Uint8Array(32);
+  crypto.getRandomValues(valores);
+
+  return Array.from(valores)
+    .map(valor => valor.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+
+function crearUrlPublica(token) {
+  return `${window.location.origin}${window.location.pathname}?token=${encodeURIComponent(token)}`;
 }
 
 
@@ -792,43 +536,26 @@ function cargarLinkPublico(
    MOSTRAR ERROR
 ============================================================ */
 
-function mostrarError(
-  mensaje
-) {
+function mostrarError(mensaje) {
+  document.body.style.visibility = "visible";
 
-  const contenido =
-    document.querySelector(
-      ".contenido-blanco-cotizacion"
-    );
-
+  const contenido = document.querySelector(
+    ".contenido-blanco-cotizacion"
+  );
 
   if (!contenido) {
+    alert(mensaje);
     return;
   }
 
+  contenido.replaceChildren();
 
-  contenido.innerHTML = `
+  const aviso = document.createElement("p");
+  aviso.textContent = mensaje;
+  aviso.style.cssText =
+    "padding:24px;color:#b42318;font-weight:600;";
 
-    <div
-      style="
-        padding:40px;
-        text-align:center;
-        color:#b91c1c;
-      "
-    >
-
-      <h2>
-        No se pudo cargar la cotización
-      </h2>
-
-      <p>
-        ${escaparHTML(mensaje)}
-      </p>
-
-    </div>
-
-  `;
-
+  contenido.appendChild(aviso);
 }
 
 
@@ -837,110 +564,24 @@ function mostrarError(
 ============================================================ */
 
 function configurarMenu() {
-
-  const botones =
-    document.querySelectorAll(
-      ".menu-cotizacion button"
-    );
-
-
-  botones.forEach(
-    boton => {
-
-      boton.addEventListener(
-        "click",
-        () => {
-
-          const id =
-            boton.dataset.seccion;
-
-
-          const seccion =
-            document.getElementById(
-              id
-            );
-
-
-          if (!seccion) {
-            return;
-          }
-
-
-          seccion.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-
-
-          /*
-           * Marcar botón activo.
-           */
-
-          botones.forEach(
-            b => {
-
-              b.classList.remove(
-                "activo"
-              );
-
-            }
-          );
-
-
-          boton.classList.add(
-            "activo"
-          );
-
-        }
-      );
-
-    }
+  const botones = document.querySelectorAll(
+    ".menu-cotizacion button"
   );
 
+  botones.forEach(boton => {
+    boton.addEventListener("click", () => {
+      const id = boton.dataset.seccion;
+      const seccion = document.getElementById(id);
+
+      if (!seccion) return;
+
+      seccion.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+      botones.forEach(b => b.classList.remove("activo"));
+      boton.classList.add("activo");
+    });
+  });
 }
-
-
-/* ============================================================
-   INICIO
-============================================================ */
-
-async function iniciar() {
-
-  configurarMenu();
-
-  await cargarCotizacion();
-
-}
-
-
-/* ============================================================
-   AUTENTICACIÓN
-============================================================ */
-
-signInAnonymously(auth)
-
-  .then(
-    () => {
-
-      iniciar();
-
-    }
-  )
-
-  .catch(
-    error => {
-
-      console.warn(
-        "No se pudo iniciar sesión anónima:",
-        error
-      );
-
-
-      /*
-       * Intentamos cargar igualmente.
-       */
-
-      iniciar();
-
-    }
-  );
