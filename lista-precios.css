@@ -1,3 +1,4 @@
+
 /* ===============================
    RESET BÁSICO
 ================================ */
@@ -32,25 +33,20 @@ main {
   width: 100%;
   padding: 18px;
   margin-bottom: 25px;
-
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
   color: #ffffff;
-
   border: none;
   border-radius: 14px;
-
   font-size: 20px;
   font-weight: 700;
-
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #btnNuevaLista:hover {
   transform: scale(1.03);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
 }
 
 /* ===============================
@@ -69,18 +65,15 @@ h2 {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 20px;
-
   font-size: 16px;
-
   border-radius: 10px;
   border: 1px solid #d1d5db;
-
   outline: none;
 }
 
 #buscadorListas:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 /* ===============================
@@ -91,32 +84,28 @@ h2 {
 }
 
 /* ===============================
-   CARD
+   TARJETAS DE LISTAS
 ================================ */
 .lista-item {
   background: #ffffff;
   padding: 16px 18px;
   margin-bottom: 14px;
-
   border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   cursor: pointer;
-
-  transition: transform .15s ease, box-shadow .15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .lista-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
 }
 
 /* ===============================
-   INFORMACIÓN
+   INFORMACIÓN DE LA LISTA
 ================================ */
 .lista-info {
   flex: 1;
@@ -137,30 +126,134 @@ h2 {
 }
 
 /* ===============================
-   BOTÓN BORRAR
+   FILA DE LISTA DE PRECIOS
+================================ */
+.precio-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.precio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===============================
+   MENÚ DE TRES PUNTOS
+================================ */
+.acciones-lista {
+  position: relative;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Botón ⋮ */
+button.btn-menu-lista {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 42px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #1f4e8c !important;
+  font-family: inherit !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background 0.2s ease;
+}
+
+button.btn-menu-lista:hover {
+  background: #edf4fc !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Panel desplegable */
+.menu-lista {
+  display: none;
+  position: absolute;
+  top: 44px;
+  right: 0;
+  min-width: 145px;
+  padding: 6px;
+  flex-direction: column;
+  gap: 2px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+/* Mostrar al tocar los tres puntos */
+.menu-lista.mostrar {
+  display: flex;
+}
+
+/* Opciones Editar y Eliminar */
+.menu-lista button {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 10px 12px !important;
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 7px !important;
+  color: #1f4e8c !important;
+  font-family: "Segoe UI", Arial, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.menu-lista button:hover {
+  background: #eef5ff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Eliminar en rojo */
+.menu-lista .eliminar,
+.menu-lista .btn-eliminar,
+.menu-lista .eliminar-lista {
+  color: #c62828 !important;
+}
+
+/* ===============================
+   BOTÓN BORRAR ANTIGUO
+   Se conserva por compatibilidad
 ================================ */
 .btn-borrar {
   margin-left: 12px;
-
   width: 42px;
   height: 42px;
-
   border-radius: 50%;
   border: none;
-
   background: #fee2e2;
   color: #b91c1c;
-
   font-size: 20px;
   font-weight: bold;
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  transition: background .2s ease, transform .15s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
 }
 
 .btn-borrar:hover {
@@ -171,21 +264,18 @@ h2 {
 /* ===============================
    BOTÓN VOLVER
 ================================ */
-main button:last-of-type {
+main > section[style] > button {
   padding: 14px 20px;
   font-size: 16px;
-
   background: #ffffff;
   border: 2px solid #1f4e8c;
   color: #1f4e8c;
-
   border-radius: 12px;
   cursor: pointer;
-
-  transition: background .2s ease, color .2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-main button:last-of-type:hover {
+main > section[style] > button:hover {
   background: #1f4e8c;
   color: #ffffff;
 }
@@ -195,7 +285,7 @@ main button:last-of-type:hover {
 ================================ */
 .quick-actions .action-card.active {
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-  box-shadow: 0 8px 22px rgba(31,78,140,.35);
+  box-shadow: 0 8px 22px rgba(31, 78, 140, 0.35);
 }
 
 .quick-actions .action-card.active span {
@@ -209,222 +299,31 @@ main button:last-of-type:hover {
 /* ===============================
    RESPONSIVE
 ================================ */
-@media (min-width:768px){
-
-  #btnNuevaLista{
-    font-size:22px;
-    padding:20px;
+@media (min-width: 768px) {
+  #btnNuevaLista {
+    font-size: 22px;
+    padding: 20px;
   }
 
-  .lista-item{
-    padding:18px 22px;
+  .lista-item {
+    padding: 18px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: 14px;
   }
 
-}
-/* ============================================================
-   MENÚ DE TRES PUNTITOS
-============================================================ */
+  .lista-item {
+    padding: 14px;
+  }
 
-.acciones-lista {
-    position: relative;
-    margin-left: auto;
-}
+  .lista-info strong {
+    font-size: 16px;
+  }
 
-/* El menú está oculto por defecto */
-.menu-lista {
-    display: none;
-    position: absolute;
-    top: 45px;
-    right: 0;
-
-    background: white;
-    border-radius: 10px;
-
-    padding: 6px;
-
-    box-shadow: 0 6px 18px rgba(0,0,0,.15);
-
-    min-width: 150px;
-
-    z-index: 100;
-}
-
-/* Cuando se toca ⋮ */
-.menu-lista.mostrar {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Botones del menú */
-.menu-lista button {
-    width: 100%;
-
-    border: none;
-    background: white;
-
-    padding: 10px 12px;
-
-    text-align: left;
-
-    font-size: 15px;
-
-    color: #1f4e8c;
-
-    cursor: pointer;
-
-    border-radius: 7px;
-}
-
-.menu-lista button:hover {
-    background: #eef5ff;
-}
-
-/* Botón de los tres puntitos */
-.btn-menu-lista {
-    width: 45px !important;
-    height: 45px;
-
-    padding: 0 !important;
-
-    border: 2px solid #1f4e8c !important;
-    border-radius: 10px !important;
-
-    background: white !important;
-
-    color: #1f4e8c !important;
-
-    font-size: 24px !important;
-
-    line-height: 1;
-
-    cursor: pointer;
-}
-/* ============================================================
-   FILA DE LISTA DE PRECIOS
-============================================================ */
-
-.precio-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-/* Información ocupa el espacio disponible */
-.precio-info {
-    flex: 1;
-}
-
-/* Tres puntitos al extremo derecho */
-.acciones-lista {
-    margin-left: auto;
-    position: relative;
-    flex-shrink: 0;
-}
-
-
-/* ============================================================
-   MENÚ DE ACCIONES — ESTILO UNIFICADO CON CLIENTES Y ENSAYOS
-============================================================ */
-
-.acciones-lista {
-  position: relative;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-
-button.btn-menu-lista {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-
-  width: 38px !important;
-  min-width: 38px !important;
-  height: 42px !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  background: transparent !important;
-  border: none !important;
-  border-radius: 8px !important;
-
-  color: #1f4e8c !important;
-  font-family: inherit !important;
-  font-size: 28px !important;
-  font-weight: 700 !important;
-  line-height: 1 !important;
-
-  cursor: pointer;
-  box-shadow: none !important;
-  transform: none !important;
-
-  transition: background 0.2s ease;
-}
-
-button.btn-menu-lista:hover {
-  background: #edf4fc !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-/* Contenedor desplegable */
-.menu-lista {
-  display: none;
-  position: absolute;
-  top: 44px;
-  right: 0;
-
-  min-width: 145px;
-  padding: 6px;
-
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-}
-
-.menu-lista.mostrar {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Opciones Editar y Eliminar */
-.menu-lista button {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  height: auto !important;
-
-  margin: 0 !important;
-  padding: 10px 12px !important;
-
-  background: #ffffff !important;
-  border: none !important;
-  border-radius: 7px !important;
-
-  color: #1f2937 !important;
-  font-family: inherit !important;
-  font-size: 15px !important;
-  font-weight: 400 !important;
-  line-height: normal !important;
-  text-align: left !important;
-
-  cursor: pointer;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-.menu-lista button:hover {
-  background: #f3f7fb !important;
-  box-shadow: none !important;
-  transform: none !important;
-}
-
-/* Mantener Eliminar en rojo si tiene alguna de estas clases */
-.menu-lista .eliminar,
-.menu-lista .btn-eliminar,
-.menu-lista .eliminar-lista {
-  color: #c62828 !important;
+  .menu-lista {
+    min-width: 145px;
+  }
 }
