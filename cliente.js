@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
-document.addEventListener("DOMContentLoaded", async () => {
+(async () => {
 
     const clienteId =
         new URLSearchParams(window.location.search).get("id");
@@ -3284,4 +3284,4 @@ if (verHistorialCompleto) {
  * FINAL
  * ============================================================
  */
-});
+})();
