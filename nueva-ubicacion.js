@@ -3,17 +3,20 @@
  * FIREBASE
  ************************************************************/
 
+
 import {
     collection,
     getDocs,
+    getDoc,
+    addDoc,
     query,
     where,
     orderBy,
     updateDoc,
-    doc
+    doc,
+    Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { db } from "./firebase.js";
 
 /**********************
  * ELEMENTOS
