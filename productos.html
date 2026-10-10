@@ -1,23 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <title>INLACT · Productos</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="description" content="Catálogo de productos">
 
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="productos.css">
-
 </head>
 
 <body style="visibility: hidden;">
-
 
 <header class="header-inlact">
     <figure>
@@ -45,15 +39,8 @@
     </div>
 </header>
 
-
 <main>
-
-    <!-- ===============================
-         ACCESOS RÁPIDOS
-    ================================ -->
-
     <section class="quick-actions">
-
         <a href="clientes.html" class="action-card">
             <img src="img/icon-clientes.svg" alt="">
             <span>Clientes</span>
@@ -73,22 +60,11 @@
             <img src="img/icon-precios.svg" alt="">
             <span>Precios</span>
         </a>
-
     </section>
 
-    <!-- ===============================
-         NUEVO PRODUCTO
-    ================================ -->
-
     <button id="btnNuevoProducto">
-
         📦 Nuevo producto
-
     </button>
-
-    <!-- ===============================
-         LISTA
-    ================================ -->
 
     <h2>Productos</h2>
 
@@ -98,35 +74,39 @@
         placeholder="Buscar por código o descripción..."
     >
 
-    <ul id="listaProductos">
-
-    </ul>
-
-    <!-- ===============================
-         VOLVER
-    ================================ -->
+    <ul id="listaProductos"></ul>
 
     <button id="btnVolver">
-
         ⬅ Volver a Stock
-
     </button>
-
 </main>
 
-
 <script type="module">
-  import { protegerPagina } from "./proteger.js";
+    import {
+        protegerPagina,
+        obtenerPerfilUsuario
+    } from "./proteger.js";
 
-  protegerPagina().then(async () => {
-      await import("./usuario-menu.js");
-      await import("./productos.js");
-  });
+    protegerPagina()
+        .then(async () => {
+            const perfil = obtenerPerfilUsuario();
+
+            if (perfil?.rol !== "admin") {
+                document.body.style.visibility = "hidden";
+                window.location.replace("stock.html");
+                return;
+            }
+
+            await import("./usuario-menu.js");
+            await import("./productos.js");
+        })
+        .catch((error) => {
+            console.error(
+                "Error al verificar permisos de Productos:",
+                error
+            );
+        });
 </script>
-</body>
-</html>
-
 
 </body>
-
 </html>
