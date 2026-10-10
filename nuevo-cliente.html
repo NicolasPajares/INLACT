@@ -17,15 +17,31 @@
 
 <body style="visibility: hidden;">
 
-<header>
-       <figure>
+
+<header class="header-inlact">
+    <figure>
         <a href="index.html" aria-label="Volver al inicio">
             <img src="img/logo.jpg" alt="INLACT">
         </a>
     </figure>
 
+    <div class="menu-usuario">
+        <button
+            type="button"
+            id="btnMenuUsuario"
+            aria-expanded="false"
+            aria-controls="opcionesUsuario"
+        >
+            <span id="nombreUsuario">NICOLÁS PAJARES</span>
+            <span class="flecha-usuario">▾</span>
+        </button>
 
-    <h2>NICOLÁS PAJARES</h2>
+        <div id="opcionesUsuario" class="opciones-usuario" hidden>
+            <button type="button" id="btnCerrarSesion">
+                ↪ Cerrar sesión
+            </button>
+        </div>
+    </div>
 </header>
 
 <main>
@@ -83,7 +99,8 @@
   import { protegerPagina } from "./proteger.js";
 
   protegerPagina().then(async () => {
-    await import("./nuevo-cliente.js");
+      await import("./usuario-menu.js");
+      await import("./nuevo-cliente.js");
   });
 </script>
 </body>
