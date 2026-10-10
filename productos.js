@@ -1,13 +1,17 @@
+
 /************************************************************
  * FIREBASE
  ************************************************************/
 
 import {
     collection,
-    getDocs
+    getDocs,
+    doc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { db } from "./firebase.js";
+
 /**********************
  * ELEMENTOS
  **********************/
@@ -110,30 +114,79 @@ function renderProductos(listaProductos) {
             <small>Código Art.: ${prod.codigo}</small>
         `;
 
+       
         /*==============================
-          BOTÓN ELIMINAR
+          MENÚ DE ACCIONES
         ==============================*/
 
-        const btnBorrar = document.createElement("button");
+        const contenedorAcciones = document.createElement("div");
+        contenedorAcciones.className = "acciones-producto";
 
-        btnBorrar.className = "btn-borrar";
+        const btnMenu = document.createElement("button");
+        btnMenu.className = "btn-borrar";
+        btnMenu.textContent = "⋮";
+        btnMenu.type = "button";
+        btnMenu.title = "Acciones del producto";
 
-        btnBorrar.textContent = "✖";
+        const menu = document.createElement("div");
+        menu.className = "menu-producto";
+        menu.hidden = true;
 
-        btnBorrar.onclick = (e) => {
+        const btnEditar = document.createElement("button");
+        btnEditar.type = "button";
+        btnEditar.textContent = "Editar";
 
-            e.stopPropagation();
+        btnEditar.addEventListener("click", () => {
+            window.location.href =
+                `editar-producto.html?id=${encodeURIComponent(prod.id)}`;
+        });
 
-            alert(
-                "Próximamente podrás editar, desactivar o eliminar este producto."
+        const btnEliminar = document.createElement("button");
+        btnEliminar.type = "button";
+        btnEliminar.textContent = "Eliminar";
+
+        btnEliminar.addEventListener("click", async () => {
+            const confirmar = confirm(
+                `¿Querés desactivar el producto "${prod.descripcion}"?\\n\\n` +
+                "Dejará de aparecer en el catálogo, pero se conservará su historial."
             );
 
-        };
+            if (!confirmar) return;
+
+            btnEliminar.disabled = true;
+
+            try {
+                await updateDoc(doc(db, "productos", prod.id), {
+                    activo: false
+                });
+
+                alert("Producto desactivado correctamente.");
+
+                await cargarProductos();
+
+            } catch (error) {
+                console.error("Error al desactivar el producto:", error);
+                alert("No se pudo desactivar el producto. Revisá la conexión e intentá nuevamente.");
+                btnEliminar.disabled = false;
+            }
+        });
+
+        btnMenu.addEventListener("click", (e) => {
+            e.stopPropagation();
+            menu.hidden = !menu.hidden;
+        });
+
+        menu.appendChild(btnEditar);
+        menu.appendChild(btnEliminar);
+
+        contenedorAcciones.appendChild(btnMenu);
+        contenedorAcciones.appendChild(menu);
 
         li.appendChild(info);
-        li.appendChild(btnBorrar);
+        li.appendChild(contenedorAcciones);
 
         lista.appendChild(li);
+
 
     });
 
