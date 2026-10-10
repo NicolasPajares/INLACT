@@ -133,11 +133,13 @@
     <p>© INLACT · <a href="aviso-legal.html">Aviso Legal</a></p>
 </footer>
 
+
 <script type="module">
   import { protegerPagina } from "./proteger.js";
 
   protegerPagina()
     .then(async () => {
+      await import("./usuario-menu.js");
       await import("./stock.js");
     })
     .catch((error) => {
@@ -147,5 +149,8 @@
 
 </body>
 </html>
+
+
+
 
 
