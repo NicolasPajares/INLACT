@@ -1564,24 +1564,32 @@ import {
     }
 
 
-    /*
-     * ============================================================
-     * BOTÓN EDITAR CONTACTO PRINCIPAL
-     * ============================================================
-     */
+    
+/*
+ * ============================================================
+ * BOTÓN AGREGAR CONTACTO
+ * ============================================================
+ */
 
-    if (editarBtn) {
+if (editarBtn) {
 
-        editarBtn.addEventListener(
-            "click",
-            () => {
+    editarBtn.addEventListener(
+        "click",
+        () => {
 
-                mostrarFormularioEditarContactoPrincipal();
+            const formulario =
+                document.getElementById("nuevoContactoForm");
 
+            if (formulario) {
+                formulario.remove();
             }
-        );
 
-    }
+            mostrarFormularioNuevoContacto();
+
+        }
+    );
+
+}
 
 
     /*
