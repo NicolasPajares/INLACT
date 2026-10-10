@@ -174,14 +174,33 @@
 
 <body style="visibility: hidden;">
 
-    <header>
-        <figure>
-            <a href="index.html" aria-label="Volver al inicio">
-                <img src="img/logo.jpg" alt="INLACT">
-            </a>
-        </figure>
-        <h2>NICOLÁS PAJARES</h2>
-    </header>
+    
+<header class="header-inlact">
+    <figure>
+        <a href="index.html" aria-label="Volver al inicio">
+            <img src="img/logo.jpg" alt="INLACT">
+        </a>
+    </figure>
+
+    <div class="menu-usuario">
+        <button
+            type="button"
+            id="btnMenuUsuario"
+            aria-expanded="false"
+            aria-controls="opcionesUsuario"
+        >
+            <span id="nombreUsuario">NICOLÁS PAJARES</span>
+            <span class="flecha-usuario">▾</span>
+        </button>
+
+        <div id="opcionesUsuario" class="opciones-usuario" hidden>
+            <button type="button" id="btnCerrarSesion">
+                ↪ Cerrar sesión
+            </button>
+        </div>
+    </div>
+</header>
+
 
     <main>
         <section class="card historial-container">
@@ -597,6 +616,7 @@
 
         // PROTECCIÓN: iniciar el historial solo después de validar el acceso.
         try {
+            await import("./usuario-menu.js");
             await protegerPagina();
             await cargarHistorialCompleto();
         } catch (error) {
