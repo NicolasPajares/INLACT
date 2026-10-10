@@ -244,3 +244,45 @@ h2 {
 .quick-actions .action-card.active img {
     filter: brightness(0) invert(1);
 }
+
+.acciones-producto {
+    position: relative;
+    margin-left: auto;
+}
+
+.acciones-producto .btn-borrar {
+    font-size: 24px;
+    min-width: 36px;
+    cursor: pointer;
+}
+
+.menu-producto {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    min-width: 130px;
+    padding: 5px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.menu-producto[hidden] {
+    display: none;
+}
+
+.menu-producto button {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    text-align: left;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.menu-producto button:hover {
+    background: #f0f6fa;
+}
