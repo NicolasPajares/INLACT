@@ -9,6 +9,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import { db } from "./firebase.js";
+import { obtenerPerfilUsuario } from "./proteger.js";
 
 
 /************************************************************
@@ -38,6 +39,23 @@ const lista =
 
 
 /************************************************************
+ * PERMISOS
+ ************************************************************/
+
+const perfil = obtenerPerfilUsuario();
+const esAdmin = perfil?.rol === "admin";
+
+// Productos y Ubicaciones son exclusivos del administrador.
+if (btnProductos) {
+    btnProductos.hidden = !esAdmin;
+}
+
+if (btnUbicaciones) {
+    btnUbicaciones.hidden = !esAdmin;
+}
+
+
+/************************************************************
  * VARIABLES
  ************************************************************/
 
@@ -48,35 +66,35 @@ let existencias = [];
  * NAVEGACIÓN
  ************************************************************/
 
-btnProductos.addEventListener("click", () => {
+if (esAdmin && btnProductos) {
+    btnProductos.addEventListener("click", () => {
+        window.location.href = "productos.html";
+    });
+}
 
-    window.location.href = "productos.html";
+if (esAdmin && btnUbicaciones) {
+    btnUbicaciones.addEventListener("click", () => {
+        window.location.href = "ubicaciones.html";
+    });
+}
 
-});
+if (btnIngreso) {
+    btnIngreso.addEventListener("click", () => {
+        window.location.href = "ingreso-stock.html";
+    });
+}
 
-btnUbicaciones.addEventListener("click", () => {
+if (btnEgreso) {
+    btnEgreso.addEventListener("click", () => {
+        window.location.href = "egreso-stock.html";
+    });
+}
 
-    window.location.href = "ubicaciones.html";
-
-});
-
-btnIngreso.addEventListener("click", () => {
-
-    window.location.href = "ingreso-stock.html";
-
-});
-
-btnEgreso.addEventListener("click", () => {
-
-    window.location.href = "egreso-stock.html";
-
-});
-
-btnTransferencia.addEventListener("click", () => {
-
-    window.location.href = "transferencia-stock.html";
-
-});
+if (btnTransferencia) {
+    btnTransferencia.addEventListener("click", () => {
+        window.location.href = "transferencia-stock.html";
+    });
+}
 
 
 /************************************************************
@@ -92,27 +110,21 @@ async function cargarExistencias() {
                 collection(db, "stock")
             );
 
-
         existencias = [];
 
+        snapshot.forEach(documento => {
 
-        snapshot.forEach(doc => {
-
-            const datos = doc.data();
+            const datos = documento.data();
 
             const cantidad =
                 Number(datos.cantidad || 0);
 
-
-            /*
-             * Solo mostramos stock disponible
-             */
-
+            // Solo mostramos stock disponible.
             if (cantidad > 0) {
 
                 existencias.push({
 
-                    id: doc.id,
+                    id: documento.id,
 
                     productoId:
                         datos.productoId || "",
@@ -125,12 +137,7 @@ async function cargarExistencias() {
                         datos.lote ||
                         "Sin lote",
 
-                    /*
-                     * Aceptamos las dos variantes:
-                     * ubicacionID
-                     * ubicacionId
-                     */
-
+                    // Aceptamos ambas variantes del campo.
                     ubicacionId:
                         datos.ubicacionID ||
                         datos.ubicacionId ||
@@ -143,10 +150,10 @@ async function cargarExistencias() {
                     cantidad: cantidad,
 
                     unidad:
-                    datos.unidad || "",
+                        datos.unidad || "",
 
                     observacion:
-                    datos.observacion || ""
+                        datos.observacion || ""
 
                 });
 
@@ -155,12 +162,9 @@ async function cargarExistencias() {
         });
 
 
-        /*
-         * Orden:
-         * Producto
-         * Ubicación
-         * Lote
-         */
+        /********************************************************
+         * ORDEN: PRODUCTO, UBICACIÓN Y LOTE
+         ********************************************************/
 
         existencias.sort((a, b) => {
 
@@ -173,7 +177,6 @@ async function cargarExistencias() {
                 return producto;
             }
 
-
             const ubicacion =
                 a.ubicacionNombre.localeCompare(
                     b.ubicacionNombre
@@ -183,50 +186,24 @@ async function cargarExistencias() {
                 return ubicacion;
             }
 
-
-            return a.lote.localeCompare(
-                b.lote
-            );
+            return a.lote.localeCompare(b.lote);
 
         });
 
 
-        /*
-         * IMPORTANTE:
-         *
-         * Al abrir la página NO mostramos
-         * todo el stock.
-         *
-         * La lista queda vacía hasta
-         * realizar una búsqueda.
-         */
-
+        // No mostramos existencias hasta realizar una búsqueda.
         lista.innerHTML = "";
-
 
     } catch (error) {
 
-        console.error(
-            "Error cargando stock:",
-            error
-        );
-
+        console.error("Error cargando stock:", error);
 
         lista.innerHTML = `
             <li class="stock-item">
-
                 <div class="stock-info">
-
-                    <strong>
-                        Error al cargar el stock
-                    </strong>
-
-                    <small>
-                        Revisá la consola para ver el error.
-                    </small>
-
+                    <strong>Error al cargar el stock</strong>
+                    <small>Revisá la consola para ver el error.</small>
                 </div>
-
             </li>
         `;
 
@@ -236,31 +213,20 @@ async function cargarExistencias() {
 
 
 /************************************************************
- * RENDER STOCK
+ * MOSTRAR RESULTADOS
  ************************************************************/
 
 function renderExistencias(listaStock) {
 
     lista.innerHTML = "";
 
-
-    /*
-     * Si la búsqueda no encuentra nada
-     */
-
     if (listaStock.length === 0) {
 
         lista.innerHTML = `
             <li class="stock-item">
-
                 <div class="stock-info">
-
-                    <strong>
-                        No se encontraron resultados.
-                    </strong>
-
+                    <strong>No se encontraron resultados.</strong>
                 </div>
-
             </li>
         `;
 
@@ -268,48 +234,29 @@ function renderExistencias(listaStock) {
 
     }
 
-
     listaStock.forEach(stock => {
 
-        const li =
-            document.createElement("li");
-
+        const li = document.createElement("li");
         li.className = "stock-item";
 
-
-        const info =
-            document.createElement("div");
-
+        const info = document.createElement("div");
         info.className = "stock-info";
 
-
         info.innerHTML = `
-            <strong>
-                ${stock.productoNombre}
-            </strong>
+            <strong>${stock.productoNombre}</strong>
 
-            <small>
-                📍 ${stock.ubicacionNombre}
-            </small>
+            <small>📍 ${stock.ubicacionNombre}</small>
 
-            <small>
-                🏷️ Lote: ${stock.lote}
-            </small>
+            <small>🏷️ Lote: ${stock.lote}</small>
 
-            <small>
-                📦 ${stock.cantidad} ${stock.unidad}
-            </small>
+            <small>📦 ${stock.cantidad} ${stock.unidad}</small>
+
             ${stock.observacion ? `
-    <small>
-        📝 ${stock.observacion}
-    </small>
-` : ""}
+                <small>📝 ${stock.observacion}</small>
+            ` : ""}
         `;
 
-
         li.appendChild(info);
-
-
         lista.appendChild(li);
 
     });
@@ -320,68 +267,50 @@ function renderExistencias(listaStock) {
 /************************************************************
  * BUSCADOR
  *
- * Busca por:
- *
- * PRODUCTO
- * UBICACIÓN
- * LOTE
+ * Busca por producto, ubicación o lote.
  ************************************************************/
 
-buscador.addEventListener("input", () => {
+if (buscador) {
 
-    const texto =
-        buscador.value
-        .toLowerCase()
-        .trim();
+    buscador.addEventListener("input", () => {
 
+        const texto =
+            buscador.value.toLowerCase().trim();
 
-    /*
-     * SIN BÚSQUEDA
-     *
-     * No mostramos nada.
-     */
+        // Sin búsqueda, la lista queda vacía.
+        if (texto === "") {
+            lista.innerHTML = "";
+            return;
+        }
 
-    if (texto === "") {
+        const resultado =
+            existencias.filter(stock => {
 
-        lista.innerHTML = "";
+                const producto =
+                    (stock.productoNombre || "")
+                    .toLowerCase();
 
-        return;
+                const ubicacion =
+                    (stock.ubicacionNombre || "")
+                    .toLowerCase();
 
-    }
+                const lote =
+                    (stock.lote || "")
+                    .toLowerCase();
 
+                return (
+                    producto.includes(texto) ||
+                    ubicacion.includes(texto) ||
+                    lote.includes(texto)
+                );
 
-    /*
-     * BUSCAR
-     */
+            });
 
-    const resultado =
-        existencias.filter(stock => {
+        renderExistencias(resultado);
 
-            const producto =
-                (stock.productoNombre || "")
-                .toLowerCase();
+    });
 
-            const ubicacion =
-                (stock.ubicacionNombre || "")
-                .toLowerCase();
-
-            const lote =
-                (stock.lote || "")
-                .toLowerCase();
-
-
-            return (
-                producto.includes(texto) ||
-                ubicacion.includes(texto) ||
-                lote.includes(texto)
-            );
-
-        });
-
-
-    renderExistencias(resultado);
-
-});
+}
 
 
 /************************************************************
@@ -389,9 +318,7 @@ buscador.addEventListener("input", () => {
  ************************************************************/
 
 async function iniciar() {
-
     await cargarExistencias();
-
 }
 
 iniciar();
