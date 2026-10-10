@@ -17,15 +17,33 @@
 
 <body style="visibility: hidden;">
 
-<header>
-      <figure>
+
+<header class="header-inlact">
+    <figure>
         <a href="index.html" aria-label="Volver al inicio">
             <img src="img/logo.jpg" alt="INLACT">
         </a>
     </figure>
 
-  <h2>NICOLÁS PAJARES</h2>
+    <div class="menu-usuario">
+        <button
+            type="button"
+            id="btnMenuUsuario"
+            aria-expanded="false"
+            aria-controls="opcionesUsuario"
+        >
+            <span id="nombreUsuario">NICOLÁS PAJARES</span>
+            <span class="flecha-usuario">▾</span>
+        </button>
+
+        <div id="opcionesUsuario" class="opciones-usuario" hidden>
+            <button type="button" id="btnCerrarSesion">
+                ↪ Cerrar sesión
+            </button>
+        </div>
+    </div>
 </header>
+
 
 <main>
 
@@ -285,6 +303,7 @@ onclick="window.location.href='clientes.html';"
 
 
 
+
 <script type="module">
   import { protegerPagina } from "./proteger.js";
 
@@ -292,14 +311,16 @@ onclick="window.location.href='clientes.html';"
 
   try {
     await protegerPagina();
+
+    await import("./usuario-menu.js");
+    await import("./cliente.js");
+    await import("./notas.js");
+
     document.body.style.visibility = "visible";
   } catch (error) {
-    console.error("Error al proteger la página de cliente:", error);
+    console.error("Error al proteger la página de clientes:", error);
   }
 </script>
-
-<script type="module" src="cliente.js"></script>
-<script type="module" src="notas.js"></script>
 
 
 
