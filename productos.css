@@ -1,3 +1,4 @@
+
 /* ===============================
    RESET BÁSICO
 ================================ */
@@ -32,29 +33,24 @@ main {
   width: 100%;
   padding: 18px;
   margin-bottom: 25px;
-
   background: linear-gradient(135deg, #1f4e8c, #3b82f6);
   color: #ffffff;
-
   border: none;
   border-radius: 14px;
-
   font-size: 20px;
   font-weight: 700;
-
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #btnNuevoProducto:hover {
-  transform: scale(1.03);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+  transform: scale(1.02);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
 }
 
 /* ===============================
-   TITULO
+   TÍTULOS
 ================================ */
 h2 {
   font-size: 22px;
@@ -69,18 +65,16 @@ h2 {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 20px;
-
   font-size: 16px;
-
   border-radius: 10px;
   border: 1px solid #d1d5db;
-
   outline: none;
+  background: #ffffff;
 }
 
 #buscadorProductos:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 /* ===============================
@@ -91,133 +85,176 @@ h2 {
 }
 
 /* ===============================
-   CARD PRODUCTO
+   TARJETA DE PRODUCTO
 ================================ */
 .producto-item {
   background: #ffffff;
   padding: 16px 18px;
   margin-bottom: 14px;
-
   border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  gap: 12px;
+  transition: box-shadow 0.2s ease;
 }
 
 .producto-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 /* ===============================
-   INFO PRODUCTO
+   INFORMACIÓN DEL PRODUCTO
 ================================ */
 .producto-info {
   flex: 1;
   min-width: 0;
+  cursor: default;
 }
 
 .producto-info strong {
   font-size: 18px;
   display: block;
   color: #1f4e8c;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .producto-info small {
   font-size: 14px;
   color: #6b7280;
   display: block;
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 /* ===============================
-   BOTÓN BORRAR ❌
+   MENÚ DE TRES PUNTOS
+   MISMO ESTILO QUE CLIENTES
 ================================ */
-.btn-borrar {
-  margin-left: 12px;
-
-  width: 42px;
-  height: 42px;
-
-  border-radius: 50%;
-  border: none;
-
-  background: #fee2e2;
-  color: #b91c1c;
-
-  font-size: 20px;
-  font-weight: bold;
-
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: background 0.2s ease, transform 0.15s ease;
-
+.cliente-menu-contenedor {
+  position: relative;
   flex-shrink: 0;
+  margin-left: 12px;
 }
 
-.btn-borrar:hover {
-  background: #fecaca;
-  transform: scale(1.1);
+button.btn-menu-cliente {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: #1f4e8c !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+  box-shadow: none !important;
+  transition: background 0.2s ease;
+}
+
+button.btn-menu-cliente:hover {
+  background: #edf4fc !important;
+  transform: none !important;
+}
+
+button.btn-menu-cliente:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ===============================
+   OPCIONES DEL MENÚ
+================================ */
+.menu-opciones-cliente {
+  position: absolute;
+  top: 44px;
+  right: 0;
+  min-width: 145px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.menu-opciones-cliente button {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+  color: #1f2937 !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  text-align: left !important;
+  cursor: pointer;
+  transform: none !important;
+}
+
+.menu-opciones-cliente button:hover {
+  background: #f3f7fb !important;
+  transform: none !important;
+}
+
+.menu-opciones-cliente .eliminar-cliente {
+  color: #c62828 !important;
 }
 
 /* ===============================
    BOTÓN VOLVER
 ================================ */
 #btnVolver {
-
   display: block;
-
   width: fit-content;
-
   min-width: 170px;
-
   margin: 25px auto 0;
-
   padding: 14px 24px;
-
   font-size: 16px;
-
   background: #ffffff;
-
   border: 2px solid #1f4e8c;
-
   color: #1f4e8c;
-
   border-radius: 12px;
-
   cursor: pointer;
-
-  transition: background .2s ease,
-              color .2s ease;
-
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 #btnVolver:hover {
-
   background: #1f4e8c;
-
   color: #ffffff;
-
 }
 
 /* ===============================
-   RESPONSIVE DESKTOP
+   ACCESOS RÁPIDOS ACTIVOS
+================================ */
+.quick-actions .action-card.active {
+  background: linear-gradient(135deg, #1f4e8c, #3b82f6);
+  box-shadow: 0 8px 22px rgba(31, 78, 140, 0.35);
+}
+
+.quick-actions .action-card.active span {
+  color: #ffffff;
+}
+
+.quick-actions .action-card.active img {
+  filter: brightness(0) invert(1);
+}
+
+/* ===============================
+   RESPONSIVE
 ================================ */
 @media (min-width: 768px) {
-
   #btnNuevoProducto {
     font-size: 22px;
     padding: 20px;
@@ -226,63 +263,27 @@ h2 {
   .producto-item {
     padding: 18px 22px;
   }
-
 }
 
-/* ===============================
-   ACCESO ACTIVO
-================================ */
-.quick-actions .action-card.active {
-    background: linear-gradient(135deg, #1f4e8c, #3b82f6);
-    box-shadow: 0 8px 22px rgba(31,78,140,0.35);
-}
+@media (max-width: 480px) {
+  main {
+    padding: 14px;
+  }
 
-.quick-actions .action-card.active span {
-    color: #ffffff;
-}
+  .producto-item {
+    padding: 14px;
+    gap: 8px;
+  }
 
-.quick-actions .action-card.active img {
-    filter: brightness(0) invert(1);
-}
+  .producto-info strong {
+    font-size: 16px;
+  }
 
-.acciones-producto {
-    position: relative;
-    margin-left: auto;
-}
+  .producto-info small {
+    font-size: 13px;
+  }
 
-.acciones-producto .btn-borrar {
-    font-size: 24px;
-    min-width: 36px;
-    cursor: pointer;
-}
-
-.menu-producto {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    z-index: 100;
-    min-width: 130px;
-    padding: 5px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.menu-producto[hidden] {
-    display: none;
-}
-
-.menu-producto button {
-    display: block;
-    width: 100%;
-    padding: 9px 12px;
-    text-align: left;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-.menu-producto button:hover {
-    background: #f0f6fa;
+  .cliente-menu-contenedor {
+    margin-left: 4px;
+  }
 }
