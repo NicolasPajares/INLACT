@@ -2,7 +2,6 @@
 /************************************************************
  * FIREBASE
  ************************************************************/
-
 import {
     collection,
     getDocs,
@@ -17,7 +16,6 @@ import { db } from "./firebase.js";
  **********************/
 const btnNuevoProducto = document.getElementById("btnNuevoProducto");
 const btnVolver = document.getElementById("btnVolver");
-
 const buscador = document.getElementById("buscadorProductos");
 const lista = document.getElementById("listaProductos");
 
@@ -25,204 +23,221 @@ const lista = document.getElementById("listaProductos");
  * VARIABLES
  **********************/
 let productos = [];
-let productosFiltrados = [];
 
 /**********************
  * NAVEGACIÓN
  **********************/
-
 btnNuevoProducto.addEventListener("click", () => {
-
     window.location.href = "nuevo-producto.html";
-
 });
 
 btnVolver.addEventListener("click", () => {
-
     window.location.href = "stock.html";
+});
 
+/**********************
+ * CERRAR MENÚS AL HACER CLIC AFUERA
+ **********************/
+document.addEventListener("click", () => {
+    document.querySelectorAll(".menu-opciones-cliente")
+        .forEach(menu => menu.remove());
+
+    document.querySelectorAll(".btn-menu-cliente")
+        .forEach(boton => boton.setAttribute("aria-expanded", "false"));
 });
 
 /**********************
  * CARGAR PRODUCTOS
  **********************/
-
 async function cargarProductos() {
+    lista.innerHTML = "<li>Cargando productos...</li>";
 
-    productos = [];
+    try {
+        const snap = await getDocs(collection(db, "productos"));
 
-    const snap = await getDocs(collection(db, "productos"));
+        productos = [];
 
-    snap.forEach(doc => {
+        snap.forEach(documento => {
+            const datos = documento.data();
 
-        const datos = doc.data();
-
-        if (datos.activo !== false) {
-
-            productos.push({
-
-                id: doc.id,
-                ...datos
-
-            });
-
-        }
-
-    });
-
-    productos.sort((a, b) =>
-        a.descripcion.localeCompare(b.descripcion)
-    );
-
-    renderProductos(productos);
-
-}
-
-/**********************
- * RENDER
- **********************/
-
-function renderProductos(listaProductos) {
-
-    lista.innerHTML = "";
-
-    if (listaProductos.length === 0) {
-
-        lista.innerHTML = `
-            <li>
-                No hay productos cargados.
-            </li>
-        `;
-
-        return;
-
-    }
-      listaProductos.forEach(prod => {
-
-        const li = document.createElement("li");
-        li.className = "producto-item";
-
-        /*==============================
-          INFORMACIÓN
-        ==============================*/
-
-        const info = document.createElement("div");
-        info.className = "producto-info";
-
-        info.innerHTML = `
-            <strong>${prod.descripcion}</strong>
-            <small>Código Art.: ${prod.codigo}</small>
-        `;
-
-       
-        /*==============================
-          MENÚ DE ACCIONES
-        ==============================*/
-
-        const contenedorAcciones = document.createElement("div");
-        contenedorAcciones.className = "acciones-producto";
-
-        const btnMenu = document.createElement("button");
-        btnMenu.className = "btn-borrar";
-        btnMenu.textContent = "⋮";
-        btnMenu.type = "button";
-        btnMenu.title = "Acciones del producto";
-
-        const menu = document.createElement("div");
-        menu.className = "menu-producto";
-        menu.hidden = true;
-
-        const btnEditar = document.createElement("button");
-        btnEditar.type = "button";
-        btnEditar.textContent = "Editar";
-
-        btnEditar.addEventListener("click", () => {
-            window.location.href =
-                `editar-producto.html?id=${encodeURIComponent(prod.id)}`;
-        });
-
-        const btnEliminar = document.createElement("button");
-        btnEliminar.type = "button";
-        btnEliminar.textContent = "Eliminar";
-
-        btnEliminar.addEventListener("click", async () => {
-            const confirmar = confirm(
-                `¿Querés desactivar el producto "${prod.descripcion}"?\\n\\n` +
-                "Dejará de aparecer en el catálogo, pero se conservará su historial."
-            );
-
-            if (!confirmar) return;
-
-            btnEliminar.disabled = true;
-
-            try {
-                await updateDoc(doc(db, "productos", prod.id), {
-                    activo: false
+            // Los productos desactivados no aparecen en el catálogo.
+            if (datos.activo !== false) {
+                productos.push({
+                    id: documento.id,
+                    ...datos
                 });
-
-                alert("Producto desactivado correctamente.");
-
-                await cargarProductos();
-
-            } catch (error) {
-                console.error("Error al desactivar el producto:", error);
-                alert("No se pudo desactivar el producto. Revisá la conexión e intentá nuevamente.");
-                btnEliminar.disabled = false;
             }
         });
 
+        productos.sort((a, b) =>
+            (a.descripcion || "").localeCompare(b.descripcion || "")
+        );
+
+        filtrarProductos();
+
+    } catch (error) {
+        console.error("Error cargando productos:", error);
+        lista.innerHTML = "<li>Error al cargar los productos.</li>";
+    }
+}
+
+/**********************
+ * MOSTRAR PRODUCTOS
+ **********************/
+function renderProductos(listaProductos) {
+    lista.innerHTML = "";
+
+    if (listaProductos.length === 0) {
+        lista.innerHTML = "<li>No se encontraron productos.</li>";
+        return;
+    }
+
+    listaProductos.forEach(prod => {
+        const li = document.createElement("li");
+        li.className = "producto-item";
+
+        /**********************
+         * INFORMACIÓN
+         **********************/
+        const info = document.createElement("div");
+        info.className = "producto-info";
+
+        const nombre = document.createElement("strong");
+        nombre.textContent = prod.descripcion || "Sin descripción";
+
+        const codigo = document.createElement("small");
+        codigo.textContent = `Código Art.: ${prod.codigo || "Sin código"}`;
+
+        info.appendChild(nombre);
+        info.appendChild(document.createElement("br"));
+        info.appendChild(codigo);
+
+        /**********************
+         * CONTENEDOR DEL MENÚ
+         **********************/
+        const contenedorMenu = document.createElement("div");
+        contenedorMenu.className = "cliente-menu-contenedor";
+
+        const btnMenu = document.createElement("button");
+        btnMenu.type = "button";
+        btnMenu.className = "btn-menu-cliente";
+        btnMenu.textContent = "⋮";
+        btnMenu.setAttribute("aria-label", "Acciones del producto");
+        btnMenu.setAttribute("aria-expanded", "false");
+
+        /**********************
+         * ABRIR / CERRAR MENÚ
+         **********************/
         btnMenu.addEventListener("click", (e) => {
             e.stopPropagation();
-            menu.hidden = !menu.hidden;
+
+            const menuActual = contenedorMenu.querySelector(
+                ".menu-opciones-cliente"
+            );
+
+            if (menuActual) {
+                menuActual.remove();
+                btnMenu.setAttribute("aria-expanded", "false");
+                return;
+            }
+
+            document.querySelectorAll(".menu-opciones-cliente")
+                .forEach(menu => menu.remove());
+
+            document.querySelectorAll(".btn-menu-cliente")
+                .forEach(boton =>
+                    boton.setAttribute("aria-expanded", "false")
+                );
+
+            const menu = document.createElement("div");
+            menu.className = "menu-opciones-cliente";
+
+            /**********************
+             * OPCIÓN EDITAR
+             **********************/
+            const btnEditar = document.createElement("button");
+            btnEditar.type = "button";
+            btnEditar.textContent = "Editar";
+
+            btnEditar.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+
+                window.location.href =
+                    `nuevo-producto.html?id=${encodeURIComponent(prod.id)}`;
+            });
+
+            /**********************
+             * OPCIÓN ELIMINAR
+             **********************/
+            const btnEliminar = document.createElement("button");
+            btnEliminar.type = "button";
+            btnEliminar.textContent = "Eliminar";
+            btnEliminar.className = "eliminar-cliente";
+
+            btnEliminar.addEventListener("click", async (ev) => {
+                ev.stopPropagation();
+
+                const ok = confirm(
+                    `¿Querés desactivar el producto "${prod.descripcion || "Sin descripción"}"?\n\nNo aparecerá en el catálogo, pero se conservará su registro para el historial de stock.`
+                );
+
+                if (!ok) return;
+
+                btnEliminar.disabled = true;
+
+                try {
+                    await updateDoc(
+                        doc(db, "productos", prod.id),
+                        { activo: false }
+                    );
+
+                    menu.remove();
+                    await cargarProductos();
+
+                } catch (error) {
+                    console.error("Error desactivando producto:", error);
+                    alert("No se pudo desactivar el producto. Intentá nuevamente.");
+                    btnEliminar.disabled = false;
+                }
+            });
+
+            menu.appendChild(btnEditar);
+            menu.appendChild(btnEliminar);
+            contenedorMenu.appendChild(menu);
+
+            btnMenu.setAttribute("aria-expanded", "true");
         });
 
-        menu.appendChild(btnEditar);
-        menu.appendChild(btnEliminar);
-
-        contenedorAcciones.appendChild(btnMenu);
-        contenedorAcciones.appendChild(menu);
-
+        /**********************
+         * ARMAR FILA
+         **********************/
+        contenedorMenu.appendChild(btnMenu);
         li.appendChild(info);
-        li.appendChild(contenedorAcciones);
-
+        li.appendChild(contenedorMenu);
         lista.appendChild(li);
-
-
     });
-
 }
 
 /**********************
  * BUSCADOR
  **********************/
+function filtrarProductos() {
+    const texto = buscador.value.trim().toLowerCase();
 
-buscador.addEventListener("input", () => {
-
-    const texto = buscador.value.toLowerCase().trim();
-
-    productosFiltrados = productos.filter(prod => {
-
+    const filtrados = productos.filter(prod => {
         const descripcion = (prod.descripcion || "").toLowerCase();
-
         const codigo = (prod.codigo || "").toLowerCase();
 
         return descripcion.includes(texto) ||
                codigo.includes(texto);
-
     });
 
-    renderProductos(productosFiltrados);
+    renderProductos(filtrados);
+}
 
-});
+buscador.addEventListener("input", filtrarProductos);
 
 /**********************
  * INICIALIZAR
  **********************/
-
-async function iniciar() {
-
-    await cargarProductos();
-
-}
-
-iniciar();
+cargarProductos();
