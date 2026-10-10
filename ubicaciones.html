@@ -1,21 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <title>INLACT · Ubicaciones</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="ubicaciones.css">
-
 </head>
 
 <body style="visibility: hidden;">
-
 
 <header class="header-inlact">
     <figure>
@@ -43,61 +38,52 @@
     </div>
 </header>
 
-
 <main>
-
-    <!-- NUEVA UBICACIÓN -->
-
     <button id="btnNuevaUbicacion">
-
         📍 Nueva ubicación
-
     </button>
 
-
-    <!-- TÍTULO -->
-
     <h2>Ubicaciones</h2>
-
-
-    <!-- BUSCADOR -->
 
     <input
         type="text"
         id="buscadorUbicaciones"
-        placeholder="Buscar ubicación...">
+        placeholder="Buscar ubicación..."
+    >
 
-
-    <!-- LISTA -->
-
-    <ul id="listaUbicaciones">
-
-    </ul>
-
-
-    <!-- VOLVER -->
+    <ul id="listaUbicaciones"></ul>
 
     <button id="btnVolver">
-
         ← Volver a Stock
-
     </button>
-
 </main>
 
-
 <script type="module">
-  import { protegerPagina } from "./proteger.js";
+    import {
+        protegerPagina,
+        obtenerPerfilUsuario
+    } from "./proteger.js";
 
-  protegerPagina().then(async () => {
-      await import("./usuario-menu.js");
-      await import("./ubicaciones.js");
-  });
+    protegerPagina()
+        .then(async () => {
+            const perfil = obtenerPerfilUsuario();
+
+            if (perfil?.rol !== "admin") {
+                document.body.style.visibility = "hidden";
+                window.location.replace("stock.html");
+                return;
+            }
+
+            await import("./usuario-menu.js");
+            await import("./ubicaciones.js");
+        })
+        .catch((error) => {
+            console.error(
+                "Error al verificar permisos de Ubicaciones:",
+                error
+            );
+        });
 </script>
-</body>
-</html>
-
 
 </body>
-
 </html>
