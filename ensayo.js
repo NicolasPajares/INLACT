@@ -123,8 +123,12 @@ function mostrarEnsayo(data) {
   document.getElementById("nombre-ensayo").textContent =
     data.nombreEnsayo || "";
 
-  const creadorEl = document.getElementById("creado-por");
-  if (creadorEl) creadorEl.textContent = data.creadoPor ? `Creado por: ${data.creadoPor}` : "";
+  const nombreUsuarioEl = document.getElementById("nombreUsuario");
+  if (nombreUsuarioEl) {
+    nombreUsuarioEl.textContent = (data.creadoPor && data.creadoPor !== "Usuario")
+      ? data.creadoPor.toLocaleUpperCase("es-AR")
+      : "INLACT";
+  }
 
   const fecha = data.fecha;
 
