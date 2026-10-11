@@ -123,6 +123,9 @@ function mostrarEnsayo(data) {
   document.getElementById("nombre-ensayo").textContent =
     data.nombreEnsayo || "";
 
+  const creadorEl = document.getElementById("creado-por");
+  if (creadorEl) creadorEl.textContent = data.creadoPor ? `Creado por: ${data.creadoPor}` : "";
+
   const fecha = data.fecha;
 
   document.getElementById("fecha").textContent =
@@ -314,6 +317,7 @@ async function publicarEnsayo() {
   // Solo se copian los campos que verá el cliente.
   const copiaPublica = {
     clienteNombre: ensayoActual.clienteNombre || "",
+    creadoPor: ensayoActual.creadoPor || "",
     nombreEnsayo: ensayoActual.nombreEnsayo || "",
     fecha: ensayoActual.fecha || null,
     propuesta: ensayoActual.propuesta || "",
