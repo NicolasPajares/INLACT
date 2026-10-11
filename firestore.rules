@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // BORRADOR: no desplegar en producción hasta probar todas las pantallas.
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return hasProfile()
+        && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == "admin";
+    }
+
+    match /usuarios/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /clientes/{id} {
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /ensayos/{id} {
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /cotizaciones/{id} {
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /ensayos_publicos/{token} {
+      allow get: if resource.data.activo == true;
+      allow list: if false;
+      allow create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /cotizaciones_publicas/{token} {
+      allow get: if resource.data.activo == true;
+      allow list: if false;
+      allow create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /productos/{id} {
+      allow read: if hasProfile();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /ubicaciones/{id} {
+      allow read: if hasProfile();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /listaprecios/{id} {
+      allow read: if hasProfile();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /stock/{id} {
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /movimientos_stock/{id} {
+      allow read, create: if hasProfile();
+      allow update, delete: if isAdmin();
+    }
+
+    match /egresos/{id} {
+      allow read, create: if hasProfile();
+      allow update, delete: if isAdmin();
+    }
+
+    match /visitas/{id} {
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
