@@ -116,7 +116,7 @@ async function cargarEnsayoPublico() {
 /**********************
  * MOSTRAR ENSAYO
  **********************/
-function mostrarEnsayo(data) {
+async function mostrarEnsayo(data) {
   document.getElementById("empresa").textContent =
     data.clienteNombre || "";
 
@@ -125,9 +125,29 @@ function mostrarEnsayo(data) {
 
   const nombreUsuarioEl = document.getElementById("nombreUsuario");
   if (nombreUsuarioEl) {
-    nombreUsuarioEl.textContent = (data.creadoPor && data.creadoPor !== "Usuario")
-      ? data.creadoPor.toLocaleUpperCase("es-AR")
-      : "INLACT";
+    let nombreCreador = data.creadoPor;
+
+    // Si existe el UID, recuperar el nombre desde el perfil de usuario
+    // cuando creadoPor esté vacío o tenga el valor genérico.
+    if ((!nombreCreador || nombreCreador === "Usuario") && data.creadoPorUid) {
+      try {
+        const perfilSnap = await getDoc(doc(db, "usuarios", data.creadoPorUid));
+        if (perfilSnap.exists()) {
+          const perfil = perfilSnap.data();
+          nombreCreador =
+            perfil.nombre ||
+            perfil.nombreCompleto ||
+            nombreCreador;
+        }
+      } catch (error) {
+        console.error("No se pudo recuperar el nombre del creador:", error);
+      }
+    }
+
+    nombreUsuarioEl.textContent =
+      (nombreCreador && nombreCreador !== "Usuario")
+        ? nombreCreador.toLocaleUpperCase("es-AR")
+        : "INLACT";
   }
 
   const fecha = data.fecha;
