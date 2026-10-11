@@ -7,6 +7,8 @@ import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
     getFirestore,
     collection,
@@ -34,6 +36,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 
 /* ============================================================
@@ -881,10 +884,22 @@ form.addEventListener("submit", async event => {
 
         } else {
             // NUEVA: crea un documento nuevo.
+            const usuarioActual = auth.currentUser;
+            let datosCreador = {};
+            if (usuarioActual) {
+                const perfilSnap = await getDoc(doc(db, "usuarios", usuarioActual.uid));
+                const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
+                datosCreador = {
+                    creadoPor: (perfil.nombre || perfil.nombreCompleto || usuarioActual.displayName || usuarioActual.email?.split("@")[0] || "Usuario").trim(),
+                    creadoPorUid: usuarioActual.uid
+                };
+            }
+
             const docRef = await addDoc(
                 collection(db, "cotizaciones"),
                 {
                     ...datosCotizacion,
+                    ...datosCreador,
                     creadoEn: Timestamp.now()
                 }
             );
