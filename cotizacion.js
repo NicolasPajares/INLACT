@@ -164,6 +164,9 @@ function mostrarCotizacion(cotizacion) {
       cotizacion.nombreCotizacion || "Cotización";
   }
 
+  const creadorEl = document.getElementById("creado-por");
+  if (creadorEl) creadorEl.textContent = cotizacion.creadoPor ? `Creado por: ${cotizacion.creadoPor}` : "";
+
   mostrarTexto(propuestaEl, cotizacion.propuesta);
   mostrarTexto(dosisEl, cotizacion.dosis);
   mostrarTexto(observacionesEl, cotizacion.observaciones);
@@ -453,6 +456,7 @@ async function publicarCotizacion() {
 
   const copiaPublica = {
     clienteNombre: cotizacionActual.clienteNombre || "",
+    creadoPor: cotizacionActual.creadoPor || "",
     nombreCotizacion: cotizacionActual.nombreCotizacion || "",
     fecha: cotizacionActual.fecha || null,
     propuesta: cotizacionActual.propuesta || "",
