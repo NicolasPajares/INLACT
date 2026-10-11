@@ -348,6 +348,7 @@ async function publicarEnsayo() {
   const copiaPublica = {
     clienteNombre: ensayoActual.clienteNombre || "",
     creadoPor: ensayoActual.creadoPor || "",
+    creadoPorUid: ensayoActual.creadoPorUid || "",
     nombreEnsayo: ensayoActual.nombreEnsayo || "",
     fecha: ensayoActual.fecha || null,
     propuesta: ensayoActual.propuesta || "",
