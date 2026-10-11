@@ -164,8 +164,12 @@ function mostrarCotizacion(cotizacion) {
       cotizacion.nombreCotizacion || "Cotización";
   }
 
-  const creadorEl = document.getElementById("creado-por");
-  if (creadorEl) creadorEl.textContent = cotizacion.creadoPor ? `Creado por: ${cotizacion.creadoPor}` : "";
+  const nombreUsuarioEl = document.getElementById("nombreUsuario");
+  if (nombreUsuarioEl) {
+    nombreUsuarioEl.textContent = (cotizacion.creadoPor && cotizacion.creadoPor !== "Usuario")
+      ? cotizacion.creadoPor.toLocaleUpperCase("es-AR")
+      : "INLACT";
+  }
 
   mostrarTexto(propuestaEl, cotizacion.propuesta);
   mostrarTexto(dosisEl, cotizacion.dosis);
