@@ -127,6 +127,12 @@ async function mostrarEnsayo(data) {
   if (nombreUsuarioEl) {
     let nombreCreador = data.creadoPor;
 
+    // Este ensayo fue creado por Usuario Prueba antes de guardar
+    // los datos del creador en los nuevos registros.
+    if (!nombreCreador && ensayoId === "qOARW6kb4hOAnGc6Dtdz") {
+      nombreCreador = "Usuario Prueba";
+    }
+
     // Si existe el UID, recuperar el nombre desde el perfil de usuario
     // cuando creadoPor esté vacío o tenga el valor genérico.
     if ((!nombreCreador || nombreCreador === "Usuario") && data.creadoPorUid) {
