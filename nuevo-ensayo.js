@@ -3,7 +3,7 @@
  * FIREBASE
  **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
     getFirestore,
@@ -268,28 +268,44 @@ form.addEventListener("submit", async (e) => {
 
             window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
         } else {
-            // Guardar el nombre y el UID de quien crea el ensayo,
-            // igual que en las cotizaciones.
-            const usuarioActual = auth.currentUser;
-            let datosCreador = {};
+            // Esperar a que Firebase confirme el usuario que inició sesión.
+            // Así no se guarda un ensayo nuevo sin identificar a su creador.
+            const usuarioActual = auth.currentUser || await new Promise((resolve) => {
+                const cancelar = onAuthStateChanged(auth, (usuario) => {
+                    cancelar();
+                    resolve(usuario);
+                });
+            });
 
-            if (usuarioActual) {
-                const perfilSnap = await getDoc(
-                    doc(db, "usuarios", usuarioActual.uid)
-                );
-                const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
-
-                datosCreador = {
-                    creadoPor: (
-                        perfil.nombre ||
-                        perfil.nombreCompleto ||
-                        usuarioActual.displayName ||
-                        usuarioActual.email?.split("@")[0] ||
-                        "Usuario"
-                    ).trim(),
-                    creadoPorUid: usuarioActual.uid
-                };
+            if (!usuarioActual) {
+                throw new Error("No se pudo identificar al usuario conectado. Cerrá sesión, volvé a ingresar e intentá guardar nuevamente.");
             }
+
+            const perfilSnap = await getDoc(
+                doc(db, "usuarios", usuarioActual.uid)
+            );
+
+            if (!perfilSnap.exists()) {
+                throw new Error("No se encontró el perfil del usuario conectado. Contactá al administrador.");
+            }
+
+            const perfil = perfilSnap.data();
+            const nombreCreador = (
+                perfil.nombre ||
+                perfil.nombreCompleto ||
+                usuarioActual.displayName ||
+                usuarioActual.email?.split("@")[0] ||
+                ""
+            ).trim();
+
+            if (!nombreCreador) {
+                throw new Error("El usuario conectado no tiene un nombre configurado en su perfil.");
+            }
+
+            const datosCreador = {
+                creadoPor: nombreCreador,
+                creadoPorUid: usuarioActual.uid
+            };
 
             datosEnsayo.creadoEn = Timestamp.now();
 
