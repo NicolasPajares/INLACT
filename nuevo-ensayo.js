@@ -268,11 +268,37 @@ form.addEventListener("submit", async (e) => {
 
             window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
         } else {
+            // Guardar el nombre y el UID de quien crea el ensayo,
+            // igual que en las cotizaciones.
+            const usuarioActual = auth.currentUser;
+            let datosCreador = {};
+
+            if (usuarioActual) {
+                const perfilSnap = await getDoc(
+                    doc(db, "usuarios", usuarioActual.uid)
+                );
+                const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
+
+                datosCreador = {
+                    creadoPor: (
+                        perfil.nombre ||
+                        perfil.nombreCompleto ||
+                        usuarioActual.displayName ||
+                        usuarioActual.email?.split("@")[0] ||
+                        "Usuario"
+                    ).trim(),
+                    creadoPorUid: usuarioActual.uid
+                };
+            }
+
             datosEnsayo.creadoEn = Timestamp.now();
 
             const docRef = await addDoc(
                 collection(db, "ensayos"),
-                datosEnsayo
+                {
+                    ...datosEnsayo,
+                    ...datosCreador
+                }
             );
 
             window.location.href =
