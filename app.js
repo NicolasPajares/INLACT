@@ -631,6 +631,10 @@ async function cargarUltimasActividades() {
   `;
 
   try {
+    const usuarioActual = auth.currentUser;
+    if (!usuarioActual) throw new Error("No se pudo identificar al usuario conectado.");
+    const uidActual = usuarioActual.uid;
+
     const [visitasSnap, egresosSnap, ensayosSnap, cotizacionesSnap] =
       await Promise.all([
         getDocs(collection(db, "visitas")),
@@ -644,6 +648,7 @@ async function cargarUltimasActividades() {
     // VISITAS Y NOTAS
     visitasSnap.forEach(documento => {
       const datos = documento.data();
+      if (datos.creadoPorUid !== uidActual) return;
       const tipo = datos.tipoVisita || "";
 
       if (
@@ -682,6 +687,7 @@ async function cargarUltimasActividades() {
 
     egresosSnap.forEach(documento => {
       const datos = documento.data();
+      if (datos.creadoPorUid !== uidActual) return;
 
       if (String(datos.tipoEgreso || "").toLowerCase() !== "venta") {
         return;
@@ -734,6 +740,7 @@ async function cargarUltimasActividades() {
     // ENSAYOS
     ensayosSnap.forEach(documento => {
       const datos = documento.data();
+      if (datos.creadoPorUid !== uidActual) return;
 
       actividades.push({
         id: documento.id,
@@ -748,6 +755,7 @@ async function cargarUltimasActividades() {
     // COTIZACIONES
     cotizacionesSnap.forEach(documento => {
       const datos = documento.data();
+      if (datos.creadoPorUid !== uidActual) return;
 
       actividades.push({
         id: documento.id,
