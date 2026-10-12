@@ -2050,7 +2050,8 @@ const resultadoCotizaciones =
 
                 if (
                     datos.tipoVisita !== "Nota de visita" &&
-                    datos.tipoVisita !== "Nota"
+                    datos.tipoVisita !== "Nota" &&
+                    datos.tipoVisita !== "Visita"
                 ) {
 
                     return;
