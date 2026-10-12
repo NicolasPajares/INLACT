@@ -238,15 +238,7 @@
             </div>
 
             <div class="reporte-controles">
-                <label class="reporte-campo" for="periodoReporte">Período del informe
-                    <select id="periodoReporte">
-                        <option value="semana">Esta semana</option>
-                        <option value="mes" selected>Este mes</option>
-                        <option value="mes-anterior">Mes anterior</option>
-                        <option value="personalizado">Fechas personalizadas</option>
-                    </select>
-                </label>
-                <div id="fechasPersonalizadas" class="reporte-fechas" hidden>
+                <div class="reporte-fechas">
                     <label class="reporte-campo" for="fechaDesde">Desde
                         <input type="date" id="fechaDesde">
                     </label>
@@ -666,36 +658,13 @@
         }
 
 
-        const selectorPeriodo = document.getElementById("periodoReporte");
-        const fechasPersonalizadas = document.getElementById("fechasPersonalizadas");
-
-        selectorPeriodo.addEventListener("change", () => {
-            fechasPersonalizadas.hidden = selectorPeriodo.value !== "personalizado";
-        });
-
         function obtenerRangoReporte() {
-            const ahora = new Date();
-            const inicioDia = fecha => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-            let desde, hasta;
-            if (selectorPeriodo.value === "personalizado") {
-                const valorDesde = document.getElementById("fechaDesde").value;
-                const valorHasta = document.getElementById("fechaHasta").value;
-                if (!valorDesde || !valorHasta) throw new Error("Elegí las fechas Desde y Hasta.");
-                desde = new Date(valorDesde + "T00:00:00");
-                hasta = new Date(valorHasta + "T23:59:59.999");
-                if (desde > hasta) throw new Error("La fecha Desde no puede ser posterior a Hasta.");
-            } else if (selectorPeriodo.value === "semana") {
-                hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 59, 999);
-                desde = inicioDia(ahora);
-                const dia = (desde.getDay() + 6) % 7;
-                desde.setDate(desde.getDate() - dia);
-            } else if (selectorPeriodo.value === "mes-anterior") {
-                desde = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
-                hasta = new Date(ahora.getFullYear(), ahora.getMonth(), 0, 23, 59, 59, 999);
-            } else {
-                desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
-                hasta = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0, 23, 59, 59, 999);
-            }
+            const valorDesde = document.getElementById("fechaDesde").value;
+            const valorHasta = document.getElementById("fechaHasta").value;
+            if (!valorDesde || !valorHasta) throw new Error("Elegí las fechas Desde y Hasta.");
+            const desde = new Date(valorDesde + "T00:00:00");
+            const hasta = new Date(valorHasta + "T23:59:59.999");
+            if (desde > hasta) throw new Error("La fecha Desde no puede ser posterior a Hasta.");
             return { desde, hasta };
         }
 
@@ -709,7 +678,7 @@
                 const { desde, hasta } = obtenerRangoReporte();
                 const actividades = actividadesCargadas.filter(a => a.fecha && a.fecha >= desde && a.fecha <= hasta);
                 const usuario = document.getElementById("nombreUsuario")?.textContent?.trim() || auth.currentUser?.email || "Usuario";
-                const periodo = selectorPeriodo.options[selectorPeriodo.selectedIndex].text;
+                const periodo = "Período seleccionado";
                 const filas = actividades.map(a => {
                     let detalle = "";
                     if (a.origen === "visita") {
