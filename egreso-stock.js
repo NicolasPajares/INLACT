@@ -2453,6 +2453,8 @@ form.addEventListener(
                                         articulo.egresoId
                                 ),
 
+                        ...datosCreador,
+
                         creadoEn:
                             serverTimestamp()
 
