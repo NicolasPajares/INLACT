@@ -111,6 +111,12 @@
             color: #1f4e8c;
         }
 
+        .actividad-creador {
+            margin-top: 7px;
+            color: #68778a;
+            font-size: 13px;
+        }
+
         .mensaje-historial {
             text-align: center;
             padding: 30px 10px;
@@ -481,6 +487,10 @@
                     💰 Venta
                 </div>
 
+                <div class="actividad-creador">
+                    Registrado por: ${escaparHTML(actividad.creadoPor || "Usuario anterior no identificado")}
+                </div>
+
                 <div class="actividad-titulo">
                     ${actividad.productos.length}
                     producto${actividad.productos.length === 1 ? "" : "s"}
@@ -566,6 +576,10 @@
                     ${escaparHTML(titulo)}
                 </div>
 
+                <div class="actividad-creador">
+                    Registrado por: ${escaparHTML(actividad.datos.creadoPor || "Usuario anterior no identificado")}
+                </div>
+
             `;
 
             tarjeta.addEventListener("click", () => {
@@ -606,6 +620,10 @@
 
             <div class="actividad-titulo">
                 ${escaparHTML(titulo)}
+            </div>
+
+            <div class="actividad-creador">
+                Registrado por: ${escaparHTML(datos.creadoPor || "Usuario anterior no identificado")}
             </div>
 
         `;
@@ -747,74 +765,46 @@
             const ventasPorFecha = new Map();
 
             resultadoEgresos.forEach(documento => {
-
                 const datos = documento.data();
-
-                if (datos.tipoEgreso !== "venta") {
-                    return;
-                }
+                if (datos.tipoEgreso !== "venta") return;
 
                 let fecha = null;
-
-                if (
-                    datos.creadoEn &&
-                    typeof datos.creadoEn.toDate === "function"
-                ) {
+                if (datos.creadoEn && typeof datos.creadoEn.toDate === "function") {
                     fecha = datos.creadoEn.toDate();
                 }
-
                 if (!fecha && datos.fecha) {
-
-                    const fechaConvertida = new Date(
-                        `${datos.fecha}T00:00:00`
-                    );
-
-                    if (!isNaN(fechaConvertida.getTime())) {
-                        fecha = fechaConvertida;
-                    }
-
+                    const fechaConvertida = new Date(`${datos.fecha}T00:00:00`);
+                    if (!isNaN(fechaConvertida.getTime())) fecha = fechaConvertida;
                 }
 
                 let claveFecha = "sin-fecha";
-
                 if (fecha) {
-
-                    claveFecha =
-                        fecha.getFullYear() +
-                        "-" +
-                        String(fecha.getMonth() + 1).padStart(2, "0") +
-                        "-" +
+                    claveFecha = fecha.getFullYear() + "-" +
+                        String(fecha.getMonth() + 1).padStart(2, "0") + "-" +
                         String(fecha.getDate()).padStart(2, "0");
-
                 }
 
-                if (!ventasPorFecha.has(claveFecha)) {
-
-                    ventasPorFecha.set(claveFecha, {
-                        id: "venta-" + claveFecha,
+                // No mezclar productos de distintos usuarios en una misma venta.
+                const uidCreador = datos.creadoPorUid || "sin-usuario";
+                const claveVenta = claveFecha + "__" + uidCreador;
+                if (!ventasPorFecha.has(claveVenta)) {
+                    ventasPorFecha.set(claveVenta, {
+                        id: "venta-" + claveVenta,
                         origen: "venta",
                         fecha: fecha,
+                        creadoPor: datos.creadoPor || "",
                         productos: []
                     });
-
                 }
 
-                const venta = ventasPorFecha.get(claveFecha);
-
+                const venta = ventasPorFecha.get(claveVenta);
                 venta.productos.push({
                     nombre: datos.productoNombre || "Producto sin nombre",
                     cantidad: datos.cantidad,
                     unidad: datos.unidad || "",
                     lote: datos.lote || ""
                 });
-
-                if (
-                    fecha &&
-                    (!venta.fecha || fecha > venta.fecha)
-                ) {
-                    venta.fecha = fecha;
-                }
-
+                if (fecha && (!venta.fecha || fecha > venta.fecha)) venta.fecha = fecha;
             });
 
             ventasPorFecha.forEach(venta => {
