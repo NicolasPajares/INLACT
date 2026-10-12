@@ -2240,29 +2240,41 @@ if (
 
                 /*
                  * ------------------------------------------------
-                 * CREAR GRUPO
+                 * CREAR GRUPO POR FECHA Y USUARIO
                  * ------------------------------------------------
                  */
 
+                const uidCreador =
+                    datos.creadoPorUid || "sin-usuario";
+
+                const claveVenta =
+                    claveFecha + "|" + uidCreador;
+
                 if (
                     !ventasPorFecha.has(
-                        claveFecha
+                        claveVenta
                     )
                 ) {
 
                     ventasPorFecha.set(
-                        claveFecha,
+                        claveVenta,
                         {
 
                             id:
                                 "venta-" +
-                                claveFecha,
+                                claveVenta,
 
                             origen:
                                 "venta",
 
                             fecha:
                                 fecha,
+
+                            creadoPor:
+                                datos.creadoPor || "",
+
+                            creadoPorUid:
+                                datos.creadoPorUid || "",
 
                             productos:
                                 []
@@ -2275,7 +2287,7 @@ if (
 
                 const venta =
                     ventasPorFecha.get(
-                        claveFecha
+                        claveVenta
                     );
 
 
@@ -2626,6 +2638,10 @@ resultadoCotizaciones.forEach(
                         >
                             ${actividad.productos.length}
                             producto${actividad.productos.length === 1 ? "" : "s"}
+                        </div>
+
+                        <div style="margin-top:7px;font-size:13px;color:#68778a;">
+                            Registrado por: ${escaparHTML(actividad.creadoPor || "Usuario anterior no identificado")}
                         </div>
 
                     `;
@@ -3081,6 +3097,10 @@ if (
                         "
                     >
                         ${escaparHTML(titulo)}
+                    </div>
+
+                    <div style="margin-top:7px;font-size:13px;color:#68778a;">
+                        Registrado por: ${escaparHTML(datos.creadoPor || "Usuario anterior no identificado")}
                     </div>
 
                 `;
