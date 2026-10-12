@@ -2951,6 +2951,10 @@ if (
             ${escaparHTML(titulo)}
         </div>
 
+        <div style="margin-top:7px;font-size:13px;color:#68778a;">
+            Registrado por: ${escaparHTML(datos.creadoPor || "Usuario anterior no identificado")}
+        </div>
+
     `;
 
 
