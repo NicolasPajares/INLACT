@@ -156,6 +156,24 @@
             cursor: pointer;
         }
 
+        .reporte-controles {
+            display: flex;
+            align-items: end;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 0 0 20px;
+            padding: 16px;
+            background: #f5f8fc;
+            border: 1px solid #e1e7ee;
+            border-radius: 12px;
+        }
+        .reporte-campo { display: flex; flex-direction: column; gap: 6px; color: #1f4e8c; font-size: 13px; font-weight: 600; }
+        .reporte-campo select, .reporte-campo input { min-height: 38px; padding: 7px 9px; border: 1px solid #ccd6e2; border-radius: 7px; background: white; color: #333; }
+        .reporte-fechas { display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn-generar-reporte { border: 0; border-radius: 8px; padding: 11px 16px; background: #1f4e8c; color: white; font-weight: 600; cursor: pointer; min-height: 40px; }
+        .btn-generar-reporte:hover { background: #173b6a; }
+        @media print { body { visibility: visible !important; } }
+
         @media (max-width: 600px) {
             .historial-container {
                 margin: 18px 12px;
@@ -219,6 +237,26 @@
                 </button>
             </div>
 
+            <div class="reporte-controles">
+                <label class="reporte-campo" for="periodoReporte">Período del informe
+                    <select id="periodoReporte">
+                        <option value="semana">Esta semana</option>
+                        <option value="mes" selected>Este mes</option>
+                        <option value="mes-anterior">Mes anterior</option>
+                        <option value="personalizado">Fechas personalizadas</option>
+                    </select>
+                </label>
+                <div id="fechasPersonalizadas" class="reporte-fechas" hidden>
+                    <label class="reporte-campo" for="fechaDesde">Desde
+                        <input type="date" id="fechaDesde">
+                    </label>
+                    <label class="reporte-campo" for="fechaHasta">Hasta
+                        <input type="date" id="fechaHasta">
+                    </label>
+                </div>
+                <button type="button" id="btnGenerarReporte" class="btn-generar-reporte">📄 Generar informe PDF</button>
+            </div>
+
             <div id="listaHistorialCompleto" class="lista-historial">
                 <div class="mensaje-historial">
                     Cargando historial...
@@ -244,6 +282,8 @@
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const lista = document.getElementById("listaHistorialCompleto");
+        let actividadesCargadas = [];
+
 
         function escaparHTML(texto) {
             return String(texto ?? "")
@@ -523,6 +563,7 @@
                     return fechaB - fechaA;
                 });
 
+                actividadesCargadas = actividades;
                 lista.innerHTML = "";
 
                 if (actividades.length === 0) {
@@ -623,6 +664,110 @@
                 mostrarError("No se pudo cargar el historial.");
             }
         }
+
+
+        const selectorPeriodo = document.getElementById("periodoReporte");
+        const fechasPersonalizadas = document.getElementById("fechasPersonalizadas");
+
+        selectorPeriodo.addEventListener("change", () => {
+            fechasPersonalizadas.hidden = selectorPeriodo.value !== "personalizado";
+        });
+
+        function obtenerRangoReporte() {
+            const ahora = new Date();
+            const inicioDia = fecha => new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+            let desde, hasta;
+            if (selectorPeriodo.value === "personalizado") {
+                const valorDesde = document.getElementById("fechaDesde").value;
+                const valorHasta = document.getElementById("fechaHasta").value;
+                if (!valorDesde || !valorHasta) throw new Error("Elegí las fechas Desde y Hasta.");
+                desde = new Date(valorDesde + "T00:00:00");
+                hasta = new Date(valorHasta + "T23:59:59.999");
+                if (desde > hasta) throw new Error("La fecha Desde no puede ser posterior a Hasta.");
+            } else if (selectorPeriodo.value === "semana") {
+                hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 23, 59, 59, 999);
+                desde = inicioDia(ahora);
+                const dia = (desde.getDay() + 6) % 7;
+                desde.setDate(desde.getDate() - dia);
+            } else if (selectorPeriodo.value === "mes-anterior") {
+                desde = new Date(ahora.getFullYear(), ahora.getMonth() - 1, 1);
+                hasta = new Date(ahora.getFullYear(), ahora.getMonth(), 0, 23, 59, 59, 999);
+            } else {
+                desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+                hasta = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0, 23, 59, 59, 999);
+            }
+            return { desde, hasta };
+        }
+
+        function textoFechaCorta(fecha) {
+            if (!fecha) return "Sin fecha";
+            return fecha.toLocaleDateString("es-AR");
+        }
+
+        function generarInformePDF() {
+            try {
+                const { desde, hasta } = obtenerRangoReporte();
+                const actividades = actividadesCargadas.filter(a => a.fecha && a.fecha >= desde && a.fecha <= hasta);
+                const usuario = document.getElementById("nombreUsuario")?.textContent?.trim() || auth.currentUser?.email || "Usuario";
+                const periodo = selectorPeriodo.options[selectorPeriodo.selectedIndex].text;
+                const filas = actividades.map(a => {
+                    let detalle = "";
+                    if (a.origen === "visita") {
+                        detalle = `<div class="detalle">${escaparHTML(a.datos.nota || "Sin contenido registrado.").replace(/\n/g, "<br>")}</div>`;
+                    } else if (a.origen === "venta") {
+                        detalle = `<ul>${a.productos.map(p => `<li><strong>${escaparHTML(p.nombre)}</strong> — Cantidad: ${escaparHTML(p.cantidad ?? "-")} ${escaparHTML(p.unidad)}${p.lote ? ` — Lote: ${escaparHTML(p.lote)}` : ""}</li>`).join("")}</ul>`;
+                    } else {
+                        detalle = `<div class="detalle resumido">${escaparHTML(a.titulo)}</div>`;
+                    }
+                    return `<article class="actividad">
+                        <div class="meta">${escaparHTML(textoFechaCorta(a.fecha))} · ${escaparHTML(a.tipo.replace(/^\S+\s*/, ""))}</div>
+                        <h2>${escaparHTML(a.empresa)}</h2>
+                        <h3>${escaparHTML(a.titulo)}</h3>
+                        ${detalle}
+                    </article>`;
+                }).join("");
+                const conteo = {
+                    visitas: actividades.filter(a => a.origen === "visita" && a.tipo.includes("Visita")).length,
+                    notas: actividades.filter(a => a.origen === "visita" && a.tipo.includes("Nota")).length,
+                    ventas: actividades.filter(a => a.origen === "venta").length,
+                    cotizaciones: actividades.filter(a => a.origen === "cotizacion").length,
+                    ensayos: actividades.filter(a => a.origen === "ensayo").length
+                };
+                const ventana = window.open("", "_blank");
+                if (!ventana) {
+                    alert("El navegador bloqueó la ventana del informe. Permití las ventanas emergentes para este sitio e intentá nuevamente.");
+                    return;
+                }
+                ventana.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe INLACT</title>
+                    <style>
+                    body{font-family:Arial,sans-serif;color:#263445;margin:28px;font-size:12px}
+                    header{display:flex;align-items:center;gap:18px;border-bottom:3px solid #1f4e8c;padding-bottom:14px;margin-bottom:18px}
+                    header img{width:125px;max-height:70px;object-fit:contain}h1{color:#1f4e8c;margin:0 0 6px;font-size:24px}
+                    .sub{color:#5d6b7b;margin:3px 0}.resumen{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+                    .pill{border:1px solid #d8e1eb;border-radius:7px;padding:8px 10px;background:#f5f8fc}
+                    .actividad{break-inside:avoid;border-bottom:1px solid #d9e0e8;padding:12px 0}
+                    .meta{color:#64748b;font-size:11px}.actividad h2{font-size:15px;color:#1f4e8c;margin:5px 0}
+                    .actividad h3{font-size:13px;margin:4px 0 7px}.detalle{white-space:normal;line-height:1.5;overflow-wrap:anywhere}
+                    ul{margin:6px 0;padding-left:20px}li{margin:4px 0}
+                    @media print{body{margin:14mm}header{break-inside:avoid}.actividad{break-inside:avoid}}
+                    </style></head><body>
+                    <header><img src="${window.location.origin}/INLACT/img/logo.jpg" alt="INLACT"><div><h1>Informe de actividad</h1>
+                    <p class="sub"><strong>Usuario:</strong> ${escaparHTML(usuario)}</p>
+                    <p class="sub"><strong>Período:</strong> ${escaparHTML(periodo)} · ${escaparHTML(textoFechaCorta(desde))} al ${escaparHTML(textoFechaCorta(hasta))}</p>
+                    <p class="sub"><strong>Generado:</strong> ${escaparHTML(new Date().toLocaleString("es-AR"))}</p></div></header>
+                    <div class="resumen">
+                    <span class="pill">Visitas: ${conteo.visitas}</span><span class="pill">Notas: ${conteo.notas}</span>
+                    <span class="pill">Ventas: ${conteo.ventas}</span><span class="pill">Cotizaciones: ${conteo.cotizaciones}</span><span class="pill">Ensayos: ${conteo.ensayos}</span>
+                    </div>
+                    ${filas || "<p>No hay actividades para el período seleccionado.</p>"}
+                    <script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+                ventana.document.close();
+            } catch (error) {
+                alert(error.message || "No se pudo generar el informe.");
+            }
+        }
+
+        document.getElementById("btnGenerarReporte").addEventListener("click", generarInformePDF);
 
         document.getElementById("volverInicioBtn")
             .addEventListener("click", () => {
