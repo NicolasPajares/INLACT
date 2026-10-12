@@ -13,10 +13,24 @@ import {
   collection,
   getDocs,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { db } from "./firebase.js";
+import { db, auth } from "./firebase.js";
+
+async function obtenerDatosCreador() {
+  const usuario = auth.currentUser;
+  if (!usuario) throw new Error("No se pudo identificar al usuario conectado. Volvé a iniciar sesión.");
+
+  const perfilSnap = await getDoc(doc(db, "usuarios", usuario.uid));
+  const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
+  const nombre = (perfil.nombre || perfil.nombreCompleto || usuario.displayName || usuario.email?.split("@")[0] || "").trim();
+
+  if (!nombre) throw new Error("El usuario conectado no tiene un nombre configurado en su perfil.");
+  return { creadoPor: nombre, creadoPorUid: usuario.uid };
+}
 
 /**********************
 - MAPA
@@ -274,6 +288,7 @@ function mostrarFormularioEntrega(cliente, lat, lng) {
     boton.textContent = "Guardando...";
 
     try {
+      const datosCreador = await obtenerDatosCreador();
       await addDoc(collection(db, "visitas"), {
         clienteId: cliente.id,
         cliente: cliente.nombre,
@@ -281,6 +296,7 @@ function mostrarFormularioEntrega(cliente, lat, lng) {
         productos,
         lat,
         lng,
+        ...datosCreador,
         fecha: serverTimestamp()
       });
 
@@ -414,6 +430,7 @@ function mostrarFormularioNota(cliente, lat, lng) {
     botonGuardar.textContent = "Guardando...";
 
     try {
+      const datosCreador = await obtenerDatosCreador();
       await addDoc(collection(db, "visitas"), {
         clienteId: cliente.id,
         cliente: cliente.nombre,
@@ -423,6 +440,7 @@ function mostrarFormularioNota(cliente, lat, lng) {
         nota: contenido,
         lat: lat ?? null,
         lng: lng ?? null,
+        ...datosCreador,
         fecha: serverTimestamp()
       });
 
