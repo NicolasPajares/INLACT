@@ -236,7 +236,7 @@
 
     <script type="module">
         import { protegerPagina } from "./proteger.js";
-        import { db } from "./firebase.js";
+        import { db, auth } from "./firebase.js";
 
         import {
             collection,
@@ -369,6 +369,12 @@
             `;
 
             try {
+                const usuarioActual = auth.currentUser;
+                if (!usuarioActual) {
+                    throw new Error("No se pudo identificar al usuario conectado. Volvé a iniciar sesión.");
+                }
+                const uidActual = usuarioActual.uid;
+
                 const [
                     visitasSnap,
                     egresosSnap,
@@ -386,6 +392,9 @@
                 // VISITAS Y NOTAS
                 visitasSnap.forEach(documento => {
                     const datos = documento.data();
+
+                    // El historial general muestra únicamente las actividades del usuario conectado.
+                    if (datos.creadoPorUid !== uidActual) return;
 
                     if (
                         datos.tipoVisita === "Venta" ||
@@ -421,6 +430,7 @@
                     const datos = documento.data();
 
                     if (datos.tipoEgreso !== "venta") return;
+                    if (datos.creadoPorUid !== uidActual) return;
 
                     const fecha = obtenerFechaActividad(datos);
                     const empresa = nombreEmpresa(datos);
@@ -435,7 +445,8 @@
                             String(fecha.getDate()).padStart(2, "0");
                     }
 
-                    const claveGrupo = `${clienteId}__${claveDia}`;
+                    // Se separan también por usuario para no mezclar ventas de distintos usuarios.
+                    const claveGrupo = `${clienteId}__${claveDia}__${uidActual}`;
 
                     if (!ventasPorGrupo.has(claveGrupo)) {
                         ventasPorGrupo.set(claveGrupo, {
@@ -475,6 +486,8 @@
                 ensayosSnap.forEach(documento => {
                     const datos = documento.data();
 
+                    if (datos.creadoPorUid !== uidActual) return;
+
                     actividades.push({
                         id: documento.id,
                         origen: "ensayo",
@@ -489,6 +502,8 @@
                 // COTIZACIONES
                 cotizacionesSnap.forEach(documento => {
                     const datos = documento.data();
+
+                    if (datos.creadoPorUid !== uidActual) return;
 
                     actividades.push({
                         id: documento.id,
