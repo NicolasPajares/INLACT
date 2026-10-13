@@ -135,13 +135,13 @@ service cloud.firestore {
     }
 
     match /movimientos_stock/{id} {
-      allow read, create: if hasProfile();
-      allow update, delete: if isAdmin();
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
     }
 
     match /egresos/{id} {
-      allow read, create: if hasProfile();
-      allow update, delete: if isAdmin();
+      allow read, create, update: if hasProfile();
+      allow delete: if isAdmin();
     }
 
     match /visitas/{id} {
