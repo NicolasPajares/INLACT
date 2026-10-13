@@ -50,6 +50,9 @@ const app =
 const db =
     getFirestore(app);
 
+import { obtenerPerfilUsuario } from "./proteger.js";
+const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
+
 
 /* ============================================================
    ELEMENTOS DOM
@@ -71,6 +74,8 @@ let listas = [];
 /* ============================================================
    NUEVA LISTA
 ============================================================ */
+
+if (btnNuevaLista && !esAdmin) btnNuevaLista.hidden = true;
 
 btnNuevaLista.addEventListener(
     "click",
@@ -456,13 +461,10 @@ function renderListas(lista) {
                ARMAR ACCIONES
             ------------------------------------------------ */
 
-            acciones.appendChild(
-                btnMenu
-            );
-
-            acciones.appendChild(
-                menu
-            );
+            if (esAdmin) {
+        acciones.appendChild(btnMenu);
+        acciones.appendChild(menu);
+    }
 
 
             /* ------------------------------------------------
