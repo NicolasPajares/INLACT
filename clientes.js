@@ -1,5 +1,6 @@
 
 import { db } from "https://nicolaspajares.github.io/INLACT/firebase.js";
+import { obtenerPerfilUsuario } from "./proteger.js";
 
 import {
   collection,
@@ -14,6 +15,8 @@ import {
 const listaEl = document.getElementById("listaClientes");
 const buscadorEl = document.getElementById("buscadorClientes");
 const btnNuevo = document.getElementById("btnNuevoCliente");
+
+const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
 
 let clientes = [];
 
@@ -171,7 +174,7 @@ function renderClientes(lista) {
       });
 
       menu.appendChild(btnEditar);
-      menu.appendChild(btnEliminar);
+      if (esAdmin) menu.appendChild(btnEliminar);
       contenedorMenu.appendChild(menu);
 
       btnMenu.setAttribute("aria-expanded", "true");
