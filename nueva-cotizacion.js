@@ -6,6 +6,7 @@
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
     getFirestore,
@@ -34,6 +35,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 
 /* ============================================================
@@ -881,10 +883,13 @@ form.addEventListener("submit", async event => {
 
         } else {
             // NUEVA: crea un documento nuevo.
+            const usuarioActual = auth.currentUser;
+            if (!usuarioActual) throw new Error("No se pudo verificar el usuario. Volvé a iniciar sesión.");
             const docRef = await addDoc(
                 collection(db, "cotizaciones"),
                 {
                     ...datosCotizacion,
+                    creadoPorUid: usuarioActual.uid,
                     creadoEn: Timestamp.now()
                 }
             );
