@@ -31,16 +31,31 @@ service cloud.firestore {
     match /ensayos/{id} {
       allow read: if hasProfile();
       allow create: if hasProfile() && request.resource.data.creadoPorUid == request.auth.uid;
-      allow update: if hasProfile() && (
-        (!resource.data.keys().hasAny(["creadoPorUid"]) && !request.resource.data.keys().hasAny(["creadoPorUid"]))
-        || request.resource.data.creadoPorUid == resource.data.creadoPorUid
-      );
+      allow update: if hasProfile()
+        && (
+          (!resource.data.keys().hasAny(["creadoPorUid"]) && !request.resource.data.keys().hasAny(["creadoPorUid"]))
+          || request.resource.data.creadoPorUid == resource.data.creadoPorUid
+        )
+        && (
+          isAdmin()
+          || ownsEnsayo(id)
+          || !request.resource.data.diff(resource.data).affectedKeys().hasAny(["publicacionToken", "publicacionActiva"])
+        );
       allow delete: if isAdmin();
     }
     match /cotizaciones/{id} {
       allow read: if hasProfile();
       allow create: if hasProfile() && request.resource.data.creadoPorUid == request.auth.uid;
-      allow update: if hasProfile() && request.resource.data.creadoPorUid == resource.data.creadoPorUid;
+      allow update: if hasProfile()
+        && (
+          (!resource.data.keys().hasAny(["creadoPorUid"]) && !request.resource.data.keys().hasAny(["creadoPorUid"]))
+          || request.resource.data.creadoPorUid == resource.data.creadoPorUid
+        )
+        && (
+          isAdmin()
+          || ownsCotizacion(id)
+          || !request.resource.data.diff(resource.data).affectedKeys().hasAny(["publicacionToken", "publicacionActiva"])
+        );
       allow delete: if isAdmin();
     }
     match /ensayos_publicos/{token} {
