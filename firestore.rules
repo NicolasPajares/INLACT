@@ -58,8 +58,10 @@ service cloud.firestore {
       allow create: if hasProfile()
         && request.resource.data.creadoPorUid == request.auth.uid;
       allow update: if hasProfile()
-        && creatorUnchangedOrLegacy()
-        && publicationFieldsProtected();
+        && (
+          isAdmin()
+          || (creatorUnchangedOrLegacy() && publicationFieldsProtected())
+        );
       allow delete: if isAdmin();
     }
 
@@ -68,8 +70,10 @@ service cloud.firestore {
       allow create: if hasProfile()
         && request.resource.data.creadoPorUid == request.auth.uid;
       allow update: if hasProfile()
-        && creatorUnchangedOrLegacy()
-        && publicationFieldsProtected();
+        && (
+          isAdmin()
+          || (creatorUnchangedOrLegacy() && publicationFieldsProtected())
+        );
       allow delete: if isAdmin();
     }
 
@@ -80,8 +84,13 @@ service cloud.firestore {
         && request.resource.data.registroId is string
         && (isAdmin() || ownsEnsayo(request.resource.data.registroId));
       allow update: if hasProfile()
-        && resource.data.registroId == request.resource.data.registroId
-        && (isAdmin() || ownsEnsayo(resource.data.registroId));
+        && (
+          isAdmin()
+          || (
+            resource.data.registroId == request.resource.data.registroId
+            && ownsEnsayo(resource.data.registroId)
+          )
+        );
       allow delete: if isAdmin();
     }
 
@@ -92,8 +101,13 @@ service cloud.firestore {
         && request.resource.data.registroId is string
         && (isAdmin() || ownsCotizacion(request.resource.data.registroId));
       allow update: if hasProfile()
-        && resource.data.registroId == request.resource.data.registroId
-        && (isAdmin() || ownsCotizacion(resource.data.registroId));
+        && (
+          isAdmin()
+          || (
+            resource.data.registroId == request.resource.data.registroId
+            && ownsCotizacion(resource.data.registroId)
+          )
+        );
       allow delete: if isAdmin();
     }
 
