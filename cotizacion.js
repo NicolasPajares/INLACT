@@ -46,6 +46,7 @@ const esPublico = Boolean(tokenPublico);
 let cotizacionActual = null;
 let tokenActual = null;
 let usuarioInterno = false;
+let puedeGestionarPublicacion = false;
 
 
 /* ============================================================
@@ -105,6 +106,14 @@ async function cargarCotizacionInterna() {
   };
 
   tokenActual = cotizacionActual.publicacionToken || null;
+
+  const usuarioActual = auth.currentUser;
+  if (usuarioActual) {
+    const perfilSnap = await getDoc(doc(db, "usuarios", usuarioActual.uid));
+    const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
+    puedeGestionarPublicacion =
+      perfil.rol === "admin" || cotizacionActual.creadoPorUid === usuarioActual.uid;
+  }
 
   mostrarCotizacion(cotizacionActual);
   mostrarControlesPublicacion();
@@ -328,7 +337,7 @@ function cargarProductos(cotizacion) {
 ============================================================ */
 
 function mostrarControlesPublicacion() {
-  if (!usuarioInterno || esPublico) return;
+  if (!usuarioInterno || esPublico || !puedeGestionarPublicacion) return;
 
   const contenedor = document.querySelector(
     ".link-publico-cotizacion"
@@ -450,6 +459,10 @@ function mostrarControlesPublicacion() {
 ============================================================ */
 
 async function publicarCotizacion() {
+  if (!puedeGestionarPublicacion) {
+    throw new Error("Solo quien creó la cotización o el administrador puede gestionar su enlace.");
+  }
+
   if (!cotizacionActual?.id) {
     throw new Error("No se identificó la cotización original.");
   }
@@ -459,6 +472,7 @@ async function publicarCotizacion() {
   }
 
   const copiaPublica = {
+    registroId: cotizacionActual.id,
     clienteNombre: cotizacionActual.clienteNombre || "",
     creadoPor: cotizacionActual.creadoPor || "",
     nombreCotizacion: cotizacionActual.nombreCotizacion || "",
@@ -498,6 +512,10 @@ async function publicarCotizacion() {
 ============================================================ */
 
 async function desactivarPublicacion() {
+  if (!puedeGestionarPublicacion) {
+    throw new Error("Solo quien creó la cotización o el administrador puede gestionar su enlace.");
+  }
+
   if (!tokenActual) {
     throw new Error("No existe un enlace para desactivar.");
   }
