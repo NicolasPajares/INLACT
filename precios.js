@@ -3,6 +3,7 @@
  * FIREBASE
  *************************/
 import { db } from "./firebase.js";
+import { obtenerPerfilUsuario } from "./proteger.js";
 
 import {
   collection,
@@ -22,7 +23,11 @@ const buscadorEl = document.getElementById("buscadorCotizaciones");
 const btnNuevaCotizacion = document.getElementById("btnNuevaCotizacion");
 const btnListaPrecios = document.getElementById("btnListaPrecios");
 
+const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
+
 let cotizaciones = [];
+
+if (btnListaPrecios && !esAdmin) btnListaPrecios.hidden = true;
 
 /*************************
  * BOTONES PRINCIPALES
@@ -239,7 +244,8 @@ function renderCotizaciones(lista) {
       event.stopPropagation();
     });
 
-    menu.append(btnEditar, btnEliminar);
+    menu.append(btnEditar);
+    if (esAdmin) menu.append(btnEliminar);
     menuContenedor.append(btnMenu, menu);
     li.append(info, menuContenedor);
     listaEl.appendChild(li);
