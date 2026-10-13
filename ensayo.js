@@ -25,6 +25,7 @@ const esPublico = Boolean(tokenPublico);
 let ensayoActual = null;
 let tokenActual = null;
 let usuarioInterno = false;
+let puedeGestionarPublicacion = false;
 
 /**********************
  * INICIO
@@ -81,6 +82,14 @@ async function cargarEnsayoInterno() {
   };
 
   tokenActual = ensayoActual.publicacionToken || null;
+
+  const usuarioActual = auth.currentUser;
+  if (usuarioActual) {
+    const perfilSnap = await getDoc(doc(db, "usuarios", usuarioActual.uid));
+    const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
+    puedeGestionarPublicacion =
+      perfil.rol === "admin" || ensayoActual.creadoPorUid === usuarioActual.uid;
+  }
 
   mostrarEnsayo(ensayoActual);
   mostrarControlesPublicacion();
@@ -236,7 +245,7 @@ function renderImagenes(fotos) {
  * CONTROLES DE PUBLICACIÓN
  **********************/
 function mostrarControlesPublicacion() {
-  if (!usuarioInterno || esPublico) return;
+  if (!usuarioInterno || esPublico || !puedeGestionarPublicacion) return;
 
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
@@ -336,6 +345,10 @@ function mostrarControlesPublicacion() {
  * PUBLICAR COPIA
  **********************/
 async function publicarEnsayo() {
+  if (!puedeGestionarPublicacion) {
+    throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
+  }
+
   if (!ensayoActual?.id) {
     throw new Error("No se identificó el ensayo original.");
   }
@@ -346,9 +359,9 @@ async function publicarEnsayo() {
 
   // Solo se copian los campos que verá el cliente.
   const copiaPublica = {
+    registroId: ensayoActual.id,
     clienteNombre: ensayoActual.clienteNombre || "",
     creadoPor: ensayoActual.creadoPor || "",
-    creadoPorUid: ensayoActual.creadoPorUid || "",
     nombreEnsayo: ensayoActual.nombreEnsayo || "",
     fecha: ensayoActual.fecha || null,
     propuesta: ensayoActual.propuesta || "",
@@ -385,6 +398,10 @@ async function publicarEnsayo() {
  * DESACTIVAR PUBLICACIÓN
  **********************/
 async function desactivarPublicacion() {
+  if (!puedeGestionarPublicacion) {
+    throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
+  }
+
   if (!tokenActual) {
     throw new Error("No hay una publicación para desactivar.");
   }
