@@ -3,6 +3,7 @@
  * FIREBASE
  *************************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { obtenerPerfilUsuario } from "./proteger.js";
 
 import {
     getFirestore,
@@ -25,6 +26,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
 
 /*************************
  * ELEMENTOS DOM
@@ -205,7 +207,7 @@ function renderEnsayos(lista) {
             });
 
             menu.appendChild(btnEditar);
-            menu.appendChild(btnEliminar);
+            if (esAdmin) menu.appendChild(btnEliminar);
             contenedorMenu.appendChild(menu);
 
             btnMenu.setAttribute("aria-expanded", "true");
