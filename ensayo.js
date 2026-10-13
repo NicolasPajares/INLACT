@@ -25,6 +25,7 @@ const esPublico = Boolean(tokenPublico);
 let ensayoActual = null;
 let tokenActual = null;
 let usuarioInterno = false;
+let puedeGestionarPublicacion = false;
 
 /**********************
  * INICIO
@@ -79,6 +80,10 @@ async function cargarEnsayoInterno() {
     id: resultado.id,
     ...resultado.data()
   };
+
+  const perfilSnap = await getDoc(doc(db, "usuarios", auth.currentUser.uid));
+  const esAdmin = perfilSnap.exists() && perfilSnap.data().rol === "admin";
+  puedeGestionarPublicacion = esAdmin || ensayoActual.creadoPorUid === auth.currentUser.uid;
 
   tokenActual = ensayoActual.publicacionToken || null;
 
@@ -203,7 +208,7 @@ function renderImagenes(fotos) {
  * CONTROLES DE PUBLICACIÓN
  **********************/
 function mostrarControlesPublicacion() {
-  if (!usuarioInterno || esPublico) return;
+  if (!usuarioInterno || esPublico || !puedeGestionarPublicacion) return;
 
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
@@ -311,8 +316,11 @@ async function publicarEnsayo() {
     tokenActual = generarTokenAleatorio();
   }
 
+  if (!puedeGestionarPublicacion) throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
+
   // Solo se copian los campos que verá el cliente.
   const copiaPublica = {
+    registroId: ensayoActual.id,
     clienteNombre: ensayoActual.clienteNombre || "",
     nombreEnsayo: ensayoActual.nombreEnsayo || "",
     fecha: ensayoActual.fecha || null,
@@ -350,6 +358,7 @@ async function publicarEnsayo() {
  * DESACTIVAR PUBLICACIÓN
  **********************/
 async function desactivarPublicacion() {
+  if (!puedeGestionarPublicacion) throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
   if (!tokenActual) {
     throw new Error("No hay una publicación para desactivar.");
   }
