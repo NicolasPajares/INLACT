@@ -19,12 +19,14 @@ service cloud.firestore {
     function ownsEnsayo(id) {
       return hasProfile()
         && exists(/databases/$(database)/documents/ensayos/$(id))
+        && get(/databases/$(database)/documents/ensayos/$(id)).data.keys().hasAny(["creadoPorUid"])
         && get(/databases/$(database)/documents/ensayos/$(id)).data.creadoPorUid == request.auth.uid;
     }
 
     function ownsCotizacion(id) {
       return hasProfile()
         && exists(/databases/$(database)/documents/cotizaciones/$(id))
+        && get(/databases/$(database)/documents/cotizaciones/$(id)).data.keys().hasAny(["creadoPorUid"])
         && get(/databases/$(database)/documents/cotizaciones/$(id)).data.creadoPorUid == request.auth.uid;
     }
 
@@ -37,7 +39,8 @@ service cloud.firestore {
 
     function publicationFieldsProtected() {
       return isAdmin()
-        || resource.data.creadoPorUid == request.auth.uid
+        || (resource.data.keys().hasAny(["creadoPorUid"])
+          && resource.data.creadoPorUid == request.auth.uid)
         || !request.resource.data.diff(resource.data).affectedKeys()
           .hasAny(["publicacionToken", "publicacionActiva"]);
     }
