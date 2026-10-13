@@ -3,6 +3,7 @@
  * FIREBASE
  **********************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
     getFirestore,
@@ -36,6 +37,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 const storage = getStorage(app);
 
 /**********************
@@ -266,6 +268,9 @@ form.addEventListener("submit", async (e) => {
 
             window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
         } else {
+            const usuarioActual = auth.currentUser;
+            if (!usuarioActual) throw new Error("No se pudo verificar el usuario. Volvé a iniciar sesión.");
+            datosEnsayo.creadoPorUid = usuarioActual.uid;
             datosEnsayo.creadoEn = Timestamp.now();
 
             const docRef = await addDoc(
