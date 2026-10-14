@@ -31,10 +31,18 @@ service cloud.firestore {
     }
 
     function creatorUnchangedOrLegacy() {
+      // No permitir cambiar quién registró la actividad.
+      // Los registros antiguos sin UID siguen siendo editables sin añadir un UID falso.
       return (
-        !resource.data.keys().hasAny(["creadoPorUid"])
-        && !request.resource.data.keys().hasAny(["creadoPorUid"])
-      ) || request.resource.data.creadoPorUid == resource.data.creadoPorUid;
+        (
+          !resource.data.keys().hasAny(["creadoPorUid"])
+          && !request.resource.data.keys().hasAny(["creadoPorUid"])
+        ) || request.resource.data.creadoPorUid == resource.data.creadoPorUid
+      )
+      && (
+        !resource.data.keys().hasAny(["creadoPor"])
+        || request.resource.data.creadoPor == resource.data.creadoPor
+      );
     }
 
     function publicationFieldsProtected() {
