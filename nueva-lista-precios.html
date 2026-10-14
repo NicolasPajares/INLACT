@@ -119,11 +119,19 @@
 
 
 <script type="module">
-  import { protegerPagina } from "./proteger.js";
+  import { protegerPagina, obtenerPerfilUsuario } from "./proteger.js";
 
   protegerPagina().then(async () => {
+      if (obtenerPerfilUsuario()?.rol !== "admin") {
+          alert("Esta sección está disponible únicamente para el administrador.");
+          window.location.replace("index.html");
+          return;
+      }
+
       await import("./usuario-menu.js");
       await import("./nueva-lista-precios.js");
+  }).catch((error) => {
+      console.error("No se pudo validar el acceso:", error);
   });
 </script>
 </body>

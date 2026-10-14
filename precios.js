@@ -3,6 +3,7 @@
  * FIREBASE
  *************************/
 import { db } from "./firebase.js";
+import { obtenerPerfilUsuario } from "./proteger.js";
 
 import {
   collection,
@@ -22,6 +23,10 @@ const buscadorEl = document.getElementById("buscadorCotizaciones");
 const btnNuevaCotizacion = document.getElementById("btnNuevaCotizacion");
 const btnListaPrecios = document.getElementById("btnListaPrecios");
 
+const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
+
+if (btnListaPrecios) btnListaPrecios.hidden = !esAdmin;
+
 let cotizaciones = [];
 
 /*************************
@@ -31,9 +36,11 @@ btnNuevaCotizacion.addEventListener("click", () => {
   window.location.href = "nueva-cotizacion.html";
 });
 
-btnListaPrecios.addEventListener("click", () => {
-  window.location.href = "lista-precios.html";
-});
+if (esAdmin && btnListaPrecios) {
+  btnListaPrecios.addEventListener("click", () => {
+    window.location.href = "lista-precios.html";
+  });
+}
 
 /*************************
  * CARGAR COTIZACIONES
@@ -239,7 +246,8 @@ function renderCotizaciones(lista) {
       event.stopPropagation();
     });
 
-    menu.append(btnEditar, btnEliminar);
+    menu.append(btnEditar);
+    if (esAdmin) menu.append(btnEliminar);
     menuContenedor.append(btnMenu, menu);
     li.append(info, menuContenedor);
     listaEl.appendChild(li);
