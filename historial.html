@@ -92,6 +92,12 @@
             color: #1f4e8c;
         }
 
+        .actividad-creador {
+            margin-top: 7px;
+            color: #667085;
+            font-size: 13px;
+        }
+
         .actividad-empresa {
             margin: 0 0 8px;
             color: #1f4e8c;
@@ -372,7 +378,7 @@
             });
         }
 
-        function crearTarjeta(fecha, tipo, titulo, empresa) {
+        function crearTarjeta(fecha, tipo, titulo, empresa, creador) {
             const tarjeta = document.createElement("div");
             tarjeta.className = "actividad-historial";
 
@@ -390,6 +396,10 @@
                 <div class="actividad-titulo">
                     ${escaparHTML(titulo)}
                 </div>
+
+                <div class="actividad-creador">
+                    Registrado por: ${escaparHTML(creador || "Usuario anterior no identificado")}
+                </div>
             `;
 
             return tarjeta;
@@ -401,12 +411,6 @@
             `;
 
             try {
-                const usuarioActual = auth.currentUser;
-                if (!usuarioActual) {
-                    throw new Error("No se pudo identificar al usuario conectado. Volvé a iniciar sesión.");
-                }
-                const uidActual = usuarioActual.uid;
-
                 const [
                     visitasSnap,
                     egresosSnap,
@@ -424,9 +428,6 @@
                 // VISITAS Y NOTAS
                 visitasSnap.forEach(documento => {
                     const datos = documento.data();
-
-                    // El historial general muestra únicamente las actividades del usuario conectado.
-                    if (datos.creadoPorUid !== uidActual) return;
 
                     if (
                         datos.tipoVisita === "Venta" ||
@@ -451,7 +452,8 @@
                         fecha: obtenerFechaActividad(datos),
                         empresa: nombreEmpresa(datos),
                         tipo: esNota ? "📝 Nota" : "📍 Visita",
-                        titulo: datos.titulo || (esNota ? "Nota" : "Visita")
+                        titulo: datos.titulo || (esNota ? "Nota" : "Visita"),
+                        creadoPor: datos.creadoPor || "Usuario anterior no identificado"
                     });
                 });
 
@@ -462,7 +464,6 @@
                     const datos = documento.data();
 
                     if (datos.tipoEgreso !== "venta") return;
-                    if (datos.creadoPorUid !== uidActual) return;
 
                     const fecha = obtenerFechaActividad(datos);
                     const empresa = nombreEmpresa(datos);
@@ -477,8 +478,9 @@
                             String(fecha.getDate()).padStart(2, "0");
                     }
 
-                    // Se separan también por usuario para no mezclar ventas de distintos usuarios.
-                    const claveGrupo = `${clienteId}__${claveDia}__${uidActual}`;
+                    // Separar por usuario evita mezclar ventas distintas del mismo cliente y día.
+                    const uidCreador = datos.creadoPorUid || "sin-usuario";
+                    const claveGrupo = `${clienteId}__${claveDia}__${uidCreador}`;
 
                     if (!ventasPorGrupo.has(claveGrupo)) {
                         ventasPorGrupo.set(claveGrupo, {
@@ -488,6 +490,7 @@
                             empresa,
                             tipo: "💰 Venta",
                             titulo: "Venta",
+                            creadoPor: datos.creadoPor || "Usuario anterior no identificado",
                             productos: []
                         });
                     }
@@ -518,8 +521,6 @@
                 ensayosSnap.forEach(documento => {
                     const datos = documento.data();
 
-                    if (datos.creadoPorUid !== uidActual) return;
-
                     actividades.push({
                         id: documento.id,
                         origen: "ensayo",
@@ -527,15 +528,14 @@
                         fecha: obtenerFechaActividad(datos),
                         empresa: nombreEmpresa(datos),
                         tipo: "🧪 Ensayo",
-                        titulo: datos.nombreEnsayo || "Ensayo"
+                        titulo: datos.nombreEnsayo || "Ensayo",
+                        creadoPor: datos.creadoPor || "Usuario anterior no identificado"
                     });
                 });
 
                 // COTIZACIONES
                 cotizacionesSnap.forEach(documento => {
                     const datos = documento.data();
-
-                    if (datos.creadoPorUid !== uidActual) return;
 
                     actividades.push({
                         id: documento.id,
@@ -544,7 +544,8 @@
                         fecha: obtenerFechaActividad(datos),
                         empresa: nombreEmpresa(datos),
                         tipo: "📄 Cotización",
-                        titulo: datos.nombreCotizacion || "Cotización"
+                        titulo: datos.nombreCotizacion || "Cotización",
+                        creadoPor: datos.creadoPor || "Usuario anterior no identificado"
                     });
                 });
 
@@ -572,7 +573,8 @@
                         actividad.fecha,
                         actividad.tipo,
                         actividad.titulo,
-                        actividad.empresa
+                        actividad.empresa,
+                        actividad.creadoPor || actividad.datos?.creadoPor || "Usuario anterior no identificado"
                     );
 
                     // VENTAS
@@ -690,6 +692,7 @@
                     }
                     return `<article class="actividad">
                         <div class="meta">${escaparHTML(textoFechaCorta(a.fecha))} · ${escaparHTML(a.tipo.replace(/^\S+\s*/, ""))}</div>
+                        <div class="meta">Registrado por: ${escaparHTML(a.creadoPor || a.datos?.creadoPor || "Usuario anterior no identificado")}</div>
                         <h2>${escaparHTML(a.empresa)}</h2>
                         <h3>${escaparHTML(a.titulo)}</h3>
                         ${detalle}
