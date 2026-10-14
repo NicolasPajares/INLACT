@@ -884,16 +884,29 @@ form.addEventListener("submit", async event => {
 
         } else {
             // NUEVA: crea un documento nuevo.
+            // Las reglas de Firestore exigen identificar al creador de cada cotización nueva.
+            // La página ya valida la sesión; si falta el usuario o su perfil, no guardar un registro incompleto.
             const usuarioActual = auth.currentUser;
-            let datosCreador = {};
-            if (usuarioActual) {
-                const perfilSnap = await getDoc(doc(db, "usuarios", usuarioActual.uid));
-                const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
-                datosCreador = {
-                    creadoPor: (perfil.nombre || perfil.nombreCompleto || usuarioActual.displayName || usuarioActual.email?.split("@")[0] || "Usuario").trim(),
-                    creadoPorUid: usuarioActual.uid
-                };
+            if (!usuarioActual) {
+                throw new Error("No se pudo identificar al usuario conectado. Volvé a iniciar sesión e intentá nuevamente.");
             }
+
+            const perfilSnap = await getDoc(doc(db, "usuarios", usuarioActual.uid));
+            if (!perfilSnap.exists()) {
+                throw new Error("No se encontró tu perfil de INLACT. Contactá al administrador.");
+            }
+
+            const perfil = perfilSnap.data();
+            const datosCreador = {
+                creadoPor: (
+                    perfil.nombre ||
+                    perfil.nombreCompleto ||
+                    usuarioActual.displayName ||
+                    usuarioActual.email?.split("@")[0] ||
+                    "Usuario"
+                ).trim(),
+                creadoPorUid: usuarioActual.uid
+            };
 
             const docRef = await addDoc(
                 collection(db, "cotizaciones"),
