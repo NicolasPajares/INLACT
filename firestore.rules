@@ -177,12 +177,20 @@ service cloud.firestore {
     }
 
     match /egresos/{id} {
-      allow read, create, update: if hasProfile();
+      allow read: if hasProfile();
+      // El UID del creador alimenta el historial individual; no debe poder falsificarse.
+      allow create: if hasProfile()
+        && request.resource.data.creadoPorUid == request.auth.uid;
+      allow update: if hasProfile() && creatorUnchangedOrLegacy();
       allow delete: if isAdmin();
     }
 
     match /visitas/{id} {
-      allow read, create, update: if hasProfile();
+      allow read: if hasProfile();
+      // El UID del creador alimenta el historial individual; no debe poder falsificarse.
+      allow create: if hasProfile()
+        && request.resource.data.creadoPorUid == request.auth.uid;
+      allow update: if hasProfile() && creatorUnchangedOrLegacy();
       allow delete: if isAdmin();
     }
 
