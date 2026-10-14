@@ -703,6 +703,7 @@
                     visitas: actividades.filter(a => a.origen === "visita" && a.tipo.includes("Visita")).length,
                     notas: actividades.filter(a => a.origen === "visita" && a.tipo.includes("Nota")).length,
                     ventas: actividades.filter(a => a.origen === "venta").length,
+                    entregas: actividades.filter(a => a.origen === "entrega").length,
                     cotizaciones: actividades.filter(a => a.origen === "cotizacion").length,
                     ensayos: actividades.filter(a => a.origen === "ensayo").length
                 };
@@ -730,7 +731,7 @@
                     <p class="sub"><strong>Generado:</strong> ${escaparHTML(new Date().toLocaleString("es-AR"))}</p></div></header>
                     <div class="resumen">
                     <span class="pill">Visitas: ${conteo.visitas}</span><span class="pill">Notas: ${conteo.notas}</span>
-                    <span class="pill">Ventas: ${conteo.ventas}</span><span class="pill">Cotizaciones: ${conteo.cotizaciones}</span><span class="pill">Ensayos: ${conteo.ensayos}</span>
+                    <span class="pill">Ventas: ${conteo.ventas}</span><span class="pill">Entregas: ${conteo.entregas}</span><span class="pill">Cotizaciones: ${conteo.cotizaciones}</span><span class="pill">Ensayos: ${conteo.ensayos}</span>
                     </div>
                     ${filas || "<p>No hay actividades para el período seleccionado.</p>"}
                     <script>window.onload=()=>setTimeout(()=>window.print(),500);<\/script></body></html>`);
