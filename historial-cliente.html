@@ -579,16 +579,22 @@
         }
 
         const datos = actividad.datos;
+        const esNota = datos.tipoVisita === "Nota";
+        const esEntrega = datos.tipoVisita === "Entrega de productos";
 
         const titulo = datos.titulo || (
-            datos.tipoVisita === "Nota"
+            esNota
                 ? "Nota"
-                : "Visita"
+                : esEntrega
+                    ? "Entrega de productos"
+                    : "Visita"
         );
 
-        const tipoTexto = datos.tipoVisita === "Nota"
+        const tipoTexto = esNota
             ? "📝 Nota"
-            : "📍 Visita";
+            : esEntrega
+                ? "📦 Entrega"
+                : "📍 Visita";
 
         tarjeta.innerHTML = `
 
@@ -611,19 +617,25 @@
         `;
 
         tarjeta.addEventListener("click", () => {
+            let contenidoHTML = "";
 
-            const contenido = datos.nota || "";
-
-            abrirOverlay(
-                titulo,
-                fechaTexto,
-                `
-                    <div style="white-space:pre-wrap;line-height:1.5;font-size:16px;color:#333;">
-                        ${escaparHTML(contenido || "Sin contenido.")}
+            if (esEntrega && Array.isArray(datos.productos) && datos.productos.length) {
+                contenidoHTML = datos.productos.map(producto => `
+                    <div style="padding:10px 0;border-bottom:1px solid #e1e7ee;">
+                        <strong style="color:#1f4e8c;">${escaparHTML(producto.nombre || "Producto")}</strong>
+                        <div>Cantidad: ${escaparHTML(producto.cantidad ?? "-")} ${escaparHTML(producto.unidad || "")}</div>
+                        ${producto.lote ? `<div>Lote: ${escaparHTML(producto.lote)}</div>` : ""}
                     </div>
-                `
-            );
+                `).join("");
+            } else {
+                contenidoHTML = `
+                    <div style="white-space:pre-wrap;line-height:1.5;font-size:16px;color:#333;">
+                        ${escaparHTML(datos.nota || "Sin contenido.")}
+                    </div>
+                `;
+            }
 
+            abrirOverlay(titulo, fechaTexto, contenidoHTML);
         });
 
         return tarjeta;
@@ -726,12 +738,9 @@
 
                 const datos = documento.data();
 
-                if (
-                    datos.tipoVisita !== "Nota de visita" &&
-                    datos.tipoVisita !== "Nota"
-                ) {
-                    return;
-                }
+                // El historial del cliente incluye visitas, notas y entregas.
+                // Las ventas se toman de "egresos" para no duplicarlas.
+                if (datos.tipoVisita === "Venta") return;
 
                 const fecha = convertirFecha(datos.fecha);
 
