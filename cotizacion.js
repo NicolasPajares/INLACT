@@ -479,8 +479,15 @@ async function publicarCotizacion() {
     fecha: cotizacionActual.fecha || null,
     propuesta: cotizacionActual.propuesta || "",
     dosis: cotizacionActual.dosis || "",
+    // Publicar únicamente los campos que se muestran al cliente.
+    // No incluir IDs internos ni códigos del catálogo.
     productos: Array.isArray(cotizacionActual.productos)
-      ? cotizacionActual.productos
+      ? cotizacionActual.productos.map(producto => ({
+          nombre: producto.nombre || producto.descripcion || "",
+          unidad: producto.unidad || "",
+          moneda: producto.moneda || "ARS",
+          precioUnitario: Number(producto.precioUnitario || 0)
+        }))
       : [],
     observaciones: cotizacionActual.observaciones || "",
     total: cotizacionActual.total ?? null,
