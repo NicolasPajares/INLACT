@@ -314,26 +314,7 @@
 
 </footer>
 
-<script type="module">
 
-    import { protegerPagina } from "./proteger.js";
-
-    protegerPagina()
-        .then(() => {
-
-            document.body.style.visibility = "visible";
-
-        })
-        .catch((error) => {
-
-            console.error(
-                "Error al proteger la página de historial del cliente:",
-                error
-            );
-
-        });
-
-</script>
 
 <script type="module">
 
@@ -347,6 +328,7 @@
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     import { db } from "./firebase.js";
+    import { protegerPagina } from "./proteger.js";
 
     const clienteId = new URLSearchParams(
         window.location.search
@@ -942,9 +924,16 @@
         }
 
     });
-    await import("./usuario-menu.js");
-    await cargarCliente();
-    await cargarHistorialCompleto();
+    try {
+        // No consultar Firestore hasta validar sesión y perfil.
+        await protegerPagina();
+        await import("./usuario-menu.js");
+        await cargarCliente();
+        await cargarHistorialCompleto();
+    } catch (error) {
+        console.error("No se pudo validar el acceso al historial del cliente:", error);
+        window.location.replace("login.html");
+    }
 
 </script>
 
