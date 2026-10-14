@@ -25,6 +25,8 @@ const btnListaPrecios = document.getElementById("btnListaPrecios");
 
 const esAdmin = obtenerPerfilUsuario()?.rol === "admin";
 
+if (btnListaPrecios) btnListaPrecios.hidden = !esAdmin;
+
 let cotizaciones = [];
 
 /*************************
@@ -34,9 +36,11 @@ btnNuevaCotizacion.addEventListener("click", () => {
   window.location.href = "nueva-cotizacion.html";
 });
 
-btnListaPrecios.addEventListener("click", () => {
-  window.location.href = "lista-precios.html";
-});
+if (esAdmin && btnListaPrecios) {
+  btnListaPrecios.addEventListener("click", () => {
+    window.location.href = "lista-precios.html";
+  });
+}
 
 /*************************
  * CARGAR COTIZACIONES
