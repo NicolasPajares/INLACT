@@ -68,19 +68,43 @@ service cloud.firestore {
         && request.resource.data.activo is bool;
     }
 
-    // Un enlace solo se sirve si el registro original sigue existiendo,
-    // sigue publicado y conserva ese mismo token.
-    function publicEssayIsActive(token) {
-      return resource.data.activo == true
+    // En lectura pública también se valida la estructura ya almacenada.
+    // Así, un documento antiguo con campos internos extra no se expone.
+    function publicEssayResourceIsValid() {
+      return resource.data.keys().hasOnly([
+          "registroId", "clienteNombre", "creadoPor", "nombreEnsayo",
+          "fecha", "propuesta", "dosis", "elaboracion", "resultados",
+          "conclusion", "propuestaComercial", "fotos", "activo", "actualizadoEn"
+        ])
+        && resource.data.keys().hasAll(["registroId", "activo"])
         && resource.data.registroId is string
+        && resource.data.activo is bool;
+    }
+
+    function publicQuoteResourceIsValid() {
+      return resource.data.keys().hasOnly([
+          "registroId", "clienteNombre", "creadoPor", "nombreCotizacion",
+          "fecha", "propuesta", "dosis", "productos", "observaciones",
+          "total", "monedaTotal", "activo", "actualizadoEn"
+        ])
+        && resource.data.keys().hasAll(["registroId", "activo"])
+        && resource.data.registroId is string
+        && resource.data.activo is bool;
+    }
+
+    // Un enlace solo se sirve si la copia tiene campos públicos permitidos,
+    // el registro original existe, sigue publicado y conserva el mismo token.
+    function publicEssayIsActive(token) {
+      return publicEssayResourceIsValid()
+        && resource.data.activo == true
         && exists(/databases/$(database)/documents/ensayos/$(resource.data.registroId))
         && get(/databases/$(database)/documents/ensayos/$(resource.data.registroId)).data.publicacionActiva == true
         && get(/databases/$(database)/documents/ensayos/$(resource.data.registroId)).data.publicacionToken == token;
     }
 
     function publicQuoteIsActive(token) {
-      return resource.data.activo == true
-        && resource.data.registroId is string
+      return publicQuoteResourceIsValid()
+        && resource.data.activo == true
         && exists(/databases/$(database)/documents/cotizaciones/$(resource.data.registroId))
         && get(/databases/$(database)/documents/cotizaciones/$(resource.data.registroId)).data.publicacionActiva == true
         && get(/databases/$(database)/documents/cotizaciones/$(resource.data.registroId)).data.publicacionToken == token;
@@ -129,9 +153,16 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/ensayos/$(request.resource.data.registroId))
         && (isAdmin() || ownsEnsayo(request.resource.data.registroId));
       allow update: if hasProfile()
-        && publicEssayCopyIsValid()
-        && exists(/databases/$(database)/documents/ensayos/$(request.resource.data.registroId))
+        && exists(/databases/$(database)/documents/ensayos/$(resource.data.registroId))
         && resource.data.registroId == request.resource.data.registroId
+        && (
+          publicEssayCopyIsValid()
+          || (
+            request.resource.data.activo == false
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["activo", "actualizadoEn"])
+          )
+        )
         && (isAdmin() || ownsEnsayo(resource.data.registroId));
       allow delete: if isAdmin();
     }
@@ -144,9 +175,16 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/cotizaciones/$(request.resource.data.registroId))
         && (isAdmin() || ownsCotizacion(request.resource.data.registroId));
       allow update: if hasProfile()
-        && publicQuoteCopyIsValid()
-        && exists(/databases/$(database)/documents/cotizaciones/$(request.resource.data.registroId))
+        && exists(/databases/$(database)/documents/cotizaciones/$(resource.data.registroId))
         && resource.data.registroId == request.resource.data.registroId
+        && (
+          publicQuoteCopyIsValid()
+          || (
+            request.resource.data.activo == false
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["activo", "actualizadoEn"])
+          )
+        )
         && (isAdmin() || ownsCotizacion(resource.data.registroId));
       allow delete: if isAdmin();
     }
