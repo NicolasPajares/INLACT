@@ -429,30 +429,28 @@
                 visitasSnap.forEach(documento => {
                     const datos = documento.data();
 
-                    if (
-                        datos.tipoVisita === "Venta" ||
-                        datos.tipoVisita === "Entrega de productos"
-                    ) {
-                        return;
-                    }
+                    // Las ventas se obtienen de egresos para no duplicarlas.
+                    if (datos.tipoVisita === "Venta") return;
 
                     const esNota = datos.tipoVisita === "Nota";
+                    const esEntrega = datos.tipoVisita === "Entrega de productos";
 
                     const esVisita =
                         datos.tipoVisita === "Nota de visita" ||
                         datos.tipoVisita === "Visita" ||
                         !datos.tipoVisita;
 
-                    if (!esNota && !esVisita) return;
+                    if (!esNota && !esVisita && !esEntrega) return;
 
                     actividades.push({
                         id: documento.id,
-                        origen: "visita",
+                        origen: esEntrega ? "entrega" : "visita",
                         datos,
+                        productos: Array.isArray(datos.productos) ? datos.productos : [],
                         fecha: obtenerFechaActividad(datos),
                         empresa: nombreEmpresa(datos),
-                        tipo: esNota ? "📝 Nota" : "📍 Visita",
-                        titulo: datos.titulo || (esNota ? "Nota" : "Visita"),
+                        tipo: esNota ? "📝 Nota" : esEntrega ? "📦 Entrega" : "📍 Visita",
+                        titulo: datos.titulo || (esNota ? "Nota" : esEntrega ? "Entrega de productos" : "Visita"),
                         creadoPor: datos.creadoPor || "Usuario anterior no identificado"
                     });
                 });
@@ -577,8 +575,8 @@
                         actividad.creadoPor || actividad.datos?.creadoPor || "Usuario anterior no identificado"
                     );
 
-                    // VENTAS
-                    if (actividad.origen === "venta") {
+                    // VENTAS Y ENTREGAS
+                    if (actividad.origen === "venta" || actividad.origen === "entrega") {
                         tarjeta.addEventListener("click", () => {
                             let productosHTML = "";
 
@@ -605,10 +603,10 @@
                             });
 
                             abrirOverlay(
-                                "💰 Venta",
+                                actividad.origen === "entrega" ? "📦 Entrega de productos" : "💰 Venta",
                                 actividad.empresa,
                                 mostrarFecha(actividad.fecha),
-                                productosHTML
+                                productosHTML || "<p>No hay productos registrados.</p>"
                             );
                         });
                     }
@@ -685,8 +683,11 @@
                     let detalle = "";
                     if (a.origen === "visita") {
                         detalle = `<div class="detalle">${escaparHTML(a.datos.nota || "Sin contenido registrado.").replace(/\n/g, "<br>")}</div>`;
-                    } else if (a.origen === "venta") {
-                        detalle = `<ul>${a.productos.map(p => `<li><strong>${escaparHTML(p.nombre)}</strong> — Cantidad: ${escaparHTML(p.cantidad ?? "-")} ${escaparHTML(p.unidad)}${p.lote ? ` — Lote: ${escaparHTML(p.lote)}` : ""}</li>`).join("")}</ul>`;
+                    } else if (a.origen === "venta" || a.origen === "entrega") {
+                        const productos = a.productos || a.datos?.productos || [];
+                        detalle = productos.length
+                            ? `<ul>${productos.map(p => `<li><strong>${escaparHTML(p.nombre || "Producto")}</strong> — Cantidad: ${escaparHTML(p.cantidad ?? "-")} ${escaparHTML(p.unidad || "")}${p.lote ? ` — Lote: ${escaparHTML(p.lote)}` : ""}</li>`).join("")}</ul>`
+                            : "<div class=\"detalle\">Sin productos registrados.</div>";
                     } else {
                         detalle = `<div class="detalle resumido">${escaparHTML(a.titulo)}</div>`;
                     }
