@@ -20,7 +20,8 @@ import {
     getStorage,
     ref,
     uploadBytes,
-    getDownloadURL
+    getBytes,
+    refFromURL
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /**********************
@@ -89,12 +90,23 @@ let fotosExistentes = [];
 /**********************
  * MOSTRAR PREVISUALIZACIÓN
  **********************/
-function mostrarPreviewFotos() {
+function obtenerReferenciaFoto(valor) {
+    return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
+        ? refFromURL(valor)
+        : ref(storage, valor);
+}
+
+async function cargarBlobFoto(valor) {
+    const referencia = obtenerReferenciaFoto(valor);
+    const bytes = await getBytes(referencia, 50 * 1024 * 1024);
+    return URL.createObjectURL(new Blob([bytes]));
+}
+
+async function mostrarPreviewFotos() {
     previewFotos.innerHTML = "";
 
-    fotosExistentes.forEach(url => {
+    for (const valor of fotosExistentes) {
         const img = document.createElement("img");
-        img.src = url;
         img.alt = "Imagen guardada del ensayo";
         img.style.maxWidth = "250px";
         img.style.marginRight = "10px";
@@ -102,7 +114,13 @@ function mostrarPreviewFotos() {
         img.style.borderRadius = "10px";
 
         previewFotos.appendChild(img);
-    });
+        try {
+            img.src = await cargarBlobFoto(valor);
+        } catch (error) {
+            console.error("No se pudo cargar una foto guardada:", error);
+            img.alt = "No se pudo cargar esta imagen";
+        }
+    }
 
     fotosSeleccionadas.forEach(file => {
         const img = document.createElement("img");
@@ -137,7 +155,8 @@ async function subirImagen(file) {
 
     await uploadBytes(referencia, file);
 
-    return await getDownloadURL(referencia);
+    // Guardamos la ruta, no una URL de descarga pública con token.
+    return referencia.fullPath;
 }
 
 /**********************
@@ -232,12 +251,14 @@ form.addEventListener("submit", async (e) => {
     btnGuardar.disabled = true;
 
     try {
-        /* CONSERVAR FOTOS Y AGREGAR LAS NUEVAS */
-        const fotos = [...fotosExistentes];
+        /* Normalizar fotos antiguas a rutas privadas y agregar las nuevas */
+        const fotos = fotosExistentes.map(valor =>
+            obtenerReferenciaFoto(valor).fullPath
+        );
 
         for (const file of fotosSeleccionadas) {
-            const url = await subirImagen(file);
-            fotos.push(url);
+            const ruta = await subirImagen(file);
+            fotos.push(ruta);
         }
 
         const datosEnsayo = {
