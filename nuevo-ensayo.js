@@ -20,7 +20,9 @@ import {
     getStorage,
     ref,
     uploadBytes,
-    getDownloadURL
+    getBytes,
+    refFromURL,
+    deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /**********************
@@ -85,16 +87,28 @@ const previewFotos = document.getElementById("previewFotos");
 
 let fotosSeleccionadas = [];
 let fotosExistentes = [];
+let ensayoEdicionOriginal = null;
 
 /**********************
  * MOSTRAR PREVISUALIZACIÓN
  **********************/
-function mostrarPreviewFotos() {
+function obtenerReferenciaFoto(valor) {
+    return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
+        ? refFromURL(valor)
+        : ref(storage, valor);
+}
+
+async function cargarBlobFoto(valor) {
+    const referencia = obtenerReferenciaFoto(valor);
+    const bytes = await getBytes(referencia, 50 * 1024 * 1024);
+    return URL.createObjectURL(new Blob([bytes]));
+}
+
+async function mostrarPreviewFotos() {
     previewFotos.innerHTML = "";
 
-    fotosExistentes.forEach(url => {
+    for (const valor of fotosExistentes) {
         const img = document.createElement("img");
-        img.src = url;
         img.alt = "Imagen guardada del ensayo";
         img.style.maxWidth = "250px";
         img.style.marginRight = "10px";
@@ -102,7 +116,13 @@ function mostrarPreviewFotos() {
         img.style.borderRadius = "10px";
 
         previewFotos.appendChild(img);
-    });
+        try {
+            img.src = await cargarBlobFoto(valor);
+        } catch (error) {
+            console.error("No se pudo cargar una foto guardada:", error);
+            img.alt = "No se pudo cargar esta imagen";
+        }
+    }
 
     fotosSeleccionadas.forEach(file => {
         const img = document.createElement("img");
@@ -137,7 +157,8 @@ async function subirImagen(file) {
 
     await uploadBytes(referencia, file);
 
-    return await getDownloadURL(referencia);
+    // Guardamos la ruta, no una URL de descarga pública con token.
+    return referencia.fullPath;
 }
 
 /**********************
@@ -178,6 +199,7 @@ async function cargarEnsayoParaEditar() {
     }
 
     const data = snap.data();
+    ensayoEdicionOriginal = data;
 
     selectCliente.value = data.clienteId || "";
     nombreEnsayoEl.value = data.nombreEnsayo || "";
@@ -232,12 +254,14 @@ form.addEventListener("submit", async (e) => {
     btnGuardar.disabled = true;
 
     try {
-        /* CONSERVAR FOTOS Y AGREGAR LAS NUEVAS */
-        const fotos = [...fotosExistentes];
+        /* Normalizar fotos antiguas a rutas privadas y agregar las nuevas */
+        const fotos = fotosExistentes.map(valor =>
+            obtenerReferenciaFoto(valor).fullPath
+        );
 
         for (const file of fotosSeleccionadas) {
-            const url = await subirImagen(file);
-            fotos.push(url);
+            const ruta = await subirImagen(file);
+            fotos.push(ruta);
         }
 
         const datosEnsayo = {
@@ -261,10 +285,49 @@ form.addEventListener("submit", async (e) => {
         };
 
         if (modoEdicion) {
+            const datosActualizacion = { ...datosEnsayo };
+            const publicacionActiva = ensayoEdicionOriginal?.publicacionActiva === true;
+            const tokenPublico = ensayoEdicionOriginal?.publicacionToken || null;
+            const rutasCopiasPublicas = Array.isArray(ensayoEdicionOriginal?.publicacionFotosStoragePaths)
+                ? ensayoEdicionOriginal.publicacionFotosStoragePaths
+                : [];
+
+            // Al editar un ensayo publicado, desactivar primero la copia pública
+            // para evitar que el cliente siga viendo una versión desactualizada.
+            if (publicacionActiva && tokenPublico) {
+                await updateDoc(doc(db, "ensayos_publicos", tokenPublico), {
+                    activo: false
+                });
+                datosActualizacion.publicacionActiva = false;
+                // Conservamos las rutas hasta confirmar el borrado para no perder
+                // la posibilidad de limpiar archivos públicos si algo falla.
+            }
+
             await updateDoc(
                 doc(db, "ensayos", ensayoId),
-                datosEnsayo
+                datosActualizacion
             );
+
+            // El enlace ya está desactivado; intentar eliminar las copias públicas.
+            if (publicacionActiva && rutasCopiasPublicas.length) {
+                const resultadosBorrado = await Promise.allSettled(
+                    rutasCopiasPublicas.map(ruta => deleteObject(ref(storage, ruta)))
+                );
+                const erroresBorrado = resultadosBorrado.filter(resultado =>
+                    resultado.status === "rejected" &&
+                    resultado.reason?.code !== "storage/object-not-found"
+                );
+                if (erroresBorrado.length) {
+                    // Las rutas quedan guardadas en Firestore para poder reintentar
+                    // la limpieza al volver a publicar o desactivar el enlace.
+                    console.error("El enlace se desactivó, pero algunas copias públicas no se pudieron borrar:", erroresBorrado);
+                } else {
+                    await updateDoc(
+                        doc(db, "ensayos", ensayoId),
+                        { publicacionFotosStoragePaths: [] }
+                    );
+                }
+            }
 
             window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
         } else {
@@ -338,6 +401,19 @@ form.addEventListener("submit", async (e) => {
  **********************/
 async function iniciar() {
     try {
+        // Esperar a que Firebase restaure la sesión antes de leer datos o subir fotos.
+        const usuarioActual = auth.currentUser || await new Promise((resolve) => {
+            const cancelar = onAuthStateChanged(auth, (usuario) => {
+                cancelar();
+                resolve(usuario);
+            });
+        });
+
+        if (!usuarioActual) {
+            window.location.replace("login.html");
+            return;
+        }
+
         await cargarClientes();
         await cargarEnsayoParaEditar();
     } catch (error) {
