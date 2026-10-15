@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "INLACT",
+  "short_name": "INLACT",
+  "description": "Aplicación interna de INLACT para clientes, visitas y ensayos.",
+  "lang": "es-AR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#1f4e8c",
+  "icons": [
+    {
+      "src": "./img/icon-inlact.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
