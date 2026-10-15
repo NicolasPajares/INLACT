@@ -197,7 +197,7 @@ async function mostrarEnsayo(data) {
     data.propuestaComercial
   );
 
-  renderImagenes(data.fotos || []);
+  await renderImagenes(data.fotos || []);
 
   document.body.style.visibility = "visible";
 }
@@ -226,7 +226,13 @@ function renderBloque(id, titulo, contenido) {
 /**********************
  * IMÁGENES Y PUBLICACIÓN
  **********************/
-function renderImagenes(fotos) {
+function obtenerReferenciaFoto(valor) {
+  return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
+    ? refFromURL(valor)
+    : ref(storage, valor);
+}
+
+async function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
 
@@ -239,15 +245,28 @@ function renderImagenes(fotos) {
 
   contenedor.appendChild(encabezado);
 
-  fotos.forEach(url => {
+  for (const valor of fotos) {
     const img = document.createElement("img");
-    img.src = url;
     img.alt = "Imagen del ensayo";
     img.style.cssText =
       "width:100%;max-width:480px;display:block;margin-bottom:16px;border-radius:12px;";
 
     contenedor.appendChild(img);
-  });
+
+    try {
+      if (esPublico) {
+        // Las publicaciones usan URL con token de sus copias públicas.
+        img.src = valor;
+      } else {
+        // Para el ensayo interno descargamos la imagen con la sesión autenticada.
+        const bytes = await getBytes(obtenerReferenciaFoto(valor), 50 * 1024 * 1024);
+        img.src = URL.createObjectURL(new Blob([bytes]));
+      }
+    } catch (error) {
+      console.error("No se pudo cargar una imagen del ensayo:", error);
+      img.alt = "No se pudo cargar esta imagen";
+    }
+  }
 
   if (usuarioInterno && !esPublico) {
     mostrarControlesPublicacion();
@@ -364,7 +383,10 @@ async function crearCopiasPublicas(fotos, token) {
   try {
     for (let i = 0; i < fotos.length; i++) {
       const urlOriginal = fotos[i];
-      const referenciaOriginal = refFromURL(urlOriginal);
+      const referenciaOriginal =
+        typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
+          ? refFromURL(urlOriginal)
+          : ref(storage, urlOriginal);
       const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
       const metadataOriginal = await getMetadata(referenciaOriginal);
 
