@@ -12,18 +12,46 @@ service firebase.storage {
         );
     }
 
-    // Fotos originales de los ensayos: solo usuarios con perfil pueden acceder.
-    match /ensayos/{allPaths=**} {
-      allow read, write: if hasProfile();
+    function isAdmin() {
+      return hasProfile()
+        && firestore.get(
+          /databases/(default)/documents/usuarios/$(request.auth.uid)
+        ).data.rol == "admin";
     }
 
-    // Copias creadas exclusivamente para enlaces públicos.
-    // Se permite leer un archivo concreto, pero no listar el contenido del directorio.
-    // La escritura/eliminación queda reservada a usuarios con perfil.
-    match /ensayos_publicos/{allPaths=**} {
+    function canManagePublicEssay(token) {
+      let publicPath = /databases/(default)/documents/ensayos_publicos/$(token);
+      return hasProfile()
+        && firestore.exists(publicPath)
+        && firestore.get(publicPath).data.registroId is string
+        && (
+          isAdmin()
+          || (
+            firestore.exists(
+              /databases/(default)/documents/ensayos/$(firestore.get(publicPath).data.registroId)
+            )
+            && firestore.get(
+              /databases/(default)/documents/ensayos/$(firestore.get(publicPath).data.registroId)
+            ).data.creadoPorUid == request.auth.uid
+          )
+        );
+    }
+
+    // Fotos originales: todos los usuarios con perfil pueden ver y subir.
+    // Solo el administrador puede sobrescribir o borrar archivos existentes.
+    match /ensayos/{allPaths=**} {
+      allow read: if hasProfile();
+      allow create: if hasProfile();
+      allow update, delete: if isAdmin();
+    }
+
+    // Copias para enlaces públicos. Lectura de archivos individuales habilitada,
+    // pero no se permite listar directorios ni borrar copias de otro creador.
+    match /ensayos_publicos/{token}/{allPaths=**} {
       allow get: if true;
       allow list: if false;
-      allow create, update, delete: if hasProfile();
+      allow create: if hasProfile();
+      allow update, delete: if canManagePublicEssay(token);
     }
 
     // Todo otro archivo queda bloqueado por defecto.
