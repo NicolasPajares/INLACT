@@ -399,8 +399,11 @@ async function eliminarCopiasPublicas(paths) {
     paths.map(path => deleteObject(ref(storage, path)))
   );
 
-  const fallo = resultados.find(resultado => resultado.status === "rejected");
-  if (fallo) throw fallo.reason;
+  const fallosReales = resultados.filter(
+    resultado => resultado.status === "rejected" &&
+      resultado.reason?.code !== "storage/object-not-found"
+  );
+  if (fallosReales.length) throw fallosReales[0].reason;
 }
 
 async function publicarEnsayo() {
@@ -491,13 +494,19 @@ async function desactivarPublicacion() {
     }
   );
 
-  await updateDoc(
-    doc(db, "ensayos", ensayoActual.id),
-    {
-      publicacionActiva: false
-    }
-  );
+  let errorActualizacionOriginal = null;
 
+  try {
+    await updateDoc(
+      doc(db, "ensayos", ensayoActual.id),
+      { publicacionActiva: false }
+    );
+  } catch (error) {
+    errorActualizacionOriginal = error;
+  }
+
+  // Aunque falle la actualización del registro original, el enlace público ya
+  // está desactivado: intentamos borrar igualmente las copias publicadas.
   ensayoActual.publicacionActiva = false;
 
   const paths = Array.isArray(ensayoActual.publicacionFotosStoragePaths)
@@ -512,6 +521,8 @@ async function desactivarPublicacion() {
   );
 
   ensayoActual.publicacionFotosStoragePaths = [];
+
+  if (errorActualizacionOriginal) throw errorActualizacionOriginal;
 }
 
 /**********************
