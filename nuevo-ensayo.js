@@ -299,7 +299,8 @@ form.addEventListener("submit", async (e) => {
                     activo: false
                 });
                 datosActualizacion.publicacionActiva = false;
-                datosActualizacion.publicacionFotosStoragePaths = [];
+                // Conservamos las rutas hasta confirmar el borrado para no perder
+                // la posibilidad de limpiar archivos públicos si algo falla.
             }
 
             await updateDoc(
@@ -317,7 +318,14 @@ form.addEventListener("submit", async (e) => {
                     resultado.reason?.code !== "storage/object-not-found"
                 );
                 if (erroresBorrado.length) {
+                    // Las rutas quedan guardadas en Firestore para poder reintentar
+                    // la limpieza al volver a publicar o desactivar el enlace.
                     console.error("El enlace se desactivó, pero algunas copias públicas no se pudieron borrar:", erroresBorrado);
+                } else {
+                    await updateDoc(
+                        doc(db, "ensayos", ensayoId),
+                        { publicacionFotosStoragePaths: [] }
+                    );
                 }
             }
 
