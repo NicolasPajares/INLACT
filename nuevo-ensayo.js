@@ -21,7 +21,8 @@ import {
     ref,
     uploadBytes,
     getBytes,
-    refFromURL
+    refFromURL,
+    deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /**********************
@@ -86,6 +87,7 @@ const previewFotos = document.getElementById("previewFotos");
 
 let fotosSeleccionadas = [];
 let fotosExistentes = [];
+let ensayoEdicionOriginal = null;
 
 /**********************
  * MOSTRAR PREVISUALIZACIÓN
@@ -197,6 +199,7 @@ async function cargarEnsayoParaEditar() {
     }
 
     const data = snap.data();
+    ensayoEdicionOriginal = data;
 
     selectCliente.value = data.clienteId || "";
     nombreEnsayoEl.value = data.nombreEnsayo || "";
@@ -282,10 +285,41 @@ form.addEventListener("submit", async (e) => {
         };
 
         if (modoEdicion) {
+            const datosActualizacion = { ...datosEnsayo };
+            const publicacionActiva = ensayoEdicionOriginal?.publicacionActiva === true;
+            const tokenPublico = ensayoEdicionOriginal?.publicacionToken || null;
+            const rutasCopiasPublicas = Array.isArray(ensayoEdicionOriginal?.publicacionFotosStoragePaths)
+                ? ensayoEdicionOriginal.publicacionFotosStoragePaths
+                : [];
+
+            // Al editar un ensayo publicado, desactivar primero la copia pública
+            // para evitar que el cliente siga viendo una versión desactualizada.
+            if (publicacionActiva && tokenPublico) {
+                await updateDoc(doc(db, "ensayos_publicos", tokenPublico), {
+                    activo: false
+                });
+                datosActualizacion.publicacionActiva = false;
+                datosActualizacion.publicacionFotosStoragePaths = [];
+            }
+
             await updateDoc(
                 doc(db, "ensayos", ensayoId),
-                datosEnsayo
+                datosActualizacion
             );
+
+            // El enlace ya está desactivado; intentar eliminar las copias públicas.
+            if (publicacionActiva && rutasCopiasPublicas.length) {
+                const resultadosBorrado = await Promise.allSettled(
+                    rutasCopiasPublicas.map(ruta => deleteObject(ref(storage, ruta)))
+                );
+                const erroresBorrado = resultadosBorrado.filter(resultado =>
+                    resultado.status === "rejected" &&
+                    resultado.reason?.code !== "storage/object-not-found"
+                );
+                if (erroresBorrado.length) {
+                    console.error("El enlace se desactivó, pero algunas copias públicas no se pudieron borrar:", erroresBorrado);
+                }
+            }
 
             window.location.href = `ensayo.html?id=${encodeURIComponent(ensayoId)}`;
         } else {
