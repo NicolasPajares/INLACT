@@ -37,6 +37,16 @@ service firebase.storage {
         );
     }
 
+    function canDeletePublicEssayCopy(token) {
+      let publicPath = /databases/(default)/documents/ensayos_publicos/$(token);
+      // Permite limpiar archivos huérfanos si la publicación no llegó a crearse.
+      return hasProfile()
+        && (
+          !firestore.exists(publicPath)
+          || canManagePublicEssay(token)
+        );
+    }
+
     // Fotos originales: todos los usuarios con perfil pueden ver y subir.
     // Solo el administrador puede sobrescribir o borrar archivos existentes.
     match /ensayos/{allPaths=**} {
@@ -51,7 +61,8 @@ service firebase.storage {
       allow get: if true;
       allow list: if false;
       allow create: if hasProfile();
-      allow update, delete: if canManagePublicEssay(token);
+      allow update: if canManagePublicEssay(token);
+      allow delete: if canDeletePublicEssayCopy(token);
     }
 
     // Todo otro archivo queda bloqueado por defecto.
