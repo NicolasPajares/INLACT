@@ -13,6 +13,19 @@ import {
 
 import { db, auth } from "./firebase.js";
 
+import {
+  getStorage,
+  ref,
+  refFromURL,
+  getBytes,
+  getMetadata,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+const storage = getStorage();
+
 /**********************
  * CONFIGURACIÓN
  **********************/
@@ -344,6 +357,52 @@ function mostrarControlesPublicacion() {
 /**********************
  * PUBLICAR COPIA
  **********************/
+async function crearCopiasPublicas(fotos, token) {
+  const urls = [];
+  const paths = [];
+
+  try {
+    for (let i = 0; i < fotos.length; i++) {
+      const urlOriginal = fotos[i];
+      const referenciaOriginal = refFromURL(urlOriginal);
+      const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
+      const metadataOriginal = await getMetadata(referenciaOriginal);
+
+      const nombreBase = (referenciaOriginal.name || "imagen")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
+      const sufijo = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
+      const nombrePublico = `${String(i + 1).padStart(2, "0")}_${Date.now()}_${sufijo}_${nombreBase}`;
+      const referenciaPublica = ref(
+        storage,
+        `ensayos_publicos/${token}/${nombrePublico}`
+      );
+
+      await uploadBytes(referenciaPublica, bytes, {
+        contentType: metadataOriginal.contentType || "application/octet-stream"
+      });
+
+      paths.push(referenciaPublica.fullPath);
+      urls.push(await getDownloadURL(referenciaPublica));
+    }
+
+    return { urls, paths };
+  } catch (error) {
+    await Promise.allSettled(
+      paths.map(path => deleteObject(ref(storage, path)))
+    );
+    throw error;
+  }
+}
+
+async function eliminarCopiasPublicas(paths) {
+  const resultados = await Promise.allSettled(
+    paths.map(path => deleteObject(ref(storage, path)))
+  );
+
+  const fallo = resultados.find(resultado => resultado.status === "rejected");
+  if (fallo) throw fallo.reason;
+}
+
 async function publicarEnsayo() {
   if (!puedeGestionarPublicacion) {
     throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
@@ -357,7 +416,12 @@ async function publicarEnsayo() {
     tokenActual = generarTokenAleatorio();
   }
 
-  // Solo se copian los campos que verá el cliente.
+  const fotosOriginales = Array.isArray(ensayoActual.fotos)
+    ? ensayoActual.fotos
+    : [];
+  const copias = await crearCopiasPublicas(fotosOriginales, tokenActual);
+
+  // La publicación contiene URL de copias separadas, nunca las URL originales.
   const copiaPublica = {
     registroId: ensayoActual.id,
     clienteNombre: ensayoActual.clienteNombre || "",
@@ -370,28 +434,40 @@ async function publicarEnsayo() {
     resultados: ensayoActual.resultados || "",
     conclusion: ensayoActual.conclusion || "",
     propuestaComercial: ensayoActual.propuestaComercial || "",
-    fotos: Array.isArray(ensayoActual.fotos)
-      ? ensayoActual.fotos
-      : [],
+    fotos: copias.urls,
     activo: true,
     actualizadoEn: serverTimestamp()
   };
 
-  await setDoc(
-    doc(db, "ensayos_publicos", tokenActual),
-    copiaPublica
-  );
+  try {
+    await setDoc(
+      doc(db, "ensayos_publicos", tokenActual),
+      copiaPublica
+    );
 
-  await updateDoc(
-    doc(db, "ensayos", ensayoActual.id),
-    {
-      publicacionToken: tokenActual,
-      publicacionActiva: true
-    }
-  );
+    await updateDoc(
+      doc(db, "ensayos", ensayoActual.id),
+      {
+        publicacionToken: tokenActual,
+        publicacionActiva: true,
+        publicacionFotosStoragePaths: copias.paths
+      }
+    );
+  } catch (error) {
+    // Si falla el guardado, dejar inaccesible la copia pública y limpiar archivos nuevos.
+    await updateDoc(doc(db, "ensayos_publicos", tokenActual), {
+      activo: false,
+      actualizadoEn: serverTimestamp()
+    }).catch(() => {});
+    await Promise.allSettled(
+      copias.paths.map(path => deleteObject(ref(storage, path)))
+    );
+    throw error;
+  }
 
   ensayoActual.publicacionToken = tokenActual;
   ensayoActual.publicacionActiva = true;
+  ensayoActual.publicacionFotosStoragePaths = copias.paths;
 }
 
 /**********************
@@ -406,6 +482,7 @@ async function desactivarPublicacion() {
     throw new Error("No hay una publicación para desactivar.");
   }
 
+  // Primero desactivar el enlace; después borrar las imágenes asociadas a esa copia.
   await updateDoc(
     doc(db, "ensayos_publicos", tokenActual),
     {
@@ -422,6 +499,19 @@ async function desactivarPublicacion() {
   );
 
   ensayoActual.publicacionActiva = false;
+
+  const paths = Array.isArray(ensayoActual.publicacionFotosStoragePaths)
+    ? ensayoActual.publicacionFotosStoragePaths
+    : [];
+
+  await eliminarCopiasPublicas(paths);
+
+  await updateDoc(
+    doc(db, "ensayos", ensayoActual.id),
+    { publicacionFotosStoragePaths: [] }
+  );
+
+  ensayoActual.publicacionFotosStoragePaths = [];
 }
 
 /**********************
