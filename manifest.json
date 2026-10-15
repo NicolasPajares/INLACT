@@ -12,9 +12,9 @@
   "theme_color": "#1f4e8c",
   "icons": [
     {
-      "src": "https://www.inlact.com/favicon.ico",
+      "src": "./img/icon-inlact.svg",
       "sizes": "any",
-      "type": "image/x-icon",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ]
