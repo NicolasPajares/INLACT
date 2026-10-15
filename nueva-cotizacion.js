@@ -870,14 +870,31 @@ form.addEventListener("submit", async event => {
         let idGuardado;
 
         if (cotizacionId) {
-            // EDITAR: actualiza el documento existente.
-            // No crea una cotización duplicada.
+            // Si estaba publicada, desactivar primero la copia pública para que
+            // el cliente no siga viendo una versión desactualizada.
+            const publicacionActiva = cotizacionOriginal?.publicacionActiva === true;
+            const tokenPublico = cotizacionOriginal?.publicacionToken || null;
+
+            if (publicacionActiva && tokenPublico) {
+                await updateDoc(doc(db, "cotizaciones_publicas", tokenPublico), {
+                    activo: false,
+                    actualizadoEn: Timestamp.now()
+                });
+            }
+
+            const datosActualizacion = {
+                ...datosCotizacion,
+                actualizadoEn: Timestamp.now()
+            };
+
+            if (publicacionActiva && tokenPublico) {
+                datosActualizacion.publicacionActiva = false;
+            }
+
+            // EDITAR: actualiza el documento existente, sin duplicarlo.
             await updateDoc(
                 doc(db, "cotizaciones", cotizacionId),
-                {
-                    ...datosCotizacion,
-                    actualizadoEn: Timestamp.now()
-                }
+                datosActualizacion
             );
 
             idGuardado = cotizacionId;
