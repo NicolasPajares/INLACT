@@ -444,7 +444,15 @@ async function publicarEnsayo() {
   const fotosOriginales = Array.isArray(ensayoActual.fotos)
     ? ensayoActual.fotos
     : [];
+  const rutasPublicasAnteriores = Array.isArray(ensayoActual.publicacionFotosStoragePaths)
+    ? ensayoActual.publicacionFotosStoragePaths
+    : [];
   const copias = await crearCopiasPublicas(fotosOriginales, tokenActual);
+  // Mientras se reemplazan las fotos, conservamos registradas las rutas anteriores
+  // para poder reintentar su limpieza si algún borrado falla.
+  const rutasPublicasRegistradas = [
+    ...new Set([...rutasPublicasAnteriores, ...copias.paths])
+  ];
 
   // La publicación contiene URL de copias separadas, nunca las URL originales.
   const copiaPublica = {
@@ -475,7 +483,7 @@ async function publicarEnsayo() {
       {
         publicacionToken: tokenActual,
         publicacionActiva: true,
-        publicacionFotosStoragePaths: copias.paths
+        publicacionFotosStoragePaths: rutasPublicasRegistradas
       }
     );
   } catch (error) {
@@ -492,7 +500,26 @@ async function publicarEnsayo() {
 
   ensayoActual.publicacionToken = tokenActual;
   ensayoActual.publicacionActiva = true;
-  ensayoActual.publicacionFotosStoragePaths = copias.paths;
+  ensayoActual.publicacionFotosStoragePaths = rutasPublicasRegistradas;
+
+  // La nueva publicación ya está activa. Ahora limpiamos las fotos de la versión
+  // anterior; si falla algún borrado, dejamos sus rutas registradas para poder
+  // volver a intentarlo al desactivar el enlace.
+  if (rutasPublicasAnteriores.length) {
+    try {
+      await eliminarCopiasPublicas(rutasPublicasAnteriores);
+      await updateDoc(
+        doc(db, "ensayos", ensayoActual.id),
+        { publicacionFotosStoragePaths: copias.paths }
+      );
+      ensayoActual.publicacionFotosStoragePaths = copias.paths;
+    } catch (error) {
+      console.warn(
+        "La publicación se actualizó, pero no se pudieron limpiar todas las fotos anteriores. Sus rutas quedaron registradas para una limpieza posterior.",
+        error
+      );
+    }
+  }
 }
 
 /**********************
