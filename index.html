@@ -5,6 +5,8 @@
 <title>INLACT</title>
 <meta name="description" content="INLACT - Registro de visitas y clientes">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f4e8c">
 
 <link rel="stylesheet" href="index.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -235,6 +237,14 @@
 <script type="module">
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { auth } from "./firebase.js";
+
+  // Instalación PWA: el service worker no guarda datos privados.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js")
+        .catch((error) => console.error("No se pudo registrar el service worker:", error));
+    });
+  }
 
   let appCargada = false;
 
