@@ -30,19 +30,14 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/cotizaciones/$(id)).data.creadoPorUid == request.auth.uid;
     }
 
-    function creatorUnchangedOrLegacy() {
-      return (
-        !resource.data.keys().hasAny(["creadoPorUid"])
-        && !request.resource.data.keys().hasAny(["creadoPorUid"])
-      ) || request.resource.data.creadoPorUid == resource.data.creadoPorUid;
+    function isCreatorOfEnsayo() {
+      return resource.data.keys().hasAny(["creadoPorUid"])
+        && resource.data.creadoPorUid == request.auth.uid;
     }
 
-    function publicationFieldsProtected() {
-      return isAdmin()
-        || (resource.data.keys().hasAny(["creadoPorUid"])
-          && resource.data.creadoPorUid == request.auth.uid)
-        || !request.resource.data.diff(resource.data).affectedKeys()
-          .hasAny(["publicacionToken", "publicacionActiva"]);
+    function isCreatorOfCotizacion() {
+      return resource.data.keys().hasAny(["creadoPorUid"])
+        && resource.data.creadoPorUid == request.auth.uid;
     }
 
     match /usuarios/{uid} {
@@ -60,10 +55,15 @@ service cloud.firestore {
       allow read: if hasProfile();
       allow create: if hasProfile()
         && request.resource.data.creadoPorUid == request.auth.uid;
+      // Solo el administrador o el creador puede editar.
+      // Los registros antiguos sin creadoPorUid quedan editables por el administrador.
       allow update: if hasProfile()
         && (
           isAdmin()
-          || (creatorUnchangedOrLegacy() && publicationFieldsProtected())
+          || (
+            isCreatorOfEnsayo()
+            && request.resource.data.creadoPorUid == resource.data.creadoPorUid
+          )
         );
       allow delete: if isAdmin();
     }
@@ -72,10 +72,15 @@ service cloud.firestore {
       allow read: if hasProfile();
       allow create: if hasProfile()
         && request.resource.data.creadoPorUid == request.auth.uid;
+      // Solo el administrador o el creador puede editar.
+      // Los registros antiguos sin creadoPorUid quedan editables por el administrador.
       allow update: if hasProfile()
         && (
           isAdmin()
-          || (creatorUnchangedOrLegacy() && publicationFieldsProtected())
+          || (
+            isCreatorOfCotizacion()
+            && request.resource.data.creadoPorUid == resource.data.creadoPorUid
+          )
         );
       allow delete: if isAdmin();
     }
