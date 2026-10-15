@@ -338,6 +338,19 @@ form.addEventListener("submit", async (e) => {
  **********************/
 async function iniciar() {
     try {
+        // Esperar a que Firebase restaure la sesión antes de leer datos o subir fotos.
+        const usuarioActual = auth.currentUser || await new Promise((resolve) => {
+            const cancelar = onAuthStateChanged(auth, (usuario) => {
+                cancelar();
+                resolve(usuario);
+            });
+        });
+
+        if (!usuarioActual) {
+            window.location.replace("login.html");
+            return;
+        }
+
         await cargarClientes();
         await cargarEnsayoParaEditar();
     } catch (error) {
