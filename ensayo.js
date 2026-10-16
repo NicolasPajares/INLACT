@@ -17,6 +17,7 @@ import {
   getStorage,
   ref,
   getDownloadURL,
+  getBytes,
   getMetadata,
   uploadBytes,
   deleteObject
@@ -224,6 +225,8 @@ function renderBloque(id, titulo, contenido) {
 /**********************
  * IMÁGENES Y PUBLICACIÓN
  **********************/
+const urlsBlobImagenes = [];
+
 function obtenerReferenciaFoto(valor) {
   return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
     ? ref(storage, valor)
@@ -234,6 +237,9 @@ async function renderImagenes(fotos) {
   const contenedor = document.getElementById("fotos");
   if (!contenedor) return;
 
+  // Liberar las URL temporales anteriores para no acumular memoria.
+  urlsBlobImagenes.forEach(url => URL.revokeObjectURL(url));
+  urlsBlobImagenes.length = 0;
   contenedor.replaceChildren();
 
   const encabezado = document.createElement("h3");
@@ -253,13 +259,16 @@ async function renderImagenes(fotos) {
 
     try {
       if (esPublico) {
-        // Las publicaciones usan URL con token de sus copias públicas.
+        // El enlace público usa la URL de la copia publicada.
         img.src = valor;
       } else {
-        // Obtener la URL de descarga de Storage y dejar que el navegador cargue la imagen.
-        // Esto evita descargar el archivo completo como Blob desde JavaScript.
+        // Leer la imagen original con la sesión autenticada y mostrarla como Blob.
+        // No colocar una URL de descarga permanente de la imagen original en el HTML.
         const referencia = obtenerReferenciaFoto(valor);
-        img.src = await getDownloadURL(referencia);
+        const bytes = await getBytes(referencia, 50 * 1024 * 1024);
+        const urlTemporal = URL.createObjectURL(new Blob([bytes]));
+        urlsBlobImagenes.push(urlTemporal);
+        img.src = urlTemporal;
       }
     } catch (error) {
       console.error("No se pudo cargar una imagen del ensayo:", error);
