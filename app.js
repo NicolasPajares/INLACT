@@ -514,8 +514,10 @@ function escaparHTMLActividad(valor) {
     .replace(/'/g, "&#039;");
 }
 
-function fechaActividad(datos) {
-  const valor = datos?.creadoEn ?? datos?.fecha;
+function fechaActividad(datos, priorizarFechaRegistrada = false) {
+  const valor = priorizarFechaRegistrada
+    ? (datos?.fecha ?? datos?.creadoEn)
+    : (datos?.creadoEn ?? datos?.fecha);
 
   if (!valor) return null;
 
@@ -525,6 +527,9 @@ function fechaActividad(datos) {
     fecha = valor.toDate();
   } else if (valor instanceof Date) {
     fecha = valor;
+  } else if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    const [anio, mes, dia] = valor.split("-").map(Number);
+    fecha = new Date(anio, mes - 1, dia);
   } else {
     fecha = new Date(valor);
   }
@@ -532,10 +537,14 @@ function fechaActividad(datos) {
   return Number.isNaN(fecha.getTime()) ? null : fecha;
 }
 
-function fechaActividadTexto(fecha) {
+function fechaActividadTexto(fecha, soloFecha = false) {
   if (!fecha) return "Fecha no disponible";
 
-  return fecha.toLocaleString("es-AR", {
+  return fecha.toLocaleString("es-AR", soloFecha ? {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  } : {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -693,7 +702,7 @@ async function cargarUltimasActividades() {
         return;
       }
 
-      const fecha = fechaActividad(datos);
+      const fecha = fechaActividad(datos, true);
       const empresa = empresaActividad(datos);
       const dia = fecha
         ? `${fecha.getFullYear()}-${fecha.getMonth()}-${fecha.getDate()}`
@@ -788,7 +797,7 @@ async function cargarUltimasActividades() {
           data-tipo="${escaparHTMLActividad(actividad.tipoDetalle)}"
           data-id="${escaparHTMLActividad(actividad.id)}">
         <div class="actividad-fecha">
-          ${escaparHTMLActividad(fechaActividadTexto(actividad.fecha))}
+          ${escaparHTMLActividad(fechaActividadTexto(actividad.fecha, actividad.categoria === "💰 Venta"))}
         </div>
         <div class="actividad-empresa">
           ${escaparHTMLActividad(actividad.empresa)}

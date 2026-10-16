@@ -382,6 +382,11 @@
             return valor.toDate();
         }
 
+        if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            const [anio, mes, dia] = valor.split("-").map(Number);
+            return new Date(anio, mes - 1, dia);
+        }
+
         if (valor) {
 
             const fecha = new Date(valor);
@@ -395,7 +400,7 @@
         return null;
     }
 
-    function mostrarFecha(fecha) {
+    function mostrarFecha(fecha, soloFecha = false) {
 
         if (!fecha) {
             return "Sin fecha";
@@ -403,7 +408,11 @@
 
         return fecha.toLocaleString(
             "es-AR",
-            {
+            soloFecha ? {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            } : {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
@@ -473,7 +482,7 @@
         const tarjeta = document.createElement("div");
         tarjeta.className = "actividad-historial";
 
-        const fechaTexto = mostrarFecha(actividad.fecha);
+        const fechaTexto = mostrarFecha(actividad.fecha, actividad.origen === "venta");
 
         if (actividad.origen === "venta") {
 
@@ -768,13 +777,11 @@
                 const datos = documento.data();
                 if (datos.tipoEgreso !== "venta") return;
 
-                let fecha = null;
-                if (datos.creadoEn && typeof datos.creadoEn.toDate === "function") {
+                // Para las ventas se usa la fecha elegida al registrarlas;
+                // creadoEn queda como respaldo para registros antiguos sin fecha.
+                let fecha = convertirFecha(datos.fecha);
+                if (!fecha && datos.creadoEn && typeof datos.creadoEn.toDate === "function") {
                     fecha = datos.creadoEn.toDate();
-                }
-                if (!fecha && datos.fecha) {
-                    const fechaConvertida = new Date(`${datos.fecha}T00:00:00`);
-                    if (!isNaN(fechaConvertida.getTime())) fecha = fechaConvertida;
                 }
 
                 let claveFecha = "sin-fecha";

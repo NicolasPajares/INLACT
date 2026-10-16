@@ -291,6 +291,11 @@
                 return valor.toDate();
             }
 
+            if (typeof valor === "string" && /^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+                const [anio, mes, dia] = valor.split("-").map(Number);
+                return new Date(anio, mes - 1, dia);
+            }
+
             if (valor) {
                 const fecha = new Date(valor);
                 if (!isNaN(fecha.getTime())) return fecha;
@@ -299,7 +304,12 @@
             return null;
         }
 
-        function obtenerFechaActividad(datos) {
+        function obtenerFechaActividad(datos, priorizarFechaRegistrada = false) {
+            if (priorizarFechaRegistrada) {
+                const fechaRegistrada = convertirFecha(datos.fecha);
+                if (fechaRegistrada) return fechaRegistrada;
+            }
+
             if (datos.creadoEn) {
                 const fechaCreacion = convertirFecha(datos.creadoEn);
                 if (fechaCreacion) return fechaCreacion;
@@ -308,10 +318,14 @@
             return convertirFecha(datos.fecha);
         }
 
-        function mostrarFecha(fecha) {
+        function mostrarFecha(fecha, soloFecha = false) {
             if (!fecha) return "Sin fecha";
 
-            return fecha.toLocaleString("es-AR", {
+            return fecha.toLocaleString("es-AR", soloFecha ? {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            } : {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
@@ -372,13 +386,13 @@
             });
         }
 
-        function crearTarjeta(fecha, tipo, titulo, empresa) {
+        function crearTarjeta(fecha, tipo, titulo, empresa, soloFecha = false) {
             const tarjeta = document.createElement("div");
             tarjeta.className = "actividad-historial";
 
             tarjeta.innerHTML = `
                 <div class="actividad-fecha">
-                    ${escaparHTML(mostrarFecha(fecha))}
+                    ${escaparHTML(mostrarFecha(fecha, soloFecha))}
                 </div>
 
                 <div class="actividad-empresa">
@@ -464,7 +478,7 @@
                     if (datos.tipoEgreso !== "venta") return;
                     if (datos.creadoPorUid !== uidActual) return;
 
-                    const fecha = obtenerFechaActividad(datos);
+                    const fecha = obtenerFechaActividad(datos, true);
                     const empresa = nombreEmpresa(datos);
                     const clienteId = datos.clienteId || empresa;
 
@@ -572,7 +586,8 @@
                         actividad.fecha,
                         actividad.tipo,
                         actividad.titulo,
-                        actividad.empresa
+                        actividad.empresa,
+                        actividad.origen === "venta"
                     );
 
                     // VENTAS
@@ -605,7 +620,7 @@
                             abrirOverlay(
                                 "💰 Venta",
                                 actividad.empresa,
-                                mostrarFecha(actividad.fecha),
+                                mostrarFecha(actividad.fecha, true),
                                 productosHTML
                             );
                         });
