@@ -397,7 +397,26 @@ async function crearCopiasPublicas(fotos, token, informarProgreso = () => {}) {
         typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
           ? ref(storage, urlOriginal)
           : ref(storage, urlOriginal);
-      const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
+      // Evita que la publicación quede indefinidamente en "leyendo".
+      // El límite de tiempo solo diagnostica la demora; no modifica permisos ni reglas.
+      let temporizadorLectura;
+      let bytes;
+      try {
+        bytes = await Promise.race([
+          getBytes(referenciaOriginal, 50 * 1024 * 1024),
+          new Promise((_, reject) => {
+            temporizadorLectura = setTimeout(() => {
+              const error = new Error(
+                "La lectura de la imagen superó los 20 segundos. La imagen puede verse en pantalla, pero Firebase no está completando su lectura para copiarla. No se modificaron las reglas ni se publicó el archivo original."
+              );
+              error.code = "inlact/lectura-tiempo-agotado";
+              reject(error);
+            }, 20000);
+          })
+        ]);
+      } finally {
+        clearTimeout(temporizadorLectura);
+      }
       informarProgreso(`Imagen ${numeroImagen}: archivo leído; consultando sus datos...`);
       const metadataOriginal = await getMetadata(referenciaOriginal);
 
