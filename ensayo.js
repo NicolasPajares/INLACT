@@ -405,36 +405,10 @@ async function crearCopiasPublicas(fotos, token, informarProgreso = () => {}) {
         typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
           ? ref(storage, urlOriginal)
           : ref(storage, urlOriginal);
-      // Usar la URL de descarga de Firebase en lugar de getBytes().
-      // La URL solo se usa dentro de esta sesión para copiar el archivo; no se guarda
-      // en el registro público. El límite permite mostrar un error real si la descarga se atasca.
-      informarProgreso(`Imagen ${numeroImagen} de ${fotos.length}: obteniendo la URL de descarga segura...`);
-      const urlDescarga = await getDownloadURL(referenciaOriginal);
-      informarProgreso(`Imagen ${numeroImagen}: descargando el archivo original...`);
-      const controlador = new AbortController();
-      const temporizadorLectura = setTimeout(() => controlador.abort(), 20000);
-      let respuesta;
-      let bytes;
-      try {
-        respuesta = await fetch(urlDescarga, { signal: controlador.signal });
-        if (!respuesta.ok) {
-          const error = new Error(`Firebase respondió ${respuesta.status} al descargar la imagen.`);
-          error.code = "inlact/descarga-http-" + respuesta.status;
-          throw error;
-        }
-        bytes = await respuesta.arrayBuffer();
-      } catch (error) {
-        if (error?.name === "AbortError") {
-          const tiempoAgotado = new Error(
-            "La descarga de la imagen superó los 20 segundos. Verificaremos la conectividad y el acceso a Storage; no se cambiaron las reglas."
-          );
-          tiempoAgotado.code = "inlact/descarga-tiempo-agotado";
-          throw tiempoAgotado;
-        }
-        throw error;
-      } finally {
-        clearTimeout(temporizadorLectura);
-      }
+      // Leer el archivo con Firebase Storage SDK y la sesión autenticada.
+      // Así evitamos usar una URL de descarga permanente del archivo original.
+      informarProgreso(`Imagen ${numeroImagen} de ${fotos.length}: leyendo el archivo original...`);
+      const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
       informarProgreso(`Imagen ${numeroImagen}: archivo leído; consultando sus datos...`);
       const metadataOriginal = await getMetadata(referenciaOriginal);
 
