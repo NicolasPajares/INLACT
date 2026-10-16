@@ -1,0 +1,34 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasProfile() {
+      return signedIn()
+        && firestore.exists(
+          /databases/(default)/documents/usuarios/$(request.auth.uid)
+        );
+    }
+
+    // Imágenes originales de ensayos: solo usuarios autenticados
+    // que tengan un perfil válido en la colección usuarios.
+    match /ensayos/{fileName} {
+      allow read, write: if hasProfile();
+    }
+
+    // Copias de imágenes para ensayos compartidos.
+    // La página pública usa las URL de descarga de estas copias.
+    // La carga, renovación y eliminación de copias requiere perfil válido.
+    match /ensayos_publicos/{token}/{fileName} {
+      allow read, write: if hasProfile();
+    }
+
+    // Denegar por defecto cualquier otra ruta de Storage.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
