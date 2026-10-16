@@ -349,15 +349,18 @@ function mostrarControlesPublicacion() {
         await desactivarPublicacion();
         estado.textContent = "Enlace desactivado.";
       } else {
-        await publicarEnsayo();
+        await publicarEnsayo((mensaje) => {
+          estado.textContent = mensaje;
+        });
         estado.textContent = "Ensayo publicado correctamente.";
       }
 
       mostrarControlesPublicacion();
     } catch (error) {
       console.error("Error en la publicación:", error);
+      const detalle = error?.code || error?.message || "Error sin detalle";
       estado.textContent =
-        "No se pudo completar la operación. Revisá la conexión y los permisos.";
+        "No se pudo completar: " + detalle;
       boton.disabled = false;
     }
   });
@@ -381,12 +384,13 @@ function mostrarControlesPublicacion() {
 /**********************
  * PUBLICAR COPIA
  **********************/
-async function crearCopiasPublicas(fotos, token) {
+async function crearCopiasPublicas(fotos, token, informarProgreso = () => {}) {
   const urls = [];
   const paths = [];
 
   try {
     for (let i = 0; i < fotos.length; i++) {
+      informarProgreso(`Copiando imagen ${i + 1} de ${fotos.length}...`);
       const urlOriginal = fotos[i];
       const referenciaOriginal =
         typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
@@ -433,7 +437,7 @@ async function eliminarCopiasPublicas(paths) {
   if (fallosReales.length) throw fallosReales[0].reason;
 }
 
-async function publicarEnsayo() {
+async function publicarEnsayo(informarProgreso = () => {}) {
   if (!puedeGestionarPublicacion) {
     throw new Error("Solo quien creó el ensayo o el administrador puede gestionar su enlace.");
   }
@@ -452,7 +456,12 @@ async function publicarEnsayo() {
   const rutasPublicasAnteriores = Array.isArray(ensayoActual.publicacionFotosStoragePaths)
     ? ensayoActual.publicacionFotosStoragePaths
     : [];
-  const copias = await crearCopiasPublicas(fotosOriginales, tokenActual);
+  informarProgreso(
+    fotosOriginales.length
+      ? `Preparando ${fotosOriginales.length} imagen(es) para el enlace público...`
+      : "Guardando la copia pública del ensayo..."
+  );
+  const copias = await crearCopiasPublicas(fotosOriginales, tokenActual, informarProgreso);
   // Mientras se reemplazan las fotos, conservamos registradas las rutas anteriores
   // para poder reintentar su limpieza si algún borrado falla.
   const rutasPublicasRegistradas = [
@@ -478,11 +487,13 @@ async function publicarEnsayo() {
   };
 
   try {
+    informarProgreso("Guardando la copia pública en la base de datos...");
     await setDoc(
       doc(db, "ensayos_publicos", tokenActual),
       copiaPublica
     );
 
+    informarProgreso("Activando el enlace público...");
     await updateDoc(
       doc(db, "ensayos", ensayoActual.id),
       {
