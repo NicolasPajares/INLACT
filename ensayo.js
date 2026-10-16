@@ -17,9 +17,9 @@ import {
   getStorage,
   ref,
   getBytes,
+  getDownloadURL,
   getMetadata,
   uploadBytes,
-  getDownloadURL,
   deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
@@ -257,13 +257,19 @@ async function renderImagenes(fotos) {
         // Las publicaciones usan URL con token de sus copias públicas.
         img.src = valor;
       } else {
-        // Para el ensayo interno descargamos la imagen con la sesión autenticada.
-        const bytes = await getBytes(obtenerReferenciaFoto(valor), 50 * 1024 * 1024);
-        img.src = URL.createObjectURL(new Blob([bytes]));
+        // Obtener la URL de descarga de Storage y dejar que el navegador cargue la imagen.
+        // Esto evita descargar el archivo completo como Blob desde JavaScript.
+        const referencia = obtenerReferenciaFoto(valor);
+        img.src = await getDownloadURL(referencia);
       }
     } catch (error) {
       console.error("No se pudo cargar una imagen del ensayo:", error);
       img.alt = "No se pudo cargar esta imagen";
+      const aviso = document.createElement("p");
+      aviso.textContent = "No se pudo cargar la imagen. " +
+        (error?.code ? "Código: " + error.code : "Revisá la conexión y los permisos de Storage.");
+      aviso.style.cssText = "color:#b42318;font-size:14px;margin:0 0 16px;";
+      contenedor.appendChild(aviso);
     }
   }
 
