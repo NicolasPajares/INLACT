@@ -20,7 +20,6 @@ import {
     ref,
     uploadBytes,
     getBytes,
-    refFromURL,
     deleteObject
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
@@ -81,7 +80,7 @@ let ensayoEdicionOriginal = null;
  **********************/
 function obtenerReferenciaFoto(valor) {
     return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
-        ? refFromURL(valor)
+        ? ref(storage, valor)
         : ref(storage, valor);
 }
 
