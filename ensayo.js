@@ -16,7 +16,6 @@ import { db, auth } from "./firebase.js";
 import {
   getStorage,
   ref,
-  refFromURL,
   getBytes,
   getMetadata,
   uploadBytes,
@@ -228,7 +227,7 @@ function renderBloque(id, titulo, contenido) {
  **********************/
 function obtenerReferenciaFoto(valor) {
   return typeof valor === "string" && /^(https?:|gs:)/i.test(valor)
-    ? refFromURL(valor)
+    ? ref(storage, valor)
     : ref(storage, valor);
 }
 
@@ -385,7 +384,7 @@ async function crearCopiasPublicas(fotos, token) {
       const urlOriginal = fotos[i];
       const referenciaOriginal =
         typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
-          ? refFromURL(urlOriginal)
+          ? ref(storage, urlOriginal)
           : ref(storage, urlOriginal);
       const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
       const metadataOriginal = await getMetadata(referenciaOriginal);
