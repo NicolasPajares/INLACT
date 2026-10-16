@@ -390,13 +390,15 @@ async function crearCopiasPublicas(fotos, token, informarProgreso = () => {}) {
 
   try {
     for (let i = 0; i < fotos.length; i++) {
-      informarProgreso(`Copiando imagen ${i + 1} de ${fotos.length}...`);
+      const numeroImagen = i + 1;
+      informarProgreso(`Imagen ${numeroImagen} de ${fotos.length}: leyendo el archivo original...`);
       const urlOriginal = fotos[i];
       const referenciaOriginal =
         typeof urlOriginal === "string" && /^(https?:|gs:)/i.test(urlOriginal)
           ? ref(storage, urlOriginal)
           : ref(storage, urlOriginal);
       const bytes = await getBytes(referenciaOriginal, 50 * 1024 * 1024);
+      informarProgreso(`Imagen ${numeroImagen}: archivo leído; consultando sus datos...`);
       const metadataOriginal = await getMetadata(referenciaOriginal);
 
       const nombreBase = (referenciaOriginal.name || "imagen")
@@ -408,12 +410,15 @@ async function crearCopiasPublicas(fotos, token, informarProgreso = () => {}) {
         `ensayos_publicos/${token}/${nombrePublico}`
       );
 
+      informarProgreso(`Imagen ${numeroImagen}: subiendo la copia pública...`);
       await uploadBytes(referenciaPublica, bytes, {
         contentType: metadataOriginal.contentType || "application/octet-stream"
       });
 
       paths.push(referenciaPublica.fullPath);
+      informarProgreso(`Imagen ${numeroImagen}: obteniendo el enlace de la copia...`);
       urls.push(await getDownloadURL(referenciaPublica));
+      informarProgreso(`Imagen ${numeroImagen}: copia lista.`);
     }
 
     return { urls, paths };
