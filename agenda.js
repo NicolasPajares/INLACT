@@ -245,7 +245,7 @@ function crearTarjeta(actividad) {
         tarjeta.appendChild(descripcion);
     }
 
-    if (!esAdmin && actividad.responsableUid === perfil.uid) {
+    if (actividad.responsableUid === perfil.uid) {
         const acciones = document.createElement("div");
         acciones.className = "agenda-task-actions";
 
