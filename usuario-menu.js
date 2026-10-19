@@ -15,6 +15,17 @@ const opciones = document.getElementById("opcionesUsuario");
 const btnCerrarSesion = document.getElementById("btnCerrarSesion");
 const nombreUsuario = document.getElementById("nombreUsuario");
 
+// Acceso directo a la agenda desde el menú del usuario.
+if (opciones && btnCerrarSesion && !document.getElementById("btnMiAgenda")) {
+    const enlaceAgenda = document.createElement("a");
+    enlaceAgenda.id = "btnMiAgenda";
+    enlaceAgenda.className = "enlace-agenda-usuario";
+    enlaceAgenda.href = "agenda.html";
+    enlaceAgenda.textContent = "▦ Mi agenda";
+    opciones.insertBefore(enlaceAgenda, btnCerrarSesion);
+}
+
+
 // Mostrar el menú del usuario
 btnMenu?.addEventListener("click", (e) => {
     e.stopPropagation();
