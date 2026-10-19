@@ -313,7 +313,11 @@ async function eliminarActividad(actividad) {
     if (!confirm("¿Eliminar la actividad «" + actividad.titulo + "»? Esta acción no se puede deshacer.")) return;
     try {
         await deleteDoc(doc(db, "agenda_actividades", actividad.id));
-        await cargarActividades();
+
+        // Actualizar la lista local sin volver a consultar toda la colección.
+        actividades = actividades.filter(a => a.id !== actividad.id);
+        actualizarResumen();
+        renderizarActividades();
     } catch (error) {
         console.error("Error eliminando actividad:", error);
         alert(error.code === "permission-denied" ? "Firestore todavía no autoriza eliminar actividades de agenda." : "No se pudo eliminar la actividad.");
