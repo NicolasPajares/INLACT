@@ -1041,6 +1041,37 @@ btnTransferir.addEventListener(
                 );
 
 
+            const snapDestino =
+                await getDocs(
+                    qDestino
+                );
+
+
+            let destinoDoc = null;
+
+
+            snapDestino.forEach(
+                docSnap => {
+
+                    /*
+                     * Solo utilizamos un registro
+                     * de destino con cantidad.
+                     */
+
+                    if (
+                        destinoDoc ===
+                        null
+                    ) {
+
+                        destinoDoc =
+                            docSnap;
+
+                    }
+
+                }
+            );
+
+
             /*
              * OBSERVACIÓN
              */
@@ -1066,22 +1097,6 @@ btnTransferir.addEventListener(
                         await transaction.get(
                             origenRef
                         );
-
-                    const snapDestino =
-                        await transaction.get(
-                            qDestino
-                        );
-
-                    let destinoDoc = null;
-
-                    snapDestino.forEach(
-                        docSnap => {
-                            if (destinoDoc === null) {
-                                destinoDoc = docSnap;
-                            }
-                        }
-                    );
-
 
                     if (
                         !origenSnap.exists()
@@ -1147,8 +1162,13 @@ btnTransferir.addEventListener(
                             );
 
 
+                        const destinoSnap =
+                            await transaction.get(
+                                destinoRef
+                            );
+
                         if (
-                            destinoDoc.exists()
+                            destinoSnap.exists()
                         ) {
 
                             const destinoData =
