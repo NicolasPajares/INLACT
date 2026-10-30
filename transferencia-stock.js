@@ -1041,37 +1041,6 @@ btnTransferir.addEventListener(
                 );
 
 
-            const snapDestino =
-                await getDocs(
-                    qDestino
-                );
-
-
-            let destinoDoc = null;
-
-
-            snapDestino.forEach(
-                docSnap => {
-
-                    /*
-                     * Solo utilizamos un registro
-                     * de destino con cantidad.
-                     */
-
-                    if (
-                        destinoDoc ===
-                        null
-                    ) {
-
-                        destinoDoc =
-                            docSnap;
-
-                    }
-
-                }
-            );
-
-
             /*
              * OBSERVACIÓN
              */
@@ -1090,13 +1059,28 @@ btnTransferir.addEventListener(
                 async transaction => {
 
                     /*
-                     * Leer origen
+                     * LEER TODOS LOS DOCUMENTOS ANTES DE ESCRIBIR
                      */
 
                     const origenSnap =
                         await transaction.get(
                             origenRef
                         );
+
+                    const snapDestino =
+                        await transaction.get(
+                            qDestino
+                        );
+
+                    let destinoDoc = null;
+
+                    snapDestino.forEach(
+                        docSnap => {
+                            if (destinoDoc === null) {
+                                destinoDoc = docSnap;
+                            }
+                        }
+                    );
 
 
                     if (
@@ -1148,24 +1132,6 @@ btnTransferir.addEventListener(
 
 
                     /*
-                     * DESCONTAR ORIGEN
-                     */
-
-                    transaction.update(
-                        origenRef,
-                        {
-
-                            cantidad:
-                                nuevaCantidadOrigen,
-
-                            actualizadoEn:
-                                serverTimestamp()
-
-                        }
-                    );
-
-
-                    /*
                      * DESTINO EXISTENTE
                      */
 
@@ -1181,22 +1147,8 @@ btnTransferir.addEventListener(
                             );
 
 
-                        /*
-                         * OJO:
-                         *
-                         * La lectura del destino
-                         * debe hacerse dentro
-                         * de la transacción.
-                         */
-
-                        const destinoSnap =
-                            await transaction.get(
-                                destinoRef
-                            );
-
-
                         if (
-                            destinoSnap.exists()
+                            destinoDoc.exists()
                         ) {
 
                             const destinoData =
@@ -1286,6 +1238,19 @@ btnTransferir.addEventListener(
                         );
 
                     }
+
+                    /*
+                     * DESCONTAR ORIGEN
+                     * (todas las lecturas ya finalizaron)
+                     */
+
+                    transaction.update(
+                        origenRef,
+                        {
+                            cantidad: nuevaCantidadOrigen,
+                            actualizadoEn: serverTimestamp()
+                        }
+                    );
 
                 }
             );
